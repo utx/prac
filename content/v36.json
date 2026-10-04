@@ -1,0 +1,22 @@
+{
+  "version": 36,
+  "date": "2026-10-05",
+  "reading": "Four extracts: Keeping Time",
+  "reading_format": "four extracts",
+  "reading_topic": "time: sundials and water clocks, the body clock, a story about waiting, Kakadu's six seasons",
+  "thinking": [
+    "Spot the mistake (unfair comparison: totals vs class size)",
+    "Timeline chart: longest continuous overlap",
+    "View from someone else's seat"
+  ],
+  "maths": [
+    "Quick-fire scale reading: thermometer",
+    "Cheapest combination for an exact amount (two 6-packs vs 10-pack + singles)",
+    "Picture graph statements with half symbols"
+  ],
+  "sample_map": {
+    "reading": ["PT2 Q26-33 (four extracts)", "PT2 Q26-33 (purpose of a detail)", "PT2 Q26-33"],
+    "thinking": ["PT2 Q21 (detentions), PT3 Q18 (chess fractions)", "PT2 Q13 (lights timeline)", "PT3 Q16 (view from a seat)"],
+    "maths": ["PT3 Q18 (thermometers), PT2 Q11 (scales)", "PT1 Q12 (dog food lowest price)", "PT2 Q32 (picture graph key), PT1 Q27"]
+  }
+}
