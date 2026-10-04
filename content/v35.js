@@ -78,11 +78,11 @@ const TILE_OPTS = [
   tileOpt("centre", "Tile D: triangle in the top-left corner, dot in the centre")
 ];
 
-/* ---- Maths Q3: café menu ---- */
+/* ---- Maths Q3: smoothie menu ---- */
 const MENU_HTML = `<div style="display:inline-block;border:2px solid ${INK};border-radius:8px;padding:10px 18px;margin:10px 0 4px;background:#fffdf6">
-  <div style="font-weight:700;margin-bottom:6px">Build your sandwich</div>
-  <div><b>Bread</b> (choose 1): white, brown, wrap</div>
-  <div><b>Fillings</b> (choose 2 different): cheese, ham, tomato, lettuce</div>
+  <div style="font-weight:700;margin-bottom:6px">Smoothie bar</div>
+  <div>Choose <b>2 different</b> fruits:</div>
+  <div>mango · banana · strawberry · pineapple · kiwi</div>
 </div>`;
 
 const SECTIONS = [
@@ -201,15 +201,19 @@ const SECTIONS = [
                   <p class="why-not">6 (C) is the trap: it shares 12 between only the two friends and forgets Leo himself. 12 (E) stops before the sharing. 3 (A) shares between four people, wrongly counting his sister again. 8 (D) is his sister’s share.</p>`
       },
       {
-        stem: `A café lets you build your own sandwich.
+        stem: `At a smoothie bar, each smoothie is made from two different fruits.
                ${MENU_HTML}
-               <p style="margin:10px 0 0">How many different sandwiches can be made?</p>`,
-        options: ["9", "12", "18", "36", "48"],
+               <p style="margin:10px 0 0">A mango and banana smoothie is the same as a banana and mango smoothie. How many different smoothies can be made?</p>`,
+        options: ["4", "5", "10", "20", "25"],
         answer: 2,
-        skill: "counting combinations without double-counting",
-        explain: `<p>First count the pairs of fillings. With cheese, ham, tomato and lettuce, the different pairs are: cheese + ham, cheese + tomato, cheese + lettuce, ham + tomato, ham + lettuce, tomato + lettuce. That is <b>6</b> pairs. (Cheese + ham is the same sandwich as ham + cheese.)</p>
-                  <p>Each pair can go on any of the 3 breads: 3 × 6 = <b>18</b> sandwiches.</p>
-                  <p class="why-not">36 (D) is the trap: it counts “cheese then ham” and “ham then cheese” as different sandwiches (3 × 4 × 3). 12 (B) only chooses one filling. 9 (A) adds the breads and pairs (3 + 6) instead of multiplying. 48 (E) lets the same filling be chosen twice and counts the order too.</p>`
+        skill: "counting pairs without double-counting",
+        explain: `<p>Work through the fruits in order, pairing each one only with the fruits <em>after</em> it, so no pair is counted twice:</p>
+                  <p>mango with banana, strawberry, pineapple or kiwi: <b>4</b><br>
+                     banana with strawberry, pineapple or kiwi: <b>3</b> (banana + mango is already counted)<br>
+                     strawberry with pineapple or kiwi: <b>2</b><br>
+                     pineapple with kiwi: <b>1</b></p>
+                  <p>4 + 3 + 2 + 1 = <b>10</b> different smoothies.</p>
+                  <p class="why-not">20 (D) is the trap: it pairs each of the 5 fruits with the 4 others (5 × 4), which counts every smoothie twice, since mango + banana and banana + mango are the same. 25 (E) also allows the same fruit twice. 4 (A) is just how many partners one fruit has, and 5 (B) is the number of fruits.</p>`
       }
     ]
   }
