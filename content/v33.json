@@ -1,0 +1,33 @@
+{
+  "version": 33,
+  "date": "2026-10-05",
+  "reading": "Story extract: The Triangle",
+  "reading_format": "story",
+  "thinking": [
+    "Spot the mistake (needed is not a guarantee)",
+    "Timetable and conditions",
+    "Whose reasoning is correct"
+  ],
+  "maths": [
+    "Remainders in context",
+    "Equals sign: missing number",
+    "Place value regrouping"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT2 Q1-6 (story extract)",
+      "PT2 Q1-6",
+      "PT2 Q1-6"
+    ],
+    "thinking": [
+      "PT2 Q17, PT1 Q21",
+      "PT2 Q1, PT3 Q2, PT3 Q7",
+      "PT2 Q27"
+    ],
+    "maths": [
+      "PT3 Q9",
+      "PT1 Q1",
+      "PT3 Q6"
+    ]
+  }
+}
