@@ -1,0 +1,34 @@
+{
+  "version": 34,
+  "date": "2026-10-05",
+  "reading": "Cloze: Hidden in Plain Sight",
+  "reading_format": "cloze",
+  "reading_topic": "geocaching (first-person hobby piece)",
+  "thinking": [
+    "Supports the claim",
+    "Results table with a rule (best of three)",
+    "Dice nets: opposite faces add to 7"
+  ],
+  "maths": [
+    "Quick-fire money: multiply then change",
+    "Chance statements with repeated cards",
+    "Growing matchstick pattern"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1-3 Q7-14 cloze (fixed expressions: 'contain himself', 'springs to mind')",
+      "PT3 Q7-14 cloze ('springs to mind', 'teeming with')",
+      "PT2 Q7-14 cloze ('still stand', 'set a record')"
+    ],
+    "thinking": [
+      "PT2 Q26, PT3 Q3, PT1 Q9",
+      "PT2 Q25 (best of two attempts), PT1 Q19",
+      "PT1 Q10 (dice nets), PT3 Q28"
+    ],
+    "maths": [
+      "PT2 Q7 (soft drinks change), PT1 Q25",
+      "PT1 Q33, PT2 Q14, PT3 Q10",
+      "PT2 Q5, PT1 Q8"
+    ]
+  }
+}

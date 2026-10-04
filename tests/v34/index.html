@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 34</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary {
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 34</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <a class="home" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 34
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: cloze passage ---- */
+const CLOZE_TEXT = `
+<p>The first time Dad suggested geocaching, I rolled my eyes and told him that a treasure hunt using a phone app sounded like something for little kids. Three years and more than two hundred finds later, I have well and truly {1} my words.</p>
+<p>Geocaching began in 2000, and there are now millions of hidden containers, called caches, tucked away all over the world. The app shows you roughly where one is, but the last few metres are up to you. A cache might be a film canister wedged inside a hollow log, or a magnetic box stuck to the back of a sign. Some are hidden in such plain view that you can walk past them a dozen times before the penny {2}.</p>
+<p>Inside every cache is a logbook to sign, and sometimes small trinkets to swap. The rule is simple: if you take something, leave something of equal or greater value.</p>
+<p>The hardest part is not being spotted. Geocachers call people who don’t play “muggles”, and searching a bus shelter while someone is waiting for a bus takes nerves of steel. More than once, I have had to pretend I was tying my shoelace.</p>
+<p>But the best thing about geocaching has nothing to do with treasure. It has taken us to waterfalls, lookouts and laneways we would never have {3} upon otherwise. In a way, the containers are just an excuse to explore.</p>`;
+
+function clozeHtml() {
+  const si = SECTIONS.findIndex(s => s.id === "reading");
+  let t = CLOZE_TEXT;
+  SECTIONS[si].questions.forEach((q, i) => {
+    const chosen = responses[si][i];
+    let fill;
+    if (passMode === "review") fill = `<span class="gap filled correct">(${i + 1}) ${q.options[q.answer]}</span>`;
+    else if (chosen !== null) fill = `<span class="gap filled">(${i + 1}) ${q.options[chosen]}</span>`;
+    else fill = `<span class="gap">(${i + 1}) ……</span>`;
+    t = t.replace(`{${i + 1}}`, fill);
+  });
+  return t;
+}
+const PASSAGE = {
+  title: "Hidden in Plain Sight",
+  note: "Read the text below and decide which answer best fits each gap.",
+  html: clozeHtml
+};
+
+/* ---- Thinking Skills Q2: long jump table ---- */
+const JUMPS = [["Ana", 312, 298, 305], ["Ben", 290, 318, 301], ["Chi", 309, 309, 311], ["Dev", 315, 280, 299], ["Eli", 305, 314, 308]];
+const JUMP_TABLE = (() => {
+  const th = t => `<th style="border-bottom:2px solid ${INK};padding:5px 12px;text-align:center">${t}</th>`;
+  const td = t => `<td style="border-bottom:1px solid #d5dbe5;padding:5px 12px;text-align:center">${t}</td>`;
+  return `<table style="border-collapse:collapse;margin:10px 0 4px;font-size:0.95em">
+    <tr>${th("child")}${th("jump 1")}${th("jump 2")}${th("jump 3")}</tr>
+    ${JUMPS.map(r => `<tr>${r.map(td).join("")}</tr>`).join("")}
+  </table>`;
+})();
+
+/* ---- Thinking Skills Q3: dice nets ---- */
+const NETS = {
+  cross: [[0, 1, 3], [1, 0, 1], [1, 1, 2], [1, 2, 5], [1, 3, 6], [2, 1, 4]],
+  stair: [[0, 0, 1], [0, 1, 2], [1, 1, 3], [1, 2, 6], [2, 2, 4], [2, 3, 5]],
+  twoRow: [[0, 0, 2], [0, 1, 1], [0, 2, 5], [1, 2, 6], [1, 3, 4], [1, 4, 3]],
+  valid: [[0, 0, 5], [1, 0, 1], [1, 1, 3], [1, 2, 6], [1, 3, 4], [2, 3, 2]]
+};
+function netSvg(cells, label) {
+  const u = 26, R = Math.max(...cells.map(c => c[0])) + 1, C = Math.max(...cells.map(c => c[1])) + 1;
+  const W = 5 * u + 6, H = 3 * u + 6, ox = (W - C * u) / 2, oy = (H - R * u) / 2;
+  let g = "";
+  cells.forEach(([r, c, n]) => g += `<rect x="${ox + c * u}" y="${oy + r * u}" width="${u}" height="${u}" fill="#fff" stroke="${INK}" stroke-width="1.8"/>
+    <text x="${ox + c * u + u / 2}" y="${oy + r * u + u / 2 + 6}" font-size="17" font-weight="700" text-anchor="middle" fill="${INK}">${n}</text>`);
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${label}">${g}</svg>`;
+}
+const NET_OPTS = [
+  netSvg(NETS.cross, "Net A: a cross. Middle row 1, 2, 5, 6. 3 above the 2 and 4 below the 2."),
+  netSvg(NETS.stair, "Net B: a staircase. Top row 1, 2. Middle row 3, 6. Bottom row 4, 5, each row shifted one square right."),
+  netSvg(NETS.twoRow, "Net C: two rows of three. Top row 2, 1, 5. Bottom row 6, 4, 3, starting under the 5."),
+  netSvg(NETS.valid, "Net D: a row of four squares 1, 3, 6, 4, with 5 above the 1 and 2 below the 4.")
+];
+
+/* ---- Maths Q2: number cards ---- */
+const CARD_NUMS = [2, 3, 3, 5, 6, 6, 6, 8, 9, 10];
+const NUM_CARDS_SVG = (() => {
+  let g = "";
+  CARD_NUMS.forEach((d, i) => {
+    const x = (i % 5) * 46, y = Math.floor(i / 5) * 58;
+    g += `<rect x="${x}" y="${y}" width="38" height="50" rx="6" fill="#fff8e6" stroke="${INK}" stroke-width="1.8"/>
+          <text x="${x + 19}" y="${y + 33}" font-size="21" font-weight="700" text-anchor="middle" fill="${INK}">${d}</text>`;
+  });
+  return `<svg viewBox="-2 -2 226 112" width="226" height="112" role="img" aria-label="Ten number cards: 2, 3, 3, 5, 6, 6, 6, 8, 9 and 10.">${g}</svg>`;
+})();
+
+/* ---- Maths Q3: matchstick pattern ---- */
+const MATCH_SVG = (() => {
+  const s = 34, gap = 40, stick = (x1, y1, x2, y2) => { const dx = Math.sign(x2 - x1) * 4, dy = Math.sign(y2 - y1) * 4;
+    return `<line x1="${x1 + dx}" y1="${y1 + dy}" x2="${x2 - dx}" y2="${y2 - dy}" stroke="#c9852b" stroke-width="4.5" stroke-linecap="round"/>`; };
+  let g = "", x0 = 26;
+  [1, 2, 3].forEach(n => {
+    for (let k = 0; k <= n; k++) g += stick(x0 + k * s, 50, x0 + k * s, 50 - s);
+    for (let k = 0; k < n; k++) { g += stick(x0 + k * s, 50 - s, x0 + (k + 1) * s, 50 - s); g += stick(x0 + k * s, 50, x0 + (k + 1) * s, 50); }
+    g += `<text x="${x0 + n * s / 2}" y="76" font-size="13" text-anchor="middle" fill="${INK}">Pattern ${n}</text>`;
+    x0 += n * s + gap;
+  });
+  return `<svg viewBox="0 6 ${x0 - gap + 26} 78" width="${Math.round((x0 - gap + 26) * 1.35)}" height="${Math.round(78 * 1.35)}" role="img" aria-label="Matchstick patterns. Pattern 1 is one square made of 4 matchsticks. Pattern 2 is two squares in a row made of 7 matchsticks. Pattern 3 is three squares in a row made of 10 matchsticks.">${g}</svg>`;
+})();
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Read the text, then decide which answer (A, B, C or D) best fits each gap.",
+    questions: [
+      {
+        stem: "Which word best fits <b>gap 1</b>?",
+        options: ["bitten", "tasted", "eaten", "chewed"],
+        answer: 2,
+        skill: "completing an idiom",
+        explain: `<p>To <b>eat your words</b> means to admit that something you said was wrong. The writer once told Dad that geocaching was for little kids, but after hundreds of finds they clearly love it, so they have “eaten their words”.</p>
+                  <p class="why-not">“Bitten” is the trap: “bite your tongue” is a real expression, but it means stopping yourself from saying something, not admitting you were wrong. “Chewed” is close too (“chew something over” means think about it), but it doesn’t go with “words” in this way. “Tasted” makes no sense here.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 2</b>?",
+        options: ["drops", "falls", "sinks", "lands"],
+        answer: 0,
+        skill: "completing a fixed expression",
+        explain: `<p>“The penny <b>drops</b>” means that someone finally understands or notices something. Here, you walk past a cache many times before you suddenly realise it was right in front of you.</p>
+                  <p class="why-not">“Falls” is the trap: it means almost the same as “drops”, but the expression only works with “drops”. Nobody says “the penny falls”. “Sinks” and “lands” are also movements downward, but neither makes the expression.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 3</b>?",
+        options: ["tripped", "slipped", "clambered", "stumbled"],
+        answer: 3,
+        skill: "choosing the word that goes with “upon”",
+        explain: `<p>To <b>stumble upon</b> something means to find it by chance. That is exactly the point of the paragraph: geocaching led the family to places they would never have found otherwise.</p>
+                  <p class="why-not">“Tripped” is the trap: it is close in meaning to “stumbled”, but you trip <em>over</em> something, and “tripped upon” doesn’t mean finding something by chance. “Slipped” doesn’t go with “upon” either. “Clambered” means climbed with difficulty.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0"><em class="speaker">Mr Lim:</em> “Students should walk or ride to school whenever they can, because it helps them arrive ready to learn.”</p>
+               <p style="margin:10px 0 0">Which one of these statements, if true, best supports Mr Lim’s claim?</p>`,
+        options: ["Students who are active before school tend to concentrate better in their first lessons.",
+                  "There is much less traffic outside the school gate in the mornings when more students walk or ride.",
+                  "Students who walk or ride usually arrive at school earlier than students who are driven.",
+                  "Walking or riding to school costs families less than driving every day."],
+        answer: 0,
+        skill: "choosing the evidence that supports a claim",
+        explain: `<p>Mr Lim’s <em>reason</em> is that walking or riding helps students “arrive ready to learn”. A links being active before school with concentrating better in class, which is exactly what “ready to learn” means.</p>
+                  <p class="why-not">C is the trap: it is about students <em>arriving</em>, but arriving earlier doesn’t mean arriving <em>ready to learn</em>. B (less traffic) and D (cost) are real benefits of walking and riding, but they are different reasons from the one Mr Lim gives.</p>`
+      },
+      {
+        stem: `In a long jump competition, each child had three jumps. Only each child’s <b>longest</b> jump counted. The table shows every jump, in centimetres.
+               ${JUMP_TABLE}
+               <p style="margin:10px 0 0">Who came <b>second</b>?</p>`,
+        options: ["Ana", "Chi", "Dev", "Eli"],
+        answer: 2,
+        skill: "reading a table using a rule",
+        explain: `<p>Find each child’s longest jump: Ana 312, Ben <b>318</b>, Chi 311, Dev <b>315</b>, Eli 314.</p>
+                  <p>Ben came first with 318, and <b>Dev</b> came second with 315.</p>
+                  <p class="why-not">B (Chi) is the trap: Chi’s three jumps add up to the most (929 cm), but only the longest jump counts. D (Eli) has the second-highest total. A (Ana) is second if you only look at the first jumps.</p>`
+      },
+      {
+        stem: `On a normal dice, the numbers on opposite faces always add up to 7 (1 and 6, 2 and 5, 3 and 4).
+               <p style="margin:10px 0 0">Which net folds up to make a normal dice?</p>`,
+        visualOptions: true,
+        options: NET_OPTS,
+        answer: 3,
+        skill: "picturing which faces of a net end up opposite",
+        explain: `<p>When a net is folded, two squares end up opposite each other if they are <b>two apart in a straight line</b> (with one square between them). Check each net:</p>
+                  <p><b>D:</b> in the row 1, 3, 6, 4, the pairs two apart are 1 and 6, and 3 and 4. The 5 and the 2 are on opposite sides of the row and fold onto opposite faces. All three pairs add to 7 ✓</p>
+                  <p class="why-not"><b>A</b> is the trap: 1 and 6 are at the two <em>ends</em> of the row, which looks right, but squares at the ends of a row of four end up next to each other, not opposite. In the row 1, 2, 5, 6, the opposite pairs are 1 and 5, and 2 and 6. <b>B</b> gets 1 and 6 opposite, but its other pairs are 2 and 4, and 3 and 5. <b>C</b> gets 2 and 5 opposite, but pairs 1 with 4 and 3 with 6.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `Pens cost $1.35 each. Mia buys 4 pens and pays with a $10 note.
+               <p style="margin:10px 0 0">How much change should she get?</p>`,
+        options: ["$4.60", "$5.40", "$5.60", "$6.00", "$8.65"],
+        answer: 0,
+        skill: "money: multiplying, then finding change",
+        explain: `<p>4 pens cost 4 × $1.35. Split it up: 4 × $1 = $4 and 4 × 35c = $1.40, so 4 pens cost <b>$5.40</b>.</p>
+                  <p>Change: $10 − $5.40 = <b>$4.60</b>.</p>
+                  <p class="why-not">$5.40 (B) is the trap: it is what the pens cost, not the change. $5.60 (C) works out 4 × 35c as 40c, forgetting to carry the extra dollar, so the pens seem to cost $4.40. $6.00 (D) rounds each pen down to $1. $8.65 (E) is the change for just one pen.</p>`
+      },
+      {
+        stem: `These ten number cards are put in a bag. One card is picked without looking.
+               <div class="figure">${NUM_CARDS_SVG}</div>
+               <ol style="margin:8px 0 0;padding-left:22px">
+                 <li>Picking an even number is more likely than picking an odd number.</li>
+                 <li>Picking a 6 is just as likely as picking a number less than 5.</li>
+                 <li>It is certain that the card picked will show a number less than 10.</li>
+               </ol>
+               <p style="margin:8px 0 0">Which of these statements is/are correct?</p>`,
+        options: ["statement 1 only", "statement 2 only", "statements 1 and 2 only", "statements 1 and 3 only", "statements 1, 2 and 3"],
+        answer: 2,
+        skill: "chance: counting outcomes, including repeated cards",
+        explain: `<p><b>1:</b> the even cards are 2, 6, 6, 6, 8 and 10, which is 6 cards. The odd cards are 3, 3, 5 and 9, which is 4 cards. Even is more likely ✓</p>
+                  <p><b>2:</b> there are three 6s, and three cards less than 5 (2, 3 and 3). They are equally likely ✓</p>
+                  <p><b>3:</b> one card shows 10, and 10 is <em>not</em> less than 10. So it isn’t certain ✗</p>
+                  <p class="why-not">E is the trap: statement 3 feels true because almost every card is small, but “certain” means it must happen every time, and the 10 card stops that. Counting each number only once (forgetting the repeated 3s and 6s) can make statements 1 and 2 look wrong.</p>`
+      },
+      {
+        stem: `Here are the first three patterns in a sequence made from matchsticks.
+               <div class="figure">${MATCH_SVG}</div>
+               <p style="margin:10px 0 0">How many matchsticks are needed for Pattern 20?</p>`,
+        options: ["60", "61", "62", "64", "80"],
+        answer: 1,
+        skill: "finding the rule for a growing pattern",
+        explain: `<p>Pattern 1 uses 4 matchsticks, and each new square adds <b>3</b> more (it shares one side with the square before). So the patterns go 4, 7, 10, 13, …</p>
+                  <p>Pattern 20 is the first square plus 19 more squares: 4 + 19 × 3 = 4 + 57 = <b>61</b>. (Or: 3 for every square, plus the 1 starting stick: 3 × 20 + 1 = 61.)</p>
+                  <p class="why-not">62 (C) is the trap: Pattern 10 uses 31 matchsticks, but doubling it counts the shared starting stick twice. 80 (E) uses 4 matchsticks for every square, forgetting that they share sides. 60 (A) forgets the very first stick. 64 (D) adds 20 lots of 3 to Pattern 1, which is one square too many.</p>`
+      }
+    ]
+  }
+];
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 34</h1>
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  window.scrollTo(0, 0);
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+
+showStart();
+</script>
+</body>
+</html>
