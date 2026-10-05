@@ -113,6 +113,107 @@
 <script>
 const TESTS = [{"version": 33, "reading": "Story extract: The Wind in the Willows (Kenneth Grahame)", "reading_format": "story", "categories": {"reading": ["Vocabulary & idioms", "Purpose of a detail", "Tone & attitude"], "thinking": ["Spot the mistake", "Tables & timetables", "Whose reasoning"], "maths": ["Number & place value", "Number & place value", "Number & place value"]}}, {"version": 34, "reading": "Cloze: Hidden in Plain Sight", "reading_format": "cloze", "categories": {"reading": ["Vocabulary & idioms", "Vocabulary & idioms", "Vocabulary & idioms"], "thinking": ["Supports the claim", "Tables & timetables", "Spatial"], "maths": ["Money & best value", "Chance & counting", "Patterns & sequences"]}}, {"version": 35, "reading": "Missing sentences: Passengers of the Sky", "reading_format": "missing sentences", "categories": {"reading": ["Sentence links", "Sentence links", "Sentence links"], "thinking": ["Whose reasoning", "Order & arrangement", "Spatial"], "maths": ["Time & timetables", "Fractions", "Chance & counting"]}}, {"version": 36, "reading": "Four extracts: Keeping Time", "reading_format": "four extracts", "categories": {"reading": ["Feelings & inference", "Purpose of a detail", "Main idea"], "thinking": ["Spot the mistake", "Tables & timetables", "Spatial"], "maths": ["Measurement & scales", "Money & best value", "Graphs & data"]}}, {"version": 37, "reading": "Poem: The Lamplighter (Robert Louis Stevenson)", "reading_format": "poem", "categories": {"reading": ["Vocabulary & idioms", "Purpose of a detail", "Feelings & inference"], "thinking": ["Supports the claim", "Tables & timetables", "Spatial"], "maths": ["Measurement & scales", "Area, perimeter & 3D", "Rates"]}}, {"version": 38, "reading": "Story extract: Some Assembly Required", "reading_format": "story", "categories": {"reading": ["Purpose of a detail", "Comparisons & imagery", "Character & structure"], "thinking": ["Spot the mistake", "Tables & timetables", "Spatial"], "maths": ["Graphs & data", "Area, perimeter & 3D", "Fractions"]}}, {"version": 39, "reading": "Cloze: Low Tide", "reading_format": "cloze", "categories": {"reading": ["Vocabulary & idioms", "Vocabulary & idioms", "Vocabulary & idioms"], "thinking": ["Whose reasoning", "Order & arrangement", "Spatial"], "maths": ["Number & place value", "Time & timetables", "Patterns & sequences"]}}, {"version": 40, "reading": "Missing sentences: Cracking the Code", "reading_format": "missing sentences", "categories": {"reading": ["Sentence links", "Sentence links", "Sentence links"], "thinking": ["Supports the claim", "Tables & timetables", "Spatial"], "maths": ["Time & timetables", "Fractions", "Area, perimeter & 3D"]}}];
 const CATEGORIES = {"reading": ["Purpose of a detail", "Comparisons & imagery", "Feelings & inference", "Character & structure", "Tone & attitude", "Main idea", "Vocabulary & idioms", "Sentence links"], "thinking": ["Spot the mistake", "Supports the claim", "Whose reasoning", "Must or cannot be true", "Tables & timetables", "Order & arrangement", "Rules & codes", "Spatial", "Number problems"], "maths": ["Number & place value", "Time & timetables", "Money & best value", "Measurement & scales", "Graphs & data", "Fractions", "Patterns & sequences", "Area, perimeter & 3D", "Chance & counting", "Rates"]};
+const SYNC_CONFIG = {"supabase_url": "", "supabase_publishable_key": ""};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  return r.json();
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
 const KEY = "prac.v1";
 const PIN_HASH = "88e4eb6c3c041225c1cec20d38f53a35bf13c9909242528f10224affc9a473b2"; // sha256("prac-admin:" + PIN)
 const SECTION_NAMES = { reading: "Reading", thinking: "Thinking Skills", maths: "Maths" };
@@ -151,8 +252,9 @@ function showGate() {
     const v = document.getElementById("pin").value.trim();
     const h = await sha256("prac-admin:" + v);
     if (h === PIN_HASH) {
-      try { sessionStorage.setItem("prac.admin", "1"); } catch (err) {}
+      try { sessionStorage.setItem("prac.admin", "1"); sessionStorage.setItem("prac.admin.pin", v); } catch (err) {}
       render();
+      pullRemote();
     } else {
       document.getElementById("err").textContent = h === null ? "This browser can’t check the PIN here. Open the page over https." : "That PIN isn’t right.";
       document.getElementById("pin").value = "";
@@ -322,7 +424,7 @@ function render() {
     }).join("")}</table></div></div>`;
 
   const data = `<div class="card"><h2>Data</h2>
-    <p class="sub">Progress is saved in this browser on this device only. Export a backup now and then, or to move it to another device.</p>
+    <p class="sub">${syncOn() ? `Progress is saved online and also in each browser that is used. ${syncStatus}` : "Progress is saved in this browser on this device only. Export a backup now and then, or to move it to another device."}</p>
     <div class="actions"><button class="btn" id="export">Export backup</button>
       <label class="btn">Import backup<input type="file" id="import" accept="application/json,.json" hidden></label>
       <button class="btn danger" id="clear">Clear all progress</button></div></div>`;
@@ -332,8 +434,10 @@ function render() {
 
   app.querySelectorAll("[data-flag]").forEach(b => b.onclick = () => {
     const s = load(), v = b.dataset.flag;
-    if (s.flags[v] && s.flags[v].completed) delete s.flags[v]; else s.flags[v] = { completed: true, at: new Date().toISOString(), manual: true };
+    const wasDone = !!(s.flags[v] && s.flags[v].completed);
+    s.flags[v] = { completed: !wasDone, at: new Date().toISOString(), manual: true, total: s.flags[v] && s.flags[v].total };
     save(s); render();
+    syncPost(wasDone ? "unflag" : "flag", v, null, { manual: true, from: "admin" });
   });
   document.getElementById("export").onclick = () => {
     const blob = new Blob([JSON.stringify(load(), null, 2)], { type: "application/json" });
@@ -354,13 +458,28 @@ function render() {
     } catch (err) { alert("That file couldn’t be read: " + err.message); }
   };
   document.getElementById("clear").onclick = () => {
-    if (!confirm("Delete all recorded progress and completed flags on this device? Export a backup first if you might want it.")) return;
+    if (!confirm(syncOn() ? "Clear the copy of progress stored in this browser? The online copy is kept and will be loaded again next time." : "Delete all recorded progress and completed flags on this device? Export a backup first if you might want it.")) return;
     save({ attempts: [], flags: {} }); render();
   };
 }
 
-document.getElementById("lock").onclick = () => { try { sessionStorage.removeItem("prac.admin"); } catch (e) {} showGate(); };
-if (unlocked()) render(); else showGate();
+let syncStatus = "";
+async function pullRemote() {
+  if (!syncOn()) return;
+  let pin = "";
+  try { pin = sessionStorage.getItem("prac.admin.pin") || ""; } catch (e) {}
+  try {
+    await syncFlush();
+    const events = await syncRpc("admin_events", { p_pin: pin });
+    save(syncMergeEvents(load(), events));
+    syncStatus = `Last loaded from online just now (${events.length} records).`;
+  } catch (e) {
+    syncStatus = "Couldn’t load the online copy just now, so this shows this browser’s copy only.";
+  }
+  if (unlocked()) render();
+}
+document.getElementById("lock").onclick = () => { try { sessionStorage.removeItem("prac.admin"); sessionStorage.removeItem("prac.admin.pin"); } catch (e) {} showGate(); };
+if (unlocked()) { render(); pullRemote(); } else showGate();
 </script>
 </body>
 </html>
