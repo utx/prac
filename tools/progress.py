@@ -24,7 +24,7 @@ def config():
     if not url or not key:
         print("progress.py: SUPABASE_URL / SUPABASE_SERVICE_KEY not set", file=sys.stderr)
         sys.exit(2)
-    return url.rstrip("/"), key
+    return re.sub(r"/rest/v1$", "", url.rstrip("/")), key
 
 
 def fetch_events(url, key):
