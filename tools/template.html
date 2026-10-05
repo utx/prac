@@ -223,6 +223,7 @@
 <script>
 /*__CONTENT__*/
 /*__META__*/
+/*__SYNC__*/
 const LETTERS = ["A", "B", "C", "D", "E"];
 const app = document.getElementById("app");
 const hdrSection = document.getElementById("hdr-section");
@@ -269,12 +270,14 @@ function recordSection(i) {
       chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
       stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
   persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
 }
 function finishAttempt() {
   if (!attempt) return;
   attempt.finished = new Date().toISOString();
   attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
   persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
   attempt = null;
 }
 function completedNote() {

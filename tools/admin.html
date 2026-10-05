@@ -112,6 +112,7 @@
 
 <script>
 /*__TESTS__*/
+/*__SYNC__*/
 const KEY = "prac.v1";
 const PIN_HASH = "88e4eb6c3c041225c1cec20d38f53a35bf13c9909242528f10224affc9a473b2"; // sha256("prac-admin:" + PIN)
 const SECTION_NAMES = { reading: "Reading", thinking: "Thinking Skills", maths: "Maths" };
@@ -150,8 +151,9 @@ function showGate() {
     const v = document.getElementById("pin").value.trim();
     const h = await sha256("prac-admin:" + v);
     if (h === PIN_HASH) {
-      try { sessionStorage.setItem("prac.admin", "1"); } catch (err) {}
+      try { sessionStorage.setItem("prac.admin", "1"); sessionStorage.setItem("prac.admin.pin", v); } catch (err) {}
       render();
+      pullRemote();
     } else {
       document.getElementById("err").textContent = h === null ? "This browser can’t check the PIN here. Open the page over https." : "That PIN isn’t right.";
       document.getElementById("pin").value = "";
@@ -321,7 +323,7 @@ function render() {
     }).join("")}</table></div></div>`;
 
   const data = `<div class="card"><h2>Data</h2>
-    <p class="sub">Progress is saved in this browser on this device only. Export a backup now and then, or to move it to another device.</p>
+    <p class="sub">${syncOn() ? `Progress is saved online and also in each browser that is used. ${syncStatus}` : "Progress is saved in this browser on this device only. Export a backup now and then, or to move it to another device."}</p>
     <div class="actions"><button class="btn" id="export">Export backup</button>
       <label class="btn">Import backup<input type="file" id="import" accept="application/json,.json" hidden></label>
       <button class="btn danger" id="clear">Clear all progress</button></div></div>`;
@@ -331,8 +333,10 @@ function render() {
 
   app.querySelectorAll("[data-flag]").forEach(b => b.onclick = () => {
     const s = load(), v = b.dataset.flag;
-    if (s.flags[v] && s.flags[v].completed) delete s.flags[v]; else s.flags[v] = { completed: true, at: new Date().toISOString(), manual: true };
+    const wasDone = !!(s.flags[v] && s.flags[v].completed);
+    s.flags[v] = { completed: !wasDone, at: new Date().toISOString(), manual: true, total: s.flags[v] && s.flags[v].total };
     save(s); render();
+    syncPost(wasDone ? "unflag" : "flag", v, null, { manual: true, from: "admin" });
   });
   document.getElementById("export").onclick = () => {
     const blob = new Blob([JSON.stringify(load(), null, 2)], { type: "application/json" });
@@ -353,13 +357,28 @@ function render() {
     } catch (err) { alert("That file couldn’t be read: " + err.message); }
   };
   document.getElementById("clear").onclick = () => {
-    if (!confirm("Delete all recorded progress and completed flags on this device? Export a backup first if you might want it.")) return;
+    if (!confirm(syncOn() ? "Clear the copy of progress stored in this browser? The online copy is kept and will be loaded again next time." : "Delete all recorded progress and completed flags on this device? Export a backup first if you might want it.")) return;
     save({ attempts: [], flags: {} }); render();
   };
 }
 
-document.getElementById("lock").onclick = () => { try { sessionStorage.removeItem("prac.admin"); } catch (e) {} showGate(); };
-if (unlocked()) render(); else showGate();
+let syncStatus = "";
+async function pullRemote() {
+  if (!syncOn()) return;
+  let pin = "";
+  try { pin = sessionStorage.getItem("prac.admin.pin") || ""; } catch (e) {}
+  try {
+    await syncFlush();
+    const events = await syncRpc("admin_events", { p_pin: pin });
+    save(syncMergeEvents(load(), events));
+    syncStatus = `Last loaded from online just now (${events.length} records).`;
+  } catch (e) {
+    syncStatus = "Couldn’t load the online copy just now, so this shows this browser’s copy only.";
+  }
+  if (unlocked()) render();
+}
+document.getElementById("lock").onclick = () => { try { sessionStorage.removeItem("prac.admin"); sessionStorage.removeItem("prac.admin.pin"); } catch (e) {} showGate(); };
+if (unlocked()) { render(); pullRemote(); } else showGate();
 </script>
 </body>
 </html>

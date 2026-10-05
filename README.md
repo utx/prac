@@ -19,6 +19,10 @@ Short practice papers, each with 3 reading, 3 thinking skills and 3 maths questi
 | `tools/check.sh` | Builds, then runs both checks on the given tests (`tools/check.sh 40`). |
 | `tools/check_tracking.js` | End-to-end check of progress tracking, completed flags, the admin PIN and practice mode. |
 | `.github/workflows/check.yml` | Runs the build and all checks automatically on every pull request. |
+| `tools/sync.js`, `tools/site_config.json` | Sends progress to the online database (Supabase) when configured. |
+| `supabase/setup.sql` | One-time database setup (paste into Supabase's SQL editor). |
+| `tools/progress.py` | Summarises online progress (uncompleted tests, weak areas) for the overnight job. |
+| `.claude/skills/overnight/` | The nightly build procedure. |
 | `tools/question_sheet.js` | Makes an answer-free text copy of a test for independent checking. |
 | `.claude/skills/new-test/` | Step-by-step procedure Claude follows to build a new test. |
 | `tools/check_render.js` | Answers every question at desktop and phone widths, checks 9/9, sideways scrolling and page errors. |
@@ -36,6 +40,6 @@ Short practice papers, each with 3 reading, 3 thinking skills and 3 maths questi
 
 ## Progress and stats
 
-Finishing a test from the main page records the answers in that browser and marks the test as completed. The parent page at `pracadmin/` (PIN required) shows the stats and lets you open any test in practice mode, which records nothing. Progress is stored per browser and device; use Export/Import on the admin page to back it up or move it.
+Finishing a test from the main page records the answers in that browser and marks the test as completed. The parent page at `pracadmin/` (PIN required) shows the stats and lets you open any test in practice mode, which records nothing. Once the online database is connected, progress is shared across devices and the admin page loads it after the PIN; until then it is stored per browser (Export/Import on the admin page moves it).
 
 The official sample papers are copyright and are deliberately **not** stored here.

@@ -14,6 +14,9 @@ import datetime, html, json, pathlib, re
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEMPLATE = (ROOT / "tools" / "template.html").read_text(encoding="utf-8")
 ADMIN_TEMPLATE = (ROOT / "tools" / "admin.html").read_text(encoding="utf-8")
+SITE_CONFIG = json.loads((ROOT / "tools" / "site_config.json").read_text(encoding="utf-8"))
+SYNC_JS = ("const SYNC_CONFIG = " + json.dumps(SITE_CONFIG) + ";\n"
+           + (ROOT / "tools" / "sync.js").read_text(encoding="utf-8"))
 
 # Question types used for the stats page. Every question in content/vNN.json
 # "categories" must use one of these labels.
@@ -73,7 +76,7 @@ def page_meta(n, meta):
 def build_test(n, js, meta):
     content = js.read_text(encoding="utf-8")
     meta_js = "const TEST_META = " + json.dumps(page_meta(n, meta), ensure_ascii=False) + ";"
-    page = TEMPLATE.replace("{{N}}", str(n)).replace("/*__CONTENT__*/", content).replace("/*__META__*/", meta_js)
+    page = TEMPLATE.replace("{{N}}", str(n)).replace("/*__CONTENT__*/", content).replace("/*__META__*/", meta_js).replace("/*__SYNC__*/", SYNC_JS)
     dest = ROOT / "tests" / f"v{n}" / "index.html"
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(page, encoding="utf-8")
@@ -105,7 +108,7 @@ def build_admin(vs):
     tests = [{"version": n, "reading": meta.get("reading", ""), "reading_format": meta.get("reading_format", ""),
               "categories": meta.get("categories", {})} for n, _, meta in vs]
     page = ADMIN_TEMPLATE.replace("/*__TESTS__*/", "const TESTS = " + json.dumps(tests, ensure_ascii=False) + ";\n"
-                                  + "const CATEGORIES = " + json.dumps(CATEGORIES, ensure_ascii=False) + ";")
+                                  + "const CATEGORIES = " + json.dumps(CATEGORIES, ensure_ascii=False) + ";").replace("/*__SYNC__*/", SYNC_JS)
     dest = ROOT / "pracadmin" / "index.html"
     dest.parent.mkdir(exist_ok=True)
     dest.write_text(page, encoding="utf-8")
@@ -113,7 +116,7 @@ def build_admin(vs):
 
 def build_index(vs):
     cards = "\n".join(card(n, meta) for n, _, meta in reversed(vs))
-    page = INDEX.replace("{{CARDS}}", cards).replace("{{COUNT}}", str(len(vs)))
+    page = INDEX.replace("{{CARDS}}", cards).replace("{{COUNT}}", str(len(vs))).replace("/*__SYNC__*/", SYNC_JS)
     (ROOT / "index.html").write_text(page, encoding="utf-8")
 
 
@@ -179,6 +182,7 @@ INDEX = """<!DOCTYPE html>
   </div>
 </main>
 <script>
+/*__SYNC__*/
 (() => {
   const KEY = "prac.v1";
   const load = () => {
@@ -194,6 +198,7 @@ INDEX = """<!DOCTYPE html>
     cards.forEach(card => {
       const v = card.dataset.v, f = st.flags[v], isDone = !!(f && f.completed);
       const firstFinished = st.attempts.filter(a => String(a.v) === v && a.finished).sort((a, b) => a.finished < b.finished ? -1 : 1)[0];
+      const firstTotal = firstFinished && typeof firstFinished.total === "number" ? firstFinished.total : (f && typeof f.total === "number" ? f.total : null);
       card.classList.toggle("done", isDone);
       const tag = card.querySelector(".done-tag");
       tag.hidden = !isDone;
@@ -201,7 +206,7 @@ INDEX = """<!DOCTYPE html>
         done++;
         const d = new Date(f.at);
         tag.textContent = "✓ Completed" + (isNaN(d) ? "" : " " + d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }))
-          + (firstFinished && typeof firstFinished.total === "number" ? " · " + firstFinished.total + "/9" : "");
+          + (firstTotal !== null ? " · " + firstTotal + "/9" : "");
       }
       card.querySelector(".go").textContent = isDone ? "Open again →" : "Start →";
       const btn = card.querySelector(".flag");
@@ -209,14 +214,17 @@ INDEX = """<!DOCTYPE html>
       btn.onclick = e => {
         e.preventDefault(); e.stopPropagation();
         const s = load();
-        if (isDone) delete s.flags[v]; else s.flags[v] = { completed: true, at: new Date().toISOString(), manual: true };
+        const at = new Date().toISOString();
+        s.flags[v] = { completed: !isDone, at, manual: true, total: s.flags[v] && s.flags[v].total };
         save(s); paint();
+        syncPost(isDone ? "unflag" : "flag", v, null, { manual: true });
       };
     });
     document.getElementById("progress").textContent = done ? `${done} of ${cards.length} completed.` : "";
   }
   paint();
   window.addEventListener("pageshow", paint);
+  if (syncOn()) syncRpc("public_flags").then(rows => { save(syncMergeFlags(load(), rows)); paint(); }).catch(() => {});
 })();
 </script>
 </body>

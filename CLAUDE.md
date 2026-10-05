@@ -63,6 +63,14 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - `pracadmin/` (built from `tools/admin.html`) is the PIN-protected stats page. Tests opened from it use `?admin=1` and record nothing. The PIN check is client-side only.
 - Keep the template's tracking hooks working when changing `tools/template.html`; `node tools/check_tracking.js` checks them end to end.
 
+## Online progress (Supabase)
+- `tools/sync.js` (injected into every page by `build.py`) sends progress events to Supabase when `tools/site_config.json` has a URL and publishable key; otherwise the site uses browser storage only. Database setup: `supabase/setup.sql`.
+- The public key can only add events. The admin page reads through `admin_events(pin)` (PIN checked in the database); the menu reads `public_flags()`.
+- `python3 tools/progress.py [--json]` summarises progress for Claude (needs `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` in the environment settings). `python3 tools/configure_sync.py` fills `site_config.json` from `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
+
+## Overnight builds
+- A routine runs the `overnight` skill (`.claude/skills/overnight/SKILL.md`) at about 1 am Sydney time: when fewer than 10 published tests are uncompleted it builds 10 new ones, opens one pull request and merges it once the checks are green (agreed by David).
+
 ## Automatic checks
 - `.github/workflows/check.yml` runs on every pull request and push to `main`: build (validates question types and stretch tags), generated files up to date, `tools/check.sh` on every test, and `tools/check_tracking.js`. A red cross on a pull request must be fixed before merging.
 
