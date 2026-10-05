@@ -34,30 +34,30 @@ const CARNIVAL_TABLE = `<div class="table-wrap"><table class="grid">
 </table></div>`;
 
 /* ---- Thinking Skills Q3: puzzle board ---- */
-const cellsSvg = (cells, c, fill, label) => {
-  const w = Math.max(...cells.map(([, k]) => k)) + 1, h = Math.max(...cells.map(([r]) => r)) + 1;
-  const g = cells.map(([r, k]) => `<rect x="${4 + k * c}" y="${4 + r * c}" width="${c}" height="${c}" fill="${fill}" stroke="${INK}" stroke-width="1.5"/>`).join("");
-  return `<svg viewBox="0 0 ${w * c + 8} ${h * c + 8}" width="${w * c + 8}" height="${h * c + 8}" role="img" aria-label="${label}">${g}</svg>`;
-};
+const PLACED = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [2, 0]];
 const BOARD_SVG = (() => {
-  const c = 34, ox = 6, oy = 6;
-  const A = [[0, 0], [0, 1], [1, 0], [1, 1]];
-  const B = [[2, 0], [2, 1], [2, 2], [3, 0], [3, 1], [3, 2], [3, 3]];
-  const gap = [[0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
+  const c = 34, o = 6;
   let g = "";
-  gap.forEach(([r, k]) => g += `<rect x="${ox + k * c}" y="${oy + r * c}" width="${c}" height="${c}" fill="#fff" stroke="#9aa6bb" stroke-width="1" stroke-dasharray="3 3"/>`);
-  A.forEach(([r, k]) => g += `<rect x="${ox + k * c}" y="${oy + r * c}" width="${c}" height="${c}" fill="#e0a43a" stroke="${INK}" stroke-width="1"/>`);
-  B.forEach(([r, k]) => g += `<rect x="${ox + k * c}" y="${oy + r * c}" width="${c}" height="${c}" fill="#5b7db1" stroke="${INK}" stroke-width="1"/>`);
-  g += `<rect x="${ox}" y="${oy}" width="${4 * c}" height="${4 * c}" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
-  return `<svg viewBox="0 0 ${4 * c + 12} ${4 * c + 12}" width="${4 * c + 12}" height="${4 * c + 12}" role="img" aria-label="A 4 by 4 board. A 2 by 2 piece fills the top-left corner. A 7-square piece fills the bottom row and the first three squares of the row above it. The empty gap is the top-right 2 by 2 block plus the square just below its right-hand side.">${g}</svg>`;
+  for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) {
+    const placed = PLACED.some(([pr, pk]) => pr === r && pk === k);
+    g += `<rect x="${o + k * c}" y="${o + r * c}" width="${c}" height="${c}" fill="${placed ? "#5b7db1" : "#fff"}" stroke="${placed ? INK : "#9aa6bb"}" stroke-width="${placed ? 1 : 1}" ${placed ? "" : 'stroke-dasharray="3 3"'}/>`;
+  }
+  g += `<rect x="${o}" y="${o}" width="${4 * c}" height="${4 * c}" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
+  return `<svg viewBox="0 0 ${4 * c + 12} ${4 * c + 12}" width="${4 * c + 12}" height="${4 * c + 12}" role="img" aria-label="A 4 by 4 board. One piece already fills the top-left: 3 squares in the top row, 2 in the second row and 1 in the third row. The empty gap is a staircase of 10 squares: 1 in the top row, 2 in the second, 3 in the third and all 4 in the bottom row.">${g}</svg>`;
 })();
+// five numbered pieces (Y, L, T, W, U), each made of 5 squares
 const PIECES = [
-  [[0, 0], [0, 2], [1, 0], [1, 1], [1, 2]],
-  [[0, 0], [0, 1], [1, 0], [1, 1], [2, 1], [3, 1]],
+  [[0, 1], [1, 0], [1, 1], [2, 1], [3, 1]],
+  [[0, 0], [1, 0], [2, 0], [3, 0], [3, 1]],
   [[0, 0], [0, 1], [0, 2], [1, 1], [2, 1]],
-  [[0, 1], [0, 2], [1, 0], [1, 1], [1, 2]]
+  [[0, 0], [1, 0], [1, 1], [2, 1], [2, 2]],
+  [[0, 0], [0, 2], [1, 0], [1, 1], [1, 2]]
 ];
-const PIECE_OPTS = PIECES.map(p => cellsSvg(p, 26, "#9fc3e6", `A piece made of ${p.length} squares.`));
+const PIECES_SVG = `<div style="display:flex;flex-wrap:wrap;gap:14px 26px;align-items:flex-start">${PIECES.map((p, i) => {
+  const c = 24, w = Math.max(...p.map(([, k]) => k)) + 1, h = Math.max(...p.map(([r]) => r)) + 1;
+  const g = p.map(([r, k]) => `<rect x="${2 + k * c}" y="${2 + r * c}" width="${c}" height="${c}" fill="#9fc3e6" stroke="${INK}" stroke-width="1.3"/>`).join("");
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><b>${i + 1}</b><svg viewBox="0 0 ${w * c + 4} ${h * c + 4}" width="${w * c + 4}" height="${h * c + 4}" role="img" aria-label="Piece ${i + 1}, made of 5 squares.">${g}</svg></div>`;
+}).join("")}</div>`;
 
 /* ---- Maths Q1: column graph ---- */
 const CAKES = [["Mon", 12], ["Tue", 20], ["Wed", 16], ["Thu", 8], ["Fri", 28]];
@@ -169,16 +169,16 @@ const SECTIONS = [
                   <p class="why-not">D is the trap: Red and Gold each <em>won</em> two events (Red won swimming and the relay, Gold won running and tug-of-war), but the carnival is decided by total points, not by events won. A and B pick a house with a top score in one event.</p>`
       },
       {
-        stem: `Two pieces of a puzzle are already in place on a square board. One more piece will fill the gap exactly.
+        stem: `One piece is already in place on a square board. Two of the numbered pieces below will fill the gap exactly, with no overlaps.
                <div class="figure">${BOARD_SVG}</div>
-               <p style="margin:10px 0 0">Pieces can be turned around or flipped over. Which piece fills the gap?</p>`,
-        visualOptions: true,
-        options: PIECE_OPTS,
+               <div class="figure">${PIECES_SVG}</div>
+               <p style="margin:10px 0 0">Pieces can be turned around or flipped over. Which <b>two</b> pieces fill the gap?</p>`,
+        options: ["1 and 4", "2 and 3", "1 and 5", "2 and 4"],
         answer: 3,
-        skill: "fitting a shape into a gap (turning in your head)",
-        explain: `<p>The gap is a 2 × 2 square with one extra square sticking out below it, 5 squares in all.</p>
-                  <p>Piece <b>D</b> is also a 2 × 2 square with one extra square, this time sticking out to the left of the bottom row. Turn D a quarter turn anticlockwise: the 2 × 2 block stays together and the extra square swings round to sit under the right-hand column. It fits exactly.</p>
-                  <p class="why-not">B is the trap: it also has a 2 × 2 block with squares sticking out below, but count them: B has <b>6</b> squares, one more than the gap. A (the U shape) is the same size as the gap, but its top middle square is missing, so it has no 2 × 2 block. C is a T-shape, with no 2 × 2 block either.</p>`
+        skill: "fitting two shapes into a gap (turning and flipping in your head)",
+        explain: `<p>Every piece has 5 squares and the gap has 10, so counting squares doesn’t help. A good place to start is the <b>bottom row</b>, which is 4 squares long. Pieces 1 and 2 both have a straight line of 4, so try each one there.</p>
+                  <p>Piece <b>2</b> works: lay it along the bottom row with its extra square pointing up at the right-hand end. What is left is a staircase: 1 square at the top right, then 2, then 2. That is exactly piece <b>4</b>, turned so the steps go down to the left. (You can also stand piece 2 up the right-hand side instead; the same staircase is left over, so the answer is still 2 and 4.)</p>
+                  <p class="why-not">A (1 and 4) is the trap: piece 4 really is a staircase, like the gap, so it is tempting. But put piece 1 along the bottom row and its extra square pokes up into the second row from the bottom. The 5 squares left over then either make a 2 × 2 block with one extra square (not piece 4 or any other piece) or leave one square cut off on its own. B and C don’t work either: whichever way you place pieces 3 or 5, you are always left with squares that the other piece can’t cover.</p>`
       }
     ]
   },
