@@ -7,18 +7,18 @@ const INK = "#1b2a41";
 
 /* ---- Reading: missing sentences ---- */
 const ARTICLE_TEXT = `
-<p>In 1799, a dried animal skin arrived at the British Museum in London, sent from the young colony of New South Wales. It belonged to a creature unlike anything European scientists had ever examined: it had the bill of a duck, the fur of an otter, webbed feet and a broad, flat tail. {1}</p>
-<p>George Shaw, the naturalist asked to describe it, was deeply suspicious. At the time, some traders were known to sell fake creatures made by skilfully stitching together parts of different animals. {2} He even took a pair of scissors to the skin, searching for the stitches that would expose the trick. He found none.</p>
-<p>Shaw published a description of the animal, which he named <i>Platypus anatinus</i>, meaning “flat-footed and duck-like”. Yet the most astonishing discovery was still to come. For decades, scientists argued about how the platypus produced its young. {3} It was not until 1884 that a scientist working in Queensland confirmed that the platypus lays eggs, just as a bird or a reptile does, and yet feeds its babies on milk.</p>
-<p>Today the platypus is known as one of the very few mammals in the world that lay eggs. The creature once dismissed as a fake has become one of Australia’s best-loved animals.</p>`;
+<p>In July 1799, French soldiers rebuilding an old fort near the town of Rashid in Egypt, which Europeans called Rosetta, dug up a heavy slab of dark stone covered in carved writing. {1} The top section was written in hieroglyphs, the picture-writing of ancient Egypt. The middle section used another Egyptian script, called Demotic, and the bottom section was in ancient Greek.</p>
+<p>Scholars could still read ancient Greek, and the Greek section declared that the same decree had been written in all three scripts. {2} Nobody had been able to read hieroglyphs for well over a thousand years, so the discovery caused enormous excitement.</p>
+<p>Even so, the race to crack the code took more than twenty years. In England, Thomas Young showed that some of the hieroglyphs enclosed in oval rings spelled out the names of rulers, such as Ptolemy. {3} Then, in 1822, a young Frenchman named Jean-François Champollion made the breakthrough. He showed that hieroglyphs were not simply pictures of ideas: many of them stood for sounds, like the letters of an alphabet. According to a famous story, he rushed into his brother’s office shouting “I’ve got it!” and promptly fainted.</p>
+<p>Today the Rosetta Stone is one of the most visited objects in the British Museum in London, where it has been kept since 1802.</p>`;
 
 const SENT_LETTERS = ["A", "B", "C", "D", "E"];
 const SENTENCES = [
-  "Shaw wondered whether this might be another clever fake.",
-  "Others were sure it hatched from eggs, though no one had ever found any.",
-  "No such animal, it seemed, could possibly exist.",
-  "Some insisted that, like other furry animals, it must give birth to live young.",
-  "Its eggs, when they were finally found, turned out to be about the size of a marble."
+  "The officer in charge noticed that the writing was arranged in three separate sections.",
+  "Champollion, however, had been studying ancient languages since he was a boy.",
+  "This meant that the Greek could act as a key to the other two scripts.",
+  "However, he could not work out how the rest of the writing system worked.",
+  "Before long, scholars were able to read every word of all three sections."
 ];
 function articleHtml() {
   const si = SECTIONS.findIndex(s => s.id === "reading");
@@ -34,7 +34,7 @@ function articleHtml() {
   return t;
 }
 const PASSAGE = {
-  title: "Too Strange to Be Real",
+  title: "Cracking the Code",
   note: "Three sentences have been removed from the text below. Choose the sentence that fits each gap. There are two extra sentences you do not need to use.",
   html: articleHtml
 };
@@ -130,28 +130,28 @@ const SECTIONS = [
         stem: "Which sentence best fits <b>gap 1</b>?",
         letterOptions: true,
         options: ["A", "B", "C", "D", "E"],
-        answer: 2,
+        answer: 0,
         skill: "linking a sentence to what comes before and after",
-        explain: `<p>The first paragraph lists the platypus’s odd mix of features. The next paragraph begins with Shaw being “deeply suspicious”. Sentence <b>C</b> links the two: the animal seemed too strange to be real, which is exactly why Shaw was suspicious.</p>
-                  <p class="why-not">A can’t go here: “another clever fake” needs fakes to have been mentioned already, and they aren’t mentioned until the second paragraph. B and D are about how the platypus has its young, which hasn’t come up yet. E talks about “its eggs” long before anyone has discovered them.</p>`
+        explain: `<p>Before the gap, the soldiers find a stone covered in writing. After it, the text describes “the top section”, “the middle section” and “the bottom section”. Sentence <b>A</b> sets that up: the writing was arranged in <b>three separate sections</b>. Without it, “the top section” would come out of nowhere.</p>
+                  <p class="why-not">E is the trap: it is about the three sections too, but it says scholars could soon read every word, and the next paragraphs show that took more than twenty years. C talks about “the Greek” and “the other two scripts” before we know there are any scripts. B and D are about Champollion and Young, who haven’t appeared yet.</p>`
       },
       {
         stem: "Which sentence best fits <b>gap 2</b>?",
         letterOptions: true,
         options: ["A", "B", "C", "D", "E"],
-        answer: 0,
+        answer: 2,
         skill: "following a line of reasoning across a gap",
-        explain: `<p>Just before the gap, we learn that traders sold fakes made by stitching animals together. Just after it, Shaw “even took a pair of scissors to the skin, searching for the stitches”. Sentence <b>A</b> joins them: Shaw wondered whether this was <b>another</b> clever fake. “Another” points back to the stitched fakes, and “He even…” builds on his suspicion.</p>
-                  <p class="why-not">C is the trap: it also expresses doubt, so it seems to fit next to “searching for the stitches”. But C is needed at gap 1, and it doesn’t link to the stitched fakes the way “another clever fake” does. B, D and E are all about eggs and young, which belong in the third paragraph.</p>`
+        explain: `<p>Before the gap: scholars could read the Greek, and it said the same decree was written in all three scripts. After it: nobody could read hieroglyphs, “so the discovery caused enormous excitement”. Sentence <b>C</b> explains <em>why</em> it was exciting: the Greek could be used as a <b>key</b> to the other two scripts, because it said the same thing.</p>
+                  <p class="why-not">E is the trap: it follows on from the Greek being readable, so it sounds natural. But if scholars could quickly read every word, there would be no “race to crack the code” lasting more than twenty years. E contradicts what comes next. A belongs earlier, where the sections are first described.</p>`
       },
       {
         stem: "Which sentence best fits <b>gap 3</b>?",
         letterOptions: true,
         options: ["A", "B", "C", "D", "E"],
         answer: 3,
-        skill: "using linking words and the order of events to place a sentence",
-        explain: `<p>Before the gap: scientists “argued about how the platypus produced its young”. After the gap: in 1884 someone finally confirmed that it lays eggs. Sentence <b>D</b> gives one side of the argument: some insisted it must give birth to live young, like other furry animals. That sets up the surprise of the egg discovery.</p>
-                  <p class="why-not">B is the trap: it is about the same argument, and it fits the topic perfectly. But it begins with “<b>Others</b>”, which only makes sense after a sentence about what <em>some</em> people thought, and the sentence before the gap doesn’t say that. E is wrong because of the order of events: eggs being “finally found” would come after the 1884 discovery, not before it.</p>`
+        skill: "using linking words and the order of ideas to place a sentence",
+        explain: `<p>Before the gap, Thomas Young makes some progress: he shows that the oval rings hold rulers’ names. After it: “<b>Then</b>, in 1822, … Champollion made the breakthrough.” Sentence <b>D</b> fits between them. “However” shows the limit of Young’s success (“he” is Young), which explains why someone else still needed to make the breakthrough.</p>
+                  <p class="why-not">B is the trap: it also starts with “however” and is about the person who cracked the code. But the very next sentence introduces him as if for the first time: “a young Frenchman named Jean-François Champollion”. Writers only give someone’s full introduction the first time they mention them, so B can’t come before it. E would mean the code was already cracked before Champollion’s breakthrough.</p>`
       }
     ]
   },

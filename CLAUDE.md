@@ -27,7 +27,7 @@ Sample paper: story 6 Qs, cloze 8, poem 5, missing sentences 6, four extracts 8.
 - Cloze uses upper-primary to adult vocabulary like the samples (e.g. culmination, teeming, scouring, remiss): near-synonyms, look-alike words and preposition collocations where only one fits. Avoid easy everyday idioms.
 - Every few versions, use a real public-domain classic instead of an original text (author died more than 70 years ago, e.g. Grahame, Nesbit, Stevenson, Lawson). Copy the text exactly from a reliable source (Project Gutenberg via its GitHub mirrors) and credit author and year in the passage note.
 - Wrong options must be partly true or built on a real detail from the text, never obviously wrong.
-- Every reading topic must be new (check `reading` in every `content/vNN.json`) and the kind of topic the real test uses. The story is never about football.
+- Every reading topic must be new: check `reading` and `reading_topic` in every `content/vNN.json` **and** `content/used_topics_before_v33.md` (topics from the earlier tests made outside this repo) and the kind of topic the real test uses. The story is never about football.
 - In four-extract sets, every extract should be the answer to at least one question where possible.
 
 ## Thinking Skills
