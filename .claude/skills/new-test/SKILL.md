@@ -17,7 +17,7 @@ Default batch size is **1–2 tests per run** (3 at most). Each test gets its ow
 4. **Rotation.** Read every `content/vNN.json` (`reading_format`, `thinking`, `maths`, `categories`, `stretch`) and work out what comes next:
    - Reading format: aim over any 9 versions for cloze ×2, four extracts ×2, story ×2, missing sentences ×2, poem ×1. Every few versions use a public-domain classic.
    - Thinking Q1: rotate spot the mistake → supports the claim → whose reasoning (spot the mistake slightly more often); cycle the sub-patterns listed in `CLAUDE.md`, choosing one not used recently.
-   - Thinking Q2: table / timetable / data / arrangement, varied from the last few.
+   - Thinking Q2: table / timetable / data / arrangement, varied from the last few — but every few versions swap in a type the fixed slots would miss (rules/codes/sets, number problems, must/cannot be true, or a nearby type), so the whole question base gets covered (see `CLAUDE.md`).
    - Thinking Q3: spatial type not used recently (look at the `thinking` labels).
    - Maths Q1: next item in the quick-fire rotation; Q2–Q3: a new topic plus a loop-back.
 5. **Topic check.** The Reading topic must not appear in any `content/vNN.json` (`reading`, `reading_topic`) **or** in `content/used_topics_before_v33.md`. Until David confirms that list is complete, **tell David the planned Reading topic(s) in one line and wait for an OK before writing.**
