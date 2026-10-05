@@ -12,7 +12,7 @@ Default batch size is **1–2 tests per run** (3 at most). Each test gets its ow
 ## 0. Before writing anything
 
 1. **Sync.** `git fetch origin && git checkout -B claude/<branch> origin/main` (use the session's designated branch name). Never stack on a merged pull request.
-2. **Calibration source.** The official sample papers must be attached in the session (they are never in the repo). If they aren't, ask David to attach them before writing. Read the relevant sections, not just the front page.
+2. **Calibration source.** Read `calibration/sample_notes.md` (our own-words notes on all three official papers: formats, question-type maps by question number, difficulty climb, trap patterns). That is enough for routine tests. If David has attached the papers in this session, also read the relevant sections for a closer match. Never commit the papers.
 3. **Next version number.** `ls content/` → highest `vNN.js` + 1.
 4. **Rotation.** Read every `content/vNN.json` (`reading_format`, `thinking`, `maths`, `categories`, `stretch`) and work out what comes next:
    - Reading format: aim over any 9 versions for cloze ×2, four extracts ×2, story ×2, missing sentences ×2, poem ×1. Every few versions use a public-domain classic.
