@@ -69,7 +69,7 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - `python3 tools/progress.py [--json]` summarises progress for Claude (needs `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` in the environment settings). `python3 tools/configure_sync.py` fills `site_config.json` from `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
 
 ## Overnight builds
-- A routine runs the `overnight` skill (`.claude/skills/overnight/SKILL.md`) at about 1 am Sydney time: when fewer than 10 published tests are uncompleted it builds 10 new ones, opens one pull request and merges it once the checks are green (agreed by David).
+- A routine runs the `overnight` skill (`.claude/skills/overnight/SKILL.md`) at about 1 am Sydney time: when fewer than 10 published tests are uncompleted it builds 4 new ones, opens one pull request and merges it once the checks are green (agreed by David).
 
 ## Automatic checks
 - `.github/workflows/check.yml` runs on every pull request and push to `main`: build (validates question types and stretch tags), generated files up to date, `tools/check.sh` on every test, and `tools/check_tracking.js`. A red cross on a pull request must be fixed before merging.
