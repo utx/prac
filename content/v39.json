@@ -1,0 +1,34 @@
+{
+  "version": 39,
+  "date": "2026-10-05",
+  "reading": "Cloze: Low Tide",
+  "reading_format": "cloze",
+  "reading_topic": "rock pooling with Gran at low tide (first-person piece)",
+  "thinking": [
+    "Whose reasoning is correct (a rule turned around)",
+    "Order from clues (cross-country race)",
+    "Folding string and cutting once"
+  ],
+  "maths": [
+    "Quick-fire missing number: the equals sign",
+    "Repeating timetable: next ferry and arrival time",
+    "Number sequence (sum of the previous two): working backwards"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q7-14 cloze (fixed expressions), PT1 Q7 ('contain himself')",
+      "PT3 Q9 ('springs to mind'), PT1 Q7-14 cloze",
+      "PT3 Q10 ('teeming' vs 'swelling', 'flocking'), PT1 Q9 ('wove' vs 'coiled')"
+    ],
+    "thinking": [
+      "PT2 Q8 (poetry and life experiences), PT3 Q15 (observatory and soccer match), PT1 Q12 (emu eggs)",
+      "PT2 Q5 (100 m race order), PT3 Q9 (plants blooming), PT2 Q12 (bicycle race)",
+      "PT1 Q13 (string folded and marked)"
+    ],
+    "maths": [
+      "PT2 Q18 (12 × 35 = 4 × ▢ × 7), PT1 Q1",
+      "PT3 Q31 (time spent at Coffs Harbour), PT1 Q3 (train after midnight), PT2 Q2 (school timetable)",
+      "PT1 Q15 (sequence: 4 less than double), PT1 Q19 (first four terms)"
+    ]
+  }
+}
