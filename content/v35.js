@@ -7,18 +7,18 @@ const INK = "#1b2a41";
 
 /* ---- Reading: missing sentences ---- */
 const ARTICLE_TEXT = `
-<p>In the 1780s, two brothers named Joseph and Étienne Montgolfier, whose family ran a paper-making business in southern France, became fascinated by flight. According to one story, Joseph noticed that scraps of paper and cloth drifted upwards above a fire. {1} The brothers began to experiment, building bigger and bigger bags of cloth lined with paper.</p>
-<p>In June 1783, they filled a huge balloon with hot air from a fire of straw and wool, and watched it rise high above their town. News of the flight spread quickly, and soon the King of France wanted to see a balloon for himself. But there was a problem. Nobody knew whether a living creature could survive so high above the ground. {2}</p>
-<p>So, on 19 September 1783, at the palace of Versailles, a sheep, a duck and a rooster were placed in a basket beneath a brightly painted balloon. A huge crowd watched as it rose into the sky. About eight minutes later, it came down gently in a forest a few kilometres away. {3} The experiment showed that the air high above the ground was safe to breathe.</p>
-<p>Two months later, two men climbed aboard a Montgolfier balloon in Paris and became the first people ever to fly freely through the sky. The age of flight had begun, thanks partly to three very surprised farm animals.</p>`;
+<p>In the 1780s, two brothers named Joseph and Étienne Montgolfier, whose family ran a paper-making business in southern France, became captivated by the dream of flight. According to one story, Joseph noticed that scraps of paper and cloth drifted upwards above a fire. {1} The brothers began to experiment, stitching together ever larger bags of cloth lined with paper.</p>
+<p>In June 1783, they filled an enormous balloon with hot air from a fire of straw and wool, and watched it ascend high above their town. News of the spectacle spread rapidly, and before long the King of France demanded to see a balloon for himself. Yet one question troubled everyone. Nobody knew whether a living creature could survive so far above the ground. {2}</p>
+<p>And so, on 19 September 1783, in the grounds of the palace of Versailles, a sheep, a duck and a rooster were placed in a basket beneath a brightly painted balloon. An immense crowd watched it rise into the sky. About eight minutes later, it drifted down into a forest a few kilometres away. {3} The experiment had shown that the air high above the ground was safe to breathe.</p>
+<p>Two months later, two men climbed aboard a Montgolfier balloon in Paris and became the first people ever to fly freely through the sky. The age of flight had begun, thanks in part to three very bewildered farm animals.</p>`;
 
 const SENT_LETTERS = ["A", "B", "C", "D", "E"];
 const SENTENCES = [
-  "Rather than risk a human life, they decided to send animals up first.",
-  "When people rushed over to the basket, they found all three animals alive.",
-  "Some people worried that the animals might be harmed by the heat of the fire.",
-  "He wondered whether a big enough bag of hot air could lift a load into the sky.",
-  "Everyone in the crowd held their breath as the basket slowly began to rise."
+  "Rather than risk a human life, the brothers decided to send animals up first.",
+  "When onlookers rushed over to the basket, they found all three passengers alive.",
+  "Some feared that any animals on board might be harmed by the heat of the fire.",
+  "He wondered whether a large enough bag of hot air might lift a load into the sky.",
+  "As the basket came to rest, a great cheer went up from those who had chased after it."
 ];
 function articleHtml() {
   const si = SECTIONS.findIndex(s => s.id === "reading");
@@ -101,7 +101,7 @@ const SECTIONS = [
         answer: 3,
         skill: "linking a sentence to what comes before and after",
         explain: `<p>Before the gap, Joseph notices paper and cloth drifting up above a fire. After it, the brothers start building bigger and bigger bags. Sentence <b>D</b> connects the two: Joseph wonders whether a big enough bag of hot air could lift a load. That idea is what leads to the experiments. “He” points back to Joseph.</p>
-                  <p class="why-not">C doesn’t fit, because it talks about “the animals” before any animals have been mentioned. A belongs later, once the problem of sending up a living creature has been raised.</p>`
+                  <p class="why-not">C doesn’t fit, because nobody has thought of sending animals yet. E is about a basket landing, but there is no basket yet. A belongs later, once the problem of sending up a living creature has been raised.</p>`
       },
       {
         stem: "Which sentence best fits <b>gap 2</b>?",
@@ -109,17 +109,17 @@ const SECTIONS = [
         options: ["A", "B", "C", "D", "E"],
         answer: 0,
         skill: "following cause and effect across a gap",
-        explain: `<p>The paragraph ends with a problem: nobody knew whether a living creature could survive so high up. The next paragraph begins “<b>So</b>, … a sheep, a duck and a rooster were placed in a basket”. Sentence <b>A</b> links the problem to that solution: rather than risk a person, they would send animals first. “So” only makes sense if this decision comes just before it.</p>
-                  <p class="why-not">C is the trap: it is about the danger of flying, so it seems to belong next to “Nobody knew whether a living creature could survive”. But it talks about “the animals” as if the decision to send animals had already been made. The decision itself is missing, and without it “So, … a sheep, a duck and a rooster” doesn’t follow. E is about the basket rising, but at this point there is no basket and no animals yet.</p>`
+        explain: `<p>The paragraph ends with a problem: nobody knew whether a living creature could survive so high up. The next paragraph begins “<b>And so</b>, … a sheep, a duck and a rooster were placed in a basket”. Sentence <b>A</b> links the problem to that solution: rather than risk a person, they would send animals first. “And so” only makes sense if this decision comes just before it.</p>
+                  <p class="why-not">C is the trap: it is about the danger of flying, so it seems to belong next to “Nobody knew whether a living creature could survive”. But it only worries about animals that <em>might</em> be on board. The decision to send animals is still missing, and without it “And so, … a sheep, a duck and a rooster” doesn’t follow. E describes the basket landing, but the flight hasn’t happened yet.</p>`
       },
       {
         stem: "Which sentence best fits <b>gap 3</b>?",
         letterOptions: true,
         options: ["A", "B", "C", "D", "E"],
         answer: 1,
-        skill: "choosing a sentence that fits what follows",
-        explain: `<p>The sentence after the gap says the experiment showed the air up high was “safe to breathe”. That can only be known if the animals came down alive. Sentence <b>B</b> gives exactly that: all three animals were found alive.</p>
-                  <p class="why-not">E is the trap: it is about the flight, and a crowd is watching. But by gap 3 the balloon has already risen and <em>landed</em>, so a sentence about it slowly beginning to rise is in the wrong place in time. E would only fit before “A huge crowd watched as it rose into the sky”.</p>`
+        skill: "choosing a sentence that fits what comes before and after",
+        explain: `<p>The sentence after the gap says the experiment “had shown” that the air up high was “safe to breathe”. Something in the gap must give the <em>evidence</em> for that: the animals must have come down alive. Sentence <b>B</b> gives exactly that: onlookers found all three passengers alive.</p>
+                  <p class="why-not">E is the trap: it fits the moment perfectly, right as the balloon lands, and a cheer sounds like good news. But people would cheer a safe <em>landing</em> whether or not the animals were well. E tells us nothing about the passengers, so “The experiment had shown that the air … was safe” would have nothing to rest on. Only B gives the evidence. C talks about “any animals on board” as if no decision had been made, which is far too late by gap 3.</p>`
       }
     ]
   },

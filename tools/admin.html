@@ -183,7 +183,7 @@ function analyse(st) {
   first.forEach(a => a.sections.forEach((s, si) => s && s.answers.forEach((x, qi) => {
     const t = TESTS.find(t => t.version === a.v) || {};
     qs.push({ v: a.v, sec: s.id, qi, cat: x.cat || "Other", fmt: t.reading_format || "", correct: !!x.correct,
-              chosen: x.chosen, answer: x.answer, changes: x.changes || 0, when: a.started });
+              chosen: x.chosen, answer: x.answer, changes: x.changes || 0, stretch: !!x.stretch, when: a.started });
   })));
   return { byV, first, retakes, qs };
 }
@@ -287,6 +287,7 @@ function render() {
   const allTimes = first.flatMap(a => a.sections.filter(Boolean).map(s => s.ms || 0)).filter(Boolean);
   const habits = `<div class="card"><h2>Test habits</h2>
     <ul class="focus-list">
+      <li><span class="what"><b>Stretch questions</b><small>${(() => { const st = qs.filter(q => q.stretch); return st.length ? `${st.filter(q => q.correct).length} of ${st.length} right (${pct(st.filter(q => q.correct).length, st.length)}%). These are pitched at the hardest third of the real test.` : "None answered yet. Each newer test has at least one question pitched at the hardest third of the real test."; })()}</small></span></li>
       <li><span class="what"><b>Changed answers</b><small>${changed.length ? `${changed.length} question${changed.length > 1 ? "s" : ""} where an answer was changed before submitting; ${changed.filter(q => q.correct).length} ended up right.` : "No answers changed yet."}</small></span></li>
       <li><span class="what"><b>Left blank</b><small>${unanswered} question${unanswered === 1 ? "" : "s"} submitted without an answer (there is no penalty for guessing).</small></span></li>
       <li><span class="what"><b>Time per section</b><small>${allTimes.length ? `Average ${fmtMins(mins(allTimes.reduce((a, b) => a + b, 0) / allTimes.length))}, longest ${fmtMins(mins(Math.max(...allTimes)))}. In the real test it’s roughly 1 minute per question.` : "No timings yet."}</small></span></li>

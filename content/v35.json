@@ -18,7 +18,7 @@
     "reading": [
       "PT2 Q20-25 (missing sentences)",
       "PT2 Q20-25",
-      "PT2 Q20-25"
+      "PT2 Q20-25 (time order and evidence) — stretch"
     ],
     "thinking": [
       "PT3 Q30 (tennis qualification), PT2 Q24",
@@ -46,6 +46,11 @@
       "Time & timetables",
       "Fractions",
       "Chance & counting"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
     ]
   }
 }

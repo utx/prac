@@ -230,9 +230,9 @@ const INK = "#1b2a41";
 
 /* ---- Reading: cloze passage ---- */
 const CLOZE_TEXT = `
-<p>Every summer holidays, Gran takes me rock pooling on the beach near her house. We always check the tide times first, because the best time to go is at low tide, when the sea has pulled back and left the rock shelf high and {1}.</p>
-<p>Gran has one rule: look with your eyes, not your hands. Many of the creatures in rock pools are delicate, and a few, like the blue-ringed octopus, are dangerous to touch. So we crouch at the edge of each pool and wait for the water to go still. At first there never seems to be anything there. Then a crab edges out from under a ledge, a snail starts to slide across a rock, and the whole pool slowly comes to life.</p>
-<p>Last summer, something bright orange {2} my eye at the bottom of a deep pool. It was a sea star, as big as my hand, clinging to the rock. While I was watching it, a tiny octopus {3} itself into a crack no wider than a pencil. One second it was there, and the next it had simply vanished.</p>
+<p>Every summer holidays, Gran takes me rock pooling on the beach near her house. We always check the tide times first, because the best time to go is at low tide, when the sea has pulled back and left the rock shelf high and dry.</p>
+<p>Gran has one rule: look with your eyes, not your hands. Many of the creatures in rock pools are delicate, and a few, like the blue-ringed octopus, are dangerous to touch. So we crouch at the edge of each pool and wait for the water to go still. At first there never seems to be anything there. Then a crab edges out from under a ledge, a snail begins its {1} journey across a rock, and the whole pool slowly comes to life.</p>
+<p>Last summer, something bright orange caught my eye at the bottom of a deep pool. It was a sea star, as big as my hand, {2} to the rock. While I was watching it, a tiny octopus {3} its body to slip into a crack no wider than a pencil. One second it was there, and the next it had simply vanished.</p>
 <p>We stayed so long that the waves began to creep back over the rocks and splash our shoes. Gran laughed and said we had completely lost track of time, which is what she says every year.</p>`;
 
 function clozeHtml() {
@@ -285,27 +285,27 @@ const SECTIONS = [
     questions: [
       {
         stem: "Which word best fits <b>gap 1</b>?",
-        options: ["bare", "dry", "empty", "clear"],
+        options: ["painful", "painstaking", "pained", "painless"],
         answer: 1,
-        skill: "completing a fixed expression",
-        explain: `<p>“High and <b>dry</b>” is a fixed expression for something left out of the water, like a boat when the tide goes out. At low tide, the sea has pulled back and left the rock shelf out of the water.</p>
-                  <p class="why-not">“Bare” is the trap: the rocks really would be bare at low tide, so it makes sense on its own, but the expression is always “high and dry”. “Empty” and “clear” don’t make the expression either.</p>`
+        skill: "choosing between words that look alike",
+        explain: `<p>A <b>painstaking</b> journey is slow, careful and takes a lot of effort. That describes a snail inching its way across a rock.</p>
+                  <p class="why-not">“Painful” is the trap: it starts the same way and a slow journey might sound tiring, but painful means it <em>hurts</em>, and nothing suggests the snail is in pain. “Pained” describes a hurt or upset expression, and “painless” means causing no pain; neither describes how a snail moves.</p>`
       },
       {
         stem: "Which word best fits <b>gap 2</b>?",
-        options: ["grabbed", "held", "took", "caught"],
+        options: ["gripping", "grasping", "clutching", "clinging"],
         answer: 3,
-        skill: "completing a fixed expression",
-        explain: `<p>When something suddenly makes you notice it, it “<b>catches</b> your eye”. The orange sea star stood out at the bottom of the pool, so it caught the writer’s eye.</p>
-                  <p class="why-not">“Grabbed” is the trap: something can “grab your <em>attention</em>”, but with “eye” the expression is “caught my eye”. “Held my eye” and “took my eye” are not used to mean noticing something.</p>`
+        skill: "choosing the word that goes with “to”",
+        explain: `<p>Only <b>clinging</b> goes with “to”: something clings <em>to</em> a surface. Sea stars hold on tightly to rocks with hundreds of tiny tube feet.</p>
+                  <p class="why-not">“Gripping” is the trap: it means almost the same thing, but you grip something, not grip <em>to</em> it, so “gripping to the rock” is wrong. The same goes for “grasping” and “clutching”: they would need “the rock” straight after them, with no “to”.</p>`
       },
       {
         stem: "Which word best fits <b>gap 3</b>?",
-        options: ["squeezed", "squashed", "pinched", "crushed"],
+        options: ["contorted", "distorted", "distended", "deformed"],
         answer: 0,
-        skill: "choosing between words with similar meanings",
-        explain: `<p>To <b>squeeze</b> yourself into a small space means to push your body through a tight gap. Octopuses have no bones, so they really can fit through very narrow openings. It slipped out of sight into the crack.</p>
-                  <p class="why-not">“Squashed” is the trap: it is close in meaning, but squashing something flattens or damages it, and the octopus wasn’t hurt. “Crushed” is even stronger. “Pinched” means nipping something tightly between your fingers, which an octopus can’t do to itself.</p>`
+        skill: "choosing between words with similar meanings (harder vocabulary)",
+        explain: `<p>To <b>contort</b> your body means to twist and bend it into an unusual shape. An octopus has no bones, so it can twist its body to squeeze through a gap no wider than a pencil.</p>
+                  <p class="why-not">“Distorted” is the trap: it also means twisted out of shape, but it is used for things that are changed or spoiled (a distorted sound, a distorted reflection), not for an animal moving its own body on purpose. “Distended” means swollen, and “deformed” means badly shaped, which is the opposite of the octopus’s clever movement.</p>`
       }
     ]
   },
@@ -401,7 +401,7 @@ const SECTIONS = [
   }
 ];
 
-const TEST_META = {"version": 39, "reading_format": "cloze", "categories": {"reading": ["Vocabulary & idioms", "Vocabulary & idioms", "Vocabulary & idioms"], "thinking": ["Whose reasoning", "Order & arrangement", "Spatial"], "maths": ["Number & place value", "Time & timetables", "Patterns & sequences"]}};
+const TEST_META = {"version": 39, "reading_format": "cloze", "categories": {"reading": ["Vocabulary & idioms", "Vocabulary & idioms", "Vocabulary & idioms"], "thinking": ["Whose reasoning", "Order & arrangement", "Spatial"], "maths": ["Number & place value", "Time & timetables", "Patterns & sequences"]}, "stretch": {"reading": [2]}};
 const LETTERS = ["A", "B", "C", "D", "E"];
 const app = document.getElementById("app");
 const hdrSection = document.getElementById("hdr-section");
@@ -445,7 +445,8 @@ function recordSection(i) {
   const s = SECTIONS[i];
   attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
     answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
-      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi] })) };
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
   persistAttempt();
 }
 function finishAttempt() {

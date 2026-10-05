@@ -19,7 +19,7 @@ ADMIN_TEMPLATE = (ROOT / "tools" / "admin.html").read_text(encoding="utf-8")
 # "categories" must use one of these labels.
 CATEGORIES = {
     "reading": ["Purpose of a detail", "Comparisons & imagery", "Feelings & inference",
-                "Character & structure", "Main idea", "Vocabulary & idioms", "Sentence links"],
+                "Character & structure", "Tone & attitude", "Main idea", "Vocabulary & idioms", "Sentence links"],
     "thinking": ["Spot the mistake", "Supports the claim", "Whose reasoning", "Must or cannot be true",
                  "Tables & timetables", "Order & arrangement", "Rules & codes", "Spatial", "Number problems"],
     "maths": ["Number & place value", "Time & timetables", "Money & best value", "Measurement & scales",
@@ -54,7 +54,8 @@ def versions():
 
 
 def page_meta(n, meta):
-    return {"version": n, "reading_format": meta.get("reading_format", ""), "categories": meta.get("categories", {})}
+    return {"version": n, "reading_format": meta.get("reading_format", ""), "categories": meta.get("categories", {}),
+            "stretch": meta.get("stretch", {})}
 
 
 def build_test(n, js, meta):

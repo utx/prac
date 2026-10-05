@@ -16,9 +16,9 @@
   ],
   "sample_map": {
     "reading": [
-      "PT3 Q7-14 cloze (fixed expressions), PT1 Q7 ('contain himself')",
-      "PT3 Q9 ('springs to mind'), PT1 Q7-14 cloze",
-      "PT3 Q10 ('teeming' vs 'swelling', 'flocking'), PT1 Q9 ('wove' vs 'coiled')"
+      "PT3 Q13 ('decrease/descent/decay/decline'), PT1 Q8",
+      "PT3 Q10 ('teeming with'), PT1 Q9",
+      "PT1 Q12 ('paged/leafed'), PT3 Q7 ('scouring') — stretch"
     ],
     "thinking": [
       "PT2 Q8 (poetry and life experiences), PT3 Q15 (observatory and soccer match), PT1 Q12 (emu eggs)",
@@ -46,6 +46,11 @@
       "Number & place value",
       "Time & timetables",
       "Patterns & sequences"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
     ]
   }
 }

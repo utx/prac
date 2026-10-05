@@ -7,11 +7,11 @@ const INK = "#1b2a41";
 
 /* ---- Reading: cloze passage ---- */
 const CLOZE_TEXT = `
-<p>The first time Dad suggested geocaching, I rolled my eyes and told him that a treasure hunt using a phone app sounded like something for little kids. Three years and more than two hundred finds later, I have well and truly {1} my words.</p>
-<p>Geocaching began in 2000, and there are now millions of hidden containers, called caches, tucked away all over the world. The app shows you roughly where one is, but the last few metres are up to you. A cache might be a film canister wedged inside a hollow log, or a magnetic box stuck to the back of a sign. Some are hidden in such plain view that you can walk past them a dozen times before the penny {2}.</p>
+<p>The first time Dad suggested geocaching, I rolled my eyes and {1} the idea as something for little kids. Three years and more than two hundred finds later, I have well and truly eaten my words.</p>
+<p>Geocaching began in 2000, and there are now millions of hidden containers, called caches, {2} across the world. The app shows you roughly where one is, but the last few metres are up to you. A cache might be a film canister wedged inside a hollow log, or a magnetic box stuck to the back of a sign. Some are hidden in such plain view that you can walk past them a dozen times before the penny drops.</p>
 <p>Inside every cache is a logbook to sign, and sometimes small trinkets to swap. The rule is simple: if you take something, leave something of equal or greater value.</p>
 <p>The hardest part is not being spotted. Geocachers call people who don’t play “muggles”, and searching a bus shelter while someone is waiting for a bus takes nerves of steel. More than once, I have had to pretend I was tying my shoelace.</p>
-<p>But the best thing about geocaching has nothing to do with treasure. It has taken us to waterfalls, lookouts and laneways we would never have {3} upon otherwise. In a way, the containers are just an excuse to explore.</p>`;
+<p>But the best thing about geocaching has nothing to do with treasure. It has taken us to waterfalls, lookouts and laneways we would never have stumbled upon otherwise. In a way, the containers are merely a {3} for exploring.</p>`;
 
 function clozeHtml() {
   const si = SECTIONS.findIndex(s => s.id === "reading");
@@ -100,27 +100,27 @@ const SECTIONS = [
     questions: [
       {
         stem: "Which word best fits <b>gap 1</b>?",
-        options: ["bitten", "tasted", "eaten", "chewed"],
+        options: ["deterred", "discouraged", "dismissed", "dispersed"],
         answer: 2,
-        skill: "completing an idiom",
-        explain: `<p>To <b>eat your words</b> means to admit that something you said was wrong. The writer once told Dad that geocaching was for little kids, but after hundreds of finds they clearly love it, so they have “eaten their words”.</p>
-                  <p class="why-not">“Bitten” is the trap: “bite your tongue” is a real expression, but it means stopping yourself from saying something, not admitting you were wrong. “Chewed” is close too (“chew something over” means think about it), but it doesn’t go with “words” in this way. “Tasted” makes no sense here.</p>`
+        skill: "choosing a word that fits the grammar and meaning",
+        explain: `<p>To <b>dismiss</b> an idea <b>as</b> something means to decide it isn’t worth taking seriously. The writer thought geocaching was “something for little kids”, so they dismissed it.</p>
+                  <p class="why-not">“Discouraged” is the trap: it is about not wanting something to happen, which sounds close, but you discourage a <em>person</em>, and “discouraged the idea as something for little kids” doesn’t work. “Deterred” means put someone off doing something. “Dispersed” means scattered in different directions.</p>`
       },
       {
         stem: "Which word best fits <b>gap 2</b>?",
-        options: ["drops", "falls", "sinks", "lands"],
+        options: ["dotted", "spotted", "speckled", "freckled"],
         answer: 0,
-        skill: "completing a fixed expression",
-        explain: `<p>“The penny <b>drops</b>” means that someone finally understands or notices something. Here, you walk past a cache many times before you suddenly realise it was right in front of you.</p>
-                  <p class="why-not">“Falls” is the trap: it means almost the same as “drops”, but the expression only works with “drops”. Nobody says “the penny falls”. “Sinks” and “lands” are also movements downward, but neither makes the expression.</p>`
+        skill: "choosing the word that makes the right expression",
+        explain: `<p>Things that are spread out here and there over a wide area are “<b>dotted</b> across” or “dotted around” it. Millions of caches are spread out all over the world.</p>
+                  <p class="why-not">“Spotted” is the trap: it means the same kind of pattern, but “spotted across the world” would mean <em>seen</em> across the world. “Speckled” and “freckled” describe a surface covered in tiny marks, like an egg or skin, not objects spread over a large area.</p>`
       },
       {
         stem: "Which word best fits <b>gap 3</b>?",
-        options: ["tripped", "slipped", "clambered", "stumbled"],
+        options: ["pretence", "precedent", "premise", "pretext"],
         answer: 3,
-        skill: "choosing the word that goes with “upon”",
-        explain: `<p>To <b>stumble upon</b> something means to find it by chance. That is exactly the point of the paragraph: geocaching led the family to places they would never have found otherwise.</p>
-                  <p class="why-not">“Tripped” is the trap: it is close in meaning to “stumbled”, but you trip <em>over</em> something, and “tripped upon” doesn’t mean finding something by chance. “Slipped” doesn’t go with “upon” either. “Clambered” means climbed with difficulty.</p>`
+        skill: "choosing between words that look alike (harder vocabulary)",
+        explain: `<p>A <b>pretext</b> is a reason you give for doing something, when the real reason is something else. The writer says the containers are just an excuse: the real reason they go geocaching is to explore new places.</p>
+                  <p class="why-not">“Pretence” is the trap: it looks and sounds very similar, but a pretence is a false show (like the writer’s pretending to tie a shoelace). You can’t have “a pretence for exploring”. A “precedent” is an earlier example that is followed later, and a “premise” is an idea that an argument is built on.</p>`
       }
     ]
   },
