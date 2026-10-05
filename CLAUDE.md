@@ -1,19 +1,56 @@
 # Practice test repo: working notes for Claude
 
-David builds numbered practice tests ("Practice Test NN") here. One test per version, all reachable from `index.html`.
+David builds numbered practice tests ("Practice Test NN": v33, v34, …) here to prepare a Year 4 child for the NSW OC placement test. One test per version, each a new button on `index.html`. Work only in this repo (`utx/prac`); never create new repos.
 
 ## Adding version NN
-1. Write `content/vNN.js` (defines `passMode`, `INK`, the passage/diagram constants and `SECTIONS`; see `content/v33.js` for the shape) and `content/vNN.json` (version, date, reading title, reading_format, thinking/maths skill labels, sample_map).
-2. `python3 tools/build.py`, which builds `tests/vNN/index.html` and regenerates `index.html`. Never hand-edit generated files.
-3. `node tools/check_lengths.js tests/vNN/index.html` (must report 0 longest) and `node tools/check_render.js tests/vNN/index.html` (must PASS).
-4. Run an independent cold solve (a separate agent that never sees the answers), fix what it finds, re-check, then commit and push.
-5. Give David the list of each question mapped to the official sample-paper question(s) it relates to and the skill tested.
+1. Before writing, compare every planned question against the official sample papers. They are not in the repo (see Copyright), so ask David to attach them in the session if they aren't already there. Check the coverage record in every `content/vNN.json` so no skill, topic or format repeats too soon.
+2. Write `content/vNN.js` (defines `passMode`, `INK`, the passage/diagram constants and `SECTIONS`; see `content/v33.js` for the shape) and `content/vNN.json` (version, date, reading title, reading_format, thinking/maths skill labels, sample_map).
+3. `python3 tools/build.py`, which builds `tests/vNN/index.html` and regenerates `index.html`. Never hand-edit generated files.
+4. `node tools/check_lengths.js tests/vNN/index.html` (must report 0 longest) and `node tools/check_render.js tests/vNN/index.html` (must PASS).
+5. Verify every answer by computation, then run an independent cold solve (a separate agent that never sees the answers). Fix what it finds, re-check, then commit and push.
+6. Finish by giving David a list of every question mapped to the sample-paper question(s) it most relates to, and the skill being tested.
 
-## Standards (from David)
-- Format: Reading 3 questions (A–D), Thinking Skills 3 (A–D), Maths 3 (A–E). No timer. Never mention "OC" in the UI.
-- All questions new each version; fresh questions testing the same skills as the samples, not reworded copies.
-- Reading: approachable length (~250–350 words) but genuine OC-level questions (implication, purpose of a detail, structure, connotation) with partly-true distractors. Every reading topic must be new (check every `content/vNN.json` `reading`) and realistic for the real test. The story is never about football. Rotate formats: story extract, cloze, missing sentences, poem, four extracts.
-- Thinking Skills pattern (from v33): Q1 critical thinking rotating spot-the-mistake / supports-the-claim / whose-reasoning (weighted to sample frequency; cycle the mistake patterns), Q2 table/timetable/arrangement, Q3 spatial or a second critical-thinking item. No "weakens the argument" items.
-- Maths: Q1 is a quick-fire item (place value, time, money, measurement, scales, graphs); Q2–Q3 multi-step reasoning. At most one competition-style item.
-- Every distractor comes from a principled mistake; the correct option is never the single longest; spread answer letters; "may" in every option of mistake questions; facts must be accurate; prefer visuals; verify every answer by computation.
-- Never commit the official sample papers (copyright NSW Department of Education / Cambridge).
+## Format
+- Reading 3 questions (A–D), Thinking Skills 3 (A–D), Maths 3 (A–E). No timer.
+- Never mention "OC" in the page itself.
+
+## Calibration
+- Every question must be at genuine OC level and test a skill that appears in the samples.
+- Write fresh questions that test the same skills as the samples, sometimes in a similar way, sometimes in an unexpected way. Never reword a sample question.
+- Weight question types by how often they appear in the samples (frequencies below), favouring the skills that win the most marks.
+- Each version, include new skills and also loop back to skills from earlier versions.
+
+## Reading
+Sample paper: story 6 Qs, cloze 8, poem 5, missing sentences 6, four extracts 8.
+- Rotate formats. Over any 9 versions aim for about: cloze ×2, four extracts ×2, story ×2, missing sentences ×2, poem ×1.
+- Passages stay approachable (about 250–350 words), but questions are genuinely OC-level: implication, why a detail is included, structure, comparisons, feelings shown rather than stated.
+- Cloze uses near-synonym and fixed-phrase options where only one fits.
+- Wrong options must be partly true or built on a real detail from the text, never obviously wrong.
+- Every reading topic must be new (check `reading` in every `content/vNN.json`) and the kind of topic the real test uses. The story is never about football.
+- In four-extract sets, every extract should be the answer to at least one question where possible.
+
+## Thinking Skills
+Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/timetables/data 14%, supports the claim 13%, order/arrangement 12%, whose reasoning 11%, rules/codes/sets 9%, number problems 4%, must/cannot be true 3%.
+- **Q1: always critical thinking.** Rotate spot the mistake → supports the claim → whose reasoning, with spot the mistake slightly more often.
+  - Spot the mistake: cycle the patterns: ignoring another possible cause; judging from your own small group; treating something needed as a guarantee; an unfair comparison; treating "most" as "all"; reversing a rule. Every option contains "may".
+  - Whose reasoning: cycle needed versus guaranteed; reversed rule; "most" leading to "probably"; certainty/worst case.
+  - Supports the claim: the right answer backs the claim's reason; the wrong options are true but about something else.
+- **Q2:** a table, timetable, data or arrangement question (more often tables/timetables).
+- **Q3:** spatial at sample-paper difficulty (one or two clear steps), or a second critical-thinking question. Spatial questions must not be harder than the sample versions.
+- Never use "weakens the argument" questions (they don't appear in the samples).
+
+## Maths
+- **Q1:** a quick-fire question (under a minute), rotating: place value, time, money, measurement, reading a scale, reading a graph, simple word problem, missing number.
+- **Q2 and Q3:** multi-step reasoning on sample-paper topics: fractions, patterns, area and perimeter, 3D shapes, chance statements, combinations, rates, best value, timetables, "which statements are correct" graph questions.
+- At most one competition-style (Kangaroo-like) question per version.
+
+## Quality rules (every question)
+- Every wrong option comes from a real mistake a child would make.
+- The correct option is never the single longest.
+- Spread the answer letters within each section.
+- Facts must be accurate; check anything factual before using it.
+- Use images and diagrams wherever they help, drawn clearly and not to scale where measuring would give the answer away.
+- Explanations show the method and name why each trap is wrong.
+
+## Copyright
+Never commit the official sample papers (copyright NSW Department of Education / Cambridge).
