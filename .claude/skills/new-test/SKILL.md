@@ -57,6 +57,7 @@ Both must pass: `check_lengths` reports 0 longest, `check_render` reports PASS a
 1. `git add -A && git commit` with a message summarising each section (end with the attribution lines from the session's system reminder).
 2. `git push -u origin <branch>`.
 3. Check whether the previous pull request from this branch is merged; open a new pull request to `main` (use the GitHub MCP tools). Body: what each section contains, the checks run and what the cold solve found/fixed.
+4. GitHub runs `.github/workflows/check.yml` on the pull request. If it fails, read the failing step's log, fix, and push again before reporting.
 
 ## 6. Report to David
 

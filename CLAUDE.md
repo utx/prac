@@ -61,7 +61,10 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 ## Progress tracking and admin
 - Test pages record each attempt in the browser's localStorage (key `prac.v1`) and flag the test completed when it is finished. The index shows completed tests and has a "Mark as done" toggle.
 - `pracadmin/` (built from `tools/admin.html`) is the PIN-protected stats page. Tests opened from it use `?admin=1` and record nothing. The PIN check is client-side only.
-- Keep the template's tracking hooks working when changing `tools/template.html`.
+- Keep the template's tracking hooks working when changing `tools/template.html`; `node tools/check_tracking.js` checks them end to end.
+
+## Automatic checks
+- `.github/workflows/check.yml` runs on every pull request and push to `main`: build (validates question types and stretch tags), generated files up to date, `tools/check.sh` on every test, and `tools/check_tracking.js`. A red cross on a pull request must be fixed before merging.
 
 ## Copyright
 Never commit the official sample papers (copyright NSW Department of Education / Cambridge).

@@ -28,6 +28,18 @@ CATEGORIES = {
 }
 
 
+def check_stretch(n, meta):
+    """From v40 every section must tag exactly one stretch question (see CLAUDE.md)."""
+    stretch = meta.get("stretch", {})
+    for sec, idx in stretch.items():
+        if sec not in CATEGORIES or not all(isinstance(i, int) and 0 <= i < 3 for i in idx):
+            raise SystemExit(f"v{n}: bad 'stretch' entry {sec}: {idx!r}")
+    if n >= 40:
+        missing = [sec for sec in CATEGORIES if len(stretch.get(sec, [])) != 1]
+        if missing:
+            raise SystemExit(f"v{n}: needs exactly one stretch question in {', '.join(missing)} (\"stretch\" in content/v{n}.json)")
+
+
 def check_categories(n, meta):
     cats = meta.get("categories")
     if not cats:
@@ -216,6 +228,7 @@ if __name__ == "__main__":
     vs = versions()
     for n, js, meta in vs:
         check_categories(n, meta)
+        check_stretch(n, meta)
         print("built", build_test(n, js, meta).relative_to(ROOT))
     build_index(vs)
     build_admin(vs)
