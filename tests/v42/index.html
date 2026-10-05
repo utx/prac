@@ -273,16 +273,26 @@ const PASSAGE = {
   html: PARAS.map(p => `<p>${p}</p>`).join("")
 };
 
-/* ---- Thinking Skills Q2: round table ---- */
-const TABLE_SVG = (() => {
-  const cx = 110, cy = 100, R = 52, rc = 80;
-  let g = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#f3e3c7" stroke="${INK}" stroke-width="2"/>`;
-  for (let k = 0; k < 6; k++) {
-    const a = (k * 60 - 90) * Math.PI / 180, x = cx + rc * Math.cos(a), y = cy + rc * Math.sin(a);
-    g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="13" fill="#fff" stroke="${INK}" stroke-width="1.8"/>`;
-  }
-  return `<svg viewBox="0 0 220 200" width="220" height="200" role="img" aria-label="A round table seen from above with six chairs spaced evenly around it.">${g}</svg>`;
-})();
+/* ---- Thinking Skills Q2: balance scales ---- */
+const BAL_SHAPE = {
+  ball: (x, y) => `<circle cx="${x}" cy="${y - 11}" r="11" fill="#8fd3c7" stroke="${INK}" stroke-width="1.8"/>`,
+  cube: (x, y) => `<rect x="${x - 11}" y="${y - 22}" width="22" height="22" fill="#f2c14e" stroke="${INK}" stroke-width="1.8"/>`,
+  cone: (x, y) => `<polygon points="${x - 11},${y} ${x + 11},${y} ${x},${y - 24}" fill="#e9a3a3" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>`
+};
+const NAME = { ball: "ball", cube: "cube", cone: "cone" };
+function balanceSvg(left, right, label) {
+  const pan = (items, cx) => items.map((k, n) => BAL_SHAPE[k](cx + (n - (items.length - 1) / 2) * 25, 62)).join("");
+  const count = items => Object.keys(NAME).map(k => [k, items.filter(x => x === k).length]).filter(e => e[1])
+    .map(([k, c]) => `${c} ${NAME[k]}${c > 1 ? "s" : ""}`).join(" and ");
+  const g = `<polygon points="110,70 98,108 122,108" fill="#d9dee7" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+    <line x1="20" y1="70" x2="200" y2="70" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="14" y1="62" x2="86" y2="62" stroke="${INK}" stroke-width="2.4"/><line x1="134" y1="62" x2="206" y2="62" stroke="${INK}" stroke-width="2.4"/>
+    <line x1="50" y1="62" x2="50" y2="70" stroke="${INK}" stroke-width="2"/><line x1="170" y1="62" x2="170" y2="70" stroke="${INK}" stroke-width="2"/>
+    ${pan(left, 50)}${pan(right, 170)}`;
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><svg viewBox="0 0 220 112" width="220" height="112" role="img"
+    aria-label="${label}: a balanced scale with ${count(left)} on the left and ${count(right)} on the right.">${g}</svg><span style="font-size:14px">${label}</span></div>`;
+}
+const BALANCES = `<div style="display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:center">${balanceSvg(["ball", "ball", "cone"], ["cube", "cone", "cone"], "Scale 1")}${balanceSvg(["cube"], ["cone", "cone", "cone"], "Scale 2")}</div>`;
 
 /* ---- Thinking Skills Q3: cube net with symbols ---- */
 // each symbol is drawn in a 1 by 1 square, then stretched onto a face
@@ -402,24 +412,16 @@ const SECTIONS = [
                   <p class="why-not">C is the trap: Zoe’s reasoning sounds like the rule, but “must” only tells you who <em>can’t</em> be picked, not who will be. D catches students who think Hamish is making the same mistake. He isn’t: missing something that is needed really does rule Tom out.</p>`
       },
       {
-        stem: `Six friends, Amy, Ben, Cara, Dan, Eve and Finn, sit around this round table. Everyone faces the middle of the table.
-               <div class="figure">${TABLE_SVG}</div>
-               <ul class="facts">
-                 <li>Amy sits directly opposite Ben.</li>
-                 <li>Cara sits immediately on Amy’s left.</li>
-                 <li>Dan sits next to Ben, but not next to Cara.</li>
-                 <li>Eve does not sit next to Amy.</li>
-               </ul>
-               <p style="margin:10px 0 0">Who sits immediately on <b>Cara’s</b> left?</p>`,
-        options: ["Amy", "Dan", "Finn", "Eve"],
-        answer: 3,
-        skill: "using clues to work out an arrangement around a table",
-        explain: `<p>Picture the table as a clock face. Put Amy at 6 o’clock, so Ben, opposite her, is at 12 o’clock.</p>
-                  <p>Amy faces the middle (towards 12 o’clock), so her left hand points towards 9 o’clock. Cara is immediately on Amy’s left: <b>8 o’clock</b>.</p>
-                  <p>Dan is next to Ben, so at 10 or 2 o’clock. 10 o’clock is next to Cara, so Dan is at <b>2 o’clock</b>.</p>
-                  <p>That leaves 10 o’clock and 4 o’clock for Eve and Finn. 4 o’clock is next to Amy, so Eve is at <b>10 o’clock</b> and Finn at 4 o’clock.</p>
-                  <p>Cara sits at 8 o’clock facing the middle, so her left is towards 10 o’clock: <b>Eve</b>.</p>
-                  <p class="why-not">Amy (A) is the trap: she is on Cara’s <em>right</em>. Mixing up left and right (or using left and right as you look at the picture, instead of as Cara sees it) gives Amy. Dan (B) comes from forgetting that Dan is not next to Cara. Finn (C) comes from forgetting that Eve is not next to Amy, which lets Eve and Finn swap.</p>`
+        stem: `Both of these scales balance. All the balls weigh the same, all the cubes weigh the same and all the cones weigh the same.
+               <div class="figure">${BALANCES}</div>
+               <p style="margin:10px 0 0">How many cones would balance <b>1 ball and 1 cube</b> together?</p>`,
+        options: ["2", "4", "5", "6"],
+        answer: 2,
+        skill: "balance puzzles: swapping and removing equal weights",
+        explain: `<p><b>Scale 2:</b> one cube weighs the same as 3 cones.</p>
+                  <p><b>Scale 1:</b> swap the cube for 3 cones. Now 2 balls and 1 cone balance 3 + 2 = 5 cones. Take one cone off each side and the scale still balances: 2 balls balance <b>4 cones</b>.</p>
+                  <p>So 1 ball weighs the same as 2 cones. 1 ball and 1 cube = 2 + 3 = <b>5 cones</b>.</p>
+                  <p class="why-not">6 (D) is the trap: it adds the cone on the balls’ side to the other side (2 balls = 5 + 1 = 6 cones) instead of taking it away, so a ball seems to weigh 3 cones. 4 (B) stops at 2 balls = 4 cones and forgets to halve. 2 (A) finds the ball correctly but forgets to add the cube.</p>`
       },
       {
         stem: `This net is folded to make a cube.
@@ -489,7 +491,7 @@ const SECTIONS = [
   }
 ];
 
-const TEST_META = {"version": 42, "reading_format": "story", "categories": {"reading": ["Vocabulary & idioms", "Feelings & inference", "Purpose of a detail"], "thinking": ["Whose reasoning", "Order & arrangement", "Spatial"], "maths": ["Number & place value", "Money & best value", "Patterns & sequences"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}};
+const TEST_META = {"version": 42, "reading_format": "story", "categories": {"reading": ["Vocabulary & idioms", "Feelings & inference", "Purpose of a detail"], "thinking": ["Whose reasoning", "Number problems", "Spatial"], "maths": ["Number & place value", "Money & best value", "Patterns & sequences"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}};
 const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
 /* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
    SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
