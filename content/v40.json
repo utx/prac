@@ -1,9 +1,9 @@
 {
   "version": 40,
   "date": "2026-10-05",
-  "reading": "Missing sentences: Too Strange to Be Real",
+  "reading": "Missing sentences: Cracking the Code",
   "reading_format": "missing sentences",
-  "reading_topic": "the first platypus skin sent to Britain (1799) and the egg-laying discovery (1884)",
+  "reading_topic": "the Rosetta Stone (found 1799) and how hieroglyphs were deciphered (Young, Champollion 1822)",
   "thinking": [
     "Supports the claim (trees to cool the playground)",
     "Two-way table with missing numbers",
@@ -18,7 +18,7 @@
     "reading": [
       "PT2 Q20-25 (missing sentences)",
       "PT2 Q20-25 (following reasoning across a gap)",
-      "PT2 Q20-25 (linking words and order of events) — stretch"
+      "PT2 Q20-25 (linking words and who has been introduced) — stretch"
     ],
     "thinking": [
       "PT3 Q26 (leaking taps), PT3 Q21 (handling puppies), PT2 Q3",
@@ -32,9 +32,31 @@
     ]
   },
   "categories": {
-    "reading": ["Sentence links", "Sentence links", "Sentence links"],
-    "thinking": ["Supports the claim", "Tables & timetables", "Spatial"],
-    "maths": ["Time & timetables", "Fractions", "Area, perimeter & 3D"]
+    "reading": [
+      "Sentence links",
+      "Sentence links",
+      "Sentence links"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Time & timetables",
+      "Fractions",
+      "Area, perimeter & 3D"
+    ]
   },
-  "stretch": { "reading": [2], "thinking": [2], "maths": [2] }
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
 }
