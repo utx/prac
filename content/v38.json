@@ -1,0 +1,34 @@
+{
+  "version": 38,
+  "date": "2026-10-05",
+  "reading": "Story extract: Some Assembly Required",
+  "reading_format": "story",
+  "reading_topic": "a girl who builds a flat-pack bookcase without the instructions",
+  "thinking": [
+    "Spot the mistake (ignoring another possible cause)",
+    "Results table: total points versus events won",
+    "Fitting a piece into a gap (turning a shape in your head)"
+  ],
+  "maths": [
+    "Quick-fire graph reading: column graph with unlabelled grid lines",
+    "Painted block: cubes with exactly one painted face (competition-style)",
+    "Fractions: finding the whole from the part that is left"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q1-6 (story extract), PT2 Q1-6 (purpose of a detail)",
+      "PT3 Q1-6, PT2 Q1-6 (meaning of a comparison)",
+      "PT3 Q6 (impression of a character across the whole text), PT3 Q1"
+    ],
+    "thinking": [
+      "PT3 Q8 (fish and pollution: another cause), PT3 Q24 (crocuses and possums)",
+      "PT3 Q7 (robot packs table), PT2 Q7 (city with the highest total rainfall)",
+      "PT3 Q4 (puzzle pieces making layers of a cube), PT1 Q16 (same shapes used)"
+    ],
+    "maths": [
+      "PT1 Q17 (umbrella column graphs), PT2 Q27 (column graph)",
+      "PT1 Q28 (faces of small cubes), PT1 Q14 (object glued from cubes)",
+      "PT2 Q6 (fraction of a cake left), PT1 Q4 (fraction shaded)"
+    ]
+  }
+}
