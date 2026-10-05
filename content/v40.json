@@ -1,0 +1,40 @@
+{
+  "version": 40,
+  "date": "2026-10-05",
+  "reading": "Missing sentences: Too Strange to Be Real",
+  "reading_format": "missing sentences",
+  "reading_topic": "the first platypus skin sent to Britain (1799) and the egg-laying discovery (1884)",
+  "thinking": [
+    "Supports the claim (trees to cool the playground)",
+    "Two-way table with missing numbers",
+    "Fold twice, punch a triangle: holes reflected in the folds (stretch)"
+  ],
+  "maths": [
+    "Quick-fire time: hours and minutes to seconds, then rounding (supplied by David)",
+    "Simplifying fractions before adding (competition-style, supplied by David)",
+    "Two rooms: missing sides from areas, then the perimeter (stretch, supplied by David)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT2 Q20-25 (missing sentences)",
+      "PT2 Q20-25 (following reasoning across a gap)",
+      "PT2 Q20-25 (linking words and order of events) — stretch"
+    ],
+    "thinking": [
+      "PT3 Q26 (leaking taps), PT3 Q21 (handling puppies), PT2 Q3",
+      "PT3 Q7 (robot packs table), PT2 Q7 (rainfall totals)",
+      "PT1 Q13 (folding string), PT1 maths Q24 (folded paper with holes cut out) — stretch"
+    ],
+    "maths": [
+      "PT1 Q3 (time on a train), PT3 Q31 (time at Coffs Harbour)",
+      "PT2 Q6 (fraction of a cake), PT2 Q20 (thirds and quarters)",
+      "PT1 Q31 (perimeter of a new shape), PT2 Q17 (same perimeter) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": ["Sentence links", "Sentence links", "Sentence links"],
+    "thinking": ["Supports the claim", "Tables & timetables", "Spatial"],
+    "maths": ["Time & timetables", "Fractions", "Area, perimeter & 3D"]
+  },
+  "stretch": { "reading": [2], "thinking": [2], "maths": [2] }
+}
