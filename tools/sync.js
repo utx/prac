@@ -3,7 +3,9 @@
    is a no-op and the site works from browser storage alone. Events that can't be sent
    (offline, server down) wait in localStorage and are retried on the next page load. */
 const SYNC_OUTBOX = "prac.outbox";
-const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key);
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
 function syncHeaders() {
   const k = SYNC_CONFIG.supabase_publishable_key;
   const h = { "apikey": k, "Content-Type": "application/json" };
@@ -13,7 +15,7 @@ function syncHeaders() {
 function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
 function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
 async function syncSend(rows) {
-  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/$/, "") + "/rest/v1/events", {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
     method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
     body: JSON.stringify(rows), keepalive: true
   });
@@ -42,7 +44,7 @@ function syncPost(kind, version, attemptId, payload) {
   syncFlush();
 }
 async function syncRpc(name, args) {
-  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/$/, "") + "/rest/v1/rpc/" + name, {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
     method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
   });
   if (!r.ok) throw new Error(name + " " + r.status);
