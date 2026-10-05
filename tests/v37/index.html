@@ -228,18 +228,30 @@
 let passMode = "answer";
 const INK = "#1b2a41";
 
-/* ---- Reading: poem ---- */
+/* ---- Reading: poem (public domain: Robert Louis Stevenson, 1885) ---- */
 const STANZAS = [
-  ["For months the sky was a lid of tin,", "the dam a cracked brown plate;", "the paddocks lay like an old dog’s coat,", "and the cattle stood by the gate."],
-  ["Dad read the clouds the way some men", "read the paper, every day,", "and every day he folded them up", "and put them all away."],
-  ["Then late one night the tin roof spoke:", "a tap, a tap, a drum,", "and the dry gums lifted their thirsty arms", "as if they’d heard it come."],
-  ["Dad didn’t call or cheer or shout.", "He walked out to the yard", "and stood bareheaded in the dark", "while it rained, and rained down hard."],
-  ["Mum held the door. She didn’t say", "he’d catch his death of cold.", "I watched him from the kitchen step;", "he looked a little less old."],
-  ["Next morning, frogs were arguing", "in the ditch beside the shed,", "and the dam held a piece of the sky again,", "like the old days, Dad said."]
+  [
+    "My tea is nearly ready and the sun has left the sky.",
+    "It’s time to take the window to see Leerie going by;",
+    "For every night at teatime and before you take your seat,",
+    "With lantern and with ladder he comes posting up the street."
+  ],
+  [
+    "Now Tom would be a driver and Maria go to sea,",
+    "And my papa’s a banker and as rich as he can be;",
+    "But I, when I am stronger and can choose what I’m to do,",
+    "O Leerie, I’ll go round at night and light the lamps with you!"
+  ],
+  [
+    "For we are very lucky, with a lamp before the door,",
+    "And Leerie stops to light it as he lights so many more;",
+    "And oh! before you hurry by with ladder and with light;",
+    "O Leerie, see a little child and nod to him to-night!"
+  ]
 ];
 const PASSAGE = {
-  title: "The Night the Rain Came Back",
-  note: "Read the poem below, then answer the questions. The numbers show the verses.",
+  title: "The Lamplighter",
+  note: "Read the poem below by Robert Louis Stevenson (1885), then answer the questions. The numbers show the verses. <i>Leerie</i> is a Scottish name for a lamplighter: in Stevenson’s time, street lamps were lit by hand every evening.",
   html: `<div class="poem">${STANZAS.map((s, i) => `<div class="stanza"><span class="vn">${i + 1}</span>${s.map(l => `<span class="line">${l}</span>`).join("")}</div>`).join("")}</div>`
 };
 
@@ -309,37 +321,37 @@ const SECTIONS = [
     intro: "Read the poem, then choose the best answer (A, B, C or D) for each question.",
     questions: [
       {
-        stem: "In verse 2, Dad reads the clouds “the way some men / read the paper”, and every day he “folded them up / and put them all away”. What does this suggest about Dad?",
-        options: ["He could tell what the weather would do better than anyone else.",
-                  "He watched for rain each day but kept his worries quiet.",
-                  "He had given up hope that the drought would ever end.",
-                  "He was more interested in the news than in the weather."],
+        stem: "In verse 1, Leerie “comes posting up the street”. Here, “posting” means",
+        options: ["delivering letters to each house.",
+                  "hurrying along quickly.",
+                  "sticking up notices on the walls.",
+                  "standing on guard like a soldier."],
         answer: 1,
-        skill: "interpreting a comparison to infer a character’s feelings",
-        explain: `<p>People read the paper as a daily habit, so Dad checked the sky for rain <em>every</em> day. When no rain came, he “folded” the clouds up and “put them all away”, the way you put down a paper you’ve finished with. He didn’t talk about his disappointment; he just put it aside until the next day. Verse 4 shows how much he had been holding in.</p>
-                  <p class="why-not">C is the trap: “put them all away” can sound like giving up, but someone who had given up would not keep reading the clouds “every day”. A takes “read the clouds” too far: the poem never says he was good at forecasting, only that he kept looking. D reads “the paper” literally, but the newspaper is only a comparison.</p>`
+        skill: "working out an unusual meaning of a word from context",
+        explain: `<p>“Posting” has an old meaning: travelling fast. Leerie has a whole street of lamps to light every evening, “as he lights so many more”, and in verse 3 the child asks him not to “hurry by”. So he comes <b>hurrying</b> up the street.</p>
+                  <p class="why-not">A is the trap: today “posting” usually means sending letters, but Leerie carries a lantern and a ladder, not a mailbag. C (posting a notice) and D (a soldier at his post) are other real meanings of “post”, but neither fits a man going from lamp to lamp.</p>`
       },
       {
-        stem: "In verse 5, why does Mum not say that Dad will “catch his death of cold”?",
-        options: ["She was too surprised by the sudden storm to say anything.",
-                  "She was cross with him for going out without his hat.",
-                  "She wanted him to come back inside before the storm got worse.",
-                  "She understood how much the rain meant to him."],
-        answer: 3,
-        skill: "inferring feelings that are shown rather than stated",
-        explain: `<p>“You’ll catch your death of cold” is what people say to someone standing out in the rain. Mum has every reason to say it, but she doesn’t. She just holds the door and lets him stay out. After months of drought, she knows this rain is a huge relief to Dad, and she doesn’t want to spoil the moment.</p>
-                  <p class="why-not">C is the trap: holding the door open <em>could</em> be a way of waiting for him, but if she wanted him inside she would have called him, which is exactly what she chooses not to do. B uses a real detail (“bareheaded”), but nothing shows Mum is cross. A doesn’t fit: Mum calmly holds the door, and the poem presents her silence as a choice (“She didn’t say”), not as being lost for words.</p>`
+        stem: "Why does the speaker mention Tom, Maria and papa in verse 2?",
+        options: ["To show that the speaker’s family is rich and important.",
+                  "To show that the others have already chosen the jobs they will do.",
+                  "To show that the speaker would choose Leerie’s job over theirs.",
+                  "To show that the speaker is jealous of Tom and Maria."],
+        answer: 2,
+        skill: "understanding why a detail is included (contrast)",
+        explain: `<p>Verse 2 lists exciting or important jobs: driving, going to sea, being a rich banker. Then comes “<b>But</b> I…”: out of all of them, the speaker would rather “go round at night and light the lamps” with Leerie. The other jobs are there to show how much the child admires Leerie’s job by comparison.</p>
+                  <p class="why-not">A is the trap: papa <em>is</em> “as rich as he can be”, but the point is that even being rich doesn’t tempt the speaker. B misreads “would be”: Tom and Maria only <em>wish</em> for those jobs. Nothing suggests the speaker is jealous (D); the child is happy with their own choice.</p>`
       },
       {
-        stem: "In verse 6, the dam “held a piece of the sky again”. This suggests that",
-        options: ["the dam had filled with water and reflected the sky.",
-                  "grey clouds still hung low over the dam that morning.",
-                  "the dam was as dull and grey as the drought sky had been.",
-                  "rain was still falling from the sky into the dam."],
+        stem: "Taken together, the words “when I am stronger” (verse 2) and the last two lines of the poem suggest that the speaker",
+        options: ["is small or unwell, and longs for Leerie to notice him.",
+                  "has been told off for staying up past teatime.",
+                  "is frightened of the dark street outside the window.",
+                  "plans to slip out of the house and follow Leerie round the town."],
         answer: 0,
-        skill: "interpreting an image and linking the end of a poem to its beginning",
-        explain: `<p>Still water reflects what is above it, so a full dam shows a “piece of the sky” on its surface. The word “again” and Dad’s comment “like the old days” tell us this is how the dam used to look before the drought. In verse 1 the dam was “a cracked brown plate”, with no water at all. The ending answers the beginning.</p>
-                  <p class="why-not">C is the trap: it links back to the “lid of tin” sky in verse 1, but the poem is showing a <em>change</em>, not more of the same. B and D take “sky” literally, but nothing in verse 6 mentions clouds or rain still falling; the morning is full of frogs, not storms.</p>`
+        skill: "inferring a character’s situation and feelings",
+        explain: `<p>“When I am stronger” suggests the child is young, and perhaps weak or often ill, so going out at night isn’t possible yet. Instead, the child watches from the window every evening. The last lines (“And oh! … O Leerie, see a little child and nod to him to-night!”) show how much the child wants this busy man to notice him, even just for a nod.</p>
+                  <p class="why-not">D is the trap: the child does want to go round with Leerie, but only “when I am stronger” in the future, not tonight. B and C have no support: watching at teatime is a happy routine (“we are very lucky”), not a punishment, and nothing suggests fear of the dark.</p>`
       }
     ]
   },
@@ -446,7 +458,7 @@ const SECTIONS = [
   }
 ];
 
-const TEST_META = {"version": 37, "reading_format": "poem", "categories": {"reading": ["Comparisons & imagery", "Feelings & inference", "Comparisons & imagery"], "thinking": ["Supports the claim", "Tables & timetables", "Spatial"], "maths": ["Measurement & scales", "Area, perimeter & 3D", "Rates"]}};
+const TEST_META = {"version": 37, "reading_format": "poem", "categories": {"reading": ["Vocabulary & idioms", "Purpose of a detail", "Feelings & inference"], "thinking": ["Supports the claim", "Tables & timetables", "Spatial"], "maths": ["Measurement & scales", "Area, perimeter & 3D", "Rates"]}, "stretch": {"reading": [2]}};
 const LETTERS = ["A", "B", "C", "D", "E"];
 const app = document.getElementById("app");
 const hdrSection = document.getElementById("hdr-section");
@@ -490,7 +502,8 @@ function recordSection(i) {
   const s = SECTIONS[i];
   attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
     answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
-      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi] })) };
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
   persistAttempt();
 }
 function finishAttempt() {

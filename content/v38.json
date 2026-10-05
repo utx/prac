@@ -18,7 +18,7 @@
     "reading": [
       "PT3 Q1-6 (story extract), PT2 Q1-6 (purpose of a detail)",
       "PT3 Q1-6, PT2 Q1-6 (meaning of a comparison)",
-      "PT3 Q6 (impression of a character across the whole text), PT3 Q1"
+      "PT3 Q6 (impression across the whole text), PT2 Q18 (what lines 14-19 are doing) — stretch"
     ],
     "thinking": [
       "PT3 Q8 (fish and pollution: another cause), PT3 Q24 (crocuses and possums)",
@@ -46,6 +46,11 @@
       "Graphs & data",
       "Area, perimeter & 3D",
       "Fractions"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
     ]
   }
 }

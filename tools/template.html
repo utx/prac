@@ -266,7 +266,8 @@ function recordSection(i) {
   const s = SECTIONS[i];
   attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
     answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
-      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi] })) };
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
   persistAttempt();
 }
 function finishAttempt() {

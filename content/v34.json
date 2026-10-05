@@ -16,9 +16,9 @@
   ],
   "sample_map": {
     "reading": [
-      "PT1-3 Q7-14 cloze (fixed expressions: 'contain himself', 'springs to mind')",
-      "PT3 Q7-14 cloze ('springs to mind', 'teeming with')",
-      "PT2 Q7-14 cloze ('still stand', 'set a record')"
+      "PT1 Q7 ('contain himself'), PT3 Q8 ('in that case')",
+      "PT3 Q10 ('teeming with'), PT1 Q9 ('wove')",
+      "PT1 Q8 ('culmination'), PT3 Q13 ('decline' vs 'decay') — stretch"
     ],
     "thinking": [
       "PT2 Q26, PT3 Q3, PT1 Q9",
@@ -46,6 +46,11 @@
       "Money & best value",
       "Chance & counting",
       "Patterns & sequences"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
     ]
   }
 }

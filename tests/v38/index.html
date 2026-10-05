@@ -230,7 +230,7 @@ const INK = "#1b2a41";
 
 /* ---- Reading: narrative ---- */
 const PARAS = [
-  `The box was taller than Ruby, and it said SOME ASSEMBLY REQUIRED in cheerful red letters, as if that were good news.`,
+  `The box with the new bookcase in it was taller than Ruby, and it said SOME ASSEMBLY REQUIRED in cheerful red letters, as if that were good news.`,
   `“I’ll do it,” Ruby said. “By myself.”`,
   `Dad looked at the box, then at Ruby, then at the instruction booklet, which was as thick as a comic. “Don’t you want this?” he asked, holding it out.`,
   `“Instructions are for people who don’t know what they’re doing.”`,
@@ -340,22 +340,22 @@ const SECTIONS = [
         options: ["had been left out but were meant to be used.",
                   "were too small and weak to be useful in a bookcase.",
                   "had been lined up so that Ruby could count them easily.",
-                  "were spares that the bookcase did not need."],
+                  "had rolled under the carpet and been lost for hours."],
         answer: 0,
         skill: "interpreting a comparison",
         explain: `<p>Children who aren’t picked for a team are left standing on the side, even though they came to play. In the same way, the screws and pegs were <em>supposed</em> to be part of the bookcase but were left out. That is why the bookcase leans, and why Ruby finally opens the instructions.</p>
-                  <p class="why-not">D is the trap: some flat-pack kits do include spares, but the leaning shelves and Ruby’s decision to undo her work show these pieces were needed. C uses a real detail (“a neat little row”), but the comparison is about being left out, not about counting. B has no support in the story.</p>`
+                  <p class="why-not">C is the trap: it uses a real detail (“a neat little row”), but the comparison is about being <em>left out</em>, not about counting. The leaning shelves and Ruby undoing her work show these pieces were needed. D has no support: the pieces are lying on the carpet in plain view. B has no support in the story.</p>`
       },
       {
-        stem: "Which sentence best describes how Ruby changes during the story?",
-        options: ["She starts out bored by the job, and ends up enjoying it.",
-                  "She starts out cross with Dad, and ends up proud of what she has made.",
-                  "She starts out nervous about the job, and ends up confident.",
-                  "She starts out sure she needs no help, and ends up asking for it."],
+        stem: "The story ends before we find out whether Ruby builds the bookcase properly. What is the most likely reason the writer ends it here?",
+        options: ["The writer wants readers to decide whether instructions are worth reading.",
+                  "The bookcase cannot be fixed, and the writer wants to avoid a sad ending.",
+                  "Dad is about to take over and finish the whole job on his own.",
+                  "The change that matters most, Ruby asking for help, has already happened."],
         answer: 3,
-        skill: "tracking how a character changes",
-        explain: `<p>At the start, Ruby says “By myself” and that “Instructions are for people who don’t know what they’re doing.” By the end, she has opened the booklet at Step 1 and asks Dad to help her take the bookcase apart. She has gone from refusing help to asking for it.</p>
-                  <p class="why-not">C is the trap: it reverses what happens. Ruby is confident at the start and less sure at the end, not the other way round. B doesn’t fit, because she isn’t cross with Dad, and the wonky bookcase gives her nothing to be proud of. A doesn’t fit either: she is keen from the beginning (“I’ll do it”).</p>`
+        skill: "understanding why a story ends where it does (structure)",
+        explain: `<p>The story is really about Ruby, not the bookcase. It begins with her refusing help (“By myself”, “Instructions are for people who don’t know what they’re doing”) and ends with her reading Step 1 and asking, “Can you hold the side while I undo it?” Once she has changed, the story has done its job, so the writer stops there. Whether the bookcase ends up straight doesn’t matter.</p>
+                  <p class="why-not">A is the trap: instructions are a big part of the story, but the writer has already shown what happens without them, and Ruby has clearly decided to use them, so readers aren’t left to decide. B has no support: Ruby is going to “undo it” and start again. C misreads the last lines: Ruby asks Dad only to <em>hold the side</em>, so she is still doing the job herself.</p>`
       }
     ]
   },
@@ -448,7 +448,7 @@ const SECTIONS = [
   }
 ];
 
-const TEST_META = {"version": 38, "reading_format": "story", "categories": {"reading": ["Purpose of a detail", "Comparisons & imagery", "Character & structure"], "thinking": ["Spot the mistake", "Tables & timetables", "Spatial"], "maths": ["Graphs & data", "Area, perimeter & 3D", "Fractions"]}};
+const TEST_META = {"version": 38, "reading_format": "story", "categories": {"reading": ["Purpose of a detail", "Comparisons & imagery", "Character & structure"], "thinking": ["Spot the mistake", "Tables & timetables", "Spatial"], "maths": ["Graphs & data", "Area, perimeter & 3D", "Fractions"]}, "stretch": {"reading": [2]}};
 const LETTERS = ["A", "B", "C", "D", "E"];
 const app = document.getElementById("app");
 const hdrSection = document.getElementById("hdr-section");
@@ -492,7 +492,8 @@ function recordSection(i) {
   const s = SECTIONS[i];
   attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
     answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
-      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi] })) };
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
   persistAttempt();
 }
 function finishAttempt() {

@@ -5,20 +5,15 @@
 let passMode = "answer";
 const INK = "#1b2a41";
 
-/* ---- Reading: narrative ---- */
+/* ---- Reading: story extract (public domain: Kenneth Grahame, 1908) ---- */
 const PARAS = [
-  `When Mr Okafor handed out the instruments, Wren held her breath. The trumpets went to Leo and Sami. The drums went to the Fitzgerald twins, who had been drumming on desks since kindergarten. Then Mr Okafor reached into the box and pulled out a small, bent piece of silver on a string.`,
-  `“Triangle,” he said, and smiled <b>as if he were giving her a present</b>.`,
-  `For three weeks Wren sat at the end of the back row and counted. In “Sea Song” she had to wait one hundred and twelve bars before her single note. She counted bars the way other people count sheep, and some afternoons she very nearly fell asleep doing it. Once she lost count completely and played her note into a silence so long and empty that Leo turned around to stare.`,
-  `“It’s not a real instrument,” she told her mother. “Anyone could play it. A goldfish could play it.”`,
-  `On the night of the concert, the hall was hot and crowded. The trumpets were loud and a little wrong. Wren counted. Ninety-nine, a hundred. Her hands were damp. At a hundred and ten, Mr Okafor looked straight at her over the top of his glasses, <b>the way a pilot might check a single dial before landing</b>. She lifted the beater.`,
-  `The note rang out, thin and bright, and hung over the hall until it faded into nothing. For a moment nobody clapped. Then everybody did.`,
-  `Afterwards, a woman Wren had never seen before stopped her by the door. “The little bell at the end,” she said. “That was the best part.”`,
-  `Wren didn’t correct her.`
+  "The Mole had been working very hard all the morning, spring-cleaning his little home. First with brooms, then with dusters; then on ladders and steps and chairs, with a brush and a pail of whitewash; till he had dust in his throat and eyes, and splashes of whitewash all over his black fur, and an aching back and weary arms. Spring was moving in the air above and in the earth below and around him, penetrating even his dark and lowly little house with its spirit of divine discontent and longing. It was small wonder, then, that he suddenly flung down his brush on the floor, said ‘Bother!’ and ‘O blow!’ and also ‘Hang spring-cleaning!’ and bolted out of the house without even waiting to put on his coat. Something up above was calling him imperiously, and he made for the steep little tunnel which answered in his case to the gravelled carriage-drive owned by animals whose residences are nearer to the sun and air. So he scraped and scratched and scrabbled and scrooged and then he scrooged again and scrabbled and scratched and scraped, working busily with his little paws and muttering to himself, ‘Up we go! Up we go!’ till at last, pop! his snout came out into the sunlight, and he found himself rolling in the warm grass of a great meadow.",
+  "‘This is fine!’ he said to himself. ‘This is better than whitewashing!’ The sunshine struck hot on his fur, soft breezes caressed his heated brow, and after the seclusion of the cellarage he had lived in so long the carol of happy birds fell on his dulled hearing almost like a shout. Jumping off all his four legs at once, in the joy of living and the delight of spring without its cleaning, he pursued his way across the meadow till he reached the hedge on the further side.",
+  "‘Hold up!’ said an elderly rabbit at the gap. ‘Sixpence for the privilege of passing by the private road!’ He was bowled over in an instant by the impatient and contemptuous Mole, who trotted along the side of the hedge chaffing the other rabbits as they peeped hurriedly from their holes to see what the row was about. ‘Onion-sauce! Onion-sauce!’ he remarked jeeringly, and was gone before they could think of a thoroughly satisfactory reply. Then they all started grumbling at each other. ‘How <em>stupid</em> you are! Why didn’t you tell him—’ ‘Well, why didn’t <em>you</em> say—’ ‘You might have reminded him—’ and so on, in the usual way; but, of course, it was then much too late, as is always the case."
 ];
 const PASSAGE = {
-  title: "The Triangle",
-  note: "Read the story below, then answer the questions.",
+  title: "The River Bank",
+  note: "Read the extract below from <i>The Wind in the Willows</i> (1908) by Kenneth Grahame, then answer the questions.",
   html: PARAS.map(p => `<p>${p}</p>`).join("")
 };
 
@@ -40,40 +35,40 @@ const SECTIONS = [
     id: "reading",
     name: "Reading",
     passage: PASSAGE,
-    intro: "Read the story, then choose the best answer (A, B, C or D) for each question.",
+    intro: "Read the extract, then choose the best answer (A, B, C or D) for each question.",
     questions: [
       {
-        stem: "Why does the writer say that Mr Okafor smiled “as if he were giving her a present”?",
-        options: ["To show that Mr Okafor was teasing Wren about her tiny instrument.",
-                  "To suggest that Mr Okafor saw more value in the triangle than Wren did.",
-                  "To show that the triangle was brand new and had been bought specially for the concert.",
-                  "To suggest that Wren was delighted to be chosen to play the triangle."],
+        stem: "The writer says that spring filled Mole’s house with “its spirit of divine discontent and longing”. This suggests that spring made Mole feel",
+        options: ["unhappy that his little house was still so dirty.",
+                  "restless, and eager for something beyond his home.",
+                  "tired and sore after a long and busy morning of hard work.",
+                  "annoyed with the animals who lived above him."],
         answer: 1,
-        skill: "understanding why a writer includes a detail",
-        explain: `<p>People smile like that when they think they are giving something good. Mr Okafor seems to believe the triangle is a worthwhile part to play. Wren clearly doesn’t agree yet: she later says “It’s not a real instrument.” The detail sets up the gap between how he sees the triangle and how she does, and the ending proves him right.</p>
-                  <p class="why-not">D is the trap: it takes the “present” at face value. But Wren “held her breath” hoping for something better, and she complains about the triangle afterwards, so she wasn’t delighted. A has no support, because nothing suggests he is mocking her. C reads the comparison too literally: the triangle is old and “bent”, not new.</p>`
+        skill: "working out the meaning of a phrase from context",
+        explain: `<p><b>Discontent</b> means not being satisfied, and <b>longing</b> means wanting something badly. Spring makes Mole dissatisfied with staying inside, and makes him want something else. The very next thing he does is fling down his brush and bolt out of the house, because “something up above was calling him”.</p>
+                  <p class="why-not">A is the trap: Mole <em>is</em> cleaning, so dirt seems relevant, but the discontent comes from spring outside, not from the dust, and he leaves the cleaning unfinished. C is true (he has “an aching back and weary arms”), but that isn’t what this phrase describes. Nothing suggests he is annoyed with other animals (D).</p>`
       },
       {
-        stem: "The writer says Mr Okafor looked at Wren “the way a pilot might check a single dial before landing”. This comparison suggests that",
-        options: ["Mr Okafor was worried because the concert was going badly.",
-                  "Mr Okafor wanted the concert to be over as quickly as possible.",
-                  "Wren had often played her note too early in rehearsals.",
-                  "Wren’s single note was something important he was relying on."],
+        stem: "Mole “scraped and scratched and scrabbled and scrooged”, and then the writer repeats the same words in reverse order. Why does the writer do this?",
+        options: ["To show that Mole kept getting lost and turning back.",
+                  "To copy the sound of rain falling on the ground above.",
+                  "To show that Mole was muttering these words to himself.",
+                  "To show how long and hard Mole had to dig to get out."],
         answer: 3,
-        skill: "interpreting a comparison",
-        explain: `<p>A pilot checks a dial before landing because that one reading really matters at a key moment. By comparing his look to this, the writer shows that Wren’s one small note was important, and that Mr Okafor was counting on her at exactly the right moment, near the end of the song.</p>
-                  <p class="why-not">A is the trap: the trumpets were “a little wrong”, so things weren’t perfect, but the comparison is about one important check, not about worry. B misreads “landing” as simply wanting it over. C is partly based on the story: Wren once lost count. But she played <em>late</em> into a long silence, not early, and the comparison is about this moment, not rehearsals.</p>`
+        skill: "understanding why a writer repeats words",
+        explain: `<p>Saying the four digging words, and then saying them all again backwards, makes the sentence itself long and hard work to read, just like the digging. It shows Mole digging on and on, “working busily” until at last, “pop!”, he breaks through into the sunlight.</p>
+                  <p class="why-not">A is the trap: reversing the words might suggest going backwards, but Mole goes steadily <em>up</em> (“Up we go!”) and comes out in the meadow; he never gets lost. C uses a real detail (he is muttering), but what he mutters is “Up we go!”, not the digging words. There is no rain in the extract (B); it is a sunny spring day.</p>`
       },
       {
-        stem: "Why does Wren not correct the woman at the end of the story?",
-        options: ["She was too shy to argue with a grown-up she had never met.",
-                  "She still thought the triangle was not a real instrument, so its name didn’t matter.",
-                  "She was too pleased that her part had mattered to care what it was called.",
-                  "She thought the woman was secretly making fun of how she had played."],
-        answer: 2,
-        skill: "inferring a character’s feelings from what they don’t do",
-        explain: `<p>The woman calls the triangle a “little bell”, the wrong name, but says Wren’s note was “the best part”. Earlier, Wren thought the triangle didn’t matter. Now everybody has clapped and a stranger has praised her note. Wren lets the mistake go because the praise is what matters to her now. The short final line shows her quiet pride.</p>
-                  <p class="why-not">B is the trap: it echoes Wren’s earlier words (“It’s not a real instrument”), but her feelings have changed by the end of the story. A has no support, because nothing shows Wren as shy. D is the opposite of what happens: the woman is sincere and everybody clapped.</p>`
+        stem: "After Mole has gone, the rabbits grumble at each other “in the usual way; but, of course, it was then much too late, as is always the case.” What is the writer doing here?",
+        options: ["Gently making fun of how people blame each other once it is too late.",
+                  "Warning readers that it is foolish to stand up to a bully like Mole.",
+                  "Showing that the rabbits were clever but much too slow to act.",
+                  "Feeling sorry for the rabbits, who had been treated unfairly by Mole."],
+        answer: 0,
+        skill: "recognising a writer’s tone and attitude",
+        explain: `<p>The rabbits only work out what they <em>should</em> have said once Mole has gone, and then they blame each other: “Why didn’t you tell him—”, “Why didn’t <em>you</em> say—”. The words “in the usual way” and “as is always the case” show the writer is smiling at something everyone recognises: people often argue about what they should have done after the chance has passed. The tone is amused, not serious.</p>
+                  <p class="why-not">D is the trap: Mole <em>was</em> rude to the rabbits (he bowled one over and jeered at them), so feeling sorry for them seems reasonable. But the writer’s words poke fun at the rabbits’ squabbling rather than sympathising with them. B doesn’t fit, because nobody stands up to Mole. C is half right (they were too slow), but nothing suggests they were clever; they couldn’t think of a “satisfactory reply”.</p>`
       }
     ]
   },

@@ -1,7 +1,7 @@
 {
   "version": 33,
   "date": "2026-10-05",
-  "reading": "Story extract: The Triangle",
+  "reading": "Story extract: The Wind in the Willows (Kenneth Grahame)",
   "reading_format": "story",
   "thinking": [
     "Spot the mistake (needed is not a guarantee)",
@@ -15,9 +15,9 @@
   ],
   "sample_map": {
     "reading": [
-      "PT2 Q1-6 (story extract)",
-      "PT2 Q1-6",
-      "PT2 Q1-6"
+      "PT3 Q1-6 (Nesbit classic extract), PT3 Q1 (how the children feel at the start)",
+      "PT2 Q15 (repetition to suggest something), PT3 Q2",
+      "PT3 Q5 (the Phoenix's language), PT3 Q6 (impression across the text) — stretch"
     ],
     "thinking": [
       "PT2 Q17, PT1 Q21",
@@ -32,9 +32,9 @@
   },
   "categories": {
     "reading": [
+      "Vocabulary & idioms",
       "Purpose of a detail",
-      "Comparisons & imagery",
-      "Feelings & inference"
+      "Tone & attitude"
     ],
     "thinking": [
       "Spot the mistake",
@@ -45,6 +45,12 @@
       "Number & place value",
       "Number & place value",
       "Number & place value"
+    ]
+  },
+  "reading_topic": "Mole abandons his spring-cleaning (classic extract, 1908, public domain)",
+  "stretch": {
+    "reading": [
+      2
     ]
   }
 }

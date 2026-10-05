@@ -24,7 +24,8 @@ David builds numbered practice tests ("Practice Test NN": v33, v34, …) here to
 Sample paper: story 6 Qs, cloze 8, poem 5, missing sentences 6, four extracts 8.
 - Rotate formats. Over any 9 versions aim for about: cloze ×2, four extracts ×2, story ×2, missing sentences ×2, poem ×1.
 - Passages stay approachable (about 250–350 words), but questions are genuinely OC-level: implication, why a detail is included, structure, comparisons, feelings shown rather than stated.
-- Cloze uses near-synonym and fixed-phrase options where only one fits.
+- Cloze uses upper-primary to adult vocabulary like the samples (e.g. culmination, teeming, scouring, remiss): near-synonyms, look-alike words and preposition collocations where only one fits. Avoid easy everyday idioms.
+- Every few versions, use a real public-domain classic instead of an original text (author died more than 70 years ago, e.g. Grahame, Nesbit, Stevenson, Lawson). Copy the text exactly from a reliable source (Project Gutenberg via its GitHub mirrors) and credit author and year in the passage note.
 - Wrong options must be partly true or built on a real detail from the text, never obviously wrong.
 - Every reading topic must be new (check `reading` in every `content/vNN.json`) and the kind of topic the real test uses. The story is never about football.
 - In four-extract sets, every extract should be the answer to at least one question where possible.
@@ -43,6 +44,10 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - **Q1:** a quick-fire question (under a minute), rotating: place value, time, money, measurement, reading a scale, reading a graph, simple word problem, missing number.
 - **Q2 and Q3:** multi-step reasoning on sample-paper topics: fractions, patterns, area and perimeter, 3D shapes, chance statements, combinations, rates, best value, timetables, "which statements are correct" graph questions.
 - At most one competition-style (Kangaroo-like) question per version.
+
+## Stretch questions
+- Every section of every version (Reading, Thinking Skills and Maths) has one stretch question pitched at the hardest third of the sample papers (around Q25–35). Usually make it Q3. Record it in `content/vNN.json` as `"stretch": {"reading": [2], "thinking": [2], "maths": [2]}` (zero-based question numbers), so the stats page can report it.
+- A stretch question must need inference, not word-matching between question and text.
 
 ## Quality rules (every question)
 - Every wrong option comes from a real mistake a child would make.

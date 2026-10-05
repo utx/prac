@@ -1,9 +1,9 @@
 {
   "version": 37,
   "date": "2026-10-05",
-  "reading": "Poem: The Night the Rain Came Back",
+  "reading": "Poem: The Lamplighter (Robert Louis Stevenson)",
   "reading_format": "poem",
-  "reading_topic": "a drought breaking on a farm, seen by a child watching Dad",
+  "reading_topic": "a child watching the lamplighter at teatime (classic poem, 1885, public domain)",
   "thinking": [
     "Supports the claim (reading every night and spelling)",
     "Bus timetable: work backwards with walking times and a skipped stop",
@@ -16,9 +16,9 @@
   ],
   "sample_map": {
     "reading": [
-      "PT2 Q15 (repetition to suggest care), PT3 Q17 (what the poem suggests about a character)",
-      "PT3 Q17 (feelings shown, not stated), PT1 Q16 (what we learn about the person)",
-      "PT2 Q17 (connecting beginning and end), PT3 Q15 (what is compared with what)"
+      "PT1 Q15-19 (Les Murray poem), PT3 Q15 (what is compared with what)",
+      "PT3 Q17 (what the poem suggests), PT1 Q16 (what we learn about the person)",
+      "PT3 Q16 (what the writer wonders), PT2 Q19 ('different direction') — stretch"
     ],
     "thinking": [
       "PT2 Q3 (chess coach and exercise), PT3 Q3 (learning Wiradjuri), PT2 Q11",
@@ -33,9 +33,9 @@
   },
   "categories": {
     "reading": [
-      "Comparisons & imagery",
-      "Feelings & inference",
-      "Comparisons & imagery"
+      "Vocabulary & idioms",
+      "Purpose of a detail",
+      "Feelings & inference"
     ],
     "thinking": [
       "Supports the claim",
@@ -46,6 +46,11 @@
       "Measurement & scales",
       "Area, perimeter & 3D",
       "Rates"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
     ]
   }
 }

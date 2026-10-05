@@ -233,7 +233,7 @@ const EXTRACTS = [
   `Long before mechanical clocks were invented, people used the sun to tell the time. A sundial is simply a pointer that casts a shadow. As the sun moves across the sky, the shadow creeps around marks on a dial. Sundials were used in ancient Egypt thousands of years ago. They had one obvious weakness, however: at night, or whenever clouds covered the sun, they were useless. For those times, people used water clocks, which measured time by how much water had dripped out of a container.`,
   `Your body has a clock of its own. Even without a watch, it tells you when to feel sleepy and when to feel wide awake, following a cycle that lasts roughly twenty-four hours. Daylight helps to keep this clock set correctly. When people fly halfway around the world, their body clock can be left many hours behind or ahead of the clock on the wall. This is called jet lag, and it can take several days for the body to catch up.`,
   `Mum said she would be back in ten minutes. Ivy sat on the bench outside the shop and watched the long hand on the big clock above the door. It crawled. She counted the cars going past. She counted the cracks in the footpath. She retied both of her shoelaces, slowly, twice. When she was certain that at least half an hour had gone by, she looked up at the clock again. Mum had been gone for six minutes.`,
-  `Not every calendar is divided into twelve months. In Kakadu, in northern Australia, the Aboriginal traditional owners recognise six seasons rather than four, and none of them begins on a fixed date. Instead, each season arrives when its signs appear: a change in the wind, the first storms, certain plants flowering or animals behaving in particular ways. In some years a season comes early; in others it comes late. This knowledge has been passed down for many generations.`
+  `Not everyone divides the year into spring, summer, autumn and winter. In Kakadu, in northern Australia, the Aboriginal traditional owners recognise six seasons rather than four, and none of them can be marked in advance on a chart. Instead, each season arrives when its signs appear: a change in the wind, the first storms, certain plants flowering or animals behaving in particular ways. In some years a season comes early; in others it comes late. This knowledge has been passed down for many generations.`
 ];
 const PASSAGE = {
   title: "Keeping Time",
@@ -341,13 +341,13 @@ const SECTIONS = [
                   <p class="why-not">Extract B is the trap: the body clock needs daylight to stay set, and it can be thrown out by jet lag, but the extract never says a second way of measuring time was needed. Extract D describes a different way of dividing the year, not one method failing. Extract C has a clock that works perfectly; it is Ivy’s feeling that is wrong.</p>`
       },
       {
-        stem: "In which extract is time divided up by changes in nature rather than by dates?",
+        stem: "Which extract suggests that writing down in advance the day something will happen each year would not always work?",
         letterOptions: true,
         options: ["Extract A", "Extract B", "Extract C", "Extract D"],
         answer: 3,
-        skill: "identifying the main idea of an extract",
-        explain: `<p>Extract D explains that in Kakadu, seasons begin “when its signs appear”: changes in the wind, the first storms, plants flowering and animal behaviour. None begins on a fixed date.</p>
-                  <p class="why-not">Extract B is the trap: daylight, which is part of nature, helps to set the body clock, but the body clock doesn’t divide time into parts like seasons. Extract A uses the sun to tell the time of day, but a sundial measures hours, not the year, and still uses marks on a dial.</p>`
+        skill: "matching an idea to the extract that supports it (careful reading)",
+        explain: `<p>In Extract D, each Kakadu season begins when its signs appear (the wind changes, storms arrive, plants flower), and “in some years a season comes early; in others it comes late”. The seasons “can’t be marked in advance on a chart”, so if you wrote down the day each season should start, you would often be wrong. The signs in nature are the real guide.</p>
+                  <p class="why-not">B is the trap: it says the body clock can be out of step with “the clock on the wall”, so something is a poor guide there too. But that is about hours on a clock after a long flight, not about something that happens once a year, and the problem is the body, not the clock. A is about sundials failing at night, and in C the clock is right and Ivy’s feeling is wrong.</p>`
       }
     ]
   },
@@ -454,7 +454,7 @@ const SECTIONS = [
   }
 ];
 
-const TEST_META = {"version": 36, "reading_format": "four extracts", "categories": {"reading": ["Feelings & inference", "Purpose of a detail", "Main idea"], "thinking": ["Spot the mistake", "Tables & timetables", "Spatial"], "maths": ["Measurement & scales", "Money & best value", "Graphs & data"]}};
+const TEST_META = {"version": 36, "reading_format": "four extracts", "categories": {"reading": ["Feelings & inference", "Purpose of a detail", "Main idea"], "thinking": ["Spot the mistake", "Tables & timetables", "Spatial"], "maths": ["Measurement & scales", "Money & best value", "Graphs & data"]}, "stretch": {"reading": [2]}};
 const LETTERS = ["A", "B", "C", "D", "E"];
 const app = document.getElementById("app");
 const hdrSection = document.getElementById("hdr-section");
@@ -498,7 +498,8 @@ function recordSection(i) {
   const s = SECTIONS[i];
   attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
     answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
-      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi] })) };
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
   persistAttempt();
 }
 function finishAttempt() {
