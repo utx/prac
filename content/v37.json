@@ -1,0 +1,34 @@
+{
+  "version": 37,
+  "date": "2026-10-05",
+  "reading": "Poem: The Night the Rain Came Back",
+  "reading_format": "poem",
+  "reading_topic": "a drought breaking on a farm, seen by a child watching Dad",
+  "thinking": [
+    "Supports the claim (reading every night and spelling)",
+    "Bus timetable: work backwards with walking times and a skipped stop",
+    "Front view of a cube building (tallest stack in each column)"
+  ],
+  "maths": [
+    "Quick-fire measurement: metres and centimetres",
+    "Same perimeter, different area (square and rectangle)",
+    "Rates in stages: two hoses filling a pond"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT2 Q15 (repetition to suggest care), PT3 Q17 (what the poem suggests about a character)",
+      "PT3 Q17 (feelings shown, not stated), PT1 Q16 (what we learn about the person)",
+      "PT2 Q17 (connecting beginning and end), PT3 Q15 (what is compared with what)"
+    ],
+    "thinking": [
+      "PT2 Q3 (chess coach and exercise), PT3 Q3 (learning Wiradjuri), PT2 Q11",
+      "PT3 Q19 (magicians' timetable), PT2 Q1 (sports days), PT3 Q2",
+      "PT2 Q4 (side view of a construction-kit piece), PT3 Q16"
+    ],
+    "maths": [
+      "PT1 Q9 (millilitres between two containers), PT1 Q6 (metres walked)",
+      "PT2 Q17 (rectangle and rhombus with the same perimeter), PT1 Q31 (perimeter of a new shape)",
+      "PT3 Q32 (two people working together), PT1 Q23 (penguins and sea lions)"
+    ]
+  }
+}
