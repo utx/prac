@@ -16,6 +16,9 @@ Short practice papers, each with 3 reading, 3 thinking skills and 3 maths questi
 | `tools/admin.html` → `pracadmin/index.html` | The PIN-protected stats page (**generated** into `pracadmin/`). |
 | `tools/build.py` | Builds every test and the menu page. |
 | `tools/check_lengths.js` | Flags any question where the right answer is the longest option. |
+| `tools/check.sh` | Builds, then runs both checks on the given tests (`tools/check.sh 40`). |
+| `tools/question_sheet.js` | Makes an answer-free text copy of a test for independent checking. |
+| `.claude/skills/new-test/` | Step-by-step procedure Claude follows to build a new test. |
 | `tools/check_render.js` | Answers every question at desktop and phone widths, checks 9/9, sideways scrolling and page errors. |
 
 ## Adding a new test
