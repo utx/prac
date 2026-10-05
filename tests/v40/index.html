@@ -195,7 +195,13 @@
   .review-box button.rv-redo, .review-box button.rv-send { border-color: var(--wrong); color: var(--wrong); }
   .review-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 8px; border: 1.5px solid var(--line); border-radius: 6px; }
   .review-box .rv-msg { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
-  .review-box .rv-msg:empty, .review-box .rv-form[hidden] { display: none; }
+  .review-box .rv-diff { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 0; font-size: 14px; }
+  .review-box .rv-diff span { color: var(--ink-soft); margin-right: 2px; }
+  .review-box button.rv-chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; border-color: var(--line); }
+  .review-box button.rv-chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .review-box .rv-form { margin-top: 10px; }
+  .review-box .rv-chosen { margin: 0; width: 100%; font-weight: 600; }
+  .review-box .rv-msg:empty, .review-box .rv-form[hidden], .review-box [hidden] { display: none; }
   @media (max-width: 760px) { .review-box { margin-left: 0; } }
 
   .section-score { font-size: 18px; margin: 0 0 24px; }
@@ -791,6 +797,7 @@ function showReview() {
 /* ---- question feedback (practice mode only): approve, or send back for a redo with a comment.
    Saved online through add_review(pin, …); Claude answers each redo with a 'done' row. ---- */
 let reviewRows = [];
+const RV_DIFF = ["Much easier", "A bit easier", "A bit harder", "Much harder"];
 const RV_LABEL = { approve: "Approved", redo: "Sent back for a redo", done: "Redone by Claude" };
 const rvEsc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 function reviewPin() { try { return sessionStorage.getItem("prac.admin.pin") || ""; } catch (e) { return ""; } }
@@ -814,20 +821,36 @@ function renderReviewBox(box, sec, qi, msg) {
       <button type="button" class="rv-approve">${last && last.kind === "approve" ? "Approved ✓" : "Approve"}</button>
       <button type="button" class="rv-redo">Send back for a redo</button>
     </div>
+    <div class="rv-diff" role="group" aria-label="Quick difficulty change for question ${qi + 1}">
+      <span>Difficulty:</span>
+      ${RV_DIFF.map((d, k) => `<button type="button" class="rv-chip" data-d="${k}">${d}</button>`).join("")}
+    </div>
     <div class="rv-form" hidden>
+      <p class="rv-chosen" hidden></p>
       <textarea rows="3" maxlength="4000" aria-label="What needs changing in question ${qi + 1}?" placeholder="What needs changing? (e.g. too easy, two answers could be right, picture unclear)"></textarea>
       <button type="button" class="rv-send">Send back</button>
       <button type="button" class="rv-cancel">Cancel</button>
     </div>
     <p class="rv-msg" role="status">${msg || ""}</p>`;
   const form = box.querySelector(".rv-form"), say = t => box.querySelector(".rv-msg[role=status]").textContent = t;
+  const chosen = box.querySelector(".rv-chosen"), ta = box.querySelector("textarea");
+  let diff = null;
+  const pick = k => {
+    diff = k;
+    box.querySelectorAll(".rv-chip").forEach(c => c.classList.toggle("on", +c.dataset.d === k));
+    chosen.hidden = k === null;
+    chosen.textContent = k === null ? "" : `Make it ${RV_DIFF[k].toLowerCase()}. Add a comment if you like, then press Send back.`;
+    ta.placeholder = k === null ? "What needs changing? (e.g. too easy, two answers could be right, picture unclear)" : "Optional: anything else to change?";
+    form.hidden = false; ta.focus(); say("");
+  };
   box.querySelector(".rv-approve").onclick = () => submitReview(box, sec, qi, "approve", "");
-  box.querySelector(".rv-redo").onclick = () => { form.hidden = false; box.querySelector("textarea").focus(); };
-  box.querySelector(".rv-cancel").onclick = () => { form.hidden = true; say(""); };
+  box.querySelector(".rv-redo").onclick = () => pick(null);
+  box.querySelectorAll(".rv-chip").forEach(c => c.onclick = () => pick(+c.dataset.d));
+  box.querySelector(".rv-cancel").onclick = () => { form.hidden = true; diff = null; box.querySelectorAll(".rv-chip").forEach(c => c.classList.remove("on")); say(""); };
   box.querySelector(".rv-send").onclick = () => {
-    const c = box.querySelector("textarea").value.trim();
-    if (!c) { say("Add a comment so Claude knows what to change."); return; }
-    submitReview(box, sec, qi, "redo", c);
+    const c = ta.value.trim();
+    if (diff === null && !c) { say("Add a comment (or pick a difficulty) so Claude knows what to change."); return; }
+    submitReview(box, sec, qi, "redo", (diff === null ? "" : `Difficulty: make it ${RV_DIFF[diff].toLowerCase()}.` + (c ? " " : "")) + c);
   };
 }
 async function submitReview(box, sec, qi, kind, comment) {
@@ -841,7 +864,7 @@ async function submitReview(box, sec, qi, kind, comment) {
     return;
   }
   reviewRows.push({ version: TEST_META.version, section: sec, q: qi, kind, comment, at: new Date().toISOString() });
-  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it (overnight, or sooner if you ask).");
+  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it within the hour (7 am to 10 pm), or straight away if you ask.");
 }
 
 function showFinal() {

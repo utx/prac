@@ -67,7 +67,8 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 
 ## Question feedback (admin review)
 - In practice mode, each checked question has **Approve** and **Send back for a redo** (with a comment). Saved online in the `reviews` table through `add_review(pin, …)`; the admin page lists what's waiting and what's been redone.
-- Handle sent-back questions with the `redo` skill (`.claude/skills/redo/SKILL.md`): rebuild just those questions to full standard (or explain why not), one pull request, merge when green, then reply with `python3 tools/reviews.py done V SECTION Q "reply"`. The overnight run does any waiting redos first.
+- Each question also has quick difficulty buttons (much easier / a bit easier / a bit harder / much harder); they send a redo whose comment starts "Difficulty: make it …". The admin page's tests table has **Approve test** (approves all its questions) and shows each test's review status.
+- David wants redos done **immediately**, never left for the overnight run: an hourly routine (7 am to 10 pm Sydney) runs the `redo` skill whenever something is waiting, and when David says "do the redos" do them at once. Use the `redo` skill (`.claude/skills/redo/SKILL.md`): rebuild just those questions to full standard (or explain why not), one pull request, merge when green, then reply with `python3 tools/reviews.py done V SECTION Q "reply"`. The overnight run also does any still waiting.
 
 ## Online progress (Supabase)
 - `tools/sync.js` (injected into every page by `build.py`) sends progress events to Supabase when `tools/site_config.json` has a URL and publishable key; otherwise the site uses browser storage only. Database setup: `supabase/setup.sql`.
