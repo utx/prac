@@ -233,8 +233,8 @@ const CLOZE_TEXT = `
 <p>Last winter, Dad and I drove for hours along empty country roads to camp beside a national park that has been named a Dark Sky Park. That means there are hardly any lights for kilometres around, so the night sky looks much as it did hundreds of years ago, before towns and cities lit up the dark.</p>
 <p>We put up our tent before sunset and ate dinner while the sky faded from orange to deep blue. Dad had packed a torch that shines red light, because red light does not spoil your night vision the way white light does. He explained that our eyes need at least twenty minutes to adjust to darkness, and that one glance at a bright screen can undo all that waiting.</p>
 <p>At first I could see only a scattering of stars. But as my eyes grew {1} to the dark, more and more appeared, until there seemed to be no black gaps left between them. Then Dad pointed out a pale, misty band stretching right across the sky. “That’s the Milky Way,” he said. “It’s our own galaxy, and we’re looking at it from the inside.”</p>
-<p>Every few minutes, a meteor {2} across the sky and was gone in the blink of an eye. Dad told me that many shooting stars are made by specks of dust no bigger than a grain of sand, burning up as they plunge into the air high above us. I found that very hard to believe.</p>
-<p>Lying on my back in the cold grass, I felt utterly {3}: just one small person on one small planet, spinning through a space far too big to imagine. Strangely, it was one of the best feelings I have ever had.</p>`;
+<p>It was the night of a meteor shower, so every few minutes a meteor {2} across the sky and was gone in the blink of an eye. Dad told me that many shooting stars are made by specks of dust no bigger than a grain of sand, burning up as they plunge into the air high above us. I found that very hard to believe.</p>
+<p>Lying on my back in the cold grass, beneath a sky that seemed to go on for ever, I felt utterly {3}. Strangely, it was one of the best feelings I have ever had.</p>`;
 
 function clozeHtml() {
   const si = SECTIONS.findIndex(s => s.id === "reading");
@@ -332,11 +332,11 @@ const SECTIONS = [
       },
       {
         stem: "Which word best fits <b>gap 3</b>?",
-        options: ["indifferent", "insignificant", "insufficient", "inconsiderate"],
+        options: ["indifferent", "insignificant", "insufficient", "indestructible"],
         answer: 1,
-        skill: "using the rest of the sentence to work out the right word (harder vocabulary)",
-        explain: `<p>The words after the colon explain the gap: she is “just one small person on one small planet” in a space “far too big to imagine”. She feels tiny and unimportant: <b>insignificant</b>. The next sentence adds a twist: “Strangely”, this feeling was a good one, because it filled her with wonder.</p>
-                  <p class="why-not">“Insufficient” is the trap: it looks and sounds similar, but it means <em>not enough</em> (insufficient food), which describes an amount, not how a person feels about their place in the universe. “Indifferent” means not caring, but she was so amazed that it was one of the best feelings she ever had. “Inconsiderate” means not thinking about other people’s feelings, which has nothing to do with the stars.</p>`
+        skill: "using clues across two sentences to infer a feeling (harder vocabulary)",
+        explain: `<p>Two clues work together. First, she is lying under “a sky that seemed to go on for ever”: next to something that huge, a person feels tiny and unimportant. Second, “Strangely” tells you the word names a feeling that is usually <em>unpleasant</em>, yet this time it was “one of the best feelings” she has had. Feeling <b>insignificant</b> (small and unimportant) fits both clues: normally that would feel bad, but under the stars it filled her with wonder.</p>
+                  <p class="why-not">“Indestructible” is the trap: it is a wonderful feeling, so it seems to fit “best feelings”, but then nothing would be strange about enjoying it, and a never-ending sky makes you feel small, not mighty. “Insufficient” looks and sounds similar, but it means <em>not enough</em> (insufficient food), which describes an amount, not a feeling. “Indifferent” means not caring, but someone who didn’t care wouldn’t call it one of the best feelings ever.</p>`
       }
     ]
   },
