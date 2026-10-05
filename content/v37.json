@@ -30,5 +30,22 @@
       "PT2 Q17 (rectangle and rhombus with the same perimeter), PT1 Q31 (perimeter of a new shape)",
       "PT3 Q32 (two people working together), PT1 Q23 (penguins and sea lions)"
     ]
+  },
+  "categories": {
+    "reading": [
+      "Comparisons & imagery",
+      "Feelings & inference",
+      "Comparisons & imagery"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Measurement & scales",
+      "Area, perimeter & 3D",
+      "Rates"
+    ]
   }
 }

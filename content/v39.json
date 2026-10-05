@@ -30,5 +30,22 @@
       "PT3 Q31 (time spent at Coffs Harbour), PT1 Q3 (train after midnight), PT2 Q2 (school timetable)",
       "PT1 Q15 (sequence: 4 less than double), PT1 Q19 (first four terms)"
     ]
+  },
+  "categories": {
+    "reading": [
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Order & arrangement",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Time & timetables",
+      "Patterns & sequences"
+    ]
   }
 }

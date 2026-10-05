@@ -15,8 +15,37 @@
     "Picture graph statements with half symbols"
   ],
   "sample_map": {
-    "reading": ["PT2 Q26-33 (four extracts)", "PT2 Q26-33 (purpose of a detail)", "PT2 Q26-33"],
-    "thinking": ["PT2 Q21 (detentions), PT3 Q18 (chess fractions)", "PT2 Q13 (lights timeline)", "PT3 Q16 (view from a seat)"],
-    "maths": ["PT3 Q18 (thermometers), PT2 Q11 (scales)", "PT1 Q12 (dog food lowest price)", "PT2 Q32 (picture graph key), PT1 Q27"]
+    "reading": [
+      "PT2 Q26-33 (four extracts)",
+      "PT2 Q26-33 (purpose of a detail)",
+      "PT2 Q26-33"
+    ],
+    "thinking": [
+      "PT2 Q21 (detentions), PT3 Q18 (chess fractions)",
+      "PT2 Q13 (lights timeline)",
+      "PT3 Q16 (view from a seat)"
+    ],
+    "maths": [
+      "PT3 Q18 (thermometers), PT2 Q11 (scales)",
+      "PT1 Q12 (dog food lowest price)",
+      "PT2 Q32 (picture graph key), PT1 Q27"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Feelings & inference",
+      "Purpose of a detail",
+      "Main idea"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Measurement & scales",
+      "Money & best value",
+      "Graphs & data"
+    ]
   }
 }

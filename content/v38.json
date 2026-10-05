@@ -30,5 +30,22 @@
       "PT1 Q28 (faces of small cubes), PT1 Q14 (object glued from cubes)",
       "PT2 Q6 (fraction of a cake left), PT1 Q4 (fraction shaded)"
     ]
+  },
+  "categories": {
+    "reading": [
+      "Purpose of a detail",
+      "Comparisons & imagery",
+      "Character & structure"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Graphs & data",
+      "Area, perimeter & 3D",
+      "Fractions"
+    ]
   }
 }

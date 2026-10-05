@@ -32,6 +32,9 @@
   .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
   .bar .section-name { color: #c6d0e0; }
   .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
 
   main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
   .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
@@ -211,7 +214,8 @@
     <span class="title">Practice Test 35</span>
     <span class="section-name" id="hdr-section"></span>
     <span class="spacer"></span>
-    <a class="home" href="../../index.html">All tests</a>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
   </div>
 </header>
 <main id="app"></main>
@@ -438,17 +442,74 @@ const SECTIONS = [
   }
 ];
 
+const TEST_META = {"version": 35, "reading_format": "missing sentences", "categories": {"reading": ["Sentence links", "Sentence links", "Sentence links"], "thinking": ["Whose reasoning", "Order & arrangement", "Spatial"], "maths": ["Time & timetables", "Fractions", "Chance & counting"]}};
 const LETTERS = ["A", "B", "C", "D", "E"];
 const app = document.getElementById("app");
 const hdrSection = document.getElementById("hdr-section");
 let responses = SECTIONS.map(s => s.questions.map(() => null));
 let current = 0;
 
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi] })) };
+  persistAttempt();
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
 function showStart() {
   hdrSection.textContent = "";
   app.innerHTML = `
     <div class="sheet instructions">
       <h1>Practice paper 35</h1>
+      ${completedNote()}
       <p class="lead">Three short sections: reading, thinking skills and maths.</p>
       <div class="plan">
         ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
@@ -461,7 +522,7 @@ function showStart() {
       </ol>
       <button class="primary" id="start">Start the reading section</button>
     </div>`;
-  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); showSection(); };
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
 }
 
 function renderPassage(pass) {
@@ -509,6 +570,7 @@ function renderQuestions(section, mode) {
 
 function showSection() {
   passMode = "answer";
+  sectionStart = Date.now();
   const s = SECTIONS[current];
   hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
   const qs = `<div>
@@ -526,6 +588,7 @@ function showSection() {
   app.querySelectorAll(".option").forEach(btn => {
     btn.onclick = () => {
       const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
       responses[current][qi] = oi;
       app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
       refreshPassage();
@@ -535,6 +598,7 @@ function showSection() {
   document.getElementById("submit").onclick = () => {
     const unanswered = responses[current].filter(r => r === null).length;
     if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
     showReview();
   };
   updateStatus();
@@ -573,6 +637,7 @@ function showReview() {
 
 function showFinal() {
   hdrSection.textContent = "Results";
+  finishAttempt();
   const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
   const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
   let verdict;

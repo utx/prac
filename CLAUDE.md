@@ -4,7 +4,7 @@ David builds numbered practice tests ("Practice Test NN": v33, v34, …) here to
 
 ## Adding version NN
 1. Before writing, compare every planned question against the official sample papers. They are not in the repo (see Copyright), so ask David to attach them in the session if they aren't already there. Check the coverage record in every `content/vNN.json` so no skill, topic or format repeats too soon.
-2. Write `content/vNN.js` (defines `passMode`, `INK`, the passage/diagram constants and `SECTIONS`; see `content/v33.js` for the shape) and `content/vNN.json` (version, date, reading title, reading_format, thinking/maths skill labels, sample_map).
+2. Write `content/vNN.js` (defines `passMode`, `INK`, the passage/diagram constants and `SECTIONS`; see `content/v33.js` for the shape) and `content/vNN.json` (version, date, reading title, reading_format, thinking/maths skill labels, sample_map, and `categories`: one question-type label per question, chosen from `CATEGORIES` in `tools/build.py`, which the stats page groups by).
 3. `python3 tools/build.py`, which builds `tests/vNN/index.html` and regenerates `index.html`. Never hand-edit generated files.
 4. `node tools/check_lengths.js tests/vNN/index.html` (must report 0 longest) and `node tools/check_render.js tests/vNN/index.html` (must PASS).
 5. Verify every answer by computation, then run an independent cold solve (a separate agent that never sees the answers). Fix what it finds, re-check, then commit and push.
@@ -51,6 +51,11 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - Facts must be accurate; check anything factual before using it.
 - Use images and diagrams wherever they help, drawn clearly and not to scale where measuring would give the answer away.
 - Explanations show the method and name why each trap is wrong.
+
+## Progress tracking and admin
+- Test pages record each attempt in the browser's localStorage (key `prac.v1`) and flag the test completed when it is finished. The index shows completed tests and has a "Mark as done" toggle.
+- `pracadmin/` (built from `tools/admin.html`) is the PIN-protected stats page. Tests opened from it use `?admin=1` and record nothing. The PIN check is client-side only.
+- Keep the template's tracking hooks working when changing `tools/template.html`.
 
 ## Copyright
 Never commit the official sample papers (copyright NSW Department of Education / Cambridge).
