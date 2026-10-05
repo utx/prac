@@ -73,7 +73,7 @@ function cubeSvg([top, left, right], letter) {
   const W = 2 * k + 12, H = 2 * a + 12;
   return `<svg viewBox="0 0 ${W.toFixed(1)} ${H}" width="${W.toFixed(1)}" height="${H}" role="img" aria-label="Cube ${letter}: top face ${SYM_NAME[top]}, front-left face ${SYM_NAME[left]}, front-right face ${SYM_NAME[right]}.">${g}</svg>`;
 }
-const CUBE_OPTS = [["ring", "plus", "square"], ["circle", "dots", "ring"], ["plus", "cross", "circle"], ["square", "ring", "circle"]]
+const CUBE_OPTS = [["ring", "plus", "square"], ["circle", "dots", "ring"], ["plus", "cross", "circle"], ["ring", "square", "plus"]]
   .map((f, i) => cubeSvg(f, "ABCD"[i]));
 
 /* ---- Maths Q2: juice prices ---- */
@@ -183,14 +183,14 @@ const SECTIONS = [
         visualOptions: true,
         options: CUBE_OPTS,
         answer: 0,
-        skill: "picturing which faces of a net end up opposite each other",
+        skill: "picturing which faces of a net end up opposite each other, and which way round they meet",
         explain: `<p>Two faces that end up <b>opposite</b> each other can never be seen together. Find the opposite pairs by folding in your head, keeping the green square still:</p>
                   <p>• The plus and the red face fold over on either side of the green square, so they face each other: they are opposite (they have one square between them in a straight line).<br>
                      • The ring (attached to the plus) and the four dots (attached to the red face) fold round to fill the two walls that are left, so they face each other too: opposite.<br>
                      • The black dot is the last face. It closes the cube on the far side from the green square, so those two are opposite.</p>
                   <p>Opposite pairs: plus and red face, ring and four dots, black dot and green square.</p>
-                  <p><b>A</b> shows the ring, the plus and the green square. No two of these are opposite, and they meet at one corner in this order ✓</p>
-                  <p class="why-not">B is the trap: the ring and the four dots are far apart on the net and not in a straight line, so they don’t look like an opposite pair, but folding shows that they are. C shows the plus and the red face together, and D shows the black dot and the green square together, which are opposite pairs too.</p>`
+                  <p><b>A</b> shows the ring, the plus and the green square. No two of these are opposite, and they meet at one corner in this order ✓ (Then check the order: on the net, the ring is joined to the top of the plus, and the green square is joined to the right of the plus. Fold them up and the ring is on top, the plus at the front-left and the green square at the front-right, exactly as in A.)</p>
+                  <p class="why-not">B is the trap: the ring and the four dots are far apart on the net and not in a straight line, so they don’t look like an opposite pair, but folding shows that they are. C shows the plus and the red face together, which are an opposite pair too. D is the hardest trap: it shows the same three faces as A, and none of them are opposite. But they are the wrong way round. On the net, going round the corner where they meet, the order is ring → plus → green square (top → front-left → front-right in A). D has ring → green square → plus, which is the mirror image, so no way of turning the cube can make it.</p>`
       }
     ]
   },
