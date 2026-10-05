@@ -16,7 +16,7 @@ When the papers *are* attached, still prefer them for deep recalibration; these 
 |---|---|---|---|---|
 | Reading | 33 (Q1–33) | 40 min | A–D (missing sentences: a bank lettered A–G) | ~70 s per question incl. reading |
 | Thinking Skills | 30 | 30 min | A–D | 60 s per question |
-| Mathematical Reasoning | 35 (PT1: 33, although its cover says 35) | 40 min | A–E | ~70 s per question |
+| Mathematical Reasoning | 35 | 40 min | A–E | ~70 s per question |
 
 - No penalty for wrong answers; separate answer sheet; no calculators.
 - Difficulty is not strictly increasing, but the last third of each paper is clearly harder (more steps, more constraints, subtler traps). "Stretch" in our tests = the level of roughly Q25–35 (Maths), Q20–30 (Thinking), and the inference questions at the end of each Reading task.
@@ -188,10 +188,9 @@ Story and poem questions, roughly in order of frequency:
 | 31 | perimeter change from an added rectangle | smallest + largest 3-digit (distinct digits) | sum and difference (two unknowns) |
 | 32 | points spent, then cost of last item | picture graph with missing key | two people working together (rates) |
 | 33 | chance with counters 1–11 | age differences chain | savings over days, find one day |
-| 34 | — | volume of a folded box in cm cubes | sides of pieces after cutting a shape |
-| 35 | — | product code for letters | grid-region route counting (competition-style) |
+| 34 | straight cuts splitting a pentagon into shape pairs (geometry) | volume of a folded box in cm cubes | sides of pieces after cutting a shape |
+| 35 | lengths measurable on a ruler with only some marks (combinations) | product code for letters | grid-region route counting (competition-style) |
 
-(PT1 has only 33 questions; the rows for Q34–35 are empty.)
 
 ### 4.2 Typical distractors (from the explained answers and option sets)
 
