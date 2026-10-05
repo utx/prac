@@ -48,7 +48,8 @@ async function syncRpc(name, args) {
     method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
   });
   if (!r.ok) throw new Error(name + " " + r.status);
-  return r.json();
+  const t = await r.text(); // functions that return nothing send an empty body
+  return t ? JSON.parse(t) : null;
 }
 /* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
 function syncMergeFlags(store, rows) {

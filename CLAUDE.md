@@ -65,6 +65,10 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - `pracadmin/` (built from `tools/admin.html`) is the PIN-protected stats page. Tests opened from it use `?admin=1` and record nothing. The PIN check is client-side only.
 - Keep the template's tracking hooks working when changing `tools/template.html`; `node tools/check_tracking.js` checks them end to end.
 
+## Question feedback (admin review)
+- In practice mode, each checked question has **Approve** and **Send back for a redo** (with a comment). Saved online in the `reviews` table through `add_review(pin, …)`; the admin page lists what's waiting and what's been redone.
+- Handle sent-back questions with the `redo` skill (`.claude/skills/redo/SKILL.md`): rebuild just those questions to full standard (or explain why not), one pull request, merge when green, then reply with `python3 tools/reviews.py done V SECTION Q "reply"`. The overnight run does any waiting redos first.
+
 ## Online progress (Supabase)
 - `tools/sync.js` (injected into every page by `build.py`) sends progress events to Supabase when `tools/site_config.json` has a URL and publishable key; otherwise the site uses browser storage only. Database setup: `supabase/setup.sql`.
 - The public key can only add events. The admin page reads through `admin_events(pin)` (PIN checked in the database); the menu reads `public_flags()`.

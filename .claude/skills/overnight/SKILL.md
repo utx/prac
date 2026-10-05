@@ -12,6 +12,7 @@ Unattended: **never wait for or ask David anything.** If something blocks, stop 
 1. Work in the `utx/prac` checkout. `git fetch origin && git checkout -B claude/overnight-$(TZ=Australia/Sydney date +%F) origin/main`.
 2. **Finish online-progress setup if needed:** `python3 tools/configure_sync.py`. If it prints `updated`: run `python3 tools/build.py`, `tools/check.sh`, commit (`Connect the site to the online progress database`), and include it in tonight's pull request (or, if no tests are needed tonight, open and merge a pull request just for it, waiting for the green check).
 3. **Leftovers:** list open pull requests whose title starts with `Overnight:`. If one exists, do not build more. Drive it to green (read the failing check's log, fix, push; never skip a check) and merge it, then stop.
+4. **Redos first:** follow `.claude/skills/redo/SKILL.md` for any questions David sent back from the admin page. If tests are also being built tonight, include the redos in tonight's pull request and reply to them after it merges; otherwise give them their own pull request. If the reviews list can't be read, note it in the final message and carry on.
 
 ## 1. Decide
 
@@ -50,4 +51,4 @@ Spawn 2 general-purpose subagents with `isolation: "worktree"`, each building **
 
 ## 6. Final message (the routine's notification)
 
-Short: how many tests were built and merged (with the link), the uncompleted count before and after, the weakest areas the batch targeted, and anything that went wrong.
+Short: how many tests were built and merged (with the link), the uncompleted count before and after, the weakest areas the batch targeted, which sent-back questions were redone (and the replies), and anything that went wrong.
