@@ -1,5 +1,6 @@
 -- Practice tests: progress database (Supabase / Postgres).
--- Paste this whole file into Supabase → SQL Editor → New query → Run. Safe to run again.
+-- Paste this whole file into Supabase → SQL Editor → New query → Run. Safe to run again
+-- (run it again after it changes: it only adds what is missing and updates the functions).
 --
 -- Design: one append-only table of events. The public site (publishable/anon key) may only
 -- INSERT events. It cannot read, change or delete anything. Reading goes through two functions:
@@ -66,3 +67,59 @@ revoke all on function public.public_flags() from public;
 revoke all on function public.admin_events(text) from public;
 grant execute on function public.public_flags() to anon, authenticated, service_role;
 grant execute on function public.admin_events(text) to anon, authenticated, service_role;
+
+-- ---------------------------------------------------------------------------------------
+-- Question feedback (admin review). In practice mode, after a section is checked, the admin
+-- can approve a question or send it back for a redo with a comment. Claude answers each redo
+-- with a 'done' row (written with the service key) once the question is rebuilt or explained.
+-- The site never touches this table directly: writing and reading both go through functions
+-- that check the admin PIN.
+create table if not exists public.reviews (
+  id       bigint generated always as identity primary key,
+  at       timestamptz not null default now(),
+  version  int  not null check (version between 1 and 9999),
+  section  text not null check (section in ('reading', 'thinking', 'maths')),
+  q        int  not null check (q between 0 and 19),
+  kind     text not null check (kind in ('approve', 'redo', 'done')),
+  comment  text not null default '' check (length(comment) <= 4000)
+);
+create index if not exists reviews_question_idx on public.reviews (version, section, q, at);
+
+alter table public.reviews enable row level security;
+revoke all on public.reviews from anon, authenticated;
+grant all on public.reviews to service_role;
+
+create or replace function public.add_review(p_pin text, p_version int, p_section text, p_q int, p_kind text, p_comment text)
+returns void
+language plpgsql volatile security definer set search_path = public as $$
+begin
+  if encode(sha256(convert_to('prac-admin:' || coalesce(p_pin, ''), 'UTF8')), 'hex')
+     <> '88e4eb6c3c041225c1cec20d38f53a35bf13c9909242528f10224affc9a473b2' then
+    perform pg_sleep(1);
+    raise exception 'wrong pin' using errcode = '28000';
+  end if;
+  if p_kind not in ('approve', 'redo') then
+    raise exception 'kind must be approve or redo' using errcode = '22023';
+  end if;
+  insert into reviews (version, section, q, kind, comment)
+  values (p_version, p_section, p_q, p_kind, coalesce(p_comment, ''));
+end;
+$$;
+
+create or replace function public.admin_reviews(p_pin text)
+returns setof public.reviews
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if encode(sha256(convert_to('prac-admin:' || coalesce(p_pin, ''), 'UTF8')), 'hex')
+     <> '88e4eb6c3c041225c1cec20d38f53a35bf13c9909242528f10224affc9a473b2' then
+    perform pg_sleep(1);
+    raise exception 'wrong pin' using errcode = '28000';
+  end if;
+  return query select * from reviews order by id;
+end;
+$$;
+
+revoke all on function public.add_review(text, int, text, int, text, text) from public;
+revoke all on function public.admin_reviews(text) from public;
+grant execute on function public.add_review(text, int, text, int, text, text) to anon, authenticated, service_role;
+grant execute on function public.admin_reviews(text) to anon, authenticated, service_role;

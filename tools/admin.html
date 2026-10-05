@@ -322,6 +322,32 @@ function render() {
           <button class="btn" data-flag="${t.version}">${f && f.completed ? "Mark not done" : "Mark done"}</button></span></td></tr>`;
     }).join("")}</table></div></div>`;
 
+  // question feedback (approve / send back for a redo), loaded from the online database
+  const fbCard = (() => {
+    if (!syncOn()) return "";
+    if (reviewRows === null) return `<div class="card"><h2>Question feedback</h2><p class="empty">${esc(reviewStatus || "Loading…")}</p></div>`;
+    const byQ = new Map();
+    reviewRows.forEach(r => { const k = `${r.version}|${r.section}|${r.q}`; if (!byQ.has(k)) byQ.set(k, []); byQ.get(k).push(r); });
+    const items = [...byQ.values()].map(h => ({ h, last: h[h.length - 1] }));
+    const waiting = items.filter(i => i.last.kind === "redo").sort((a, b) => a.last.at < b.last.at ? -1 : 1);
+    const redone = items.filter(i => i.last.kind === "done").sort((a, b) => a.last.at < b.last.at ? 1 : -1).slice(0, 10);
+    const approved = items.filter(i => i.last.kind === "approve").length;
+    const qname = r => `Test ${r.version} · ${SECTION_NAMES[r.section] || esc(r.section)} Q${r.q + 1}`;
+    const open = r => `<a class="btn" href="../tests/v${r.version}/index.html?admin=1">Open</a>`;
+    const lastRedo = h => [...h].reverse().find(r => r.kind === "redo");
+    return `<div class="card"><h2>Question feedback</h2>
+      <p class="sub">In practice mode, each checked question has Approve and Send back buttons. Claude redoes sent-back questions overnight (or sooner if you ask) and replies here. ${approved} question${approved === 1 ? "" : "s"} approved so far.</p>
+      <h3 style="margin:14px 0 6px;font-size:16px">Waiting for a redo (${waiting.length})</h3>
+      ${waiting.length ? `<div class="tw"><table class="t"><tr><th>Question</th><th>Your comment</th><th>Sent</th><th></th></tr>
+        ${waiting.map(i => `<tr><td class="n">${qname(i.last)}</td><td>${esc(i.last.comment)}</td><td class="n">${esc(fmtDate(i.last.at))}</td><td>${open(i.last)}</td></tr>`).join("")}</table></div>`
+        : `<p class="empty">Nothing waiting.</p>`}
+      <h3 style="margin:16px 0 6px;font-size:16px">Recently redone: check these again</h3>
+      ${redone.length ? `<div class="tw"><table class="t"><tr><th>Question</th><th>Your comment</th><th>Claude’s reply</th><th></th></tr>
+        ${redone.map(i => { const r = lastRedo(i.h); return `<tr><td class="n">${qname(i.last)}</td><td>${r ? esc(r.comment) : ""}</td><td>${esc(i.last.comment)}</td><td>${open(i.last)}</td></tr>`; }).join("")}</table></div>`
+        : `<p class="empty">None yet.</p>`}
+    </div>`;
+  })();
+
   const data = `<div class="card"><h2>Data</h2>
     <p class="sub">${syncOn() ? `Progress is saved online and also in each browser that is used. ${syncStatus}` : "Progress is saved in this browser on this device only. Export a backup now and then, or to move it to another device."}</p>
     <div class="actions"><button class="btn" id="export">Export backup</button>
@@ -329,7 +355,7 @@ function render() {
       <button class="btn danger" id="clear">Clear all progress</button></div></div>`;
 
   app.innerHTML = `<h1>Progress</h1><p class="sub">Only tests done from the student page are counted. Tests opened from here are never recorded.</p>
-    ${tiles}${focus}<div class="grid2">${bySection}${byFormat}</div><div style="height:18px"></div>${scoreChart}${byType}${habits}${mistakes}${testsTable}${data}`;
+    ${tiles}${focus}<div class="grid2">${bySection}${byFormat}</div><div style="height:18px"></div>${scoreChart}${byType}${habits}${mistakes}${fbCard}${testsTable}${data}`;
 
   app.querySelectorAll("[data-flag]").forEach(b => b.onclick = () => {
     const s = load(), v = b.dataset.flag;
@@ -362,7 +388,11 @@ function render() {
   };
 }
 
-let syncStatus = "";
+let syncStatus = "", reviewRows = null, reviewStatus = "";
+async function pullReviews(pin) {
+  try { reviewRows = (await syncRpc("admin_reviews", { p_pin: pin })) || []; }
+  catch (e) { reviewRows = null; reviewStatus = "Couldn’t load question feedback. If this keeps happening, the database may need its update (ask Claude)."; }
+}
 async function pullRemote() {
   if (!syncOn()) return;
   let pin = "";
@@ -375,6 +405,7 @@ async function pullRemote() {
   } catch (e) {
     syncStatus = "Couldn’t load the online copy just now, so this shows this browser’s copy only.";
   }
+  await pullReviews(pin);
   if (unlocked()) render();
 }
 document.getElementById("lock").onclick = () => { try { sessionStorage.removeItem("prac.admin"); sessionStorage.removeItem("prac.admin.pin"); } catch (e) {} showGate(); };

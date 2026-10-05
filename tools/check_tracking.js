@@ -25,12 +25,13 @@ const server = http.createServer((req, res) => {
   });
 });
 
-async function answerAll(p, pick) {
+async function answerAll(p, pick, onReview) {
   await p.click("#start");
   const ans = await p.evaluate(() => SECTIONS.map(s => s.questions.map(q => q.answer)));
   for (let s = 0; s < ans.length; s++) {
     for (let q = 0; q < ans[s].length; q++) await p.click(`.option[data-q="${q}"][data-o="${pick(s, q, ans[s][q])}"]`);
     await p.click("#submit");
+    if (onReview) await onReview(s, ans[s].length);
     await p.click("#next");
   }
   return (await p.textContent(".final-score")).replace(/\s+/g, " ").trim();
@@ -65,6 +66,7 @@ async function answerAll(p, pick) {
       await p.click(`.option[data-q="${q}"][data-o="${s === maths ? (a + 1) % n : a}"]`);
     }
     await p.click("#submit");
+    if (s === 0) ok(await p.locator(".review-box").count() === 0, "no question-feedback boxes on the student's test");
     await p.click("#next");
   }
   const expected = ans.reduce((n, sec, i) => n + (i === maths ? 0 : sec.length), 0);
@@ -112,7 +114,12 @@ async function answerAll(p, pick) {
   await p.click(`a.btn.primary[href*="v${vC}/"]`);
   ok(await p.evaluate(() => ADMIN), "Practice link opens the test in practice mode");
   ok(await p.isVisible(".admin-badge"), "practice-mode badge visible");
-  await answerAll(p, (s, q, a) => a);
+  let boxes = [];
+  await answerAll(p, (s, q, a) => a, async (s, n) => {
+    boxes.push((await p.locator(".review-box").count()) === n);
+    if (s === 0) await p.waitForFunction(() => !/Loading/.test(document.querySelector(".review-box").textContent));
+  });
+  ok(boxes.length === 3 && boxes.every(Boolean), "practice mode shows a feedback box under every checked question");
   const after = await p.evaluate(() => JSON.parse(localStorage.getItem("prac.v1")));
   ok(after.attempts.length === before && !after.flags[vC], "practice-mode run not recorded or flagged");
   await p.click("#home-link");
