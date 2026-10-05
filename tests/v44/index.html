@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 44</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary {
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 44</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 44
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: missing sentences ---- */
+const ARTICLE_TEXT = `
+<p>In 1941, a Swiss engineer named George de Mestral came home from a trip in the Alps with his dog. Both of them were covered in burrs, the prickly seed cases of the burdock plant. {1} De Mestral, however, wanted to know why they clung on so stubbornly.</p>
+<p>He put one of the burrs under a microscope to take a closer look. {2} These hooks grabbed onto anything with tiny loops in it, such as the threads of his clothes, and tangled themselves in his dog’s fur. That gave him an idea. Perhaps two strips of fabric, one covered in hooks and the other in loops, could be pressed together to make a fastener that could be pulled apart and closed again.</p>
+<p>Turning the idea into a product was far from easy. With the help of a weaver, he made his first strips from cotton, but the cotton wore out too quickly. {3} After years of experiments, he found the answer: nylon, a strong thread made by people rather than by plants or animals. In 1951 he applied for a patent, the official right to be the only one to make and sell his invention.</p>
+<p>He named it Velcro, joining parts of two French words: <em>velours</em>, meaning velvet, and <em>crochet</em>, meaning hook. Today hook-and-loop fasteners hold together everything from children’s shoes to hospital equipment, and astronauts have used them to stop objects floating away in space. Not bad for an idea that began with a few annoying seeds.</p>`;
+
+const SENT_LETTERS = ["A", "B", "C", "D", "E"];
+const SENTENCES = [
+  "Burdock grows wild in many parts of Europe and Asia.",
+  "Each burr was covered in hundreds of tiny spikes, and the end of every spike was bent into a hook.",
+  "He needed a material that would keep its hooked shape, even after being pulled open again and again.",
+  "Most people would simply have pulled them off and thrown them away.",
+  "Within a few weeks, he had made a fastener that worked perfectly and was ready to be sold in shops."
+];
+function articleHtml() {
+  const si = SECTIONS.findIndex(s => s.id === "reading");
+  let t = ARTICLE_TEXT;
+  SECTIONS[si].questions.forEach((q, i) => {
+    const chosen = responses[si][i];
+    let fill;
+    if (passMode === "review") fill = `<span class="gap filled correct">(${i + 1}) ${SENTENCES[q.answer]}</span>`;
+    else if (chosen !== null) fill = `<span class="gap filled">(${i + 1}) ${SENTENCES[chosen]}</span>`;
+    else fill = `<span class="gap">(${i + 1}) …………</span>`;
+    t = t.replace(`{${i + 1}}`, fill);
+  });
+  return t;
+}
+const PASSAGE = {
+  title: "Stuck on an Idea",
+  note: "Three sentences have been removed from the text below. Choose the sentence that fits each gap. There are two extra sentences you do not need to use.",
+  html: articleHtml
+};
+
+/* ---- Thinking Skills Q2: bike hire prices ---- */
+const BIKE_TABLE = `<div class="table-wrap"><table class="grid">
+  <tr><th></th><th style="text-align:center">1 hour</th><th style="text-align:center">half day<br><small>(up to 4 hours)</small></th><th style="text-align:center">full day</th></tr>
+  <tr><th>adult bike</th><td style="text-align:center">$12</td><td style="text-align:center">$30</td><td style="text-align:center">$45</td></tr>
+  <tr><th>child bike</th><td style="text-align:center">$8</td><td style="text-align:center">$20</td><td style="text-align:center">$30</td></tr>
+</table></div>`;
+
+/* ---- Thinking Skills Q3: turned shape ---- */
+const shapeSvg = (cells, c, fill, label) => {
+  const w = Math.max(...cells.map(p => p[0])) + 1, h = Math.max(...cells.map(p => p[1])) + 1;
+  let g = "";
+  cells.forEach(([x, y]) => g += `<rect x="${4 + x * c}" y="${4 + y * c}" width="${c}" height="${c}" fill="${fill}" stroke="${INK}" stroke-width="1.6"/>`);
+  return `<svg viewBox="0 0 ${w * c + 8} ${h * c + 8}" width="${w * c + 8}" height="${h * c + 8}" role="img" aria-label="${label}">${g}</svg>`;
+};
+// cells as [column, row], rows counted downwards
+const F_SHAPE = shapeSvg([[1, 0], [2, 0], [0, 1], [1, 1], [1, 2]], 34, "#8fb7e0",
+  "A shape made of five squares. Top row: squares in the middle and right columns. Middle row: squares in the left and middle columns. Bottom row: a square in the middle column only.");
+const TURN_OPTS = [
+  // A: flipped left-right
+  shapeSvg([[0, 0], [1, 0], [1, 1], [2, 1], [1, 2]], 26, "#f2c58a", "Top row: left and middle. Middle row: middle and right. Bottom row: middle."),
+  // B: turned a quarter turn (correct)
+  shapeSvg([[1, 0], [0, 1], [1, 1], [2, 1], [2, 2]], 26, "#f2c58a", "Top row: middle. Middle row: left, middle and right. Bottom row: right."),
+  // C: flipped, then turned
+  shapeSvg([[1, 0], [0, 1], [1, 1], [2, 1], [0, 2]], 26, "#f2c58a", "Top row: middle. Middle row: left, middle and right. Bottom row: left."),
+  // D: flipped upside down
+  shapeSvg([[1, 0], [0, 1], [1, 1], [1, 2], [2, 2]], 26, "#f2c58a", "Top row: middle. Middle row: left and middle. Bottom row: middle and right.")
+];
+
+/* ---- Maths Q2: spinner ---- */
+const SPINNER_SVG = (() => {
+  const r = 110, cx = 130, cy = 130;
+  // sectors clockwise from the top: [degrees, colour name, fill]
+  const parts = [[90, "blue", "#7fa8d8"], [45, "red", "#e58b84"], [45, "green", "#8cc79a"], [45, "red", "#e58b84"],
+                 [45, "yellow", "#f3d36b"], [45, "green", "#8cc79a"], [45, "red", "#e58b84"]];
+  const pt = (deg, rr) => [cx + rr * Math.sin(deg * Math.PI / 180), cy - rr * Math.cos(deg * Math.PI / 180)];
+  let g = "", a = 0;
+  parts.forEach(([deg, name, fill]) => {
+    const [x1, y1] = pt(a, r), [x2, y2] = pt(a + deg, r);
+    g += `<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${fill}" stroke="${INK}" stroke-width="1.6"/>`;
+    const [lx, ly] = pt(a + deg / 2, r * 0.66);
+    g += `<text x="${lx.toFixed(1)}" y="${(ly + 5).toFixed(1)}" font-size="14" text-anchor="middle" fill="${INK}">${name}</text>`;
+    a += deg;
+  });
+  for (let t = 0; t < 360; t += 45) {
+    const [x1, y1] = pt(t, r), [x2, y2] = pt(t, r + 9);
+    g += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${INK}" stroke-width="2"/>`;
+  }
+  g += `<line x1="${cx}" y1="${cy}" x2="${cx + 14}" y2="${cy + 40}" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="6" fill="${INK}"/>`;
+  return `<svg viewBox="0 0 260 260" width="260" height="260" role="img" aria-label="A spinner with marks around its edge every eighth of a turn. Going clockwise from the top: blue covers a quarter of the spinner (two eighths), then red one eighth, green one eighth, red one eighth, yellow one eighth, green one eighth and red one eighth.">${g}</svg>`;
+})();
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Choose the sentence (A, B, C, D or E) that best fits each gap. There are two sentences you won’t use.",
+    preamble: `<div class="choice-list"><ol>${SENTENCES.map((t, i) =>
+      `<li><span class="letter">${SENT_LETTERS[i]}</span><span>${t}</span></li>`).join("")}</ol></div>`,
+    questions: [
+      {
+        stem: "Which sentence best fits <b>gap 1</b>?",
+        letterOptions: true,
+        options: ["A", "B", "C", "D", "E"],
+        answer: 3,
+        skill: "using a contrast word to place a sentence",
+        explain: `<p>After the gap comes “De Mestral, <b>however</b>, wanted to know why they clung on so stubbornly.” “However” shows a contrast, so the sentence before it must say what <em>other</em> people would do. Sentence <b>D</b> does this: most people would just pull the burrs off and throw them away, but de Mestral was curious. In D, “them” means the burrs.</p>
+                  <p class="why-not">A is the trap: it is about burdock, which has just been mentioned, so it seems to follow on. But it gives no contrast for “however”, and after A the word “they” in the next sentence would seem to mean the countries of Europe and Asia. B describes what he saw under the microscope, which hasn’t happened yet.</p>`
+      },
+      {
+        stem: "Which sentence best fits <b>gap 2</b>?",
+        letterOptions: true,
+        options: ["A", "B", "C", "D", "E"],
+        answer: 1,
+        skill: "using a reference word (“These hooks”) to place a sentence",
+        explain: `<p>Before the gap, de Mestral looks at a burr under a microscope. After it: “<b>These hooks</b> grabbed onto anything with tiny loops.” “These hooks” must point back to hooks that have just been mentioned. Sentence <b>B</b> is the only sentence that tells us what he saw: spikes with ends bent into hooks.</p>
+                  <p class="why-not">C is the trap: it mentions a “hooked shape”, but it is about choosing a material for the fastener, and he hasn’t even had the idea for a fastener yet at this point. A is about where burdock grows, not about what the microscope showed, and doesn’t mention hooks at all.</p>`
+      },
+      {
+        stem: "Which sentence best fits <b>gap 3</b>?",
+        letterOptions: true,
+        options: ["A", "B", "C", "D", "E"],
+        answer: 2,
+        skill: "following a problem and its solution across a gap",
+        explain: `<p>Before the gap there is a <b>problem</b>: the cotton wore out too quickly. After it: “After years of experiments, he found <b>the answer</b>: nylon.” “The answer” only makes sense if something before it sets a question or a need. Sentence <b>C</b> does: he needed a material that would keep its hooked shape after being opened again and again. Nylon is the answer to that need.</p>
+                  <p class="why-not">E is the trap: it follows on from making the first strips, so it sounds natural. But the paragraph begins “far from easy”, the cotton strips wore out, and the next sentence says it took “years of experiments”. A fastener that worked perfectly within a few weeks contradicts all of that. D and B belong to the start of the story, when he first finds the burrs.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0"><em class="speaker">Tom:</em> “We should plant our tomato seedlings in the sunny corner of the garden, so that they produce more tomatoes.”</p>
+               <p style="margin:10px 0 0">Which one of these statements, if true, best supports Tom’s claim?</p>`,
+        options: ["Tomato plants produce more fruit when they get at least six hours of sunlight a day.",
+                  "The sunny corner of the garden is right next to the tap, so the seedlings would be easy to water.",
+                  "Tomatoes are one of the most popular vegetables that people grow in their own gardens.",
+                  "The shady part of the garden is already full of herbs that Tom’s family planted last year."],
+        answer: 0,
+        skill: "choosing the statement that supports a claim",
+        explain: `<p>Tom’s reason for choosing the sunny corner is that the plants would produce <b>more tomatoes</b> there. To support the claim, we need a link between sunshine and the number of tomatoes. A gives exactly that link: more sunlight means more fruit.</p>
+                  <p class="why-not">B is the trap: it is a real advantage of the sunny corner, but it is about how <em>easy</em> watering would be, not about how many tomatoes the plants will grow. C is about tomatoes in general, not about where to plant them. D gives a reason not to use the shady part, but it says nothing about getting more tomatoes.</p>`
+      },
+      {
+        stem: `A shop hires out bikes. These are its prices.
+               ${BIKE_TABLE}
+               <p style="margin:10px 0 0">From Monday to Friday, every half-day and full-day price is <b>$5 cheaper</b>.</p>
+               <p style="margin:10px 0 0">On <b>Saturday</b>, two adults and one child each hire a bike for <b>3 hours</b>. They pay the lowest price they can. How much do they pay altogether?</p>`,
+        options: ["$50", "$65", "$80", "$96"],
+        answer: 2,
+        skill: "using a price table with conditions",
+        explain: `<p>For 3 hours, compare paying by the hour with a half-day hire (which covers up to 4 hours):</p>
+                  <p>• Adult bike: 3 × $12 = $36 by the hour, or <b>$30</b> for a half day. The half day is cheaper.<br>
+                     • Child bike: 3 × $8 = $24 by the hour, or <b>$20</b> for a half day. The half day is cheaper.</p>
+                  <p>It is Saturday, so there is no $5 discount. Total: $30 + $30 + $20 = <b>$80</b>.</p>
+                  <p class="why-not">$65 (B) is the trap: it takes $5 off each of the three bikes, but that discount is only for Monday to Friday. $96 (D) pays for every bike by the hour, missing that a half day is cheaper than 3 hours. $50 (A) counts only one adult bike.</p>`
+      },
+      {
+        stem: `Here is a shape made of five squares.
+               <div class="figure">${F_SHAPE}</div>
+               <p style="margin:10px 0 0">The shape is <b>turned</b> (it is not flipped over). Which of these could be the turned shape?</p>`,
+        visualOptions: true,
+        options: TURN_OPTS,
+        answer: 1,
+        skill: "telling a turned shape from a flipped (mirror-image) shape",
+        explain: `<p>Turn the shape a quarter turn clockwise. The long column of three squares (the middle column) becomes a row of three across the middle. The square sticking out on the left (middle row) moves to the top. The square at the top right moves to the bottom right. That is <b>B</b>.</p>
+                  <p class="why-not">C is the trap: it has the same row of three, with one square above the middle and one below an end, so it looks like a turned shape, but the bottom square is at the wrong end. It is the mirror image of B, which you can only make by flipping the shape over. A is the original flipped left to right, and D is the original flipped upside down.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `A jug holds <b>1.5 L</b> of water. Tom pours out <b>4</b> cups of water. Each cup holds <b>250 mL</b>.
+               <p style="margin:10px 0 0">How much water is left in the jug?</p>`,
+        options: ["50 mL", "500 mL", "1000 mL", "1250 mL", "2500 mL"],
+        answer: 1,
+        skill: "capacity: litres and millilitres",
+        explain: `<p>1 L = 1000 mL, so 1.5 L = <b>1500 mL</b>.</p>
+                  <p>4 cups × 250 mL = <b>1000 mL</b> poured out.</p>
+                  <p>1500 − 1000 = <b>500 mL</b> left.</p>
+                  <p class="why-not">50 mL (A) is the trap: it reads 1.5 L as “1 litre and 50 mL” (1050 mL), but 0.5 L is half a litre, which is 500 mL. 1000 mL (C) is the amount poured out, not the amount left. 1250 mL (D) takes away only one cup. 2500 mL (E) adds the water poured out instead of taking it away.</p>`
+      },
+      {
+        stem: `Ivy spins the arrow on this spinner once. The marks around the edge split the spinner into eighths.
+               <div class="figure">${SPINNER_SVG}</div>
+               <p style="margin:10px 0 0">Which statement is true?</p>`,
+        options: ["Landing on blue is just as likely as landing on green.",
+                  "Landing on green is twice as likely as landing on blue.",
+                  "There is a 1 in 4 chance of landing on yellow.",
+                  "Landing on red is more likely than not landing on red.",
+                  "There is a 3 in 7 chance of landing on red."],
+        answer: 0,
+        skill: "chance: comparing likelihood when the parts are different sizes",
+        explain: `<p>Compare the <b>size</b> of each colour, in eighths of the spinner:</p>
+                  <p>blue 2 eighths (one quarter), green 2 eighths, red 3 eighths, yellow 1 eighth. Check: 2 + 2 + 3 + 1 = 8 ✓</p>
+                  <p>Blue and green each cover 2 eighths, so they are <b>equally likely</b>. A is true.</p>
+                  <p class="why-not">B is the trap: green has two separate parts and blue only one, but blue’s part is twice as big, so they cover the same amount. C counts the 4 colours as if each had the same chance; yellow is really 1 in 8. D: red covers 3 eighths and the other colours 5 eighths, so <em>not</em> red is more likely. E counts the 7 parts as if they were all the same size; red is really 3 in 8.</p>`
+      },
+      {
+        stem: `Sam reads <b>12 pages every 10 minutes</b>. He has <b>90 pages</b> left in his book and wants to finish them at exactly <b>8:00 pm</b>.
+               <p style="margin:10px 0 0">He will take a <b>15-minute break</b> after every 30 pages he reads (but not after the last page).</p>
+               <p style="margin:10px 0 0">What is the latest time he can start reading?</p>`,
+        options: ["5:42 pm", "6:00 pm", "6:10 pm", "6:15 pm", "6:45 pm"],
+        answer: 3,
+        skill: "rates and time: working backwards from a finishing time",
+        explain: `<p><b>Reading time.</b> 12 pages take 10 minutes, so 6 pages take 5 minutes. 90 pages = 15 lots of 6 pages, which take 15 × 5 = <b>75 minutes</b>.</p>
+                  <p><b>Breaks.</b> He reads 30 pages, break, 30 pages, break, 30 pages, then finishes. That is only <b>2 breaks</b>: 2 × 15 = 30 minutes.</p>
+                  <p><b>Total:</b> 75 + 30 = 105 minutes = 1 hour 45 minutes. Work back from 8:00 pm: 8:00 − 1 hour = 7:00, then − 45 minutes = <b>6:15 pm</b>.</p>
+                  <p class="why-not">6:00 pm (B) is the trap: 90 ÷ 30 = 3, but there is no break after the last 30 pages, so there are 2 breaks, not 3. (Reading 1 page a minute with 2 breaks also gives 6:00.) 6:10 pm (C) rounds 90 ÷ 12 = 7½ up to 8 lots of 10 minutes. 5:42 pm (A) swaps the rate to 10 pages every 12 minutes. 6:45 pm (E) forgets the breaks.</p>`
+      }
+    ]
+  }
+];
+
+const TEST_META = {"version": 44, "reading_format": "missing sentences", "categories": {"reading": ["Sentence links", "Sentence links", "Sentence links"], "thinking": ["Supports the claim", "Tables & timetables", "Spatial"], "maths": ["Measurement & scales", "Chance & counting", "Rates"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}};
+const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  return r.json();
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
+  persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 44</h1>
+      ${completedNote()}
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  sectionStart = Date.now();
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  window.scrollTo(0, 0);
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  finishAttempt();
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+
+showStart();
+</script>
+</body>
+</html>
