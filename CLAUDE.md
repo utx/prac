@@ -37,7 +37,8 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
   - Spot the mistake: cycle the patterns: ignoring another possible cause; judging from your own small group; treating something needed as a guarantee; an unfair comparison; treating "most" as "all"; reversing a rule. Every option contains "may".
   - Whose reasoning: cycle needed versus guaranteed; reversed rule; "most" leading to "probably"; certainty/worst case.
   - Supports the claim: the right answer backs the claim's reason; the wrong options are true but about something else.
-- **Q2:** a table, timetable, data or arrangement question (more often tables/timetables).
+- **Q2:** usually a table, timetable, data or arrangement question (more often tables/timetables).
+- **Cover the whole question base.** Every few versions, use Q2 (or Q3) for a type the fixed slots would otherwise miss: rules/codes/sets, number problems, must/cannot be true, and question types next to the samples (for example odd one out, logic grids, sequences of shapes, balance scales, true/false statements from a diagram). Check the `thinking` labels and `categories` in recent `content/vNN.json` files so each type comes round regularly.
 - **Q3:** spatial at sample-paper difficulty (one or two clear steps), or a second critical-thinking question. Spatial questions must not be harder than the sample versions.
 - Never use "weakens the argument" questions (they don't appear in the samples).
 
@@ -45,6 +46,7 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - **Q1:** a quick-fire question (under a minute), rotating: place value, time, money, measurement, reading a scale, reading a graph, simple word problem, missing number.
 - **Q2 and Q3:** multi-step reasoning on sample-paper topics: fractions, patterns, area and perimeter, 3D shapes, chance statements, combinations, rates, best value, timetables, "which statements are correct" graph questions.
 - At most one competition-style (Kangaroo-like) question per version.
+- Cover the whole question base here too: every few versions, use Q2 or Q3 for a sample topic not seen recently or a nearby one (for example symmetry, angles, position and direction, mass, volume, number puzzles), checking the `maths` labels in recent `content/vNN.json` files.
 
 ## Stretch questions
 - Every section of every version (Reading, Thinking Skills and Maths) has one stretch question pitched at the hardest third of the sample papers (around Q25–35). Usually make it Q3. Record it in `content/vNN.json` as `"stretch": {"reading": [2], "thinking": [2], "maths": [2]}` (zero-based question numbers), so the stats page can report it.

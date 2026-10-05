@@ -1,0 +1,62 @@
+{
+  "version": 43,
+  "date": "2026-10-05",
+  "reading": "Cloze: Under a Dark Sky",
+  "reading_format": "cloze",
+  "reading_topic": "stargazing with Dad at a dark-sky campsite: night vision, the Milky Way, meteors (first-person piece)",
+  "thinking": [
+    "Spot the mistake (treating \"most\" as \"all\")",
+    "Two-step letter code (vowel shift, then backwards)",
+    "Cubes needed to complete a cuboid, including hidden cubes (stretch)"
+  ],
+  "maths": [
+    "Quick-fire money: multiply then add",
+    "Line graph statements with unlabelled grid lines",
+    "Area of a tilted square on a grid by subtraction (competition-style, stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q10 ('teeming with'), PT1 Q8",
+      "PT1 Q12 ('paged/leafed'), PT3 Q13 ('decrease/descent/decay/decline')",
+      "PT3 Q7 ('scouring'), PT1 Q9 — stretch"
+    ],
+    "thinking": [
+      "PT2 Q14 (mistake: \"most\" treated as \"all\"), PT2 Q27 (\"most\" → \"probably\")",
+      "PT2 Q15 (letter-shift code), PT3 Q13 (letter values in words)",
+      "PT1 maths Q14 (hidden faces of a cube model), PT3 Q19 (tallest stack), PT2 Q28 (layers of a pyramid) — stretch"
+    ],
+    "maths": [
+      "PT2 Q7 (price from change), PT3 Q7 (estimating change)",
+      "PT1 Q27 (which graph claims are correct), PT2 Q11 (scale with different markings)",
+      "PT3 Q20 (equal shaded area), PT3 Q14 (area from a smaller shape), PT1 Q24 (area left after cutting) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Rules & codes",
+      "Spatial"
+    ],
+    "maths": [
+      "Money & best value",
+      "Graphs & data",
+      "Area, perimeter & 3D"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 43</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary {
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 43</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 43
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: cloze passage ---- */
+const CLOZE_TEXT = `
+<p>Last winter, Dad and I drove for hours along empty country roads to camp beside a national park that has been named a Dark Sky Park. That means there are hardly any lights for kilometres around, so the night sky looks much as it did hundreds of years ago, before towns and cities lit up the dark.</p>
+<p>We put up our tent before sunset and ate dinner while the sky faded from orange to deep blue. Dad had packed a torch that shines red light, because red light does not spoil your night vision the way white light does. He explained that our eyes need at least twenty minutes to adjust to darkness, and that one glance at a bright screen can undo all that waiting.</p>
+<p>At first I could see only a scattering of stars. But as my eyes grew {1} to the dark, more and more appeared, until there seemed to be no black gaps left between them. Then Dad pointed out a pale, misty band stretching right across the sky. “That’s the Milky Way,” he said. “It’s our own galaxy, and we’re looking at it from the inside.”</p>
+<p>It was the night of a meteor shower, so every few minutes a meteor {2} across the sky and was gone in the blink of an eye. Dad told me that many shooting stars are made by specks of dust no bigger than a grain of sand, burning up as they plunge into the air high above us. I found that very hard to believe.</p>
+<p>Lying on my back in the cold grass, beneath a sky that seemed to go on for ever, I felt utterly {3}. Strangely, it was one of the best feelings I have ever had.</p>`;
+
+function clozeHtml() {
+  const si = SECTIONS.findIndex(s => s.id === "reading");
+  let t = CLOZE_TEXT;
+  SECTIONS[si].questions.forEach((q, i) => {
+    const chosen = responses[si][i];
+    let fill;
+    if (passMode === "review") fill = `<span class="gap filled correct">(${i + 1}) ${q.options[q.answer]}</span>`;
+    else if (chosen !== null) fill = `<span class="gap filled">(${i + 1}) ${q.options[chosen]}</span>`;
+    else fill = `<span class="gap">(${i + 1}) ……</span>`;
+    t = t.replace(`{${i + 1}}`, fill);
+  });
+  return t;
+}
+const PASSAGE = {
+  title: "Under a Dark Sky",
+  note: "Read the text below and decide which answer best fits each gap.",
+  html: clozeHtml
+};
+
+/* ---- Thinking Skills Q3: cube model ---- */
+const CUBES_SVG = (() => {
+  const s = 44, d = s * 0.5, ox = 12, base = 3 * s + 2 * d + 10;
+  const P = (x, y, z) => [ox + x * s + y * d, base - z * s - y * d];
+  const poly = (pts, fill) => `<polygon points="${pts.map(p => p.join(",")).join(" ")}" fill="${fill}" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>`;
+  const cube = (x, y, z) =>
+    poly([P(x, y, z), P(x + 1, y, z), P(x + 1, y, z + 1), P(x, y, z + 1)], "#a9c4e6") +
+    poly([P(x + 1, y, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x + 1, y, z + 1)], "#6f95c7") +
+    poly([P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], "#dbe7f6");
+  const HEIGHTS = [[2, 1, 1], [3, 3, 2]]; // [front row, back row], left to right
+  let g = "";
+  for (let y = 1; y >= 0; y--) for (let x = 0; x < 3; x++) for (let z = 0; z < HEIGHTS[y][x]; z++) g += cube(x, y, z);
+  const W = ox + 3 * s + d + 12, Hh = base + 8;
+  return `<svg viewBox="0 0 ${W} ${Hh}" width="${W}" height="${Hh}" role="img" aria-label="A model made of identical cubes on a base 3 cubes long and 2 cubes deep. Back row, left to right: stacks of 3, 3 and 2 cubes. Front row, left to right: stacks of 2, 1 and 1 cubes.">${g}</svg>`;
+})();
+
+/* ---- Maths Q2: line graph ---- */
+const TEMP_SVG = (() => {
+  const data = [["6 am", 4], ["8 am", 6], ["10 am", 12], ["12 pm", 16], ["2 pm", 18], ["4 pm", 14], ["6 pm", 8]];
+  const ox = 50, top = 16, h = 220, step = 40, max = 20;
+  const Y = v => top + h - (v / max) * h, X = i => ox + 20 + i * step;
+  const W = X(data.length - 1) + 30;
+  let g = "";
+  for (let v = 0; v <= max; v += 2) {
+    const lab = v % 4 === 0;
+    g += `<line x1="${ox}" y1="${Y(v)}" x2="${W - 10}" y2="${Y(v)}" stroke="${lab ? "#9aa5b8" : "#d5dbe5"}" stroke-width="1"/>`;
+    if (lab) g += `<text x="${ox - 8}" y="${Y(v) + 5}" font-size="15" text-anchor="end" fill="${INK}">${v}</text>`;
+  }
+  g += `<line x1="${ox}" y1="${top}" x2="${ox}" y2="${top + h}" stroke="${INK}" stroke-width="1.5"/>`;
+  g += `<polyline points="${data.map((d, i) => `${X(i)},${Y(d[1])}`).join(" ")}" fill="none" stroke="#c0392b" stroke-width="2.5"/>`;
+  data.forEach((d, i) => {
+    g += `<circle cx="${X(i)}" cy="${Y(d[1])}" r="4" fill="#c0392b"/>`;
+    g += `<text x="${X(i)}" y="${top + h + 20}" font-size="13" text-anchor="middle" fill="${INK}">${d[0]}</text>`;
+  });
+  g += `<text x="14" y="${top + h / 2}" font-size="13" text-anchor="middle" fill="${INK}" transform="rotate(-90 14 ${top + h / 2})">temperature (°C)</text>`;
+  return `<svg viewBox="0 0 ${W} ${top + h + 32}" width="${W}" height="${top + h + 32}" role="img" aria-label="Line graph of the temperature every 2 hours from 6 am to 6 pm. The scale is labelled 0, 4, 8, 12, 16 and 20 degrees, with an unlabelled grid line halfway between each pair. 6 am 4, 8 am 6, 10 am 12, 12 pm 16, 2 pm 18, 4 pm 14, 6 pm 8.">${g}</svg>`;
+})();
+
+/* ---- Maths Q3: tilted square on a grid ---- */
+const TILT_SVG = (() => {
+  const c = 36, o = 6, n = 6;
+  const pt = ([x, y]) => `${o + x * c},${o + (n - y) * c}`;
+  let g = `<polygon points="${[[0, 2], [4, 0], [6, 4], [2, 6]].map(pt).join(" ")}" fill="#f2b8a2" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`;
+  for (let i = 0; i <= n; i++) {
+    g += `<line x1="${o + i * c}" y1="${o}" x2="${o + i * c}" y2="${o + n * c}" stroke="#8a96ab" stroke-width="1"/>`;
+    g += `<line x1="${o}" y1="${o + i * c}" x2="${o + n * c}" y2="${o + i * c}" stroke="#8a96ab" stroke-width="1"/>`;
+  }
+  g += `<polygon points="${[[0, 2], [4, 0], [6, 4], [2, 6]].map(pt).join(" ")}" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`;
+  const S = 2 * o + n * c;
+  return `<svg viewBox="0 0 ${S} ${S}" width="${S}" height="${S}" role="img" aria-label="A 6 by 6 grid of 1 centimetre squares. A tilted shaded square has its corners on the edges of the grid: on the left edge 2 squares up from the bottom, on the bottom edge 4 squares from the left, on the right edge 4 squares up from the bottom, and on the top edge 2 squares from the left.">${g}</svg>`;
+})();
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Read the text, then decide which answer (A, B, C or D) best fits each gap.",
+    questions: [
+      {
+        stem: "Which word best fits <b>gap 1</b>?",
+        options: ["accustomed", "acquainted", "customary", "habitual"],
+        answer: 0,
+        skill: "choosing between words that look alike, and the word that goes with “to”",
+        explain: `<p>To grow <b>accustomed to</b> something means to get used to it. As your eyes get used to the dark, you see more and more stars.</p>
+                  <p class="why-not">“Acquainted” is the trap: it is close in meaning (you can become acquainted with a place or a person), but it goes with “with”, not “to”, and it means getting to know something, not getting used to it. “Customary” looks like “accustomed” but means usual or traditional (a customary greeting); eyes can’t be customary. “Habitual” means done out of habit, and you can’t grow habitual <em>to</em> anything.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 2</b>?",
+        options: ["strayed", "strode", "streaked", "straggled"],
+        answer: 2,
+        skill: "choosing between words with similar sounds but different meanings",
+        explain: `<p>Something that <b>streaks</b> across the sky moves very fast in a thin line, like a flash. The meteor was “gone in the blink of an eye”, so it must have moved very quickly.</p>
+                  <p class="why-not">“Strayed” is the trap: it means wandered away from where it should be, so it sounds possible for something moving through the sky. But straying is slow and aimless, and this meteor vanished in an instant. “Strode” means walked with long steps, which a meteor can’t do, and “straggled” means lagged slowly behind a group.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 3</b>?",
+        options: ["indifferent", "insignificant", "insufficient", "indestructible"],
+        answer: 1,
+        skill: "using clues across two sentences to infer a feeling (harder vocabulary)",
+        explain: `<p>Two clues work together. First, she is lying under “a sky that seemed to go on for ever”: next to something that huge, a person feels tiny and unimportant. Second, “Strangely” tells you the word names a feeling that is usually <em>unpleasant</em>, yet this time it was “one of the best feelings” she has had. Feeling <b>insignificant</b> (small and unimportant) fits both clues: normally that would feel bad, but under the stars it filled her with wonder.</p>
+                  <p class="why-not">“Indestructible” is the trap: it is a wonderful feeling, so it seems to fit “best feelings”, but then nothing would be strange about enjoying it, and a never-ending sky makes you feel small, not mighty. “Insufficient” looks and sounds similar, but it means <em>not enough</em> (insufficient food), which describes an amount, not a feeling. “Indifferent” means not caring, but someone who didn’t care wouldn’t call it one of the best feelings ever.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0">A survey at Banksia Primary School found that <b>most</b> of the students in Year 4 walk to school.</p>
+               <p class="quote"><em class="speaker">Leo:</em> “Mia is in Year 4 at Banksia Primary, so she must walk to school.”</p>
+               <p style="margin:10px 0 0">Which one of these sentences shows the mistake Leo has made?</p>`,
+        options: ["Mia may live closer to the school than most of the other students in her class do.",
+                  "Some students in other years at Banksia Primary may also walk to school.",
+                  "Walking to school may be healthier for students than being driven there.",
+                  "Mia may be one of the Year 4 students who do not walk to school."],
+        answer: 3,
+        skill: "spotting the mistake in someone’s reasoning (treating “most” as “all”)",
+        explain: `<p>The survey says <b>most</b> Year 4 students walk, not <b>all</b> of them. So some Year 4 students get to school another way. Leo treats “most” as if it meant “every”. Mia could be one of the students who don’t walk, so D shows his mistake.</p>
+                  <p class="why-not">B is the trap: it is probably true, but it is about students in <em>other</em> years, which tells us nothing about Mia. A would, if anything, make Leo’s conclusion more likely, so it doesn’t show a mistake. C is about whether walking is healthy, which has nothing to do with how Mia gets to school.</p>`
+      },
+      {
+        stem: `In a secret code, each word is changed in two steps:
+               <ul class="facts">
+                 <li><b>Step 1:</b> every vowel is changed to the next vowel in this list: A → E, E → I, I → O, O → U, U → A. Other letters stay the same.</li>
+                 <li><b>Step 2:</b> the whole word is written backwards.</li>
+               </ul>
+               <p style="margin:10px 0 0">For example, SUN is written as NAS.</p>
+               <p style="margin:10px 0 0">How is <b>PLANET</b> written in this code?</p>`,
+        options: ["PLENIT", "TINELP", "TENALP", "TANULP"],
+        answer: 1,
+        skill: "following the rules of a code (two steps)",
+        explain: `<p><b>Step 1:</b> PLANET has two vowels. A → E and E → I, so PLANET becomes PLENIT.</p>
+                  <p><b>Step 2:</b> write PLENIT backwards: <b>TINELP</b>.</p>
+                  <p>Check with the example: SUN → U becomes A → SAN → backwards → NAS ✓</p>
+                  <p class="why-not">PLENIT (A) is the trap: it does step 1 correctly but forgets step 2. TENALP (C) writes the word backwards but forgets to change the vowels. TANULP (D) moves each vowel to the one <em>before</em> it in the list (A → U, E → A) instead of the one after.</p>`
+      },
+      {
+        stem: `This model is made of identical cubes. It stands on a base 3 cubes long and 2 cubes deep. There are no gaps: every cube sits on the table or on top of another cube.
+               <div class="figure">${CUBES_SVG}</div>
+               <p style="margin:10px 0 0">How many more cubes are needed to turn the model into a solid block 3 cubes long, 2 cubes deep and 3 cubes high?</p>`,
+        options: ["3", "4", "6", "9"],
+        answer: 2,
+        skill: "counting cubes in a model, including the hidden ones",
+        explain: `<p><b>Count the cubes in each stack</b>, using the top of each stack and the fact that there are no gaps underneath.</p>
+                  <p>Back row (left to right): 3, 3, 2. Front row: 2, 1, 1. That is 8 + 4 = <b>12 cubes</b>, including 3 you can’t see (two behind the front-left stack and one behind the front-middle stack).</p>
+                  <p>A solid block 3 long, 2 deep and 3 high has 3 × 2 × 3 = <b>18 cubes</b>. So 18 − 12 = <b>6</b> more are needed.</p>
+                  <p class="why-not">9 (D) is the trap: it counts only the 9 cubes you can see, forgetting the hidden cubes that hold up the back stacks. 4 (B) fills only the gaps in the top layer and forgets that the front-middle and front-right stacks also need a cube in the middle layer. 3 (A) is the number of hidden cubes, not the number still needed.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `Ella buys <b>3</b> notebooks that cost <b>$2.45</b> each and <b>1</b> ruler that costs <b>$1.80</b>.
+               <p style="margin:10px 0 0">How much does she spend altogether?</p>`,
+        options: ["$4.25", "$8.15", "$9.15", "$9.30", "$12.75"],
+        answer: 2,
+        skill: "money: multiplying and adding amounts",
+        explain: `<p>3 notebooks: 3 × $2.45. 3 × $2 = $6 and 3 × 45c = 135c = $1.35, so 3 notebooks cost <b>$7.35</b>.</p>
+                  <p>Add the ruler: $7.35 + $1.80 = <b>$9.15</b>.</p>
+                  <p class="why-not">$8.15 (B) is the trap: 3 × 45c is 135c, which is $1.35, and forgetting to carry the dollar gives $6.35 for the notebooks. $4.25 (A) adds one notebook and the ruler, forgetting to multiply by 3. $9.30 (D) rounds each notebook to $2.50 first. $12.75 (E) multiplies the ruler by 3 as well.</p>`
+      },
+      {
+        stem: `The line graph shows the temperature at a weather station every 2 hours on one day.
+               <div class="figure">${TEMP_SVG}</div>
+               <ol style="margin:8px 0 0;padding-left:22px">
+                 <li>The temperature rose by 12 °C between 6 am and 12 pm.</li>
+                 <li>The temperature rose by the same amount between 8 am and 10 am as between 10 am and 12 pm.</li>
+                 <li>The highest temperature shown was 14 °C more than the lowest.</li>
+               </ol>
+               <p style="margin:8px 0 0">Which of these statements is/are correct?</p>`,
+        options: ["statement 1 only", "statement 3 only", "statements 1 and 2 only", "statements 2 and 3 only", "statements 1 and 3 only"],
+        answer: 4,
+        skill: "reading a line graph with unlabelled grid lines",
+        explain: `<p>Each grid line is <b>2 °C</b> (there is one unlabelled line between each pair of labels, which are 4 apart).</p>
+                  <p>Readings: 6 am 4, 8 am 6, 10 am 12, 12 pm 16, 2 pm 18, 4 pm 14, 6 pm 8.</p>
+                  <p><b>1:</b> 16 − 4 = 12 ✓<br>
+                     <b>2:</b> 8 am to 10 am: 12 − 6 = 6. 10 am to 12 pm: 16 − 12 = 4. Not the same ✗<br>
+                     <b>3:</b> highest 18 (2 pm), lowest 4 (6 am): 18 − 4 = 14 ✓</p>
+                  <p class="why-not">C is the trap: both parts of the line in statement 2 slope upwards and look similar, but the first one climbs 3 grid lines and the second only 2. D makes the same mistake about statement 2 and also rejects statement 1, which happens if you read the 12 pm point as 14 instead of 16. A and B each miss one of the two correct statements, usually from reading a point on an unlabelled grid line wrongly.</p>`
+      },
+      {
+        stem: `The grid is made of squares that measure <b>1 cm</b> by <b>1 cm</b>. A shaded square is drawn with its corners on the edges of the grid.
+               <div class="figure">${TILT_SVG}</div>
+               <p style="margin:10px 0 0">What is the area of the shaded square?</p>`,
+        options: ["20 cm²", "24 cm²", "28 cm²", "32 cm²", "36 cm²"],
+        answer: 0,
+        skill: "area: finding a tilted shape by taking away the parts outside it",
+        explain: `<p>The shaded square is hard to count directly, so find the area of the <b>whole grid</b> and take away the four white corners.</p>
+                  <p>• Whole grid: 6 × 6 = <b>36 cm²</b>.<br>
+                     • Each white corner is a right-angled triangle with sides of 4 cm and 2 cm along the grid. It is half of a 4 × 2 rectangle: half of 8 = <b>4 cm²</b>.<br>
+                     • Four corners: 4 × 4 = 16 cm².</p>
+                  <p>Shaded square: 36 − 16 = <b>20 cm²</b>.</p>
+                  <p class="why-not">28 cm² (C) is the trap: it counts every square that is shaded even a little, so the part-shaded squares along the edges are counted as whole ones. 24 cm² (B) works out each corner triangle as (4 + 2) ÷ 2 = 3 instead of 4 × 2 ÷ 2. 32 cm² (D) takes away only one corner triangle. 36 cm² (E) is the whole grid.</p>`
+      }
+    ]
+  }
+];
+
+const TEST_META = {"version": 43, "reading_format": "cloze", "categories": {"reading": ["Vocabulary & idioms", "Vocabulary & idioms", "Vocabulary & idioms"], "thinking": ["Spot the mistake", "Rules & codes", "Spatial"], "maths": ["Money & best value", "Graphs & data", "Area, perimeter & 3D"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}};
+const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  return r.json();
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
+  persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 43</h1>
+      ${completedNote()}
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  sectionStart = Date.now();
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  window.scrollTo(0, 0);
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  finishAttempt();
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+
+showStart();
+</script>
+</body>
+</html>

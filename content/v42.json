@@ -1,0 +1,62 @@
+{
+  "version": 42,
+  "date": "2026-10-05",
+  "reading": "Story extract: The Railway Children (E. Nesbit)",
+  "reading_format": "story",
+  "reading_topic": "the children wave red flannel flags to stop the train before a landslide (classic extract, 1906, public domain)",
+  "thinking": [
+    "Whose reasoning is correct (needed versus guaranteed)",
+    "Arrangement from clues (round table, left and right)",
+    "Cube net with symbols: which cube could it make (stretch)"
+  ],
+  "maths": [
+    "Quick-fire word problem: two multiplications, then the difference",
+    "Best value: comparing prices for the same amount of juice",
+    "Growing tile pattern: rule for a later term (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q1-6 (Nesbit classic extract), PT1 Q1-6 (meaning of a word in context)",
+      "PT3 Q1 (how the children feel), PT2 Q1-6 (feelings shown rather than stated)",
+      "PT3 Q6 (impression across the text), PT2 Q1-6 (why the writer includes a detail) — stretch"
+    ],
+    "thinking": [
+      "PT1 Q5 (whose reasoning: needed vs guaranteed), PT2 Q8, PT1 Q18 ('only if')",
+      "PT1 Q15 (round-table seating), PT3 Q12 (car seating)",
+      "PT1 Q10 (dice nets, opposite faces), PT3 Q28 (dice with unusual opposite sums) — stretch"
+    ],
+    "maths": [
+      "PT2 Q1 (two-step word problem), PT1 Q32 (points spent, then cost of last item)",
+      "PT1 Q12 (cheapest way to buy a mass)",
+      "PT2 Q5 (10th term of a sequence), PT1 Q19 (doubling sequence, term difference) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Vocabulary & idioms",
+      "Feelings & inference",
+      "Purpose of a detail"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Order & arrangement",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Money & best value",
+      "Patterns & sequences"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

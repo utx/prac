@@ -1,0 +1,62 @@
+{
+  "version": 44,
+  "date": "2026-10-05",
+  "reading": "Missing sentences: Stuck on an Idea",
+  "reading_format": "missing sentences",
+  "reading_topic": "how Velcro was invented (George de Mestral, burdock burrs, 1941; patent applied for 1951)",
+  "thinking": [
+    "Supports the claim (tomatoes in the sunny corner)",
+    "Bike hire price table with a weekday discount",
+    "Turned or flipped: which shape is a rotation (stretch)"
+  ],
+  "maths": [
+    "Quick-fire capacity: litres and millilitres",
+    "Spinner with different-sized parts: which chance statement is true",
+    "Reading rate with breaks: working back from a finishing time (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT2 Q20-25 (missing sentences: contrast and correction)",
+      "PT2 Q20-25 (reference words pointing back)",
+      "PT2 Q20-25 (problem and solution; a plausible sentence that contradicts what follows) — stretch"
+    ],
+    "thinking": [
+      "PT1 Q2, PT2 Q3, PT3 Q26 (supports the claim)",
+      "PT3 Q7 (packs table + a swap), PT3 Q2 (juice availability table), PT1 Q25 (limiting ingredient)",
+      "PT3 Q22 (tiles that were rotated), PT2 Q16 (which way a tile goes), PT1 Q16 (same pieces in a new arrangement) — stretch"
+    ],
+    "maths": [
+      "PT1 Q9 (reading a jug scale, pouring), PT2 Q13 (grams to half a kilogram)",
+      "PT2 Q23 (least likely event), PT3 Q10 (chance statements), PT2 Q14",
+      "PT3 Q32 (two people working together), PT1 Q23 (proportional feeding), PT3 Q30 (time between two buses) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Sentence links",
+      "Sentence links",
+      "Sentence links"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Measurement & scales",
+      "Chance & counting",
+      "Rates"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

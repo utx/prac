@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 42</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary {
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 42</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 42
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: story extract (public domain: E. Nesbit, 1906; text from Project Gutenberg #1874) ---- */
+const PARAS = [
+  "Perhaps Peter had not rightly calculated the number of minutes it would take the 11.29 to get from the station to the place where they were, or perhaps the train was late. Anyway, it seemed a very long time that they waited.",
+  "Phyllis grew impatient. “I expect the watch is wrong, and the train’s gone by,” said she.",
+  "Peter relaxed the heroic attitude he had chosen to show off his two flags. And Bobbie began to feel sick with suspense.",
+  "It seemed to her that they had been standing there for hours and hours, holding those silly little red flannel flags that no one would ever notice. The train wouldn’t care. It would go rushing by them and tear round the corner and go crashing into that awful mound. And everyone would be killed. Her hands grew very cold and trembled so that she could hardly hold the flag. And then came the distant rumble and hum of the metals, and a puff of white steam showed far away along the stretch of line.",
+  "“Stand firm,” said Peter, “and wave like mad! When it gets to that big furze bush step back, but go on waving! Don’t stand <em>on</em> the line, Bobbie!”",
+  "The train came rattling along very, very fast.",
+  "“They don’t see us! They won’t see us! It’s all no good!” cried Bobbie.",
+  "The two little flags on the line swayed as the nearing train shook and loosened the heaps of loose stones that held them up. One of them slowly leaned over and fell on the line. Bobbie jumped forward and caught it up, and waved it; her hands did not tremble now.",
+  "It seemed that the train came on as fast as ever. It was very near now.",
+  "“Keep off the line, you silly cuckoo!” said Peter, fiercely.",
+  "“It’s no good,” Bobbie said again.",
+  "“Stand back!” cried Peter, suddenly, and he dragged Phyllis back by the arm.",
+  "But Bobbie cried, “Not yet, not yet!” and waved her two flags right over the line. The front of the engine looked black and enormous. Its voice was loud and harsh.",
+  "“Oh, stop, stop, stop!” cried Bobbie. No one heard her. At least Peter and Phyllis didn’t, for the oncoming rush of the train covered the sound of her voice with a mountain of sound. But afterwards she used to wonder whether the engine itself had not heard her. It seemed almost as though it had—for it slackened swiftly, slackened and stopped, not twenty yards from the place where Bobbie’s two flags waved over the line. She saw the great black engine stop dead, but somehow she could not stop waving the flags."
+];
+const PASSAGE = {
+  title: "Saviours of the Train",
+  note: "This extract is from <i>The Railway Children</i> (1906) by E. Nesbit. Bobbie, Peter and Phyllis have seen a landslide block the railway line just round a bend, and the 11.29 train is due. They have torn up their red flannel petticoats to make six little flags. Read the extract, then answer the questions.",
+  html: PARAS.map(p => `<p>${p}</p>`).join("")
+};
+
+/* ---- Thinking Skills Q2: round table ---- */
+const TABLE_SVG = (() => {
+  const cx = 110, cy = 100, R = 52, rc = 80;
+  let g = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#f3e3c7" stroke="${INK}" stroke-width="2"/>`;
+  for (let k = 0; k < 6; k++) {
+    const a = (k * 60 - 90) * Math.PI / 180, x = cx + rc * Math.cos(a), y = cy + rc * Math.sin(a);
+    g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="13" fill="#fff" stroke="${INK}" stroke-width="1.8"/>`;
+  }
+  return `<svg viewBox="0 0 220 200" width="220" height="200" role="img" aria-label="A round table seen from above with six chairs spaced evenly around it.">${g}</svg>`;
+})();
+
+/* ---- Thinking Skills Q3: cube net with symbols ---- */
+// each symbol is drawn in a 1 by 1 square, then stretched onto a face
+const SYM = {
+  circle: `<circle cx=".5" cy=".5" r=".25" fill="${INK}"/>`,
+  ring: `<circle cx=".5" cy=".5" r=".25" fill="none" stroke="${INK}" stroke-width=".09"/>`,
+  plus: `<rect x=".43" y=".2" width=".14" height=".6" fill="${INK}"/><rect x=".2" y=".43" width=".6" height=".14" fill="${INK}"/>`,
+  cross: `<rect x=".08" y=".08" width=".84" height=".84" fill="#e8796e"/>`,
+  square: `<rect x=".3" y=".3" width=".4" height=".4" fill="#2f7d4f"/>`,
+  dots: [[.3, .3], [.7, .3], [.3, .7], [.7, .7]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".09" fill="${INK}"/>`).join("")
+};
+const SYM_NAME = { circle: "a black dot", ring: "a ring", plus: "a plus sign", cross: "red shading over the whole face", square: "a small green square", dots: "four small dots" };
+const NET = [[0, 0, "circle"], [0, 1, "ring"], [1, 1, "plus"], [1, 2, "square"], [1, 3, "cross"], [2, 3, "dots"]];
+const NET_SVG = (() => {
+  const u = 46, o = 4;
+  let g = "";
+  NET.forEach(([r, c, s]) => {
+    const x = o + c * u, y = o + r * u;
+    g += `<rect x="${x}" y="${y}" width="${u}" height="${u}" fill="#fff" stroke="${INK}" stroke-width="2"/><g transform="matrix(${u} 0 0 ${u} ${x} ${y})">${SYM[s]}</g>`;
+  });
+  return `<svg viewBox="0 0 ${4 * u + 2 * o} ${3 * u + 2 * o}" width="${4 * u + 2 * o}" height="${3 * u + 2 * o}" role="img" aria-label="A net of six squares. Top row: ${SYM_NAME.circle}, then ${SYM_NAME.ring} to its right. Middle row, starting under the ring: ${SYM_NAME.plus}, ${SYM_NAME.square}, ${SYM_NAME.cross}. Bottom row: ${SYM_NAME.dots}, under the red face.">${g}</svg>`;
+})();
+function cubeSvg([top, left, right], letter) {
+  const a = 46, k = a * Math.cos(Math.PI / 6), cx = 6 + k, y0 = 6;
+  const T = [cx, y0], Rt = [cx + k, y0 + a / 2], Fr = [cx, y0 + a], Lf = [cx - k, y0 + a / 2];
+  const face = (o, u, v, s, fill) =>
+    `<polygon points="${[o, [o[0] + u[0], o[1] + u[1]], [o[0] + u[0] + v[0], o[1] + u[1] + v[1]], [o[0] + v[0], o[1] + v[1]]].map(p => p.join(",")).join(" ")}" fill="${fill}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+     <g transform="matrix(${u[0]} ${u[1]} ${v[0]} ${v[1]} ${o[0]} ${o[1]})">${SYM[s]}</g>`;
+  const sub = (p, q) => [p[0] - q[0], p[1] - q[1]];
+  const g = face(Lf, sub(T, Lf), sub(Fr, Lf), top, "#ffffff") +
+            face(Lf, sub(Fr, Lf), [0, a], left, "#eef1f6") +
+            face(Fr, sub(Rt, Fr), [0, a], right, "#dfe4ec");
+  const W = 2 * k + 12, H = 2 * a + 12;
+  return `<svg viewBox="0 0 ${W.toFixed(1)} ${H}" width="${W.toFixed(1)}" height="${H}" role="img" aria-label="Cube ${letter}: top face ${SYM_NAME[top]}, front-left face ${SYM_NAME[left]}, front-right face ${SYM_NAME[right]}.">${g}</svg>`;
+}
+const CUBE_OPTS = [["ring", "plus", "square"], ["circle", "dots", "ring"], ["plus", "cross", "circle"], ["ring", "square", "plus"]]
+  .map((f, i) => cubeSvg(f, "ABCD"[i]));
+
+/* ---- Maths Q2: juice prices ---- */
+const JUICE_TABLE = `<div class="table-wrap"><table class="grid">
+  <tr><th>bottle</th><th>price</th></tr>
+  ${[["500 mL", "$2.40"], ["750 mL", "$3.30"], ["1 L", "$4.50"], ["1.5 L", "$6.30"], ["3 L", "$13.00"]].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join("")}
+</table></div>`;
+
+/* ---- Maths Q3: tile pattern ---- */
+const TILES_SVG = (() => {
+  const c = 19;
+  return `<div style="display:flex;flex-wrap:wrap;gap:12px 30px;align-items:flex-end">${[1, 2, 3].map(n => {
+    const m = n + 2;
+    let g = "";
+    for (let r = 0; r < m; r++) for (let k = 0; k < m; k++) {
+      const border = r === 0 || k === 0 || r === m - 1 || k === m - 1;
+      g += `<rect x="${2 + k * c}" y="${2 + r * c}" width="${c}" height="${c}" fill="${border ? "#8d99ae" : "#fff"}" stroke="${INK}" stroke-width="1"/>`;
+    }
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><svg viewBox="0 0 ${m * c + 4} ${m * c + 4}" width="${m * c + 4}" height="${m * c + 4}" role="img" aria-label="Pattern ${n}: ${n * n} white tile${n > 1 ? "s" : ""} in a ${n} by ${n} square, with a border of ${4 * n + 4} grey tiles all the way round.">${g}</svg><span style="font-size:14px">Pattern ${n}</span></div>`;
+  }).join("")}</div>`;
+})();
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Read the extract, then choose the best answer (A, B, C or D) for each question.",
+    questions: [
+      {
+        stem: "“Peter relaxed the heroic attitude he had chosen to show off his two flags.” This suggests that Peter",
+        options: ["had arms that were growing too tired to keep holding his two flags up high.",
+                  "had given up all hope that the train would ever come along the line.",
+                  "had been posing like a hero, and let the pose slip as the wait went on.",
+                  "was annoyed that the girls had been given more of the flags than he had."],
+        answer: 2,
+        skill: "working out the meaning of a phrase from context",
+        explain: `<p>Here an “attitude” is a way of standing, a pose. Peter had <em>chosen</em> a heroic pose “to show off his two flags”, so he was partly enjoying looking like a hero. As the wait dragged on, he let the pose drop. The writer is gently teasing him.</p>
+                  <p class="why-not">B is the trap: it is Phyllis, not Peter, who thinks “the train’s gone by”. Peter only relaxes his pose; a moment later he is shouting “Stand firm … and wave like mad!”. A reads “relaxed” too literally: nothing says his arms were tired. D is wrong, because Peter has two flags and each girl has only one.</p>`
+      },
+      {
+        stem: "At first Bobbie’s hands “trembled so that she could hardly hold the flag”, but later “her hands did not tremble now”. What does this change show?",
+        options: ["Once there was something she had to do, Bobbie’s fear gave way to determination.",
+                  "Bobbie had become certain, by this time, that the driver had seen the waving flags.",
+                  "Peter’s order to “stand firm” had made Bobbie feel calm and sure of herself again.",
+                  "Bobbie was no longer frightened of the train at all."],
+        answer: 0,
+        skill: "inferring feelings that are shown, not stated",
+        explain: `<p>Bobbie’s hands shake while she can only stand and wait and imagine the crash. They stop shaking at the moment a flag falls and she has to <em>act</em>: she “jumped forward and caught it up, and waved it”. Having something to do pushes her fear aside and makes her determined.</p>
+                  <p class="why-not">B is the trap: just before this, Bobbie cries “They don’t see us! They won’t see us!”, so she is not sure at all. C uses a real detail (Peter does say “Stand firm”), but straight after it Bobbie cries “It’s all no good!”, so his words haven’t calmed her. D goes too far: she is still crying “Oh, stop, stop, stop!” as the engine looms.</p>`
+      },
+      {
+        stem: "Why does the writer end the extract with Bobbie unable to stop waving the flags, even though the engine has stopped?",
+        options: ["To show that Bobbie wanted the passengers to see who had really saved them.",
+                  "To show that Bobbie still believed, as she had said, that it was “all no good”.",
+                  "To show that Bobbie was afraid the train might start again and crash into the mound.",
+                  "To show how fear and effort had gripped her, even once the danger was over."],
+        answer: 3,
+        skill: "understanding why a writer includes a detail (feelings shown through actions)",
+        explain: `<p>The key word is “<b>somehow</b>”: Bobbie doesn’t <em>decide</em> to keep waving; she simply can’t stop. She has been so frightened, and has concentrated so hard on stopping the train, that her body carries on even after she has seen it “stop dead”. The detail shows how much strain she has been under, without the writer having to say so.</p>
+                  <p class="why-not">A is the trap: it is Peter who wanted credit (“because it was my idea”, his “heroic attitude”), not Bobbie, and she isn’t choosing to wave at all. B can’t be right, because she has just seen the engine stop. C gives her a reason for waving, but “somehow” tells us there was no reason: she couldn’t help it.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0">To be picked for the zone swimming team, a swimmer <b>must</b> swim 50 metres in under 40 seconds at the school carnival.</p>
+               <p class="quote"><em class="speaker">Zoe:</em> “Lily swam 50 metres in 36 seconds at the carnival, so she will be picked for the zone team.”</p>
+               <p class="quote"><em class="speaker">Hamish:</em> “Tom took 42 seconds to swim 50 metres at the carnival, so he will not be picked for the zone team.”</p>
+               <p style="margin:10px 0 0">If the information in the first box is true, whose reasoning is correct?</p>`,
+        options: ["Zoe only", "Hamish only", "Both Zoe and Hamish", "Neither Zoe nor Hamish"],
+        answer: 1,
+        skill: "deciding whose reasoning is correct (needed versus guaranteed)",
+        explain: `<p>The rule says a time under 40 seconds is <b>needed</b> to be picked. It does not say that every swimmer who does it <em>will</em> be picked: there might be more fast swimmers than places, or other things the coaches look at.</p>
+                  <p><b>Zoe</b> treats the time as a guarantee. Lily has done what is needed, but that doesn’t mean she will be picked. Zoe is not correct.</p>
+                  <p><b>Hamish</b> is correct. Tom’s 42 seconds is not under 40, so he hasn’t done what is needed, and he can’t be picked.</p>
+                  <p class="why-not">C is the trap: Zoe’s reasoning sounds like the rule, but “must” only tells you who <em>can’t</em> be picked, not who will be. D catches students who think Hamish is making the same mistake. He isn’t: missing something that is needed really does rule Tom out.</p>`
+      },
+      {
+        stem: `Six friends, Amy, Ben, Cara, Dan, Eve and Finn, sit around this round table. Everyone faces the middle of the table.
+               <div class="figure">${TABLE_SVG}</div>
+               <ul class="facts">
+                 <li>Amy sits directly opposite Ben.</li>
+                 <li>Cara sits immediately on Amy’s left.</li>
+                 <li>Dan sits next to Ben, but not next to Cara.</li>
+                 <li>Eve does not sit next to Amy.</li>
+               </ul>
+               <p style="margin:10px 0 0">Who sits immediately on <b>Cara’s</b> left?</p>`,
+        options: ["Amy", "Dan", "Finn", "Eve"],
+        answer: 3,
+        skill: "using clues to work out an arrangement around a table",
+        explain: `<p>Picture the table as a clock face. Put Amy at 6 o’clock, so Ben, opposite her, is at 12 o’clock.</p>
+                  <p>Amy faces the middle (towards 12 o’clock), so her left hand points towards 9 o’clock. Cara is immediately on Amy’s left: <b>8 o’clock</b>.</p>
+                  <p>Dan is next to Ben, so at 10 or 2 o’clock. 10 o’clock is next to Cara, so Dan is at <b>2 o’clock</b>.</p>
+                  <p>That leaves 10 o’clock and 4 o’clock for Eve and Finn. 4 o’clock is next to Amy, so Eve is at <b>10 o’clock</b> and Finn at 4 o’clock.</p>
+                  <p>Cara sits at 8 o’clock facing the middle, so her left is towards 10 o’clock: <b>Eve</b>.</p>
+                  <p class="why-not">Amy (A) is the trap: she is on Cara’s <em>right</em>. Mixing up left and right (or using left and right as you look at the picture, instead of as Cara sees it) gives Amy. Dan (B) comes from forgetting that Dan is not next to Cara. Finn (C) comes from forgetting that Eve is not next to Amy, which lets Eve and Finn swap.</p>`
+      },
+      {
+        stem: `This net is folded to make a cube.
+               <div class="figure">${NET_SVG}</div>
+               <p style="margin:10px 0 0">Which cube could it make?</p>`,
+        visualOptions: true,
+        options: CUBE_OPTS,
+        answer: 0,
+        skill: "picturing which faces of a net end up opposite each other, and which way round they meet",
+        explain: `<p>Two faces that end up <b>opposite</b> each other can never be seen together. Find the opposite pairs by folding in your head, keeping the green square still:</p>
+                  <p>• The plus and the red face fold over on either side of the green square, so they face each other: they are opposite (they have one square between them in a straight line).<br>
+                     • The ring (attached to the plus) and the four dots (attached to the red face) fold round to fill the two walls that are left, so they face each other too: opposite.<br>
+                     • The black dot is the last face. It closes the cube on the far side from the green square, so those two are opposite.</p>
+                  <p>Opposite pairs: plus and red face, ring and four dots, black dot and green square.</p>
+                  <p><b>A</b> shows the ring, the plus and the green square. No two of these are opposite, and they meet at one corner in this order ✓ (Then check the order: on the net, the ring is joined to the top of the plus, and the green square is joined to the right of the plus. Fold them up and the ring is on top, the plus at the front-left and the green square at the front-right, exactly as in A.)</p>
+                  <p class="why-not">B is the trap: the ring and the four dots are far apart on the net and not in a straight line, so they don’t look like an opposite pair, but folding shows that they are. C shows the plus and the red face together, which are an opposite pair too. D is the hardest trap: it shows the same three faces as A, and none of them are opposite. But they are the wrong way round. On the net, going round the corner where they meet, the order is ring → plus → green square (top → front-left → front-right in A). D has ring → green square → plus, which is the mirror image, so no way of turning the cube can make it.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `Mr Lee buys 9 boxes of pencils with 12 pencils in each box. He gives 4 pencils to each of the 23 students in his class.
+               <p style="margin:10px 0 0">How many pencils does he have left?</p>`,
+        options: ["16", "26", "85", "92", "104"],
+        answer: 0,
+        skill: "a two-step word problem: multiply, multiply, then subtract",
+        explain: `<p>Pencils bought: 9 × 12 = <b>108</b>.</p>
+                  <p>Pencils given out: 4 × 23 = 4 × 20 + 4 × 3 = 80 + 12 = <b>92</b>.</p>
+                  <p>Pencils left: 108 − 92 = <b>16</b>.</p>
+                  <p class="why-not">26 (B) is the trap: it works out 4 × 23 as 82 by forgetting to carry the 1 from 4 × 3 = 12. 92 (D) is the number given out, not the number left. 85 (C) gives each student only 1 pencil. 104 (E) takes away only 4 pencils.</p>`
+      },
+      {
+        stem: `A shop sells the same juice in five bottle sizes.
+               ${JUICE_TABLE}
+               <p style="margin:10px 0 0">Which bottle is the best value for money?</p>`,
+        options: ["500 mL for $2.40", "750 mL for $3.30", "1 L for $4.50", "1.5 L for $6.30", "3 L for $13.00"],
+        answer: 3,
+        skill: "best value: comparing prices for the same amount",
+        explain: `<p>Compare the cost of the <b>same amount</b> of juice. Every size fits exactly into 3 litres:</p>
+                  <p>• 500 mL: 6 bottles × $2.40 = $14.40<br>
+                     • 750 mL: 4 × $3.30 = $13.20<br>
+                     • 1 litre: 3 × $4.50 = $13.50<br>
+                     • 1.5 litres: 2 × $6.30 = <b>$12.60</b><br>
+                     • 3 litres: $13.00</p>
+                  <p>The 1.5-litre bottle gives 3 litres for the least money, so it is the best value.</p>
+                  <p class="why-not">The 3-litre bottle (E) is the trap: the biggest size is often the best value, but not here. It costs 40 cents more for 3 litres than two 1.5-litre bottles. The 500 mL bottle (A) has the lowest price but is the worst value. The 750 mL and 1-litre bottles (B and C) are in between.</p>`
+      },
+      {
+        stem: `Each pattern is a square of white tiles with a border of grey tiles around it.
+               <div class="figure">${TILES_SVG}</div>
+               <p style="margin:10px 0 0">The pattern continues in the same way. In <b>Pattern 20</b>, how many more white tiles are there than grey tiles?</p>`,
+        options: ["312", "316", "320", "324", "400"],
+        answer: 1,
+        skill: "finding a rule for a growing pattern and using it for a later term",
+        explain: `<p>Look at how each pattern is built. Pattern 3 has a 3 by 3 square of white tiles. Its grey border has 3 tiles along each of the 4 sides, plus 1 in each of the 4 corners: 4 × 3 + 4 = 16 grey tiles. (Check Pattern 1: 4 × 1 + 4 = 8 ✓)</p>
+                  <p>So Pattern 20 has:</p>
+                  <p>• white tiles: 20 × 20 = <b>400</b><br>
+                     • grey tiles: 4 × 20 + 4 = <b>84</b></p>
+                  <p>400 − 84 = <b>316</b> more white tiles than grey.</p>
+                  <p class="why-not">320 (C) is the trap: it forgets the 4 corner tiles and uses 80 grey tiles. 312 (A) counts each corner twice, using 4 sides of 22 tiles = 88. 324 (D) takes the corners away (76 grey tiles) instead of adding them. 400 (E) is just the number of white tiles.</p>`
+      }
+    ]
+  }
+];
+
+const TEST_META = {"version": 42, "reading_format": "story", "categories": {"reading": ["Vocabulary & idioms", "Feelings & inference", "Purpose of a detail"], "thinking": ["Whose reasoning", "Order & arrangement", "Spatial"], "maths": ["Number & place value", "Money & best value", "Patterns & sequences"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}};
+const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  return r.json();
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
+  persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 42</h1>
+      ${completedNote()}
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  sectionStart = Date.now();
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  window.scrollTo(0, 0);
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  finishAttempt();
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+
+showStart();
+</script>
+</body>
+</html>
