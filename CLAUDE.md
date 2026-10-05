@@ -4,7 +4,7 @@ David builds numbered practice tests ("Practice Test NN": v33, v34, …) here to
 
 ## Adding version NN
 Use the `new-test` skill (`.claude/skills/new-test/SKILL.md`): it is the full step-by-step procedure. Summary:
-1. Before writing, compare every planned question against the official sample papers. They are not in the repo (see Copyright), so ask David to attach them in the session if they aren't already there. Check the coverage record in every `content/vNN.json` so no skill, topic or format repeats too soon.
+1. Before writing, compare every planned question against the official sample papers, using `calibration/sample_notes.md` (own-words notes on all three papers; the papers themselves are never in the repo, see Copyright). Attached papers, when available, are a bonus for closer calibration. Check the coverage record in every `content/vNN.json` so no skill, topic or format repeats too soon.
 2. Write `content/vNN.js` (defines `passMode`, `INK`, the passage/diagram constants and `SECTIONS`; see `content/v33.js` for the shape) and `content/vNN.json` (version, date, reading title, reading_format, thinking/maths skill labels, sample_map, and `categories`: one question-type label per question, chosen from `CATEGORIES` in `tools/build.py`, which the stats page groups by).
 3. `python3 tools/build.py`, which builds `tests/vNN/index.html` and regenerates `index.html`. Never hand-edit generated files.
 4. `tools/check.sh NN` (runs the build, `check_lengths` (must report 0 longest) and `check_render` (must PASS)). `node tools/question_sheet.js content/vNN.js` makes the answer-free copy for the cold solve.
@@ -61,7 +61,10 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 ## Progress tracking and admin
 - Test pages record each attempt in the browser's localStorage (key `prac.v1`) and flag the test completed when it is finished. The index shows completed tests and has a "Mark as done" toggle.
 - `pracadmin/` (built from `tools/admin.html`) is the PIN-protected stats page. Tests opened from it use `?admin=1` and record nothing. The PIN check is client-side only.
-- Keep the template's tracking hooks working when changing `tools/template.html`.
+- Keep the template's tracking hooks working when changing `tools/template.html`; `node tools/check_tracking.js` checks them end to end.
+
+## Automatic checks
+- `.github/workflows/check.yml` runs on every pull request and push to `main`: build (validates question types and stretch tags), generated files up to date, `tools/check.sh` on every test, and `tools/check_tracking.js`. A red cross on a pull request must be fixed before merging.
 
 ## Copyright
 Never commit the official sample papers (copyright NSW Department of Education / Cambridge).

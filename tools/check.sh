@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Usage: tools/check.sh NN [NN ...]   (no arguments = every test)
 # Rebuilds everything, then runs the length and render checks on the given tests.
-set -e
+set -e -o pipefail
 cd "$(dirname "$0")/.."
 python3 tools/build.py
 shots="${TMPDIR:-/tmp}/prac-shots"; mkdir -p "$shots"

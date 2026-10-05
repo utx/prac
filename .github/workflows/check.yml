@@ -1,0 +1,54 @@
+name: Check tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1
+          npx playwright install --with-deps chromium
+
+      - name: Build every test (also checks question types and stretch tags)
+        run: python3 tools/build.py
+
+      - name: Generated pages are up to date
+        run: |
+          if ! git diff --quiet -- index.html tests pracadmin; then
+            echo "::error::Generated files are out of date. Run 'python3 tools/build.py' and commit the result."
+            git --no-pager diff --stat -- index.html tests pracadmin
+            exit 1
+          fi
+
+      - name: Check every test (longest-option rule and 9/9 render at desktop and phone width)
+        run: tools/check.sh
+
+      - name: Check progress tracking and the admin page
+        run: node tools/check_tracking.js "$RUNNER_TEMP"
+
+      - name: Keep screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: |
+            ${{ runner.temp }}/*.png
+            /tmp/prac-shots/*.png
+          if-no-files-found: ignore
