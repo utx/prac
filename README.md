@@ -12,7 +12,8 @@ Short practice papers, each with 3 reading, 3 thinking skills and 3 maths questi
 | `tests/vNN/index.html` | Each finished test. **Generated**. |
 | `content/vNN.js` | The questions, passage and diagrams for test NN. |
 | `content/vNN.json` | Details shown on the menu (date, reading title) plus a record of the question types and sample-paper mapping. |
-| `tools/template.html` | The shared page design that every test uses. |
+| `tools/template.html` | The shared page design that every test uses, including progress tracking. |
+| `tools/admin.html` → `pracadmin/index.html` | The PIN-protected stats page (**generated** into `pracadmin/`). |
 | `tools/build.py` | Builds every test and the menu page. |
 | `tools/check_lengths.js` | Flags any question where the right answer is the longest option. |
 | `tools/check_render.js` | Answers every question at desktop and phone widths, checks 9/9, sideways scrolling and page errors. |
@@ -27,5 +28,9 @@ Short practice papers, each with 3 reading, 3 thinking skills and 3 maths questi
    node tools/check_render.js tests/vNN/index.html
    ```
 4. Commit and push. The new test appears as a button on the menu page.
+
+## Progress and stats
+
+Finishing a test from the main page records the answers in that browser and marks the test as completed. The parent page at `pracadmin/` (PIN required) shows the stats and lets you open any test in practice mode, which records nothing. Progress is stored per browser and device; use Export/Import on the admin page to back it up or move it.
 
 The official sample papers are copyright and are deliberately **not** stored here.

@@ -15,8 +15,37 @@
     "Counting pairs without double-counting"
   ],
   "sample_map": {
-    "reading": ["PT2 Q20-25 (missing sentences)", "PT2 Q20-25", "PT2 Q20-25"],
-    "thinking": ["PT3 Q30 (tennis qualification), PT2 Q24", "PT1 Q29 (chests), PT2 Q20 (lunch boxes)", "PT3 Q22 (wall tiles), PT2 Q16"],
-    "maths": ["PT1 Q3, PT2 Q2 (time)", "PT2 Q6 (cake fractions), PT1 Q20", "PT3 Q28 (tennis tournament pairs), PT2 Q10"]
+    "reading": [
+      "PT2 Q20-25 (missing sentences)",
+      "PT2 Q20-25",
+      "PT2 Q20-25"
+    ],
+    "thinking": [
+      "PT3 Q30 (tennis qualification), PT2 Q24",
+      "PT1 Q29 (chests), PT2 Q20 (lunch boxes)",
+      "PT3 Q22 (wall tiles), PT2 Q16"
+    ],
+    "maths": [
+      "PT1 Q3, PT2 Q2 (time)",
+      "PT2 Q6 (cake fractions), PT1 Q20",
+      "PT3 Q28 (tennis tournament pairs), PT2 Q10"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Sentence links",
+      "Sentence links",
+      "Sentence links"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Order & arrangement",
+      "Spatial"
+    ],
+    "maths": [
+      "Time & timetables",
+      "Fractions",
+      "Chance & counting"
+    ]
   }
 }

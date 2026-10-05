@@ -29,5 +29,22 @@
       "PT1 Q1",
       "PT3 Q6"
     ]
+  },
+  "categories": {
+    "reading": [
+      "Purpose of a detail",
+      "Comparisons & imagery",
+      "Feelings & inference"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Tables & timetables",
+      "Whose reasoning"
+    ],
+    "maths": [
+      "Number & place value",
+      "Number & place value",
+      "Number & place value"
+    ]
   }
 }

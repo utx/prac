@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Practice Admin</title>
+<style>
+  :root {
+    --ink: #1b2a41; --ink-soft: #55627a; --ink-muted: #7a859a; --line: #d8dde6; --paper: #ffffff; --field: #f3f5f8;
+    --pitch: #2e7d4f; --pitch-deep: #23603c; --bar: #4a7fc1; --track: #e7ebf2;
+    --good: #1e7a4f; --good-bg: #e3f3ea; --warn: #8a6100; --warn-bg: #fdf1d6; --bad: #b3362f; --bad-bg: #fbe7e5;
+  }
+  :root[data-theme="dark"] {
+    --ink: #e8ecf3; --ink-soft: #a9b3c4; --ink-muted: #8590a5; --line: #33405a; --paper: #1d2638; --field: #141b29;
+    --bar: #7aa7e0; --track: #2a3650; --good: #7fd3a6; --good-bg: #1f3a2d; --warn: #f2c66b; --warn-bg: #3a3020; --bad: #f19a92; --bad-bg: #3d2224;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #e8ecf3; --ink-soft: #a9b3c4; --ink-muted: #8590a5; --line: #33405a; --paper: #1d2638; --field: #141b29;
+      --bar: #7aa7e0; --track: #2a3650; --good: #7fd3a6; --good-bg: #1f3a2d; --warn: #f2c66b; --warn-bg: #3a3020; --bad: #f19a92; --bad-bg: #3d2224;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 16px; line-height: 1.5; }
+  header { background: #1b2a41; color: #fff; }
+  .bar { max-width: 1040px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 14px; }
+  .bar .title { font-weight: 600; }
+  .bar .spacer { flex: 1; }
+  .bar a, .bar button { color: #fff; background: none; border: 1px solid rgba(255,255,255,.4); border-radius: 6px;
+    padding: 3px 10px; font: inherit; font-size: 14px; text-decoration: none; cursor: pointer; white-space: nowrap; }
+  main { max-width: 1040px; margin: 24px auto 80px; padding: 0 24px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 19px; margin: 0 0 4px; }
+  .sub { color: var(--ink-soft); margin: 0 0 14px; font-size: 14px; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; margin: 0 0 18px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid2 > .card { margin: 0; }
+  .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 18px 0; }
+  .tile { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .tile b { display: block; font-size: 28px; line-height: 1.1; }
+  .tile span { color: var(--ink-soft); font-size: 13px; }
+  .empty { color: var(--ink-soft); font-style: italic; margin: 6px 0 0; }
+
+  /* horizontal accuracy bars */
+  .hbars { display: grid; grid-template-columns: minmax(130px, max-content) 1fr 92px; gap: 8px 12px; align-items: center; }
+  .hbars .lab { font-size: 14px; }
+  .hbars .lab small { color: var(--ink-muted); display: block; font-size: 12px; }
+  .track { position: relative; height: 14px; background: var(--track); border-radius: 4px; }
+  .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--bar); border-radius: 4px; min-width: 2px; }
+  .hbars .val { font-size: 14px; font-variant-numeric: tabular-nums; text-align: right; color: var(--ink-soft); }
+  .hbars .val b { color: var(--ink); }
+  .group-h { grid-column: 1 / -1; margin: 10px 0 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
+  .group-h:first-child { margin-top: 0; }
+
+  .chip { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 4px; padding: 1px 7px; white-space: nowrap; }
+  .chip.bad { background: var(--bad-bg); color: var(--bad); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); }
+  .chip.good { background: var(--good-bg); color: var(--good); }
+  .chip.none { background: var(--track); color: var(--ink-soft); }
+
+  .focus-list { list-style: none; margin: 0; padding: 0; }
+  .focus-list li { display: flex; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .focus-list li:last-child { border-bottom: 0; }
+  .focus-list .what { flex: 1; }
+  .focus-list .what small { color: var(--ink-soft); display: block; }
+
+  /* score columns */
+  .cols { display: flex; align-items: flex-end; gap: 10px; height: 170px; padding: 6px 0 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 38px; }
+  .col .stack { width: 26px; display: flex; flex-direction: column-reverse; gap: 2px; }
+  .col .seg { width: 100%; border-radius: 0; }
+  .col .seg:last-child { border-radius: 4px 4px 0 0; }
+  .col .num { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .col-labels { display: flex; gap: 10px; overflow-x: hidden; }
+  .col-labels span { min-width: 38px; text-align: center; font-size: 12px; color: var(--ink-soft); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 0; font-size: 13px; color: var(--ink-soft); }
+  .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+  table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.t th { text-align: left; font-weight: 600; color: var(--ink-soft); border-bottom: 1.5px solid var(--line); padding: 6px 8px; white-space: nowrap; }
+  table.t td { border-bottom: 1px solid var(--line); padding: 7px 8px; vertical-align: top; }
+  table.t td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tw { overflow-x: auto; }
+  .btn { background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer; text-decoration: none; white-space: nowrap; display: inline-block; }
+  .btn:hover { border-color: var(--ink-soft); }
+  .btn.primary { background: var(--pitch); border-color: var(--pitch); color: #fff; }
+  .btn.danger { color: var(--bad); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* PIN gate */
+  .gate { max-width: 360px; margin: 12vh auto 0; text-align: center; }
+  .gate input { font: inherit; font-size: 28px; letter-spacing: .4em; text-align: center; width: 200px; padding: 8px 10px;
+    border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); }
+  .gate .err { color: var(--bad); min-height: 24px; margin: 10px 0 0; }
+  .gate button { margin-top: 12px; font: inherit; font-weight: 600; background: var(--pitch); color: #fff; border: 0; border-radius: 6px; padding: 10px 24px; cursor: pointer; }
+
+  @media (max-width: 820px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .grid2 { grid-template-columns: 1fr; }
+    main { padding: 0 16px; }
+    .bar { padding: 12px 16px; }
+    .hbars { grid-template-columns: minmax(100px, 40%) 1fr 78px; }
+  }
+</style>
+</head>
+<body>
+<header><div class="bar"><span class="title">Practice Admin</span><span class="spacer"></span>
+  <a href="../index.html">Student page</a><button id="lock" hidden>Lock</button></div></header>
+<main id="app"></main>
+
+<script>
+/*__TESTS__*/
+const KEY = "prac.v1";
+const PIN_HASH = "88e4eb6c3c041225c1cec20d38f53a35bf13c9909242528f10224affc9a473b2"; // sha256("prac-admin:" + PIN)
+const SECTION_NAMES = { reading: "Reading", thinking: "Thinking Skills", maths: "Maths" };
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { alert("Could not save: " + e.message); } }
+function unlocked() { try { return sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } }
+
+async function sha256(text) {
+  if (window.crypto && crypto.subtle) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  return null;
+}
+
+function showGate() {
+  document.getElementById("lock").hidden = true;
+  app.innerHTML = `<div class="gate card">
+      <h1>Enter PIN</h1>
+      <p class="sub">This page is for grown-ups.</p>
+      <form id="pinform" autocomplete="off">
+        <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" aria-label="PIN" autofocus>
+        <div><button type="submit">Unlock</button></div>
+        <p class="err" id="err" role="alert"></p>
+      </form>
+    </div>`;
+  document.getElementById("pinform").onsubmit = async e => {
+    e.preventDefault();
+    const v = document.getElementById("pin").value.trim();
+    const h = await sha256("prac-admin:" + v);
+    if (h === PIN_HASH) {
+      try { sessionStorage.setItem("prac.admin", "1"); } catch (err) {}
+      render();
+    } else {
+      document.getElementById("err").textContent = h === null ? "This browser can’t check the PIN here. Open the page over https." : "That PIN isn’t right.";
+      document.getElementById("pin").value = "";
+    }
+  };
+}
+
+/* ---------------- stats ---------------- */
+function pct(c, n) { return n ? Math.round(100 * c / n) : 0; }
+function status(p, n) {
+  if (!n) return `<span class="chip none">Not yet practised</span>`;
+  if (n < 2) return `<span class="chip none">Too few to tell</span>`;
+  if (p < 60) return `<span class="chip bad">⚠ Focus here</span>`;
+  if (p < 80) return `<span class="chip warn">● Building</span>`;
+  return `<span class="chip good">✓ Strong</span>`;
+}
+function fmtDate(iso) { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" }); }
+function mins(ms) { return ms ? (ms / 60000) : 0; }
+function fmtMins(m) { return m < 1 ? "<1 min" : Math.round(m) + " min"; }
+
+function analyse(st) {
+  const byV = {};
+  st.attempts.filter(a => a.sections && a.sections.some(Boolean))
+    .sort((a, b) => a.started < b.started ? -1 : 1)
+    .forEach(a => (byV[a.v] = byV[a.v] || []).push(a));
+  const first = [], retakes = [];
+  Object.values(byV).forEach(list => { first.push(list[0]); retakes.push(...list.slice(1)); });
+  const qs = []; // one row per question answered on a first attempt
+  first.forEach(a => a.sections.forEach((s, si) => s && s.answers.forEach((x, qi) => {
+    const t = TESTS.find(t => t.version === a.v) || {};
+    qs.push({ v: a.v, sec: s.id, qi, cat: x.cat || "Other", fmt: t.reading_format || "", correct: !!x.correct,
+              chosen: x.chosen, answer: x.answer, changes: x.changes || 0, when: a.started });
+  })));
+  return { byV, first, retakes, qs };
+}
+function tally(rows, keyFn) {
+  const m = new Map();
+  rows.forEach(r => { const k = keyFn(r); const e = m.get(k) || { c: 0, n: 0 }; e.n++; if (r.correct) e.c++; m.set(k, e); });
+  return m;
+}
+function hbar(label, sub, c, n, extra = "") {
+  const p = pct(c, n);
+  return `<div class="lab">${esc(label)}${sub ? `<small>${esc(sub)}</small>` : ""}</div>
+    <div class="track" title="${esc(label)}: ${c} of ${n} right (${p}%)"><div class="fill" style="width:${n ? p : 0}%"></div></div>
+    <div class="val">${n ? `<b>${p}%</b> · ${c}/${n}` : "—"}${extra}</div>`;
+}
+
+function render() {
+  document.getElementById("lock").hidden = false;
+  const st = load();
+  const { byV, first, retakes, qs } = analyse(st);
+  const totalTests = TESTS.length;
+  const completed = TESTS.filter(t => st.flags[t.version] && st.flags[t.version].completed).length;
+  const finishedFirst = first.filter(a => a.finished && typeof a.total === "number");
+  const avg = finishedFirst.length ? (finishedFirst.reduce((n, a) => n + a.total, 0) / finishedFirst.length) : null;
+  const correctAll = qs.filter(q => q.correct).length;
+  const last = st.attempts.map(a => a.finished || a.started).sort().pop();
+
+  // tiles
+  const tiles = `<div class="tiles">
+    <div class="tile"><b>${completed}<span style="font-size:16px;color:var(--ink-soft)"> / ${totalTests}</span></b><span>tests completed</span></div>
+    <div class="tile"><b>${qs.length ? pct(correctAll, qs.length) + "%" : "—"}</b><span>right first time</span></div>
+    <div class="tile"><b>${avg === null ? "—" : avg.toFixed(1)}<span style="font-size:16px;color:var(--ink-soft)"> / 9</span></b><span>average score</span></div>
+    <div class="tile"><b>${qs.length}</b><span>questions answered</span></div>
+    <div class="tile"><b style="font-size:20px;line-height:1.6">${last ? fmtDate(last) : "—"}</b><span>last practice</span></div>
+  </div>`;
+
+  // focus areas: by category, at least 2 questions, lowest accuracy first
+  const catT = tally(qs, q => q.sec + "|" + q.cat);
+  const catRows = [...catT].map(([k, e]) => { const [sec, cat] = k.split("|"); return { sec, cat, ...e, p: pct(e.c, e.n) }; });
+  const weak = catRows.filter(r => r.n >= 2 && r.p < 80).sort((a, b) => a.p - b.p || b.n - a.n).slice(0, 4);
+  const early = catRows.filter(r => r.n === 1 && r.c === 0);
+  const strong = catRows.filter(r => r.n >= 2 && r.p >= 80).sort((a, b) => b.p - a.p || b.n - a.n).slice(0, 3);
+  const untried = [];
+  Object.entries(CATEGORIES).forEach(([sec, cats]) => cats.forEach(cat => { if (!catT.has(sec + "|" + cat)) untried.push(`${cat} (${SECTION_NAMES[sec]})`); }));
+  const focus = `<div class="card">
+    <h2>Where to focus</h2>
+    <p class="sub">Question types answered at least twice, weakest first. Based on first attempts only.</p>
+    ${qs.length === 0 ? `<p class="empty">No answers recorded yet. Stats appear here once tests are done from the student page.</p>` : `
+    <ul class="focus-list">
+      ${weak.length ? weak.map(r => `<li><span class="what"><b>${esc(r.cat)}</b><small>${SECTION_NAMES[r.sec]} · ${r.c} of ${r.n} right</small></span>${status(r.p, r.n)}</li>`).join("")
+        : `<li><span class="what">Nothing below 80% yet among question types seen at least twice.</span></li>`}
+      ${early.length ? `<li><span class="what"><b>Early signs</b><small>Missed the only question so far of: ${early.map(r => `${esc(r.cat)} (${SECTION_NAMES[r.sec]})`).join(", ")}. Worth watching as more tests are done.</small></span><span class="chip warn">● Watch</span></li>` : ""}
+    </ul>
+    ${strong.length ? `<p class="sub" style="margin:14px 0 4px">Strengths: ${strong.map(r => `${esc(r.cat)} (${r.p}%)`).join(", ")}.</p>` : ""}
+    ${untried.length ? `<p class="sub" style="margin:6px 0 0">Not yet practised: ${esc(untried.join(", "))}.</p>` : ""}`}
+  </div>`;
+
+  // by section
+  const secT = tally(qs, q => q.sec);
+  const timeBySec = {};
+  first.forEach(a => a.sections.forEach(s => { if (s && s.ms) { (timeBySec[s.id] = timeBySec[s.id] || []).push(s.ms); } }));
+  const bySection = `<div class="card"><h2>By section</h2><p class="sub">First attempts. Average time is per section of 3 questions.</p>
+    <div class="hbars">${Object.keys(SECTION_NAMES).map(sec => {
+      const e = secT.get(sec) || { c: 0, n: 0 };
+      const ts = timeBySec[sec] || [];
+      const avgT = ts.length ? fmtMins(mins(ts.reduce((a, b) => a + b, 0) / ts.length)) : "";
+      return hbar(SECTION_NAMES[sec], avgT ? `avg ${avgT}` : "", e.c, e.n);
+    }).join("")}</div></div>`;
+
+  // reading formats
+  const fmtT = tally(qs.filter(q => q.sec === "reading"), q => q.fmt || "other");
+  const byFormat = `<div class="card"><h2>Reading by format</h2><p class="sub">Story, cloze, poem, missing sentences and four extracts.</p>
+    <div class="hbars">${["story", "cloze", "poem", "missing sentences", "four extracts"].map(f => {
+      const e = fmtT.get(f) || { c: 0, n: 0 }; return hbar(f[0].toUpperCase() + f.slice(1), "", e.c, e.n);
+    }).join("")}</div></div>`;
+
+  // by type, grouped by section
+  const byType = `<div class="card"><h2>By question type</h2><p class="sub">Every question type, first attempts only. Grey rows haven’t come up yet.</p>
+    <div class="hbars">${Object.entries(CATEGORIES).map(([sec, cats]) =>
+      `<div class="group-h">${SECTION_NAMES[sec]}</div>` + cats.map(cat => {
+        const e = catT.get(sec + "|" + cat) || { c: 0, n: 0 };
+        return hbar(cat, "", e.c, e.n, `<div style="margin-top:2px">${status(pct(e.c, e.n), e.n)}</div>`);
+      }).join("")).join("")}</div></div>`;
+
+  // scores by test (first attempt), stacked by section
+  const SEG = { reading: "#4a7fc1", thinking: "#e0a43a", maths: "#2e9e6a" };
+  const ordered = first.filter(a => a.finished).sort((a, b) => a.v - b.v);
+  const scoreChart = `<div class="card"><h2>Score by test</h2><p class="sub">First attempt at each test, out of 9, split by section.</p>
+    ${ordered.length ? `<div class="cols">${ordered.map(a => {
+      const parts = ["reading", "thinking", "maths"].map(id => { const s = a.sections.find(x => x && x.id === id); return [id, s ? s.answers.filter(x => x.correct).length : 0]; });
+      const tot = parts.reduce((n, p) => n + p[1], 0);
+      return `<div class="col" title="Test ${a.v}: ${tot}/9 (Reading ${parts[0][1]}, Thinking ${parts[1][1]}, Maths ${parts[2][1]})"><span class="num">${tot}</span>
+        <div class="stack">${parts.filter(p => p[1]).map(p => `<div class="seg" style="height:${p[1] * 15}px;background:${SEG[p[0]]}"></div>`).join("")}</div></div>`;
+    }).join("")}</div>
+    <div class="col-labels">${ordered.map(a => `<span>T${a.v}</span>`).join("")}</div>
+    <div class="legend"><span><i style="background:${SEG.reading}"></i>Reading</span><span><i style="background:${SEG.thinking}"></i>Thinking Skills</span><span><i style="background:${SEG.maths}"></i>Maths</span></div>`
+    : `<p class="empty">No finished tests yet.</p>`}</div>`;
+
+  // habits: changed answers, time
+  const changed = qs.filter(q => q.changes > 0);
+  const unanswered = qs.filter(q => q.chosen === null || q.chosen === undefined).length;
+  const allTimes = first.flatMap(a => a.sections.filter(Boolean).map(s => s.ms || 0)).filter(Boolean);
+  const habits = `<div class="card"><h2>Test habits</h2>
+    <ul class="focus-list">
+      <li><span class="what"><b>Changed answers</b><small>${changed.length ? `${changed.length} question${changed.length > 1 ? "s" : ""} where an answer was changed before submitting; ${changed.filter(q => q.correct).length} ended up right.` : "No answers changed yet."}</small></span></li>
+      <li><span class="what"><b>Left blank</b><small>${unanswered} question${unanswered === 1 ? "" : "s"} submitted without an answer (there is no penalty for guessing).</small></span></li>
+      <li><span class="what"><b>Time per section</b><small>${allTimes.length ? `Average ${fmtMins(mins(allTimes.reduce((a, b) => a + b, 0) / allTimes.length))}, longest ${fmtMins(mins(Math.max(...allTimes)))}. In the real test it’s roughly 1 minute per question.` : "No timings yet."}</small></span></li>
+      <li><span class="what"><b>Retakes</b><small>${retakes.length ? retakes.filter(a => a.finished).map(a => `Test ${a.v}: ${a.total}/9 on ${fmtDate(a.finished)}`).join("; ") || "Started but not finished." : "None yet. Retakes are kept separate so they don’t inflate the stats above."}</small></span></li>
+    </ul></div>`;
+
+  // recent mistakes
+  const L = "ABCDE";
+  const wrong = qs.filter(q => !q.correct).sort((a, b) => a.when < b.when ? 1 : -1).slice(0, 12);
+  const mistakes = `<div class="card"><h2>Recent mistakes</h2><p class="sub">Open a test in practice mode to go through the explanation together.</p>
+    ${wrong.length ? `<div class="tw"><table class="t"><tr><th>Test</th><th>Question</th><th>Type</th><th>Chose</th><th>Correct</th><th></th></tr>
+      ${wrong.map(q => `<tr><td class="n">Test ${q.v}</td><td>${SECTION_NAMES[q.sec]} Q${q.qi + 1}</td><td>${esc(q.cat)}</td>
+        <td class="n">${q.chosen === null || q.chosen === undefined ? "blank" : L[q.chosen]}</td><td class="n">${L[q.answer]}</td>
+        <td><a class="btn" href="../tests/v${q.v}/index.html?admin=1">Open</a></td></tr>`).join("")}</table></div>`
+    : `<p class="empty">No mistakes recorded yet.</p>`}</div>`;
+
+  // all tests
+  const testsTable = `<div class="card"><h2>All tests</h2><p class="sub">“Practice” opens a test without recording anything. You can also mark tests done or not done here.</p>
+    <div class="tw"><table class="t"><tr><th>Test</th><th>Reading</th><th>Status</th><th>First score</th><th>R / T / M</th><th>Time</th><th></th></tr>
+    ${[...TESTS].reverse().map(t => {
+      const a = (byV[t.version] || [])[0];
+      const f = st.flags[t.version];
+      const sc = id => { const s = a && a.sections.find(x => x && x.id === id); return s ? s.answers.filter(x => x.correct).length : "–"; };
+      const time = a ? fmtMins(mins(a.sections.filter(Boolean).reduce((n, s) => n + (s.ms || 0), 0))) : "";
+      return `<tr><td class="n"><b>Test ${t.version}</b></td><td>${esc(t.reading)}</td>
+        <td>${f && f.completed ? `<span class="chip good">✓ Done ${esc(fmtDate(f.at))}</span>` : (a ? `<span class="chip warn">Started</span>` : `<span class="chip none">Not started</span>`)}</td>
+        <td class="n">${a && a.finished ? `<b>${a.total}/9</b>` : "–"}</td><td class="n">${a ? `${sc("reading")} / ${sc("thinking")} / ${sc("maths")}` : "–"}</td>
+        <td class="n">${time}</td>
+        <td><span class="actions"><a class="btn primary" href="../tests/v${t.version}/index.html?admin=1">Practice</a>
+          <button class="btn" data-flag="${t.version}">${f && f.completed ? "Mark not done" : "Mark done"}</button></span></td></tr>`;
+    }).join("")}</table></div></div>`;
+
+  const data = `<div class="card"><h2>Data</h2>
+    <p class="sub">Progress is saved in this browser on this device only. Export a backup now and then, or to move it to another device.</p>
+    <div class="actions"><button class="btn" id="export">Export backup</button>
+      <label class="btn">Import backup<input type="file" id="import" accept="application/json,.json" hidden></label>
+      <button class="btn danger" id="clear">Clear all progress</button></div></div>`;
+
+  app.innerHTML = `<h1>Progress</h1><p class="sub">Only tests done from the student page are counted. Tests opened from here are never recorded.</p>
+    ${tiles}${focus}<div class="grid2">${bySection}${byFormat}</div><div style="height:18px"></div>${scoreChart}${byType}${habits}${mistakes}${testsTable}${data}`;
+
+  app.querySelectorAll("[data-flag]").forEach(b => b.onclick = () => {
+    const s = load(), v = b.dataset.flag;
+    if (s.flags[v] && s.flags[v].completed) delete s.flags[v]; else s.flags[v] = { completed: true, at: new Date().toISOString(), manual: true };
+    save(s); render();
+  });
+  document.getElementById("export").onclick = () => {
+    const blob = new Blob([JSON.stringify(load(), null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = `practice-progress-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  document.getElementById("import").onchange = async e => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      const inc = JSON.parse(await file.text());
+      if (!inc || !Array.isArray(inc.attempts)) throw new Error("not a progress backup");
+      const cur = load(), ids = new Set(cur.attempts.map(a => a.id));
+      inc.attempts.forEach(a => { if (!ids.has(a.id)) cur.attempts.push(a); });
+      Object.entries(inc.flags || {}).forEach(([v, f]) => { if (!cur.flags[v]) cur.flags[v] = f; });
+      save(cur); render();
+      alert("Backup merged in.");
+    } catch (err) { alert("That file couldn’t be read: " + err.message); }
+  };
+  document.getElementById("clear").onclick = () => {
+    if (!confirm("Delete all recorded progress and completed flags on this device? Export a backup first if you might want it.")) return;
+    save({ attempts: [], flags: {} }); render();
+  };
+}
+
+document.getElementById("lock").onclick = () => { try { sessionStorage.removeItem("prac.admin"); } catch (e) {} showGate(); };
+if (unlocked()) render(); else showGate();
+</script>
+</body>
+</html>

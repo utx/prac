@@ -30,5 +30,22 @@
       "PT1 Q33, PT2 Q14, PT3 Q10",
       "PT2 Q5, PT1 Q8"
     ]
+  },
+  "categories": {
+    "reading": [
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Money & best value",
+      "Chance & counting",
+      "Patterns & sequences"
+    ]
   }
 }

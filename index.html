@@ -8,10 +8,11 @@
   :root {
     --ink: #1b2a41; --ink-soft: #55627a; --line: #d8dde6; --paper: #ffffff;
     --field: #f3f5f8; --pitch: #2e7d4f; --pitch-deep: #23603c; --chip: #eef2f8;
+    --done: #1e7a4f; --done-bg: #e3f3ea; --done-card: #f6faf7; --done-line: #b9dcc7;
   }
-  :root[data-theme="dark"] { --ink: #e8ecf3; --ink-soft: #a9b3c4; --line: #33405a; --paper: #1d2638; --field: #141b29; --chip: #26324a; }
+  :root[data-theme="dark"] { --ink: #e8ecf3; --ink-soft: #a9b3c4; --line: #33405a; --paper: #1d2638; --field: #141b29; --chip: #26324a; --done: #7fd3a6; --done-bg: #1f3a2d; --done-card: #18261f; --done-line: #2f5a43; }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) { --ink: #e8ecf3; --ink-soft: #a9b3c4; --line: #33405a; --paper: #1d2638; --field: #141b29; --chip: #26324a; }
+    :root:not([data-theme="light"]) { --ink: #e8ecf3; --ink-soft: #a9b3c4; --line: #33405a; --paper: #1d2638; --field: #141b29; --chip: #26324a; --done: #7fd3a6; --done-bg: #1f3a2d; --done-card: #18261f; --done-line: #2f5a43; }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--field); color: var(--ink);
@@ -22,11 +23,23 @@
   h1 { font-size: 28px; margin: 0 0 6px; }
   .lead { color: var(--ink-soft); margin: 0 0 24px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-  a.test { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1px solid var(--line);
+  .test { position: relative; display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1px solid var(--line);
     border-radius: 10px; padding: 18px 18px 16px; color: var(--ink); text-decoration: none;
     transition: border-color .12s, transform .12s; }
-  a.test:hover, a.test:focus-visible { border-color: var(--pitch); transform: translateY(-1px); outline: none; }
-  a.test:first-child { border: 2px solid var(--pitch); }
+  .test:hover, .test:focus-within { border-color: var(--pitch); transform: translateY(-1px); }
+  .test:first-child { border: 2px solid var(--pitch); }
+  .test a.cover { position: absolute; inset: 0; border-radius: 10px; z-index: 1; }
+  .test a.cover:focus-visible { outline: 3px solid #b8860b; outline-offset: 2px; }
+  .test .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; }
+  .test .flag { position: relative; z-index: 2; background: none; border: 1px solid var(--line); color: var(--ink-soft);
+    border-radius: 6px; padding: 5px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+  .test .flag:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .done-tag { align-self: flex-start; background: var(--done-bg); color: var(--done); font-weight: 700; font-size: 14px;
+    border-radius: 4px; padding: 2px 8px; }
+  .test.done { background: var(--done-card); border-color: var(--done-line); }
+  .test.done:first-child { border-color: var(--done); }
+  .test.done .go { background: var(--ink-soft); }
+  .test.done .num { color: var(--ink-soft); }
   .num { font-size: 22px; font-weight: 700; }
   .meta { color: var(--ink-soft); font-size: 14px; }
   .reading { font-size: 15px; }
@@ -41,58 +54,113 @@
 <header><div class="bar">Practice Tests</div></header>
 <main>
   <h1>Choose a test</h1>
-  <p class="lead">Each test has three reading, three thinking skills and three maths questions, with explanations at the end of each section. The newest test is first.</p>
+  <p class="lead">Each test has three reading, three thinking skills and three maths questions, with explanations at the end of each section. The newest test is first. <span id="progress"></span></p>
   <div class="grid">
-      <a class="test" href="tests/v39/index.html">
+      <div class="test" data-v="39">
+        <a class="cover" href="tests/v39/index.html" aria-label="Open Test 39"></a>
         <span class="num">Test 39</span>
         <span class="meta">5 October 2026</span>
+        <span class="done-tag" hidden>✓ Completed</span>
         <span class="reading">Cloze: Low Tide</span>
         <span class="mix">3 reading · 3 thinking skills · 3 maths</span>
-        <span class="go">Start →</span>
-      </a>
-      <a class="test" href="tests/v38/index.html">
+        <span class="row"><span class="go">Start →</span><button type="button" class="flag">Mark as done</button></span>
+      </div>
+      <div class="test" data-v="38">
+        <a class="cover" href="tests/v38/index.html" aria-label="Open Test 38"></a>
         <span class="num">Test 38</span>
         <span class="meta">5 October 2026</span>
+        <span class="done-tag" hidden>✓ Completed</span>
         <span class="reading">Story extract: Some Assembly Required</span>
         <span class="mix">3 reading · 3 thinking skills · 3 maths</span>
-        <span class="go">Start →</span>
-      </a>
-      <a class="test" href="tests/v37/index.html">
+        <span class="row"><span class="go">Start →</span><button type="button" class="flag">Mark as done</button></span>
+      </div>
+      <div class="test" data-v="37">
+        <a class="cover" href="tests/v37/index.html" aria-label="Open Test 37"></a>
         <span class="num">Test 37</span>
         <span class="meta">5 October 2026</span>
+        <span class="done-tag" hidden>✓ Completed</span>
         <span class="reading">Poem: The Night the Rain Came Back</span>
         <span class="mix">3 reading · 3 thinking skills · 3 maths</span>
-        <span class="go">Start →</span>
-      </a>
-      <a class="test" href="tests/v36/index.html">
+        <span class="row"><span class="go">Start →</span><button type="button" class="flag">Mark as done</button></span>
+      </div>
+      <div class="test" data-v="36">
+        <a class="cover" href="tests/v36/index.html" aria-label="Open Test 36"></a>
         <span class="num">Test 36</span>
         <span class="meta">5 October 2026</span>
+        <span class="done-tag" hidden>✓ Completed</span>
         <span class="reading">Four extracts: Keeping Time</span>
         <span class="mix">3 reading · 3 thinking skills · 3 maths</span>
-        <span class="go">Start →</span>
-      </a>
-      <a class="test" href="tests/v35/index.html">
+        <span class="row"><span class="go">Start →</span><button type="button" class="flag">Mark as done</button></span>
+      </div>
+      <div class="test" data-v="35">
+        <a class="cover" href="tests/v35/index.html" aria-label="Open Test 35"></a>
         <span class="num">Test 35</span>
         <span class="meta">5 October 2026</span>
+        <span class="done-tag" hidden>✓ Completed</span>
         <span class="reading">Missing sentences: Passengers of the Sky</span>
         <span class="mix">3 reading · 3 thinking skills · 3 maths</span>
-        <span class="go">Start →</span>
-      </a>
-      <a class="test" href="tests/v34/index.html">
+        <span class="row"><span class="go">Start →</span><button type="button" class="flag">Mark as done</button></span>
+      </div>
+      <div class="test" data-v="34">
+        <a class="cover" href="tests/v34/index.html" aria-label="Open Test 34"></a>
         <span class="num">Test 34</span>
         <span class="meta">5 October 2026</span>
+        <span class="done-tag" hidden>✓ Completed</span>
         <span class="reading">Cloze: Hidden in Plain Sight</span>
         <span class="mix">3 reading · 3 thinking skills · 3 maths</span>
-        <span class="go">Start →</span>
-      </a>
-      <a class="test" href="tests/v33/index.html">
+        <span class="row"><span class="go">Start →</span><button type="button" class="flag">Mark as done</button></span>
+      </div>
+      <div class="test" data-v="33">
+        <a class="cover" href="tests/v33/index.html" aria-label="Open Test 33"></a>
         <span class="num">Test 33</span>
         <span class="meta">5 October 2026</span>
+        <span class="done-tag" hidden>✓ Completed</span>
         <span class="reading">Story extract: The Triangle</span>
         <span class="mix">3 reading · 3 thinking skills · 3 maths</span>
-        <span class="go">Start →</span>
-      </a>
+        <span class="row"><span class="go">Start →</span><button type="button" class="flag">Mark as done</button></span>
+      </div>
   </div>
 </main>
+<script>
+(() => {
+  const KEY = "prac.v1";
+  const load = () => {
+    try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+    catch (e) {}
+    return { attempts: [], flags: {} };
+  };
+  const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} };
+  function paint() {
+    const st = load();
+    const cards = document.querySelectorAll(".test[data-v]");
+    let done = 0;
+    cards.forEach(card => {
+      const v = card.dataset.v, f = st.flags[v], isDone = !!(f && f.completed);
+      const firstFinished = st.attempts.filter(a => String(a.v) === v && a.finished).sort((a, b) => a.finished < b.finished ? -1 : 1)[0];
+      card.classList.toggle("done", isDone);
+      const tag = card.querySelector(".done-tag");
+      tag.hidden = !isDone;
+      if (isDone) {
+        done++;
+        const d = new Date(f.at);
+        tag.textContent = "✓ Completed" + (isNaN(d) ? "" : " " + d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }))
+          + (firstFinished && typeof firstFinished.total === "number" ? " · " + firstFinished.total + "/9" : "");
+      }
+      card.querySelector(".go").textContent = isDone ? "Open again →" : "Start →";
+      const btn = card.querySelector(".flag");
+      btn.textContent = isDone ? "Undo done" : "Mark as done";
+      btn.onclick = e => {
+        e.preventDefault(); e.stopPropagation();
+        const s = load();
+        if (isDone) delete s.flags[v]; else s.flags[v] = { completed: true, at: new Date().toISOString(), manual: true };
+        save(s); paint();
+      };
+    });
+    document.getElementById("progress").textContent = done ? `${done} of ${cards.length} completed.` : "";
+  }
+  paint();
+  window.addEventListener("pageshow", paint);
+})();
+</script>
 </body>
 </html>
