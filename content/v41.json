@@ -1,0 +1,62 @@
+{
+  "version": 41,
+  "date": "2026-10-05",
+  "reading": "Four extracts: Busy Bees",
+  "reading_format": "four extracts",
+  "reading_topic": "bees: the honeybee waggle dance (von Frisch), a beekeeper's diary, a child stung by a bee, Australian stingless bees (Tetragonula)",
+  "thinking": [
+    "Spot the mistake (judging from your own small group)",
+    "Cinema timetable with travel times at both ends",
+    "Transparent cards: turn one over, then lay it on the other (stretch)"
+  ],
+  "maths": [
+    "Quick-fire place value: greatest number written in different units",
+    "Combinations with a restriction (meal deals)",
+    "Edges of a solid made by joining a prism to a cube (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1 Q26-33 (four extracts), PT2 Q26-33 (writer's attitude)",
+      "PT3 Q26-33 (an idea expressed in completely different words)",
+      "PT2 Q26-33 (inference questions such as 'suggests newcomers are not always welcome') — stretch"
+    ],
+    "thinking": [
+      "PT3 Q5 (mistake: judging from own small group), PT2 Q6 ('I've never seen it')",
+      "PT3 Q19 (timetable minus a cancelled day), PT2 Q19 (appointments in a working day)",
+      "PT2 Q16 (which way a tile goes), PT3 Q22 (tiles that were rotated) — stretch"
+    ],
+    "maths": [
+      "PT3 Q6 (thousands/hundreds/tens/ones regrouping), PT2 Q9 (which digit change increases most)",
+      "PT2 Q10 (combinations: shapes × colours), PT3 Q28 (round-robin matches)",
+      "PT1 Q14 (hidden faces of a cube model), PT3 Q34 (sides of pieces after cutting a shape) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Tone & attitude",
+      "Main idea",
+      "Feelings & inference"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Chance & counting",
+      "Area, perimeter & 3D"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
