@@ -44,6 +44,7 @@ const BIKE_TABLE = `<div class="table-wrap"><table class="grid">
   <tr><th></th><th style="text-align:center">1 hour</th><th style="text-align:center">half day<br><small>(up to 4 hours)</small></th><th style="text-align:center">full day</th></tr>
   <tr><th>adult bike</th><td style="text-align:center">$12</td><td style="text-align:center">$30</td><td style="text-align:center">$45</td></tr>
   <tr><th>child bike</th><td style="text-align:center">$8</td><td style="text-align:center">$20</td><td style="text-align:center">$30</td></tr>
+  <tr><th>family pass<br><small>(2 adults and up to 2 children)</small></th><td style="text-align:center">–</td><td style="text-align:center">–</td><td style="text-align:center">$100</td></tr>
 </table></div>`;
 
 /* ---- Thinking Skills Q3: turned shape ---- */
@@ -148,16 +149,17 @@ const SECTIONS = [
       {
         stem: `A shop hires out bikes. These are its prices.
                ${BIKE_TABLE}
-               <p style="margin:10px 0 0">From Monday to Friday, every half-day and full-day price is <b>$5 cheaper</b>.</p>
-               <p style="margin:10px 0 0">On <b>Saturday</b>, two adults and one child each hire a bike for <b>3 hours</b>. They pay the lowest price they can. How much do they pay altogether?</p>`,
-        options: ["$50", "$65", "$80", "$96"],
+               <p style="margin:10px 0 0">A half day can be made longer by paying the 1-hour price for each extra hour.</p>
+               <p style="margin:10px 0 0">Two adults and one child each want a bike for <b>5 hours</b>. What is the lowest price they can pay altogether?</p>`,
+        options: ["$70", "$80", "$100", "$112"],
         answer: 2,
-        skill: "using a price table with conditions",
-        explain: `<p>For 3 hours, compare paying by the hour with a half-day hire (which covers up to 4 hours):</p>
-                  <p>• Adult bike: 3 × $12 = $36 by the hour, or <b>$30</b> for a half day. The half day is cheaper.<br>
-                     • Child bike: 3 × $8 = $24 by the hour, or <b>$20</b> for a half day. The half day is cheaper.</p>
-                  <p>It is Saturday, so there is no $5 discount. Total: $30 + $30 + $20 = <b>$80</b>.</p>
-                  <p class="why-not">$65 (B) is the trap: it takes $5 off each of the three bikes, but that discount is only for Monday to Friday. $96 (D) pays for every bike by the hour, missing that a half day is cheaper than 3 hours. $50 (A) counts only one adult bike.</p>`
+        skill: "using a price table to find the cheapest way to pay",
+        explain: `<p>5 hours is more than a half day (up to 4 hours), so compare the ways each person could pay:</p>
+                  <p>• Adult: 5 × $12 = $60 by the hour, $45 for a full day, or a half day + 1 extra hour = $30 + $12 = <b>$42</b>.<br>
+                     • Child: 5 × $8 = $40 by the hour, $30 for a full day, or $20 + $8 = <b>$28</b>.</p>
+                  <p>Paying separately, the cheapest is $42 + $42 + $28 = $112.</p>
+                  <p>But the <b>family pass</b> is for 2 adults and <em>up to</em> 2 children, so it covers this family too, for the whole day: <b>$100</b>. That is cheaper.</p>
+                  <p class="why-not">$112 (D) is the trap: it finds the cheapest way for each person, but misses the family pass, perhaps thinking it needs two children. $80 (B) uses half-day prices, forgetting that a half day only covers 4 of the 5 hours. $70 (A) finds the best price for one adult and the child but leaves out the second adult.</p>`
       },
       {
         stem: `Here is a shape made of five squares.
@@ -178,31 +180,26 @@ const SECTIONS = [
     intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
     questions: [
       {
-        stem: `A jug holds <b>1.5 L</b> of water. Tom pours out <b>4</b> cups of water. Each cup holds <b>250 mL</b>.
-               <p style="margin:10px 0 0">How much water is left in the jug?</p>`,
-        options: ["50 mL", "500 mL", "1000 mL", "1250 mL", "2500 mL"],
+        stem: `A water cooler holds <b>4.5 L</b> of water. During the day, <b>12</b> cups are filled from it. Each cup holds <b>275 mL</b>.
+               <p style="margin:10px 0 0">How much water is left in the cooler?</p>`,
+        options: ["750 mL", "1.2 L", "1.5 L", "3.3 L", "7.8 L"],
         answer: 1,
-        skill: "capacity: litres and millilitres",
-        explain: `<p>1 L = 1000 mL, so 1.5 L = <b>1500 mL</b>.</p>
-                  <p>4 cups × 250 mL = <b>1000 mL</b> poured out.</p>
-                  <p>1500 − 1000 = <b>500 mL</b> left.</p>
-                  <p class="why-not">50 mL (A) is the trap: it reads 1.5 L as “1 litre and 50 mL” (1050 mL), but 0.5 L is half a litre, which is 500 mL. 1000 mL (C) is the amount poured out, not the amount left. 1250 mL (D) takes away only one cup. 2500 mL (E) adds the water poured out instead of taking it away.</p>`
+        skill: "capacity: litres and millilitres in two steps",
+        explain: `<p>1 L = 1000 mL, so 4.5 L = <b>4500 mL</b>.</p>
+                  <p>12 cups × 275 mL: 4 cups hold 1100 mL, so 12 cups hold 3 × 1100 = <b>3300 mL</b>.</p>
+                  <p>4500 − 3300 = 1200 mL = <b>1.2 L</b>.</p>
+                  <p class="why-not">750 mL (A) is the trap: it reads 4.5 L as “4 litres and 50 mL” (4050 mL), but 0.5 L is half a litre, which is 500 mL. 1.5 L (C) rounds each cup to 250 mL. 3.3 L (D) is the water poured out, not the water left. 7.8 L (E) adds instead of taking away.</p>`
       },
       {
-        stem: `Ivy spins the arrow on this spinner once. The marks around the edge split the spinner into eighths.
+        stem: `The marks around the edge of this spinner split it into eighths.
                <div class="figure">${SPINNER_SVG}</div>
-               <p style="margin:10px 0 0">Which statement is true?</p>`,
-        options: ["Landing on blue is just as likely as landing on green.",
-                  "Landing on green is twice as likely as landing on blue.",
-                  "There is a 1 in 4 chance of landing on yellow.",
-                  "Landing on red is more likely than not landing on red.",
-                  "There is a 3 in 7 chance of landing on red."],
-        answer: 0,
-        skill: "chance: comparing likelihood when the parts are different sizes",
-        explain: `<p>Compare the <b>size</b> of each colour, in eighths of the spinner:</p>
-                  <p>blue 2 eighths (one quarter), green 2 eighths, red 3 eighths, yellow 1 eighth. Check: 2 + 2 + 3 + 1 = 8 ✓</p>
-                  <p>Blue and green each cover 2 eighths, so they are <b>equally likely</b>. A is true.</p>
-                  <p class="why-not">B is the trap: green has two separate parts and blue only one, but blue’s part is twice as big, so they cover the same amount. C counts the 4 colours as if each had the same chance; yellow is really 1 in 8. D: red covers 3 eighths and the other colours 5 eighths, so <em>not</em> red is more likely. E counts the 7 parts as if they were all the same size; red is really 3 in 8.</p>`
+               <p style="margin:10px 0 0">Ivy spins the arrow <b>40</b> times. About how many times should she expect it to land on <b>red or yellow</b>?</p>`,
+        options: ["10", "15", "20", "23", "25"],
+        answer: 2,
+        skill: "chance: expected results when the parts are different sizes",
+        explain: `<p>Count the <b>eighths</b>, not the parts: red covers 3 eighths and yellow 1 eighth, so red or yellow covers 4 eighths, which is half the spinner.</p>
+                  <p>Half of 40 spins = <b>20</b>.</p>
+                  <p class="why-not">23 (D) is the trap: there are 7 coloured parts and 4 of them are red or yellow, so 4 out of 7 of 40 is about 23. But the parts are not all the same size: blue’s part is twice as big as the others. 15 (B) counts red only (3 eighths of 40) and forgets yellow. 25 (E) is the number of times it should land on anything <em>except</em> red (5 eighths of 40). 10 (A) treats the 4 colours as equally likely, 1 in 4 each.</p>`
       },
       {
         stem: `Sam reads <b>12 pages every 10 minutes</b>. He has <b>90 pages</b> left in his book and wants to finish them at exactly <b>8:00 pm</b>.
