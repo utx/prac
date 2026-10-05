@@ -1,6 +1,6 @@
 ---
 name: redo
-description: Handle questions David sent back from the admin page ("Send back for a redo" with a comment). Lists them, rebuilds just those questions to the full new-test standard (or explains why no change is needed), publishes them in one pull request, merges once the checks are green, then replies to each comment so David sees it on the admin page. Use when David asks to "do the redos" / "check the feedback", and at the start of every overnight run.
+description: Handle questions David sent back from the admin page ("Send back for a redo" with a comment). Lists them, rebuilds just those questions to the full new-test standard (or explains why no change is needed), publishes them in one pull request, merges once the checks are green, then replies to each comment so David sees it on the admin page. Use when David asks to "do the redos" / "check the feedback", when the hourly redo check finds something waiting, and at the start of every overnight run. David wants redos done straight away, so never defer one to the overnight run.
 ---
 
 # Redo sent-back questions
@@ -19,6 +19,7 @@ Read the comment, the question in `content/vNN.js` (stem, options, answer, expla
 - **Change it** when the comment points to a real problem or a preference David has stated (too easy/hard, ambiguous, two defensible answers, a factual slip, an unclear picture, wording, wants a different skill). Change only what the comment needs, but the result must meet every quality rule: OC level, wrong options from real mistakes, correct option never the single longest, facts checked, explanation names each trap. Keep the answer letter unless the fix needs a new one (then keep the section's letters spread).
 - If the comment implies a rule for all future tests (e.g. "spatial questions should be harder"), also update `CLAUDE.md` / the skills so it sticks, and say so in the reply.
 - **Don't change it** only if the comment rests on a misunderstanding (for example the answer is right and the explanation already shows why). The reply must then explain clearly and kindly, with the working.
+- A comment starting "Difficulty: make it a bit harder/easier" (from the quick buttons) means one notch: keep the skill and format, add or remove one step or make the main trap more or less tempting. "Much harder/easier" means a clearly different level (for harder: a stretch-level step or a less obvious method; for easier: one clear step). Any extra words after it are further instructions.
 - A redo that changes the question type or skill: update `categories`, the `thinking`/`maths` labels and `sample_map` in `content/vNN.json`; keep the stretch question in Q3.
 
 ## 3. Check
