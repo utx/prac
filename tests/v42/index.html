@@ -334,7 +334,7 @@ const CUBE_OPTS = [["ring", "plus", "square"], ["circle", "dots", "ring"], ["plu
 /* ---- Maths Q2: juice prices ---- */
 const JUICE_TABLE = `<div class="table-wrap"><table class="grid">
   <tr><th>bottle</th><th>price</th></tr>
-  ${[["500 mL", "$2.40"], ["750 mL", "$3.30"], ["1 L", "$4.50"], ["1.5 L", "$6.30"], ["3 L", "$13.00"]].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join("")}
+  ${[["250 mL", "$1.00"], ["500 mL", "$1.80"], ["1 L", "$3.40"], ["2 L", "$6.20"], ["4 L", "$12.80"]].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join("")}
 </table></div>`;
 
 /* ---- Maths Q3: tile pattern ---- */
@@ -461,17 +461,17 @@ const SECTIONS = [
         stem: `A shop sells the same juice in five bottle sizes.
                ${JUICE_TABLE}
                <p style="margin:10px 0 0">Which bottle is the best value for money?</p>`,
-        options: ["500 mL for $2.40", "750 mL for $3.30", "1 L for $4.50", "1.5 L for $6.30", "3 L for $13.00"],
+        options: ["250 mL for $1.00", "500 mL for $1.80", "1 L for $3.40", "2 L for $6.20", "4 L for $12.80"],
         answer: 3,
         skill: "best value: comparing prices for the same amount",
-        explain: `<p>Compare the cost of the <b>same amount</b> of juice. Every size fits exactly into 3 litres:</p>
-                  <p>• 500 mL: 6 bottles × $2.40 = $14.40<br>
-                     • 750 mL: 4 × $3.30 = $13.20<br>
-                     • 1 litre: 3 × $4.50 = $13.50<br>
-                     • 1.5 litres: 2 × $6.30 = <b>$12.60</b><br>
-                     • 3 litres: $13.00</p>
-                  <p>The 1.5-litre bottle gives 3 litres for the least money, so it is the best value.</p>
-                  <p class="why-not">The 3-litre bottle (E) is the trap: the biggest size is often the best value, but not here. It costs 40 cents more for 3 litres than two 1.5-litre bottles. The 500 mL bottle (A) has the lowest price but is the worst value. The 750 mL and 1-litre bottles (B and C) are in between.</p>`
+        explain: `<p>Compare the cost of the <b>same amount</b> of juice. Each bottle is double the one before, so find what 4 litres would cost in each size:</p>
+                  <p>• 250 mL: 16 bottles × $1.00 = $16.00<br>
+                     • 500 mL: 8 × $1.80 = $14.40<br>
+                     • 1 litre: 4 × $3.40 = $13.60<br>
+                     • 2 litres: 2 × $6.20 = <b>$12.40</b><br>
+                     • 4 litres: $12.80</p>
+                  <p>Two 2-litre bottles give 4 litres for the least money, so the 2-litre bottle is the best value.</p>
+                  <p class="why-not">The 4-litre bottle (E) is the trap: the biggest size is often the best value, but not here. It costs 40 cents more than two 2-litre bottles. The 250 mL bottle (A) has the lowest price but is the worst value. The 500 mL and 1-litre bottles (B and C) are in between.</p>`
       },
       {
         stem: `Each pattern is a square of white tiles with a border of grey tiles around it.
