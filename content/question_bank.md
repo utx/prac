@@ -55,6 +55,39 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 10: 5 × 2.
     - 120: 60 × 2.
 
+### Twelve squares make a rectangle
+- **Section**: maths (perimeter; a gentle Q2, or quick-fire Q1)
+- **Added**: 2026-10-07
+- **Question**: Twelve squares are arranged in three rows and four columns to form rectangle ABCD. The perimeter of each square is 8 inches. What is the perimeter of rectangle ABCD?
+  - Diagram: a 4-wide, 3-tall grid of squares, labelled A (top left), B (top right), C (bottom right), D (bottom left).
+  - No options or answer were given. The answer was checked: **28**. Each square has sides of 8 ÷ 4 = 2. The rectangle is 4 × 2 = 8 by 3 × 2 = 6, so its perimeter is 8 + 6 + 8 + 6 = 28.
+- **Notes**:
+  - Written by David (his questions can be reworded). Use centimetres instead of inches.
+  - Possible wrong options from real mistakes:
+    - 96: 12 squares × 8, adding every square's perimeter.
+    - 14: counts the side lengths around the edge (4 + 3 + 4 + 3) but forgets each one is 2 cm.
+    - 48: 8 × 6, the area, not the perimeter.
+    - 112: uses 8 as the side of a square.
+    - 80: 10 edge squares × 8.
+  - Choose 4 or 5 of these.
+
+### Painted 4 × 4 × 4 cube
+- **Section**: maths (3D: painted cube; competition-style, so it counts as the test's one competition-style question)
+- **Added**: 2026-10-07
+- **Question**: Sixty-four small white cubes of the same size are glued together to form a large cube. After painting all six sides of the large cube blue, how many small cubes have 2 blue sides?
+  - Diagram: a 4 × 4 × 4 cube drawn in 3D, painted blue.
+  - No options or answer were given. The answer was checked by counting: **24**. The cubes with 2 blue sides are on the edges but not at the corners: 12 edges × 2 middle cubes = 24.
+  - Full count: 8 cubes have 3 blue sides, 24 have 2, 24 have 1 and 8 have none.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - v38 Maths Q2 was also a painted block (cubes with exactly one painted face), so space this a few tests after v38. It is the same skill with a different question.
+  - The number of cubes with 1 blue side is also 24. A child who mixes up "1 side" and "2 sides" still gets 24, so the explanation should mention it.
+  - Possible wrong options from real mistakes:
+    - 8: the corners (3 blue sides), or the hidden inside cubes.
+    - 12: one cube per edge.
+    - 48: 4 cubes per edge, including the corners.
+    - 56: every cube that has any paint (64 − 8).
+
 ## Used
 
 (none yet)
