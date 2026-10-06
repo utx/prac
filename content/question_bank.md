@@ -26,6 +26,21 @@ Never paste in questions from the official sample papers or other copyrighted bo
   - 11: forgets the extra marble.
   - Choose 4 or 5 of these that fit the section's option count.
 
+### Milk crates
+- **Section**: maths (quick-fire Q1: a simple word problem, rounding up a remainder)
+- **Added**: 2026-10-07
+- **Question**: Mike uses crates to deliver milk for a dairy farm. Each crate holds at most 6 bottles. Mike needs to deliver 50 bottles of milk in one trip. At least how many crates does Mike need if all the bottles need to be in crates?
+  - No options or answer were given. The answer was checked: **9**. 50 ÷ 6 = 8 remainder 2, and the last 2 bottles need a crate of their own.
+- **Notes**:
+  - David's picture showed a 6-bottle crate with a handle; redraw it.
+  - Source not yet confirmed. If it comes from a published book, reword it in our own words rather than copying it.
+  - It is easier than a typical Q2 or Q3, so use it as Maths Q1 (quick-fire). Remainders were last used in v33, so it fits soon.
+  - Possible wrong options from real mistakes:
+    - 8: ignores the remainder.
+    - 2: gives the remainder as the answer.
+    - 44: 50 − 6.
+    - 300: 50 × 6.
+
 ## Used
 
 (none yet)
