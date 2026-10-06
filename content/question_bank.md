@@ -88,6 +88,29 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 48: 4 cubes per edge, including the corners.
     - 56: every cube that has any paint (64 − 8).
 
+### Who got the medal (one liar)
+- **Section**: thinking (truth-tellers and liars: logic with one false statement; stretch-level, like the sample-paper liars questions around Q21–30)
+- **Added**: 2026-10-07
+- **Question**: Anthony, Babul, Carl, and Dilly ran in a race. Only one of them received a medal. Among the statements below, only one of them did not tell the truth.
+  - Anthony says, "Babul didn't receive a medal."
+  - Babul says, "Dilly received a medal."
+  - Carl says, "I received a medal."
+  - Dilly says, "I didn't receive a medal."
+
+  Who did not tell the truth?
+- **Answer** (checked by trying each runner as the medal winner): **Babul**. Carl got the medal.
+  - If Carl won, only Babul's statement is false.
+  - If Anthony won, both Babul and Carl lie.
+  - If Babul won, Anthony, Babul and Carl all lie.
+  - If Dilly won, both Carl and Dilly lie.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Options: Anthony, Babul, Carl, Dilly.
+  - Main traps:
+    - Dilly: Babul and Dilly contradict each other, so one of them must be lying, and a child may pick the wrong one.
+    - Carl: "I received a medal" sounds like boasting.
+  - Good as a Thinking Q2 (a type the fixed slots miss) or a stretch Q3. A small table of the four cases makes a clear explanation.
+
 ## Used
 
 (none yet)
