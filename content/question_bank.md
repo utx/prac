@@ -33,7 +33,7 @@ Never paste in questions from the official sample papers or other copyrighted bo
   - No options or answer were given. The answer was checked: **9**. 50 ÷ 6 = 8 remainder 2, and the last 2 bottles need a crate of their own.
 - **Notes**:
   - David's picture showed a 6-bottle crate with a handle; redraw it.
-  - Source not yet confirmed. If it comes from a published book, reword it in our own words rather than copying it.
+  - Written by David. He's happy for it to be reworded (for example to tighten the wording or change the numbers).
   - It is easier than a typical Q2 or Q3, so use it as Maths Q1 (quick-fire). Remainders were last used in v33, so it fits soon.
   - Possible wrong options from real mistakes:
     - 8: ignores the remainder.
