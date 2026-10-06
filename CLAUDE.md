@@ -40,6 +40,7 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - **Q2:** usually a table, timetable or data question. David finds seating/ordering arrangement questions come up too often: use one at most about once in every 6 versions (check the `categories` for "Order & arrangement").
 - **Cover the whole question base.** Every few versions, use Q2 (or Q3) for a type the fixed slots would otherwise miss: rules/codes/sets, number problems, must/cannot be true, and question types next to the samples (for example odd one out, logic grids, sequences of shapes, balance scales, true/false statements from a diagram). Check the `thinking` labels and `categories` in recent `content/vNN.json` files so each type comes round regularly.
 - **Q3:** spatial at sample-paper difficulty (one or two clear steps), or a second critical-thinking question. Spatial questions must not be harder than the sample versions.
+- No paper-folding questions (fold and punch, folding string) for a while (David, Oct 2026: "had enough of these folding ones"). Use other spatial types: straight cuts on paper, views, nets, cube models, turns and flips, compass directions.
 - Never use "weakens the argument" questions (they don't appear in the samples).
 
 ## Maths

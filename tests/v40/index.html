@@ -292,49 +292,19 @@ const CLUB_TABLE = `<div class="table-wrap"><table class="grid">
   <tr><th>total</th><td style="text-align:center">15</td><td style="text-align:center">?</td><td style="text-align:center">28</td></tr>
 </table></div>`;
 
-/* ---- Thinking Skills Q3: fold and punch ---- */
-// paper coordinates 0..1 (x to the right, y upwards); folded quarter is the top-right
-const tri = (cx, cy, dir, s) => { // isosceles triangle pointing left (-1) or right (+1)
-  const h = s * 0.9;
-  return `<path d="M${cx + dir * h / 2} ${cy} L${cx - dir * h / 2} ${cy - s / 2} L${cx - dir * h / 2} ${cy + s / 2} Z" fill="#1b2a41"/>`;
-};
-const paper = (holes, size) => {
-  const P = v => 4 + v * size;
-  let g = `<rect x="4" y="4" width="${size}" height="${size}" fill="#fdf3e1" stroke="${INK}" stroke-width="1.6"/>`;
-  holes.forEach(([x, y, d]) => g += tri(P(x), P(1 - y), d, size * 0.12));
-  return `<svg viewBox="0 0 ${size + 8} ${size + 8}" width="${size + 8}" height="${size + 8}" role="img" aria-label="An unfolded square of paper with ${holes.length} triangle-shaped holes.">${g}</svg>`;
-};
-const FOLD_SVG = (() => {
-  const s = 120;
-  const box = (w, h, inner, label, aria) =>
-    `<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start"><span style="font-size:13px;color:#55607a">${label}</span>
-      <svg viewBox="0 0 ${w + 8} ${h + 8}" width="${w + 8}" height="${h + 8}" role="img" aria-label="${aria}">${inner}</svg></div>`;
-  const step1 = `<rect x="4" y="4" width="${s}" height="${s}" fill="#fdf3e1" stroke="${INK}" stroke-width="1.6"/>
-    <line x1="${4 + s / 2}" y1="4" x2="${4 + s / 2}" y2="${4 + s}" stroke="${INK}" stroke-dasharray="4 3"/>
-    <path d="M${4 + s * 0.22} ${4 + s * 0.5} q${s * 0.28} -${s * 0.3} ${s * 0.56} 0" fill="none" stroke="#c0392b" stroke-width="2"/>
-    <path d="M${4 + s * 0.78} ${4 + s * 0.5} l-9 -2 l5 -7 Z" fill="#c0392b"/>`;
-  const step2 = `<rect x="4" y="4" width="${s / 2}" height="${s}" fill="#fdf3e1" stroke="${INK}" stroke-width="1.6"/>
-    <line x1="4" y1="${4 + s / 2}" x2="${4 + s / 2}" y2="${4 + s / 2}" stroke="${INK}" stroke-dasharray="4 3"/>
-    <path d="M${4 + s * 0.25} ${4 + s * 0.82} q${s * 0.22} -${s * 0.3} 0 -${s * 0.56}" fill="none" stroke="#c0392b" stroke-width="2"/>
-    <path d="M${4 + s * 0.25} ${4 + s * 0.26} l-2 9 l7 -4 Z" fill="#c0392b"/>`;
-  const q = s / 2;
-  const step3 = `<rect x="4" y="4" width="${q}" height="${q}" fill="#fdf3e1" stroke="${INK}" stroke-width="1.6"/>
-    <line x1="4" y1="4" x2="4" y2="${4 + q}" stroke="${INK}" stroke-width="4"/>
-    <line x1="4" y1="${4 + q}" x2="${4 + q}" y2="${4 + q}" stroke="${INK}" stroke-width="4"/>
-    ${tri(4 + q * 0.2, 4 + q * 0.4, 1, s * 0.12)}`;
-  return `<div style="display:flex;flex-wrap:wrap;gap:16px 34px;align-items:flex-start">
-    ${box(s, s, step1, "1. Fold left onto right", "A square of paper. The left half is folded over onto the right half.")}
-    ${box(s / 2, s, step2, "2. Fold bottom up", "The folded paper, now a tall rectangle. The bottom half is folded up onto the top half.")}
-    ${box(q, q, step3, "3. Punch a hole", "The folded paper, now a quarter of the size, with its folds along the left and bottom edges (shown thick). A triangle-shaped hole pointing right is punched near the left fold, in the upper part.")}
-  </div><p style="margin:6px 0 0;font-size:14px;color:#55607a">In step 3, the thick edges are the folds.</p>`;
+/* ---- Thinking Skills Q3: two straight cuts across a square ---- */
+const CUT_SVG = (() => {
+  const s = 160, o = 14;
+  const P = (x, y) => [o + x * s / 4, o + (4 - y) * s / 4]; // 4×4 units, y upwards
+  const L = (a, b, extra) => `<line x1="${P(...a)[0]}" y1="${P(...a)[1]}" x2="${P(...b)[0]}" y2="${P(...b)[1]}" ${extra}/>`;
+  let g = `<rect x="${o}" y="${o}" width="${s}" height="${s}" fill="#fdf3e1" stroke="${INK}" stroke-width="2"/>`;
+  g += L([0, 4], [4, 2], `stroke="#c0392b" stroke-width="2.4" stroke-dasharray="7 5"`);
+  g += L([2, 4], [2, 0], `stroke="#c0392b" stroke-width="2.4" stroke-dasharray="7 5"`);
+  const [mx, my] = P(4, 2), [tx, ty] = P(2, 4), [bx, by] = P(2, 0), [cx, cy] = P(0, 4);
+  g += `<circle cx="${mx}" cy="${my}" r="3.5" fill="${INK}"/><circle cx="${tx}" cy="${ty}" r="3.5" fill="${INK}"/><circle cx="${bx}" cy="${by}" r="3.5" fill="${INK}"/><circle cx="${cx}" cy="${cy}" r="3.5" fill="${INK}"/>`;
+  const W = s + 2 * o, H = s + 2 * o;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="A square of paper with two dashed cutting lines. One goes from the top-left corner to the middle of the right side. The other goes straight down from the middle of the top edge to the middle of the bottom edge. The two lines cross.">${g}</svg>`;
 })();
-// holes in full-paper coordinates [x, y, direction]
-const FOLD_OPTS = [
-  [[0.4, 0.8, 1], [0.6, 0.8, 1], [0.4, 0.2, 1], [0.6, 0.2, 1]],   // all point right (slid, not flipped)
-  [[0.4, 0.8, 1], [0.6, 0.8, -1], [0.4, 0.2, 1], [0.6, 0.2, -1]], // point towards each other
-  [[0.4, 0.8, -1], [0.6, 0.8, 1]],                                // only one fold undone
-  [[0.4, 0.8, -1], [0.6, 0.8, 1], [0.4, 0.2, -1], [0.6, 0.2, 1]]  // correct: mirror images
-].map(h => paper(h, 104));
 
 /* ---- Maths Q2: stacked fractions ---- */
 const frac = (n, d) => `<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 3px"><span style="border-bottom:1.5px solid currentColor;padding:0 3px">${n}</span><span style="padding:0 3px">${d}</span></span>`;
@@ -432,18 +402,22 @@ const SECTIONS = [
                   <p class="why-not">1 (A) is the trap: 28 − 12 − 15 = 1 takes away the instrument students and the sport students, but the 7 who do <em>both</em> have been taken away twice. 13 (D) is 28 − 15, everyone who doesn’t play a sport, including the 5 who learn an instrument. 5 (B) is the students who learn an instrument but don’t play a sport.</p>`
       },
       {
-        stem: `A square of paper is folded twice and then a triangle-shaped hole is punched through all the layers.
-               <div class="figure">${FOLD_SVG}</div>
-               <p style="margin:10px 0 0">Which of these shows the paper when it is completely unfolded?</p>`,
-        visualOptions: true,
-        options: FOLD_OPTS,
+        stem: `Ella has a square of paper. She makes two straight cuts along the dashed lines: one from the top-left corner to the middle of the right side, and one straight down from the middle of the top edge to the middle of the bottom edge.
+               <div class="figure">${CUT_SVG}</div>
+               <p style="margin:10px 0 0">Which of these is true about the pieces she ends up with?</p>`,
+        options: ["She has four pieces: two triangles and two with four sides.",
+                  "She has four pieces, and every one of the pieces has four sides.",
+                  "She has three pieces: one triangle and two with four sides.",
+                  "She has four pieces: one triangle and three with four sides."],
         answer: 3,
-        skill: "picturing folding and unfolding (holes are reflected in the folds)",
-        explain: `<p>Unfold one fold at a time. Each fold acts like a <b>mirror</b>: the new hole appears on the other side of the fold line, the same distance away, and <b>flipped</b>.</p>
-                  <p>• Undo fold 2 (the bottom edge): a second triangle appears in the bottom half, the same distance below the middle line. It still points right.<br>
-                     • Undo fold 1 (the left edge): both triangles are copied onto the left half, flipped, so they point <b>left</b>.</p>
-                  <p>So there are four holes. The two on the right point right, the two on the left point left, and each pair points <em>away</em> from the middle. That is <b>D</b>.</p>
-                  <p class="why-not">A is the trap: it has four holes in the right places, but all pointing the same way, as if the holes were slid across instead of flipped. B flips them the wrong way, so they point towards each other. C forgets the second fold, so it has only two holes.</p>`
+        skill: "picturing the pieces made by straight cuts",
+        explain: `<p>The two cuts cross, so the square is split into <b>four</b> pieces. The slanted cut crosses the upright one <b>above</b> the middle of the square, because it ends halfway down the right side, not at the bottom corner. Look at each piece in turn:</p>
+                  <p>• top left: the top-left corner, the middle of the top edge, and the crossing point. That is <b>3 sides</b>, a triangle.<br>
+                     • bottom left: the top-left corner, the crossing point, the middle of the bottom edge, and the bottom-left corner: <b>4 sides</b>.<br>
+                     • top right: the middle of the top edge, the top-right corner, the middle of the right side, and the crossing point: <b>4 sides</b>.<br>
+                     • bottom right: the crossing point, the middle of the right side, the bottom-right corner, and the middle of the bottom edge: <b>4 sides</b>.</p>
+                  <p>So there is one triangle and three pieces with four sides: <b>D</b>.</p>
+                  <p class="why-not">A is the trap: it is what you get if the slanted cut went right down to the bottom-right corner, like a diagonal. Then the cuts would make two triangles. But this cut stops at the middle of the right side, so the bottom-right piece keeps the corner and has four sides. B misses that the top-left piece has only three corners. C counts only three pieces, as if one cut stopped where it met the other. But both cuts go all the way across the paper, so where they cross they make four pieces.</p>`
       }
     ]
   },
