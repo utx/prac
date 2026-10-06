@@ -135,6 +135,7 @@ Never paste in questions from the official sample papers or other copyrighted bo
   - Written by David (his questions can be reworded).
   - Use kilometres and the Australian spelling "realised".
   - A number-line diagram (home, library, the turn-around point, school) helps the explanation, but don't mark the library's position in the question.
+  - Difficulty: medium-hard, around Q20–28 of the sample papers. By default use it as the **Maths Q3 stretch** question with no diagram in the question. For an easier Q2, show a number line with home, school and the 7 km point, but not the library.
   - Possible wrong options from real mistakes:
     - 3: the distance he biked back, not the library's distance from home.
     - 6: 16 − 10, forgetting the extra stretch is ridden twice.
