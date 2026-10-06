@@ -111,6 +111,21 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - Carl: "I received a medal" sounds like boasting.
   - Good as a Thinking Q2 (a type the fixed slots miss) or a stretch Q3. A small table of the four cases makes a clear explanation.
 
+### Peyton's mix-up (working backwards)
+- **Section**: maths (inverse operations / working backwards; sample PT3 Q24-style, a good Q2 or Q3)
+- **Added**: 2026-10-07
+- **Question**: Peyton was supposed to add 4 to the number on the board and then multiply the result by 3. Instead, Peyton added 3 to the number on the board and then multiplied the result by 4. Peyton got an answer of 48. What answer would Peyton get if he solved the problem correctly?
+- **Answer** (checked): **39**. Work backwards: 48 ÷ 4 = 12, then 12 − 3 = 9 is the number on the board. The correct way gives (9 + 4) × 3 = 39.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Possible wrong options from real mistakes:
+    - 36: 12 × 3, undoing only the multiply.
+    - 9: stops at the number on the board.
+    - 13: 9 + 4, forgetting to multiply.
+    - 48: thinks the order of steps doesn't matter.
+    - 45: 48 − 3.
+  - Choose 4 or 5 of these.
+
 ## Used
 
 (none yet)
