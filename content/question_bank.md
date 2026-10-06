@@ -41,6 +41,20 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 44: 50 − 6.
     - 300: 50 × 6.
 
+### Robot building bikes
+- **Section**: maths (quick-fire Q1, a simple rate word problem; rates also appear in Q2/Q3 in the samples)
+- **Added**: 2026-10-07
+- **Question**: It takes a robot 5 minutes to put together 2 bikes. At this rate, how many bikes can the robot put together in 1 hour?
+  - No options or answer were given. The answer was checked: **24**. 1 hour = 60 minutes, which is 12 lots of 5 minutes, and 12 × 2 = 24.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Don't put it in the same test as the milk crates question; both suit Maths Q1.
+  - Possible wrong options from real mistakes:
+    - 12: the number of 5-minute blocks, forgetting the ×2.
+    - 30: 60 ÷ 2.
+    - 10: 5 × 2.
+    - 120: 60 × 2.
+
 ## Used
 
 (none yet)
