@@ -1,6 +1,6 @@
 ---
 name: redo
-description: Handle questions David sent back from the admin page ("Send back for a redo" with a comment). Lists them, rebuilds just those questions to the full new-test standard (or explains why no change is needed), publishes them in one pull request, merges once the checks are green, then replies to each comment so David sees it on the admin page. Use when David asks to "do the redos" / "check the feedback", when the hourly redo check finds something waiting, and at the start of every overnight run. David wants redos done straight away, so never defer one to the overnight run.
+description: Handle questions David sent back from the admin page ("Send back for a redo" with a comment). Lists them, rebuilds just those questions to the full new-test standard (or explains why no change is needed), publishes them in one pull request, merges once the checks are green, then replies to each comment so David sees it on the admin page. Use when David asks to "do the redos" / "check the feedback", when his "Do redos now" routine starts a run, and at the start of every overnight run.
 ---
 
 # Redo sent-back questions

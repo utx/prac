@@ -68,7 +68,7 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 ## Question feedback (admin review)
 - In practice mode, each checked question has **Approve** and **Send back for a redo** (with a comment). Saved online in the `reviews` table through `add_review(pin, …)`; the admin page lists what's waiting and what's been redone.
 - Each question also has quick difficulty buttons (much easier / a bit easier / a bit harder / much harder); they send a redo whose comment starts "Difficulty: make it …". The admin page's tests table has **Approve test** (approves all its questions) and shows each test's review status.
-- David wants redos done **immediately**, never left for the overnight run: an hourly routine (7 am to 10 pm Sydney) runs the `redo` skill whenever something is waiting, and when David says "do the redos" do them at once. Use the `redo` skill (`.claude/skills/redo/SKILL.md`): rebuild just those questions to full standard (or explain why not), one pull request, merge when green, then reply with `python3 tools/reviews.py done V SECTION Q "reply"`. The overnight run also does any still waiting.
+- Redos are picked up by the nightly routine (about 1 am Sydney), and David can start them any time with the **"Do redos now (run on demand)"** routine (**Run now** at claude.ai/code/routines). When David says "do the redos", do them at once. Use the `redo` skill (`.claude/skills/redo/SKILL.md`): rebuild just those questions to full standard (or explain why not), one pull request, merge when green, then reply with `python3 tools/reviews.py done V SECTION Q "reply"`.
 
 ## Online progress (Supabase)
 - `tools/sync.js` (injected into every page by `build.py`) sends progress events to Supabase when `tools/site_config.json` has a URL and publishable key; otherwise the site uses browser storage only. Database setup: `supabase/setup.sql`.
@@ -76,10 +76,13 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - `python3 tools/progress.py [--json]` summarises progress for Claude (needs `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` in the environment settings). `python3 tools/configure_sync.py` fills `site_config.json` from `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
 
 ## Overnight builds
-- A routine runs the `overnight` skill (`.claude/skills/overnight/SKILL.md`) at about 1 am Sydney time: when fewer than 10 published tests are uncompleted it builds 4 new ones, opens one pull request and merges it once the checks are green (agreed by David).
+- A routine runs the `overnight` skill (`.claude/skills/overnight/SKILL.md`) at about 1 am Sydney time: it does any waiting redos, and when fewer than 10 published tests are uncompleted it builds 4 new ones, opens one pull request and merges it once the checks are green (agreed by David).
 
 ## How the routines run (cost)
-- Both routines (hourly redo check, nightly build check) wake a small dedicated session, "prac routines (checks only)", on the lighter model. It only runs the cheap checks (`tools/reviews.py`, `tools/progress.py`) and, when real work is needed, starts a fresh full-strength session (`create_session` with this repo as source) to do the redo or build. Never do heavy work inside the routines session or a very long conversation: every message re-reads the whole conversation, so long sessions get expensive.
+- David chose to keep usage low: there is **no hourly check**. Two routines, both waking a small dedicated session ("prac routine dispatcher (light)") on the lighter model:
+  - **"Overnight: redos and practice tests"** (12:50 am Sydney): runs `tools/reviews.py` and `tools/progress.py`; if redos are waiting or fewer than 10 tests are uncompleted, it starts a fresh full-strength session (`create_session` with this repo as source) to run the `overnight` skill; otherwise it stops.
+  - **"Do redos now (run on demand)"** (no schedule; David presses **Run now**): if redos are waiting, starts a fresh full-strength session to run the `redo` skill.
+- Never do heavy work inside the dispatcher session or a very long conversation: every message re-reads the whole conversation, so long sessions get expensive. Don't add more scheduled routines without asking David.
 - Routine sessions created with "a fresh session on each firing" can't push or use the GitHub tools here, so don't use that mode.
 
 ## Automatic checks

@@ -836,7 +836,7 @@ async function submitReview(box, sec, qi, kind, comment) {
     return;
   }
   reviewRows.push({ version: TEST_META.version, section: sec, q: qi, kind, comment, at: new Date().toISOString() });
-  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it within the hour (7 am to 10 pm), or straight away if you ask.");
+  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it overnight, or straight away if you run "Do redos now".");
 }
 
 function showFinal() {
