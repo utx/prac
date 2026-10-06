@@ -85,7 +85,8 @@ def build_test(n, js, meta):
 
 def card(n, meta):
     e = html.escape
-    reading = e(meta.get("reading", ""))
+    # Show only the title on the front page, not the reading format ("Cloze: Low Tide" -> "Low Tide").
+    reading = e(meta.get("reading", "").split(": ", 1)[-1])
     date = meta.get("date", "")
     try:
         d = datetime.date.fromisoformat(date)
