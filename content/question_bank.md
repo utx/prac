@@ -55,6 +55,22 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 10: 5 × 2.
     - 120: 60 × 2.
 
+### Twelve squares make a rectangle
+- **Section**: maths (perimeter; a gentle Q2, or quick-fire Q1)
+- **Added**: 2026-10-07
+- **Question**: Twelve squares are arranged in three rows and four columns to form rectangle ABCD. The perimeter of each square is 8 inches. What is the perimeter of rectangle ABCD?
+  - Diagram: a 4-wide, 3-tall grid of squares, labelled A (top left), B (top right), C (bottom right), D (bottom left).
+  - No options or answer were given. The answer was checked: **28**. Each square has sides of 8 ÷ 4 = 2. The rectangle is 4 × 2 = 8 by 3 × 2 = 6, so its perimeter is 8 + 6 + 8 + 6 = 28.
+- **Notes**:
+  - Written by David (his questions can be reworded). Use centimetres instead of inches.
+  - Possible wrong options from real mistakes:
+    - 96: 12 squares × 8, adding every square's perimeter.
+    - 14: counts the side lengths around the edge (4 + 3 + 4 + 3) but forgets each one is 2 cm.
+    - 48: 8 × 6, the area, not the perimeter.
+    - 112: uses 8 as the side of a square.
+    - 80: 10 edge squares × 8.
+  - Choose 4 or 5 of these.
+
 ## Used
 
 (none yet)
