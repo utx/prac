@@ -1,6 +1,6 @@
 ---
 name: overnight
-description: Nightly unattended run (fired by the 1 am Sydney routine). Checks online progress; if fewer than 10 published tests are uncompleted, builds 4 new tests to the full new-test standard, opens one pull request, waits for the automatic checks and merges it. Also finishes the online-progress setup when the environment provides the keys.
+description: Nightly unattended run (started by the 12:50 am Sydney routine). Does any waiting redos, checks online progress; if fewer than 10 published tests are uncompleted, builds 4 new tests to the full new-test standard, opens one pull request, waits for the automatic checks and merges it. Also finishes the online-progress setup when the environment provides the keys.
 ---
 
 # Overnight build
