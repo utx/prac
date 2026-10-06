@@ -126,6 +126,21 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 45: 48 − 3.
   - Choose 4 or 5 of these.
 
+### Carter's trip back to the library
+- **Section**: maths (distance on a line, working backwards; a good Q2 or Q3, or a Thinking number problem)
+- **Added**: 2026-10-07
+- **Question**: Carter's school is 10 miles away from his home. The library is on his way from home to school. This morning, Carter biked to school from his home. After biking 7 miles, he realized that he forgot to stop at the library. He biked back to the library right away, and then he biked straight to school. He biked a total of 16 miles during this trip. How far is the library from Carter's home?
+- **Answer** (checked): **4**. The extra distance is 16 − 10 = 6, which is the distance back to the library and then over the same stretch again, so that stretch is 3. The library is 7 − 3 = 4 from home. Check: 7 + 3 + 6 = 16.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Use kilometres and the Australian spelling "realised".
+  - A number-line diagram (home, library, the turn-around point, school) helps the explanation, but don't mark the library's position in the question.
+  - Possible wrong options from real mistakes:
+    - 3: the distance he biked back, not the library's distance from home.
+    - 6: 16 − 10, forgetting the extra stretch is ridden twice.
+    - 1: 7 − 6.
+    - 9: 16 − 7.
+
 ## Used
 
 (none yet)
