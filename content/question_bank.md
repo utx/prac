@@ -24,7 +24,6 @@ Never paste in questions from the official sample papers or other copyrighted bo
   - 6: one more than the smallest group (5 + 1).
   - 9: one more than the second-largest group (8 + 1).
   - 11: forgets the extra marble.
-  - 31: confuses this with "one of every colour"; that answer would be 11 + 8 + 6 + 1 = 26. 31 is the total plus one.
   - Choose 4 or 5 of these that fit the section's option count.
 
 ## Used
