@@ -126,6 +126,39 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 45: 48 − 3.
   - Choose 4 or 5 of these.
 
+### Carter's trip back to the library
+- **Section**: maths (distance on a line, working backwards; a good Q2 or Q3, or a Thinking number problem)
+- **Added**: 2026-10-07
+- **Question**: Carter's school is 10 miles away from his home. The library is on his way from home to school. This morning, Carter biked to school from his home. After biking 7 miles, he realized that he forgot to stop at the library. He biked back to the library right away, and then he biked straight to school. He biked a total of 16 miles during this trip. How far is the library from Carter's home?
+- **Answer** (checked): **4**. The extra distance is 16 − 10 = 6, which is the distance back to the library and then over the same stretch again, so that stretch is 3. The library is 7 − 3 = 4 from home. Check: 7 + 3 + 6 = 16.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Use kilometres and the Australian spelling "realised".
+  - A number-line diagram (home, library, the turn-around point, school) helps the explanation, but don't mark the library's position in the question.
+  - Difficulty: medium-hard, around Q20–28 of the sample papers.
+  - **David's plan (step 1 of 3): use it WITH a diagram, as Maths Q2.** Show a number line with home, school and the 7 km turn-around point, but not the library. The next two entries follow on from it.
+  - Possible wrong options from real mistakes:
+    - 3: the distance he biked back, not the library's distance from home.
+    - 6: 16 − 10, forgetting the extra stretch is ridden twice.
+    - 1: 7 − 6.
+    - 9: 16 − 7.
+
+### Follow-up 1: another "turned back" trip, with a diagram (step 2 of 3)
+- **Section**: maths Q2
+- **Added**: 2026-10-07
+- **Question**: write a fresh question of the same kind as Carter's library trip: someone travels part of the way, turns back to a stop on the way, then carries on, and the total distance is given.
+  - Change the context, the numbers and what is asked. For example, ask how far the turn-around point is from the stop, or what the total distance was.
+  - Give a number-line diagram, as in step 1.
+- **Notes**: David's plan. Use it no sooner than **2 tests after** the test that used step 1, and only once step 1 is in **Used**.
+
+### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3)
+- **Section**: maths Q3 (stretch)
+- **Added**: 2026-10-07
+- **Question**: write another fresh question of the same kind, with **no diagram**, so the child has to picture or sketch the route.
+  - Make it one notch harder than step 2. For example, use two return trips, or a total that has to be worked out first.
+  - The explanation should show the number line.
+- **Notes**: David's plan. Use it no sooner than **2 tests after** the test that used follow-up 1, and only once follow-up 1 is in **Used**.
+
 ## Used
 
 (none yet)
