@@ -155,35 +155,34 @@ const SECTIONS = [
     questions: [
       {
         stem: "Which of these is the <b>greatest</b> number?",
-        options: ["5 thousands and 87 tens", "4 thousands and 19 hundreds", "589 tens", "5 thousands, 8 hundreds and 95 ones", "5 thousands and 905 ones"],
+        options: ["4 thousands, 18 hundreds and 9 tens", "58 hundreds and 95 ones", "5 thousands and 893 ones", "5 thousands, 7 hundreds and 196 ones", "579 tens and 107 ones"],
         answer: 4,
         skill: "place value: renaming numbers in different units",
         explain: `<p>Write each one as an ordinary number:</p>
-                  <p>A: 5000 + 870 = 5870<br>
-                     B: 4000 + 1900 = 5900<br>
-                     C: 589 × 10 = 5890<br>
-                     D: 5000 + 800 + 95 = 5895<br>
-                     E: 5000 + 905 = <b>5905</b></p>
-                  <p>The greatest is <b>E</b>, only 5 more than B.</p>
-                  <p class="why-not">B is the trap: “4 thousands” makes it look smallest, but 19 hundreds is 1900, which carries it up to 5900. D has the most parts, so it looks biggest, but it is 5895. C is a trap if you multiply by 100 instead of 10 (58 900). A is 5870.</p>`
+                  <p>A: 4000 + 1800 + 90 = 5890<br>
+                     B: 5800 + 95 = 5895<br>
+                     C: 5000 + 893 = 5893<br>
+                     D: 5000 + 700 + 196 = 5896<br>
+                     E: 5790 + 107 = <b>5897</b></p>
+                  <p>The greatest is <b>E</b>, only 1 more than D.</p>
+                  <p class="why-not">D is the trap: at 5896 it is only 1 less than E, so if you skip working out E properly (or misread “579 tens” as just 579), D looks greatest. E looks small because it starts with “579”, but 579 tens is 5790, and the 107 ones carry it past all the others. A looks smallest because of the “4 thousands”, but 18 hundreds is 1800, so it is 5890. B and C are 5895 and 5893.</p>`
       },
       {
-        stem: `A café’s lunch deal is one main, one drink and one dessert.
+        stem: `A café’s lunch deal is one main and one drink.
                <ul class="facts">
                  <li>mains: pie, wrap, sushi</li>
-                 <li>drinks: water, juice, milk, smoothie</li>
-                 <li>desserts: apple, yoghurt</li>
+                 <li>drinks: water, juice, milk, smoothie, lemonade</li>
                </ul>
                <p style="margin:10px 0 0">The sushi can only be ordered with water. How many different lunch deals are possible?</p>`,
-        options: ["9", "18", "21", "22", "24"],
+        options: ["8", "11", "14", "15", "16"],
         answer: 1,
         skill: "counting combinations with a restriction",
         explain: `<p>Count the deals for each main:</p>
-                  <p>• pie: 4 drinks × 2 desserts = 8<br>
-                     • wrap: 4 × 2 = 8<br>
-                     • sushi: only water, so 1 × 2 desserts = 2</p>
-                  <p>Total: 8 + 8 + 2 = <b>18</b>.</p>
-                  <p class="why-not">21 (C) is the trap: it takes away only 3 deals (sushi with juice, milk or smoothie), forgetting that each of those comes with 2 desserts, so 6 deals are lost. 22 (D) reads the rule backwards, as if sushi could <em>not</em> have water. 24 (E) ignores the rule. 9 (A) adds 3 + 4 + 2 instead of multiplying.</p>`
+                  <p>• pie: any of the 5 drinks, so 5 deals<br>
+                     • wrap: 5 deals<br>
+                     • sushi: only water, so 1 deal</p>
+                  <p>Total: 5 + 5 + 1 = <b>11</b>.</p>
+                  <p class="why-not">15 (D) is the trap: 3 mains × 5 drinks ignores the rule about sushi. 14 (C) reads the rule backwards, as if sushi could have any drink <em>except</em> water (5 + 5 + 4). 16 (E) adds the sushi-and-water deal on top of the 15, but it was already counted. 8 (A) adds 3 + 5 instead of matching every main with every drink.</p>`
       },
       {
         stem: `Pip glues a triangular prism on top of a cube to make this solid. The front of the solid is <b>one</b> flat face shaped like a pentagon, and so is the back.
