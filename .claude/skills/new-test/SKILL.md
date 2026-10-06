@@ -21,7 +21,8 @@ Default batch size is **1–2 tests per run** (3 at most). Each test gets its ow
    - Thinking Q3: spatial type not used recently (look at the `thinking` labels).
    - Maths Q1: next item in the quick-fire rotation; Q2–Q3: a new topic plus a loop-back.
 5. **Topic check.** The Reading topic must not appear in any `content/vNN.json` (`reading`, `reading_topic`) **or** in `content/used_topics_before_v33.md`. Until David confirms that list is complete, **tell David the planned Reading topic(s) in one line and wait for an OK before writing.**
-6. **Supplied questions.** If David supplies questions, use them as given (they are his). Check every answer, write explanations, redraw diagrams (not to scale where measuring would give the answer away), and note "supplied by David" in the `vNN.json` labels. Ask the source only if it isn't clear they're his own.
+6. **Question bank.** Read **Waiting** in `content/question_bank.md`. Place every waiting question that fits a slot in this test (oldest first, usually 1–2 per test; rules in `CLAUDE.md` under "Question bank"), and plan the rest of the test around them. In the report, say which bank questions were used and which are still waiting, and why.
+7. **Supplied questions.** If David supplies questions, use them as given (they are his). Check every answer, write explanations, redraw diagrams (not to scale where measuring would give the answer away), and note "supplied by David" in the `vNN.json` labels. Ask the source only if it isn't clear they're his own.
 
 ## 1. Write the content
 

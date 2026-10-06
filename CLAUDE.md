@@ -11,6 +11,12 @@ Use the `new-test` skill (`.claude/skills/new-test/SKILL.md`): it is the full st
 5. Verify every answer by computation, then run an independent cold solve (a separate agent that never sees the answers). Fix what it finds, re-check, then commit and push.
 6. Finish by giving David a list of every question mapped to the sample-paper question(s) it most relates to, and the skill being tested.
 
+## Question bank (David's own questions)
+- When David drops questions in chat ("add this", "remember this one"), save each one to **Waiting** in `content/question_bank.md`, word for word, with any picture in `content/bank/`. Then commit them through a small pull request and merge it when green, so the overnight run can see them. Check every answer straight away and tell David at once if one looks wrong or ambiguous.
+- Every new test, including the overnight builds, takes waiting questions **as soon as they fit**, oldest first. A question fits when its type suits a slot in that test without breaking the rotation and variety rules (for example the arrangement limit, at most one competition-style question, and no folding for now). Usually use 1–2 per test so each test stays varied. If a question can't fit yet, leave it waiting and say why.
+- Use the questions as given (they are David's). Only adapt what the format needs: the option count (A–D or A–E), the answer letter for spread, a redrawn diagram, or an extra distractor from a real mistake. Note any change. If one is clearly below the level of the sample papers, tell David rather than quietly changing its level.
+- When a question is used, move it to **Used** with the test and question it became, and label it "supplied by David" in `vNN.json`.
+
 ## Format
 - Reading 3 questions (A–D), Thinking Skills 3 (A–D), Maths 3 (A–E). No timer.
 - Never mention "OC" in the page itself.
