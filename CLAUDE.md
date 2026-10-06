@@ -78,6 +78,10 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 ## Overnight builds
 - A routine runs the `overnight` skill (`.claude/skills/overnight/SKILL.md`) at about 1 am Sydney time: when fewer than 10 published tests are uncompleted it builds 4 new ones, opens one pull request and merges it once the checks are green (agreed by David).
 
+## How the routines run (cost)
+- Both routines (hourly redo check, nightly build check) wake a small dedicated session, "prac routines (checks only)", on the lighter model. It only runs the cheap checks (`tools/reviews.py`, `tools/progress.py`) and, when real work is needed, starts a fresh full-strength session (`create_session` with this repo as source) to do the redo or build. Never do heavy work inside the routines session or a very long conversation: every message re-reads the whole conversation, so long sessions get expensive.
+- Routine sessions created with "a fresh session on each firing" can't push or use the GitHub tools here, so don't use that mode.
+
 ## Automatic checks
 - `.github/workflows/check.yml` runs on every pull request and push to `main`: build (validates question types and stretch tags), generated files up to date, `tools/check.sh` on every test, and `tools/check_tracking.js`. A red cross on a pull request must be fixed before merging.
 
