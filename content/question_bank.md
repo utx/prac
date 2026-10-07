@@ -1,6 +1,6 @@
 # Question bank (David's questions waiting to go into tests)
 
-David drops questions here (pasted in chat; Claude saves them). The next test builds, including the overnight run, take them from **Waiting**, oldest first, as soon as each fits. See "Question bank" in `CLAUDE.md` for the rules.
+David drops questions here (pasted in chat; Claude saves them). New tests, including the overnight run, mix them in evenly with our own questions: at most one per test, oldest that fits first, until all have been used. See "Question bank" in `CLAUDE.md` for the rules.
 
 Each entry has these fields:
 - **Section**: reading, thinking or maths, plus the type if known (for example "maths: combinations").
