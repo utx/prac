@@ -159,6 +159,23 @@ Never paste in questions from the official sample papers or other copyrighted bo
   - The explanation should show the number line.
 - **Notes**: David's plan. Use it no sooner than **2 tests after** the test that used follow-up 1, and only once follow-up 1 is in **Used**.
 
+### Number wheel: opposite numbers (missing number)
+- **Section**: thinking (rules: find the rule linking numbers in a diagram) or a maths pattern question
+- **Added**: 2026-10-07
+- **Question** (described in our own words; redraw the diagram): ten arrows go out from a centre like the spokes of a wheel. Going clockwise from the top, the numbers at the ends are 3, 4, 5, 6, 7, 12, 20, 30, 42 and ??. Which number should replace ??
+- **Answer** (checked): **56**.
+  - Each number is linked to the one at the opposite end of its straight line: 3 ↔ 12, 4 ↔ 20, 5 ↔ 30, 6 ↔ 42, 7 ↔ ??.
+  - The rule is n × (n + 1): 3 × 4 = 12, 4 × 5 = 20, 5 × 6 = 30 and 6 × 7 = 42, so 7 × 8 = 56.
+  - The second half also goes up by 8, 10, 12, 14, so the next step of 14 gives the same answer.
+- **Notes**:
+  - From David. It is saved as a description, not his image, and should be redrawn with our own diagram.
+  - Make the opposite pairs clearly opposite: draw each pair as one straight line through the centre.
+  - Possible wrong options from real mistakes:
+    - 8: carries on 3, 4, 5, 6, 7.
+    - 49: 7 × 7.
+    - 54: 42 + 12, repeating the last jump.
+    - 63: 7 × 9.
+
 ## Used
 
 (none yet)
