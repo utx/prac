@@ -24,7 +24,7 @@ Unattended: **never wait for or ask David anything.** If something blocks, stop 
 ## 2. Plan all 4 first (in this session, before any writing)
 
 Read `CLAUDE.md`, `.claude/skills/new-test/SKILL.md`, `calibration/sample_notes.md`, every `content/vNN.json` `content/used_topics_before_v33.md` and `content/question_bank.md`. Then write one plan table covering all 4 tests:
-- **Question bank first:** put every waiting bank question that fits into a slot (oldest first, spread across the 4 tests, usually 1–2 per test), then plan the other slots around them. Pass each subagent the bank entries for its tests word for word. In the pull request, move those entries to **Used** with the test and question numbers.
+- **Question bank, mixed in evenly:** at most **one** bank question per test, oldest that fits first. Put them in about 2 of the 4 tests, or in all 4 when more than about 8 are waiting. All other slots are our own questions. Pass each subagent the bank entries for its tests word for word. In the pull request, move those entries to **Used** with the test and question numbers.
 - Reading format for each, continuing the rotation (over any 9: cloze ×2, four extracts ×2, story ×2, missing sentences ×2, poem ×1), with **one** public-domain classic among the 4 if none of the last 4 versions used one.
 - A different, new Reading topic for each (none used before, none repeated within the batch).
 - Thinking Q1 type and sub-pattern, Q2 type, Q3 spatial type; Maths Q1 quick-fire type and Q2/Q3 topics — continuing the rotations, with no two tests in the batch identical.
