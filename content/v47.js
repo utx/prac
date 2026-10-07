@@ -137,15 +137,15 @@ const SECTIONS = [
                   <p class="why-not">C is the trap: Nell does look for Gran, but the question comes straight after she feels the soaking soil and remembers Gran’s saying, so it is about the plant, not about passing time. A is the opposite of what she suspects: the wet soil points to the man’s watering, not to a sick plant. D mixes up the order: Nell already knows how often succulents need water (she writes ONCE A FORTNIGHT on the stick), and she asks before she has decided to give him a new plant.</p>`
       },
       {
-        stem: "Which of these best sums up what the story is mainly about?",
-        options: ["A girl discovers that some customers are unfair and that she must stand up to them.",
-                  "A girl gives away a plant because she is too frightened to argue with a customer.",
-                  "A nervous girl finds she can solve a problem herself, using what Gran taught her.",
-                  "A girl proves to her grandmother that she is now ready to run the stall all on her own."],
+        stem: "The words “Thank you, come again” appear near the start of the story and again in the very last line. What does the way they are used at the end suggest the whole story is mainly about?",
+        options: ["Nell learning that customers are not always right, so she must speak up to them.",
+                  "Nell being relieved that Gran never found out about the man and his dead plant.",
+                  "Nell growing more confident after she sorts out a problem all by herself.",
+                  "Nell learning to copy the polite way that Gran always speaks to customers."],
         answer: 2,
-        skill: "main idea: the overall impression of a character across the whole story",
-        explain: `<p>At the start Nell is anxious (she straightens the sticks twice, she looks for Gran, her voice comes out small). Then she works out what killed the plant using Gran’s saying, finds a fair answer of her own, and even gives the man the care tip. By the end she says “Thank you, come again” loudly enough for the next stall to hear, which shows her new confidence. The story is about a nervous girl discovering she can cope on her own.</p>
-                  <p class="why-not">D is the trap: Nell does run the stall alone, but Gran never finds out what happened. When Gran asks, Nell just says “Not really”, so nothing is proved to Gran. The change is inside Nell. A is too strong: the man turns out to be friendly (he laughs and goes off happily), and Nell doesn’t stand up to him so much as help him. B uses a real detail (she gives him a new plant), but she does it after working out the problem calmly, not out of fear, and she is not giving it away: it is a swap for the plant he brought back.</p>`
+        skill: "main idea: what a change between the opening and the ending shows about the whole story",
+        explain: `<p>The same words frame the story. At the start, saying “Thank you, come again” is just Nell’s job, and once Gran leaves she is anxious: she straightens the sticks twice, looks for Gran, and her voice comes out “smaller than she had planned”. In the middle she works out what killed the plant using Gran’s saying and finds a fair answer of her own. At the end she says the same words loudly, for everyone to hear. The change in <em>how</em> she says them shows the story is about Nell growing in confidence by solving a problem on her own.</p>
+                  <p class="why-not">B is the trap: Nell does answer “Not really” when Gran asks, but nothing suggests she is hiding anything or relieved; she says it calmly, then speaks up loudly, which is confidence, not relief. A is too strong: Nell doesn’t argue with the man or tell him he is wrong; she helps him, and he goes off laughing. D uses a real detail (saying the words is the job Gran gave her), but the story never shows her copying Gran; what changes is how sure of herself she sounds, not her manners.</p>`
       }
     ]
   },

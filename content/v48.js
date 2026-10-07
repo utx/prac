@@ -66,11 +66,11 @@ const SECTIONS = [
     questions: [
       {
         stem: "Which word best fits <b>gap 1</b>?",
-        options: ["painstaking", "strenuous", "haphazard", "effortless"],
+        options: ["painstaking", "ponderous", "haphazard", "straightforward"],
         answer: 0,
         skill: "choosing between words close in meaning, using the reason the writer gives",
         explain: `<p><b>Painstaking</b> work needs great care and attention to detail. The sentence explains <em>why</em> the work is hard: “because each one has to stand at just the right distance from the one before”. That is about care and precision, which is exactly what “painstaking” means.</p>
-                  <p class="why-not">“Strenuous” is the trap: it also describes hard work, and the writer’s knees and fingers are sore. But strenuous work needs a lot of physical strength or effort, like digging, and the writer has just told us that “a domino weighs almost nothing”. The word “but” shows the work is hard for a different reason. “Haphazard” means careless and without a plan, the opposite of placing each domino at just the right distance. “Effortless” can’t be right when it takes four days and leaves sore fingers.</p>`
+                  <p class="why-not">“Ponderous” is the trap: it sounds like a word for heavy, tiring work, but it means slow and heavy, and the writer has just told us that “a domino weighs almost nothing”. The word “but” shows the work is hard for a different reason: care, not weight. “Straightforward” means simple and easy, which can’t be right when it takes four days and leaves sore knees and fingers. “Haphazard” means careless and without a plan, the opposite of placing each domino at just the right distance.</p>`
       },
       {
         stem: "Which word best fits <b>gap 2</b>?",

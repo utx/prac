@@ -61,22 +61,24 @@ const tileGrid = (dark, light, size, ox, oy) => {
   return g + `<rect x="${ox}" y="${oy}" width="${4 * size}" height="${4 * size}" fill="none" stroke="${INK}" stroke-width="1.6"/>`;
 };
 const MIRROR_SVG = (() => {
-  const s = 30, ox = 8, oy = 8, mx = ox + 4 * s + 18;
+  const s = 30, ox = 8, oy = 8, mx = ox + 4 * s + 18, my = oy + 4 * s + 18;
   let g = tileGrid(MIR_DARK, MIR_LIGHT, s, ox, oy);
   g += `<line x1="${mx}" y1="2" x2="${mx}" y2="${oy + 4 * s + 6}" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="7 5"/>
         <text x="${mx + 8}" y="${oy + 2 * s - 4}" font-size="13" fill="#c0392b">mirror</text>
-        <text x="${mx + 8}" y="${oy + 2 * s + 12}" font-size="13" fill="#c0392b">line</text>`;
-  return `<svg viewBox="0 0 ${mx + 56} ${oy + 4 * s + 10}" width="${mx + 56}" height="${oy + 4 * s + 10}" role="img" aria-label="A 4 by 4 pattern of blue (#) and yellow (o) squares, with a dashed mirror line a little way to its right. Rows from the top: ${gridRows(MIR_DARK, MIR_LIGHT)}.">${g}</svg>`;
+        <text x="${mx + 8}" y="${oy + 2 * s + 12}" font-size="13" fill="#c0392b">line 1</text>
+        <line x1="2" y1="${my}" x2="${ox + 4 * s + 6}" y2="${my}" stroke="#1f7a4d" stroke-width="2.5" stroke-dasharray="7 5"/>
+        <text x="${ox}" y="${my + 18}" font-size="13" fill="#1f7a4d">mirror line 2</text>`;
+  return `<svg viewBox="0 0 ${mx + 60} ${my + 26}" width="${mx + 60}" height="${my + 26}" role="img" aria-label="A 4 by 4 pattern of blue (#) and yellow (o) squares. Dashed mirror line 1 goes up and down a little way to its right. Dashed mirror line 2 goes across a little way below it. Rows from the top: ${gridRows(MIR_DARK, MIR_LIGHT)}">${g}</svg>`;
 })();
 const mirrorLR = cells => cells.map(([r, c]) => [r, 3 - c]);
 const flipTB = cells => cells.map(([r, c]) => [3 - r, c]);
 const halfTurn = cells => cells.map(([r, c]) => [3 - r, 3 - c]);
 const MIRROR_OPTS = [
-  [mirrorLR(MIR_DARK), mirrorLR(MIR_LIGHT)],   // correct: reflected in the line
-  [MIR_DARK, MIR_LIGHT],                       // slid across, not reflected
-  [flipTB(MIR_DARK), flipTB(MIR_LIGHT)],       // flipped top to bottom
-  [halfTurn(MIR_DARK), halfTurn(MIR_LIGHT)]    // given a half turn
-].map(([d, l], i) => `<svg viewBox="0 0 108 108" width="108" height="108" role="img" aria-label="Picture ${"ABCD"[i]}: rows from the top (# blue, o yellow, . white): ${gridRows(d, l)}.">${tileGrid(d, l, 24, 6, 6)}</svg>`);
+  [halfTurn(MIR_DARK), halfTurn(MIR_LIGHT)],   // correct: two reflections = a half turn
+  [MIR_DARK, MIR_LIGHT],                       // thinks two flips cancel out
+  [mirrorLR(MIR_DARK), mirrorLR(MIR_LIGHT)],   // only mirror line 1
+  [flipTB(MIR_DARK), flipTB(MIR_LIGHT)]        // only mirror line 2
+].map(([d, l], i) => `<svg viewBox="0 0 108 108" width="108" height="108" role="img" aria-label="Picture ${"ABCD"[i]}: rows from the top (# blue, o yellow, . white): ${gridRows(d, l)}">${tileGrid(d, l, 24, 6, 6)}</svg>`);
 
 /* ---- Maths Q1: milk crate (supplied by David; redrawn) ---- */
 const CRATE_SVG = (() => {
@@ -139,13 +141,13 @@ const SECTIONS = [
       {
         stem: "Which best describes the speaker’s attitude to the bird across the <b>whole</b> poem?",
         options: ["Disgusted by how it treats the worm, but sorry when it flies away.",
-                  "Nervous of it at first, then relieved when it leaves the garden path.",
-                  "Keen to tame it as a pet, and then let down when it won’t take the crumb.",
+                  "Wary of it at first, then amused by how quickly it rushes away from the crumb.",
+                  "Delighted by it, but disappointed that it flew off without eating the crumb.",
                   "Fascinated: watching closely and seeing beauty even in how it leaves."],
         answer: 3,
         skill: "working out a speaker’s attitude from the whole poem",
         explain: `<p>The speaker watches without being seen and notices tiny details: the worm bitten “in halves”, the drop of dew, eyes like “frightened beads”, a “velvet head”. Even when the bird flies off, the speaker isn’t upset. Instead, the last six lines, the most beautiful part of the poem, are spent marvelling at how gently it flew. That is fascination.</p>
-                  <p class="why-not">A is the trap: the bird eats the worm “raw”, but the speaker reports it plainly, even with a joke (“the fellow”), not with disgust, and the ending is full of wonder, not sorrow. B mixes up who is nervous: it is the bird that seems “Like one in danger”; “cautious” describes how gently the speaker offers the crumb, so as not to scare it. C goes too far: offering a crumb is friendly, but nothing suggests wanting a pet or feeling let down.</p>`
+                  <p class="why-not">B is the trap: “cautious” describes how gently the speaker offers the crumb (so as not to scare the bird), not wariness of the bird; it is the bird that seems “Like one in danger”. And the speaker isn’t amused by the bird rushing off: the flight is described as soft and graceful, “too silver for a seam”, not as funny. C starts well (the speaker is delighted), but nothing shows disappointment: the poem ends by marvelling at the flight, not regretting the uneaten crumb. A is wrong too: the bird eats the worm “raw”, but the speaker reports it plainly, even with a joke (“the fellow”), not with disgust, and the ending is full of wonder, not sorrow.</p>`
       }
     ]
   },
@@ -186,20 +188,18 @@ const SECTIONS = [
                   <p class="why-not">A is the trap: we know Ruby didn’t <em>pass</em> the test, but she may have tried it and failed. B goes even further: she might be a good swimmer who never took the test. C turns the second rule around: the rules say canoeists have caps, not that everyone with a cap went canoeing.</p>`
       },
       {
-        stem: `This pattern is reflected in the dashed mirror line.
+        stem: `This pattern is reflected in mirror line 1. Then that reflection is reflected in mirror line 2.
                <div class="figure">${MIRROR_SVG}</div>
-               <p style="margin:10px 0 0">Which picture shows its reflection?</p>`,
+               <p style="margin:10px 0 0">Which picture shows the pattern after <b>both</b> reflections?</p>`,
         visualOptions: true,
         options: MIRROR_OPTS,
         answer: 0,
-        skill: "picturing a reflection in a mirror line",
-        explain: `<p>In a reflection in an up-and-down mirror line, every square stays in the <b>same row</b>, but left and right swap: the column nearest the line stays nearest the line. So read each row backwards.</p>
-                  <p>• top row: # . o . becomes <b>. o . #</b><br>
-                     • second row: # # . . becomes <b>. . # #</b><br>
-                     • third row: . # . o becomes <b>o . # .</b><br>
-                     • bottom row: . # # . stays <b>. # # .</b> (it is the same backwards)</p>
-                  <p>That is <b>A</b>.</p>
-                  <p class="why-not">D is the trap: it is the pattern given a half turn. It has exactly the same rows as the reflection, but in the reverse order: the reflection’s top row has ended up at the bottom. B slides the pattern across without reflecting it. C flips it top to bottom, as if the mirror line went across.</p>`
+        skill: "two reflections in a row: an up-and-down mirror, then an across mirror",
+        explain: `<p>Do one reflection at a time.</p>
+                  <p><b>Step 1, mirror line 1 (up and down):</b> each square stays in the same row, but left and right swap, so read each row backwards: # . o . → . o . #, # # . . → . . # #, . # . o → o . # ., and . # # . stays . # # .</p>
+                  <p><b>Step 2, mirror line 2 (across):</b> now each square stays in the same column, but top and bottom swap, so the rows from step 1 come in the reverse order: <b>. # # . / o . # . / . . # # / . o . #</b> (top to bottom).</p>
+                  <p>That is <b>A</b>. (Two reflections in mirrors that cross at a right angle always give the same result as a half turn.)</p>
+                  <p class="why-not">B is the trap: it assumes the second reflection undoes the first, so the pattern ends up as it started. That only happens when you reflect twice in the <em>same</em> direction; here the mirrors go different ways. C stops after mirror line 1. D does only mirror line 2 (top and bottom swapped, but left and right never swapped).</p>`
       }
     ]
   },

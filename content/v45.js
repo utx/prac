@@ -67,11 +67,11 @@ const planView = (rows, label) => {
   return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${label}">${g}</svg>`;
 };
 const PLAN_OPTS = [
-  ["#.#", "##.", ".#."],
-  ["##.", ".##", "#.."],
-  [".#.", ".##", "#.#"],
-  [".#.", "##.", "#.#"]
-].map((rows, i) => planView(rows, `Picture ${"ABCD"[i]}: view from above with the front at the bottom. Rows from back to front (# a cube, . empty): ${rows.join(" / ")}.`));
+  [".#.", "##.", "#.#"],   // not turned
+  ["..#", "##.", ".##"],   // turned anticlockwise
+  ["#.#", ".##", ".#."],   // half turn
+  ["##.", ".##", "#.."]    // correct: quarter turn clockwise
+].map((rows, i) => planView(rows, `Picture ${"ABCD"[i]}: view from above with the front at the bottom. Rows from back to front (# a cube, . empty): ${rows.join(" / ")}`));
 
 /* ---- Maths Q1: measuring jug ---- */
 const JUG_SVG = (() => {
@@ -183,18 +183,15 @@ const SECTIONS = [
       {
         stem: `This model is made of 7 identical cubes standing on a floor grid.
                <div class="figure">${MODEL_SVG}</div>
-               <p style="margin:10px 0 0">Which picture shows the model when you look at it from <b>directly above</b>? In each picture the front is at the bottom.</p>`,
+               <p style="margin:10px 0 0">The model is turned a <b>quarter turn clockwise</b> (as seen from above), staying on the floor. Which picture shows the turned model when you look at it from <b>directly above</b>? In each picture the front is at the bottom.</p>`,
         visualOptions: true,
         options: PLAN_OPTS,
         answer: 3,
-        skill: "working out the top (plan) view of a 3D cube model",
-        explain: `<p>From directly above you see one square for every place on the floor that has at least one cube on it. How tall the stack is doesn’t matter.</p>
-                  <p>Work row by row, keeping left as left:</p>
-                  <p>• back row: only the middle place has a cube: <b>. # .</b><br>
-                     • middle row: left and middle: <b># # .</b><br>
-                     • front row (at the bottom): left and right: <b># . #</b></p>
-                  <p>That is <b>D</b>.</p>
-                  <p class="why-not">A is the trap: it has the right rows but puts the front row at the top, as if you were standing at the back. C swaps left and right. B is the right shape given a quarter turn, so the front of the model is no longer at the bottom.</p>`
+        skill: "two steps: the top (plan) view of a cube model, then a quarter turn",
+        explain: `<p><b>Step 1: the view from above before turning.</b> You see one square for every place on the floor that has at least one cube on it; how tall the stack is doesn’t matter. From back to front: back row <b>. # .</b>, middle row <b># # .</b>, front row <b># . #</b>.</p>
+                  <p><b>Step 2: turn it a quarter turn clockwise.</b> Think of the top-left corner moving to the top-right, like a clock hand going from 9 to 12. The <em>left</em> column (top to bottom: . # #) becomes the new <em>top</em> row read from right to left, so the new top row is <b># # .</b>. In the same way the middle column (# # .) becomes the new middle row <b>. # #</b>, and the right column (. . #) becomes the new bottom row <b># . .</b>.</p>
+                  <p>That is <b>D</b>. Check one cube: the single cube at the back of the model moves to the right-hand side, and in D the middle row’s right-hand square is shaded.</p>
+                  <p class="why-not">A is the trap: it is the correct view from above, but of the model before it was turned. B turns it the wrong way (anticlockwise). C gives it a half turn instead of a quarter turn.</p>`
       }
     ]
   },
