@@ -1,0 +1,62 @@
+{
+  "version": 45,
+  "date": "2026-10-08",
+  "reading": "Four extracts: Which Way the Wind Blows",
+  "reading_format": "four extracts",
+  "reading_topic": "wind: a memoir of flying a box kite on a headland, the Beaufort scale (Francis Beaufort, 1805), a becalmed sailing boat waiting for the breeze, an opinion piece about a windy town that built wind turbines",
+  "thinking": [
+    "Whose reasoning is correct (\"most\" leading to \"probably\")",
+    "Worst case: marbles needed to be sure of two colours (number problem, supplied by David)",
+    "Top (plan) view of a cube model (stretch)"
+  ],
+  "maths": [
+    "Quick-fire scale reading: measuring jug with unlabelled marks",
+    "Fraction jumps on a number line (working out the marks first)",
+    "Splitting combined masses: three pets weighed in pairs (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1 Q26-33 and PT3 Q26-33 (four extracts: an idea expressed in completely different words; main idea)",
+      "PT2 Q26-33 (inference such as 'suggests newcomers are not always welcome'), PT1 Q26-33 (positive effect on outlook)",
+      "PT3 Q26-33 ('uses figurative language'), PT2 Q26-33 (inference) — stretch"
+    ],
+    "thinking": [
+      "PT2 Q27 (whose reasoning: \"most\" → \"probably\"), PT3 Q15 (\"only\" rule, both directions)",
+      "PT2 Q24 and PT3 Q30 (whose reasoning: worst case / certainty), PT1 Q25 (limiting number)",
+      "PT2 Q22 (plan view from a side view), PT1 Q28 (floor plan from a view) — stretch"
+    ],
+    "maths": [
+      "PT1 Q9 (reading a jug scale), PT2 Q11 (scale reading with different markings)",
+      "PT3 Q29 (number line with fraction jumps), PT2 Q26 (counting in fraction jumps)",
+      "PT2 Q25 (splitting combined masses), PT3 Q15 (equal-weight comparison) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Main idea",
+      "Feelings & inference",
+      "Comparisons & imagery"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Number problems",
+      "Spatial"
+    ],
+    "maths": [
+      "Measurement & scales",
+      "Fractions",
+      "Measurement & scales"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
