@@ -1,0 +1,62 @@
+{
+  "version": 47,
+  "date": "2026-10-08",
+  "reading": "Story extract: Back in Five Minutes",
+  "reading_format": "story",
+  "reading_topic": "a girl left alone at her grandmother's weekend market plant stall deals with a customer returning a dead succulent",
+  "thinking": [
+    "Supports the claim (a drinking fountain next to the oval)",
+    "Pool lane booking sheet: two neighbouring lanes for a whole hour",
+    "Compass directions: placing a point from two clues on a grid map (stretch)"
+  ],
+  "maths": [
+    "Quick-fire graph reading: picture graph with a key and half pictures",
+    "Perimeter of a rectangle made of twelve squares (supplied by David)",
+    "Chance statements: counters 1 to 12 after one is removed (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q1-6 (story extract), PT2 Q1-6 (feelings shown rather than stated)",
+      "PT1 Q1-6 (what a detail shows), PT2 Q1-6 (why a character acts)",
+      "PT3 Q6 (overall impression of a character), PT1 Q6 (whole-text question) — stretch"
+    ],
+    "thinking": [
+      "PT2 Q3 (supports the claim), PT3 Q21 (supports the claim)",
+      "PT2 Q13 (longest overlap on a timeline), PT3 Q19 (timetable with a cancelled day)",
+      "PT1 Q23 (compass positions of towns), PT1 maths Q22 (compass bearing on a grid map) — stretch"
+    ],
+    "maths": [
+      "PT2 Q32 (picture graph with a key), PT3 Q27 (picture graph vs column graph)",
+      "PT2 Q3 (distance round a rectangle), PT1 Q10 (perimeter → missing side)",
+      "PT1 Q33 (chance with counters 1–11), PT3 Q10 (chance statements) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Purpose of a detail",
+      "Feelings & inference",
+      "Main idea"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Graphs & data",
+      "Area, perimeter & 3D",
+      "Chance & counting"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

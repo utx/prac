@@ -1,0 +1,62 @@
+{
+  "version": 46,
+  "date": "2026-10-08",
+  "reading": "Poem: In the Garden (\"A bird came down the walk\", Emily Dickinson)",
+  "reading_format": "poem",
+  "reading_topic": "a bird on a garden path watched closely: it eats a worm, lets a beetle pass and flies off when offered a crumb (classic poem, first published 1891, public domain)",
+  "thinking": [
+    "Spot the mistake (reversing a rule)",
+    "Must be true: working back along a chain of two rules",
+    "Two reflections in a row: mirror lines at right angles (stretch)"
+  ],
+  "maths": [
+    "Quick-fire word problem: remainder means one more crate (supplied by David)",
+    "Line symmetry: completing a pattern with two lines of symmetry",
+    "Calendar: day and date 60 days before, across months (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1 Q15-19 and PT3 Q15-19 (poem: why a detail is included, what a detail shows)",
+      "PT3 Q15 (what is compared with what), PT2 Q15-19 (purpose of imagery)",
+      "PT1 Q19 and PT2 Q19 (whole-poem question: the speaker's attitude / what the poem as a whole shows) — stretch"
+    ],
+    "thinking": [
+      "PT3 Q29 (mistake: reversed rule), PT2 Q8 (reversed rule)",
+      "PT3 Q17 (must be true: no goals → no wins), PT1 Q11 (must be true from a rule), PT3 Q6",
+      "PT2 Q16 (which way a tile goes), PT3 Q22 (tiles that were rotated) — stretch"
+    ],
+    "maths": [
+      "PT3 Q9 (layers of bricks: remainder), PT2 Q1 (two-step word problem)",
+      "PT1 Q21 (completing symmetry on a grid), PT1 Q11 (counting features of shapes)",
+      "PT2 Q29 (20 days before a date), PT1 Q26 (day of the week 41 days later) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Purpose of a detail",
+      "Comparisons & imagery",
+      "Tone & attitude"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Must or cannot be true",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Area, perimeter & 3D",
+      "Time & timetables"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
