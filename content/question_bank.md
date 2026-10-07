@@ -168,7 +168,7 @@ Never paste in questions from the official sample papers or other copyrighted bo
   - The rule is n × (n + 1): 3 × 4 = 12, 4 × 5 = 20, 5 × 6 = 30 and 6 × 7 = 42, so 7 × 8 = 56.
   - The second half also goes up by 8, 10, 12, 14, so the next step of 14 gives the same answer.
 - **Notes**:
-  - From David. It is saved as a description, not his image, and should be redrawn with our own diagram.
+  - Written by David (his questions can be reworded). Redraw the diagram.
   - Make the opposite pairs clearly opposite: draw each pair as one straight line through the centre.
   - Possible wrong options from real mistakes:
     - 8: carries on 3, 4, 5, 6, 7.
