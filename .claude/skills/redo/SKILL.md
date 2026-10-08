@@ -28,7 +28,7 @@ For every changed test: verify the answer(s) by computation, `tools/check.sh NN`
 
 ## 4. Publish
 
-One pull request for all redos: title `Redo: Test NN Section Qn[, …]`; the body lists each comment and what changed. Wait for the `check` run, fix if red, merge when green (David agreed to self-merging). In the overnight run, put the redos in that night's pull request if one is being opened.
+One pull request for all redos: title `Redo: Test NN Section Qn[, …]`; the body lists each comment and what changed. Wait for the `check` run, fix if red, merge when green (David agreed to self-merging), then check that the "pages build and deployment" run for the merge succeeded (step 4 of Publish in the overnight skill). In the overnight run, put the redos in that night's pull request if one is being opened.
 
 ## 5. Reply
 
