@@ -95,6 +95,7 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 
 ## Automatic checks
 - `.github/workflows/check.yml` runs on every pull request and push to `main`: build (validates question types and stretch tags), generated files up to date, `tools/check.sh` on every test, and `tools/check_tracking.js`. A red cross on a pull request must be fixed before merging.
+- `.github/workflows/site-watch.yml` runs after every push to `main` and daily at about 7 am Sydney. It checks that the live site shows the newest test on `main`; if not, it asks GitHub Pages to rebuild, and if that fails the run goes red. The Tests 45–48 deployment once got stuck, and the nightly check then thought 10 tests were available when David only saw 6. After merging, also check that the "pages build and deployment" and "Site is up to date" runs passed.
 
 ## Copyright
 Never commit the official sample papers (copyright NSW Department of Education / Cambridge).

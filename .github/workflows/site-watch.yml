@@ -1,0 +1,62 @@
+name: Site is up to date
+
+# GitHub Pages sometimes leaves a deployment stuck, so the live site keeps
+# showing old tests (this happened with Tests 45-48). After every push to main,
+# and once a day, this compares the newest test on the live site with main.
+# If the site is behind, it asks GitHub to rebuild it. If that doesn't work
+# either, the run fails, so GitHub emails a red cross.
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 20 * * *"   # about 7 am Sydney, after the overnight build
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+
+concurrency:
+  group: site-watch
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare the live site with main, rebuild if behind
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -u
+          newest() { grep -o 'data-v="[0-9]*"' | grep -o '[0-9]*' | sort -n | tail -1; }
+          want=$(newest < index.html)
+          site=$(gh api "repos/$REPO/pages" --jq .html_url)
+          echo "Newest test on main: $want; site: $site"
+
+          live() { curl -fsS "${site%/}/index.html?nocache=$(date +%s)" 2>/dev/null | newest; }
+
+          wait_for() {   # $1 = minutes to wait
+            for i in $(seq 1 "$1"); do
+              got=$(live || true)
+              echo "minute $i: live site shows Test ${got:-?}"
+              [ "$got" = "$want" ] && return 0
+              sleep 60
+            done
+            return 1
+          }
+
+          # Give the normal deployment time to finish first.
+          if wait_for 12; then echo "Site is up to date."; exit 0; fi
+
+          echo "Site is behind main. Asking GitHub Pages to rebuild."
+          gh api -X POST "repos/$REPO/pages/builds" || echo "Rebuild request failed."
+          if wait_for 12; then echo "Site is up to date after the rebuild."; exit 0; fi
+
+          echo "::error::The live site still shows Test ${got:-?} but main has Test $want. Open Actions > 'pages build and deployment' and press 'Re-run all jobs'."
+          exit 1

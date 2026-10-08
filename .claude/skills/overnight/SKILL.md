@@ -49,7 +49,7 @@ Spawn 2 general-purpose subagents with `isolation: "worktree"`, each building **
 1. Commit, push, open **one** pull request titled `Overnight: Practice Tests NN–MM`, body = per-test summary (formats, topics, skills, what the cold solves fixed).
 2. Wait for the `check` run on the pull request to finish (re-read its status every few minutes; it takes about a minute). If red: read the log, fix, push, repeat.
 3. When green and mergeable: merge it (merge commit).
-4. **Check the site went live.** A few minutes after merging, list the workflow runs (GitHub `actions_list`, `list_workflow_runs`) and find the "pages build and deployment" run for the merge commit. If it failed, or is still queued after about 10 minutes, the site still shows the old tests. GitHub sometimes leaves that build stuck. Re-run it if you can; if you can't, merge the next real change (which starts a fresh deployment) or tell David in the final message so he can press **Re-run all jobs** on the Actions page.
+4. **Check the site went live.** A few minutes after merging, list the workflow runs (GitHub `actions_list`, `list_workflow_runs`) and find the "pages build and deployment" run for the merge commit. If it failed, or is still queued after about 10 minutes, the site still shows the old tests. GitHub sometimes leaves that build stuck. The "Site is up to date" workflow (`site-watch.yml`) asks for a rebuild by itself; check that it went green. If it is red, re-run the Pages build if you can. Otherwise tell David in the final message so he can press **Re-run all jobs** on the Actions page.
 
 ## 6. Final message (the routine's notification)
 
