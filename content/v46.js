@@ -120,7 +120,7 @@ const SECTIONS = [
         stem: "In verse 1, the bird eats a worm raw. In verse 2, it “hopped sidewise to the wall / To let a beetle pass.” Putting these two details side by side suggests that the bird",
         options: ["was afraid that the beetle might attack it.",
                   "was saving the beetle to eat after the worm.",
-                  "could seem polite, even though it had just eaten a worm raw.",
+                  "could be polite as well as fierce.",
                   "had finished its meal and was getting ready to fly back home."],
         answer: 2,
         skill: "understanding why a detail is included (contrast)",

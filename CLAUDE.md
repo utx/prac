@@ -32,7 +32,7 @@ Use the `new-test` skill (`.claude/skills/new-test/SKILL.md`): it is the full st
 Sample paper: story 6 Qs, cloze 8, poem 5, missing sentences 6, four extracts 8.
 - Rotate formats. Over any 9 versions aim for about: cloze ×2, four extracts ×2, story ×2, missing sentences ×2, poem ×1.
 - Passages stay approachable (about 250–350 words), but questions are genuinely OC-level: implication, why a detail is included, structure, comparisons, feelings shown rather than stated.
-- Cloze uses upper-primary to adult vocabulary like the samples (e.g. culmination, teeming, scouring, remiss): near-synonyms, look-alike words and preposition collocations where only one fits. Avoid easy everyday idioms.
+- Cloze uses upper-primary to adult vocabulary like the samples (e.g. culmination, teeming, scouring, remiss): near-synonyms, look-alike words and preposition collocations where only one fits. Avoid easy everyday idioms. No homophone-spelling gaps (bated/baited and the like): the real cloze doesn't test them (David, Oct 2026).
 - Every few versions, use a real public-domain classic instead of an original text (author died more than 70 years ago, e.g. Grahame, Nesbit, Stevenson, Lawson). Copy the text exactly from a reliable source (Project Gutenberg via its GitHub mirrors) and credit author and year in the passage note.
 - Wrong options must be partly true or built on a real detail from the text, never obviously wrong.
 - Every reading topic must be new: check `reading` and `reading_topic` in every `content/vNN.json` **and** `content/used_topics_before_v33.md` (topics from the earlier tests made outside this repo) and the kind of topic the real test uses. The story is never about football.
@@ -54,6 +54,7 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - **Q1:** a quick-fire question (under a minute), rotating: place value, time, money, measurement, reading a scale, reading a graph, simple word problem, missing number.
 - **Q2 and Q3:** multi-step reasoning on sample-paper topics: fractions, patterns, area and perimeter, 3D shapes, chance statements, combinations, rates, best value, timetables, "which statements are correct" graph questions.
 - At most one competition-style (Kangaroo-like) question per version.
+- Repeating patterns must show the repeat clearly (a visible repeating block); no rule-generated sequences whose cycle only shows up after brute-force working (David, Oct 2026).
 - Cover the whole question base here too: every few versions, use Q2 or Q3 for a sample topic not seen recently or a nearby one (for example symmetry, angles, position and direction, mass, volume, number puzzles), checking the `maths` labels in recent `content/vNN.json` files.
 
 ## Stretch questions
