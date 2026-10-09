@@ -95,7 +95,7 @@ const CRATE_SVG = (() => {
 })();
 
 /* ---- Maths Q2: two lines of symmetry ---- */
-const SYM_GIVEN = [[0, 2], [1, 1], [1, 2], [2, 0], [2, 2], [1, 3], [4, 1], [3, 2]];
+const SYM_GIVEN = [[0, 2], [1, 1], [1, 2], [2, 0], [1, 3]];
 const SYM_SVG = (() => {
   const c = 30, o = 10, n = 6;
   let g = "";
@@ -106,7 +106,7 @@ const SYM_SVG = (() => {
         <line x1="${o - 8}" y1="${mid}" x2="${o + n * c + 8}" y2="${mid}" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="7 5"/>`;
   const W = 2 * o + n * c;
   const rows = [0, 1, 2, 3, 4, 5].map(r => [0, 1, 2, 3, 4, 5].map(k => has(SYM_GIVEN, r, k) ? "#" : ".").join("")).join(" / ");
-  return `<svg viewBox="0 0 ${W} ${W}" width="${W}" height="${W}" role="img" aria-label="A 6 by 6 grid with 8 shaded squares and two dashed lines through the middle, one going across and one going down. Rows from the top (# shaded): ${rows}.">${g}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${W}" width="${W}" height="${W}" role="img" aria-label="A 6 by 6 grid with 5 shaded squares and two dashed lines through the middle, one going across and one going down. Rows from the top (# shaded): ${rows}.">${g}</svg>`;
 })();
 
 const SECTIONS = [
@@ -117,15 +117,15 @@ const SECTIONS = [
     intro: "Read the poem, then choose the best answer (A, B, C or D) for each question.",
     questions: [
       {
-        stem: "In verse 2, the bird “hopped sidewise to the wall / To let a beetle pass.” Coming straight after verse 1, this detail suggests that the bird",
+        stem: "In verse 1, the bird eats a worm raw. In verse 2, it “hopped sidewise to the wall / To let a beetle pass.” Putting these two details side by side suggests that the bird",
         options: ["was afraid that the beetle might attack it.",
                   "was saving the beetle to eat after the worm.",
-                  "could seem polite, even though it had just eaten a worm raw.",
-                  "wanted to hide by the wall where the speaker could not see it."],
+                  "could be polite as well as fierce.",
+                  "had finished its meal and was getting ready to fly back home."],
         answer: 2,
         skill: "understanding why a detail is included (contrast)",
         explain: `<p>In verse 1 the bird bites a worm in half and eats it raw. Then, in verse 2, it steps aside “To let a beetle pass”, like a polite person making way on a footpath. Putting the two side by side shows a surprising contrast: the same bird can be fierce one moment and seem well-mannered the next.</p>
-                  <p class="why-not">D is the trap: the bird does hop to the wall, but the poem says why (“To let a beetle pass”), and verse 1 has already told us “He did not know I saw”, so he isn’t hiding from the speaker. A borrows from verses 3 and 4, where the bird looks “frightened” and “Like one in danger”, but that comes later and is about everything around it (and the watching speaker), not the beetle; a tiny beetle is no threat to a bird that has just eaten a worm. B is a guess based on the worm; the poem gives the reason for the hop, and it isn’t food.</p>`
+                  <p class="why-not">A is the trap: it borrows from verses 3 and 4, where the bird looks “frightened” and “Like one in danger”, but that comes later and is about everything around it (and the watching speaker), not the beetle; a tiny beetle is no threat to a bird that has just eaten a worm. B is a guess based on the worm; the poem gives the reason for the hop (“To let a beetle pass”), and it isn’t food. D is built on the ending, but the bird doesn’t fly home until verse 4, and only after the speaker offers it a crumb; in verse 2 it is still busy drinking dew and hopping about.</p>`
       },
       {
         stem: "In verses 4 and 5, the bird’s flight home is compared with oars moving through the ocean and with butterflies that leap “plashless”. What do these comparisons suggest about the flight?",
@@ -222,13 +222,13 @@ const SECTIONS = [
         stem: `Some squares on this grid are shaded. More squares are to be shaded so that <b>both</b> dashed lines are lines of symmetry of the pattern.
                <div class="figure">${SYM_SVG}</div>
                <p style="margin:10px 0 0">What is the smallest number of extra squares that must be shaded?</p>`,
-        options: ["4", "6", "7", "12", "15"],
+        options: ["3", "4", "7", "11", "12"],
         answer: 3,
         skill: "line symmetry: completing a pattern with two lines of symmetry",
-        explain: `<p>The two lines split the grid into four corner quarters. With both lines of symmetry, every quarter must be a mirror copy of the top-left quarter, which has <b>5</b> shaded squares. So the finished pattern has 4 × 5 = <b>20</b> shaded squares.</p>
-                  <p>8 squares are shaded already: 5 in the top-left quarter, 1 in the top-right quarter and 2 in the bottom-left quarter, and each of those is in a correct place. So 20 − 8 = <b>12</b> extra squares are needed.</p>
-                  <p>(Check, quarter by quarter: top right needs 4 more, bottom left 3 more and bottom right all 5: 4 + 3 + 5 = 12.)</p>
-                  <p class="why-not">15 (E) is the trap: it shades 5 squares in each of the other three quarters, forgetting that 3 of them are shaded already. 7 (C) reflects the top-left quarter across each line but forgets the bottom-right quarter, which needs both reflections. 6 (B) uses only the up-and-down line and 4 (A) only the across line, so the pattern would have just one line of symmetry.</p>`
+        explain: `<p>The two lines split the grid into four corner quarters. With both lines of symmetry, every quarter must be a mirror copy of the top-left quarter, which has <b>4</b> shaded squares. So the finished pattern has 4 × 4 = <b>16</b> shaded squares.</p>
+                  <p>5 squares are shaded already: 4 in the top-left quarter and 1 in the top-right quarter, which is already in a correct place (it mirrors the square just left of the up-and-down line). So 16 − 5 = <b>11</b> extra squares are needed.</p>
+                  <p>(Check, quarter by quarter: top right needs 3 more, bottom left all 4 and bottom right all 4: 3 + 4 + 4 = 11.)</p>
+                  <p class="why-not">12 (E) is the trap: it shades 4 squares in each of the other three quarters, forgetting that one of them is shaded already. 7 (C) reflects the top-left quarter across each line but forgets the bottom-right quarter, which needs both reflections. 3 (A) uses only the up-and-down line and 4 (B) only the across line, so the pattern would have just one line of symmetry.</p>`
       },
       {
         stem: `Today is <b>Wednesday 10 June</b>. Grandma’s birthday was exactly <b>60 days ago</b>.

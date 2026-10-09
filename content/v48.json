@@ -11,13 +11,13 @@
   ],
   "maths": [
     "Quick-fire rate word problem: bikes built in an hour (supplied by David)",
-    "Rule-based number sequence that starts repeating: a later term",
+    "Repeating bead pattern: counting one colour in the first 43 beads",
     "Largest number of coins for an exact amount with only 20c and 50c coins (stretch)"
   ],
   "sample_map": {
     "reading": [
       "PT1 Q12 ('paged/leafed'), PT3 Q13 ('decrease/descent/decay/decline')",
-      "PT1 Q8 ('contain oneself': fixed expression), PT3 Q10 ('teeming with')",
+      "PT3 Q13 (look-alike words: 'decrease/descent/decay/decline'), PT1 Q12 ('paged/leafed')",
       "PT3 Q10 ('teeming with': word decided by the preposition), PT2 Q11 — stretch"
     ],
     "thinking": [
@@ -27,7 +27,7 @@
     ],
     "maths": [
       "PT1 Q23 (proportional feeding: rates), PT3 Q32 (working together: rates)",
-      "PT3 Q13 (halve-or-add-one sequence), PT2 Q5 (10th term of a sequence)",
+      "PT2 Q5 (10th term of a repeating pattern), PT3 Q13 (sequence rule)",
       "PT1 Q25 (change with coin constraints), PT3 Q31 (sum and difference) — stretch"
     ]
   },
