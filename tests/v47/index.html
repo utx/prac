@@ -461,13 +461,13 @@ const SECTIONS = [
         stem: `Twelve squares are arranged in three rows and four columns to form rectangle ABCD.
                <div class="figure">${SQUARES_SVG}</div>
                <p style="margin:10px 0 0">The perimeter of each square is 8 cm. What is the perimeter of rectangle ABCD?</p>`,
-        options: ["112 cm", "96 cm", "80 cm", "48 cm", "28 cm"],
-        answer: 4,
+        options: ["14 cm", "20 cm", "24 cm", "28 cm", "32 cm"],
+        answer: 3,
         skill: "perimeter: finding a side from a perimeter, then the perimeter of a larger shape",
         explain: `<p>A square has 4 equal sides, so each square has sides of 8 ÷ 4 = <b>2 cm</b>.</p>
                   <p>The rectangle is 4 squares long and 3 squares high: 4 × 2 = <b>8 cm</b> by 3 × 2 = <b>6 cm</b>.</p>
-                  <p>Perimeter = 8 + 6 + 8 + 6 = <b>28 cm</b>.</p>
-                  <p class="why-not">96 cm (B) is the trap: it adds up the perimeters of all 12 squares (12 × 8), but the inside edges are not part of the rectangle’s perimeter. 80 cm (C) adds the perimeters of the 10 squares around the edge, which still counts their inside edges. 112 cm (A) uses 8 cm as the <em>side</em> of each square instead of its perimeter. 48 cm (D) multiplies 8 × 6, which is the rectangle’s area in square centimetres, not its perimeter.</p>`
+                  <p>Perimeter = 8 + 6 + 8 + 6 = <b>28 cm</b>. (Check: walking round the outside you pass 4 + 3 + 4 + 3 = 14 square sides, and 14 × 2 cm = 28 cm.)</p>
+                  <p class="why-not">14 cm (A) is the trap: it adds the length and the height (8 + 6) but stops there, which only goes halfway round (it is also what you get by counting the 14 square sides round the edge and forgetting that each one is 2 cm). 20 cm (B) counts the 10 squares around the edge and gives each one 2 cm, but the 4 corner squares each have <em>two</em> sides on the outside. 24 cm (C) multiplies the number of squares by the side (12 × 2), which mixes up squares with edges. 32 cm (E) finds the long side (8 cm) and then multiplies by 4 as if the rectangle were a square.</p>`
       },
       {
         stem: `Twelve counters numbered 1 to 12 are in a bag. Jo takes out counter <b>12</b> and keeps it. Sam then takes one counter from the bag without looking.

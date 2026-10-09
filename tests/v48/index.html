@@ -254,7 +254,7 @@ const INK = "#1b2a41";
 const CLOZE_TEXT = `
 <p>Last spring I volunteered to help my uncle’s club with something slightly mad: setting up 12,000 dominoes in one enormous chain in our local community hall, and then knocking them all down. The club’s record was 10,000, and this year they wanted to beat it.</p>
 <p>Setting up took four whole days. A domino weighs almost nothing, but placing thousands of them by hand is {1} work, because each one has to stand at just the right distance from the one before. Too close, and it won’t fall properly; too far, and it won’t reach the next one at all. By the end of the first day, my knees were red and my fingers were sore.</p>
-<p>Every thousand dominoes or so, we left a small gap, so that an accident could only knock down one section. On the second afternoon, that idea saved us. Someone’s sleeve brushed a single domino, and we watched with {2} breath as row after row went clattering down … until the clattering stopped dead at the gap. We had lost nine hundred dominoes, not nine thousand.</p>
+<p>Every thousand dominoes or so, we left a small gap, so that an accident could only knock down one section. On the second afternoon, that idea saved us. Someone’s sleeve brushed a single domino, and we watched in {2} as row after row went clattering down … until the clattering stopped dead at the gap. We had lost nine hundred dominoes, not nine thousand.</p>
 <p>On the last morning, we filled in the gaps, one careful domino at a time. Then the youngest volunteer, a girl of six, gave the first domino a gentle push. For about four minutes the hall was filled with a sound like rain on a tin roof. Everyone was so {3} on the twisting, tumbling line that nobody spoke or moved until the very last domino tipped over. Then the whole hall erupted.</p>
 <p>Four days of work, gone in four minutes. People sometimes ask me whether that seems a waste. It doesn’t. I would do it all again tomorrow.</p>`;
 
@@ -302,6 +302,22 @@ const CAND = [
 const CAND_SVG = `<div style="display:flex;flex-wrap:wrap;gap:14px 26px;align-items:flex-start">${CAND.map(([cells, lab], i) =>
   `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><b>${i + 1}</b>${shapeSvg(cells, 24, "#f2c58a", `Shape ${i + 1}. ${lab}`)}</div>`).join("")}</div>`;
 
+/* ---- Maths Q2: repeating bead pattern ---- */
+const BEADS_SVG = (() => {
+  const cols = { R: ["#d0453a", "red"], B: ["#2f6fb5", "blue"], Y: ["#f2c230", "yellow"], G: ["#3f9a4a", "green"] };
+  const seq = "RBBYGRBBYG".split("");
+  const step = 34, x0 = 24, y = 30;
+  let g = `<line x1="4" y1="${y}" x2="${x0 + 9 * step + 30}" y2="${y}" stroke="${INK}" stroke-width="2"/>`;
+  seq.forEach((c, i) => {
+    const x = x0 + i * step;
+    g += `<circle cx="${x}" cy="${y}" r="13" fill="${cols[c][0]}" stroke="${INK}" stroke-width="1.5"/>`;
+    g += `<text x="${x}" y="${y + 32}" font-size="13" text-anchor="middle" fill="${INK}">${c}</text>`;
+  });
+  g += `<text x="${x0 + 9 * step + 36}" y="${y + 5}" font-size="18" fill="${INK}">…</text>`;
+  const W = x0 + 9 * step + 56;
+  return `<svg viewBox="0 0 ${W} 72" width="${W}" height="72" style="max-width:100%;height:auto" role="img" aria-label="The first 10 beads on the string: ${seq.map(c => cols[c][1]).join(", ")}, and the string carries on.">${g}</svg>`;
+})();
+
 const SECTIONS = [
   {
     id: "reading",
@@ -319,11 +335,11 @@ const SECTIONS = [
       },
       {
         stem: "Which word best fits <b>gap 2</b>?",
-        options: ["baited", "abated", "bated", "belated"],
+        options: ["disarray", "dispute", "dismay", "disgrace"],
         answer: 2,
-        skill: "a fixed expression, choosing between look-alike and sound-alike words",
-        explain: `<p>To watch <b>with bated breath</b> means to watch anxiously, almost holding your breath, to see what will happen. It fits perfectly: the volunteers are watching to see whether the falling dominoes will stop at the gap. (“Bated” is an old word meaning held back or lessened.)</p>
-                  <p class="why-not">“Baited” is the trap: it sounds exactly the same, but it means having bait on it, like a baited hook or trap for catching fish or animals. “Abated” is related to “bated” (it means died down, as in “the storm abated”), but the fixed expression is always “bated breath”. “Belated” looks similar but means late (a belated birthday card).</p>`
+        skill: "choosing between look-alike words, using who the word describes",
+        explain: `<p><b>Dismay</b> is the shocked, upset feeling you have when something bad happens and you can’t stop it. The volunteers are watching their careful work fall down, row after row, so “we watched <b>in dismay</b>” fits exactly. (Relief only comes later, when the clattering stops at the gap.)</p>
+                  <p class="why-not">“Disarray” is the trap: the dominoes really did end up in disarray (in a messy, jumbled state), but the gap describes the people who “watched”, not the dominoes, and people don’t watch in disarray. “Disgrace” means shame after doing something wrong; only the person whose sleeve brushed the domino might feel that, and even then it was an accident. “Dispute” means an argument, and nobody is arguing: they are watching in silence.</p>`
       },
       {
         stem: "Which word best fits <b>gap 3</b>?",
@@ -410,20 +426,17 @@ const SECTIONS = [
                   <p class="why-not">12 (A) is the trap: it is the number of 5-minute blocks, but each block makes 2 bikes, not 1. 30 (C) divides 60 by 2, which would mean one bike every 2 minutes. 120 (D) multiplies 60 by 2, which would mean 2 bikes every minute. 150 (E) works out that each bike takes 2½ minutes but then multiplies 60 × 2½ instead of dividing.</p>`
       },
       {
-        stem: `A number sequence starts at <b>11</b>. Each number after that is made from the number before it using this rule:
-               <ul class="facts">
-                 <li>If the number is <b>even</b>, halve it.</li>
-                 <li>If the number is <b>odd</b>, add 5.</li>
-               </ul>
-               <p style="margin:10px 0 0">What is the <b>26th</b> number in the sequence?</p>`,
-        options: ["3", "4", "6", "8", "16"],
-        answer: 0,
-        skill: "patterns: finding where a sequence starts to repeat, then using the repeat",
-        explain: `<p>Write out the first few numbers:</p>
-                  <p>11, 16, 8, 4, 2, 1, 6, 3, 8, 4, 2, 1, 6, 3, …</p>
-                  <p>After 3 comes 8 again, so from the <b>3rd</b> number the block <b>8, 4, 2, 1, 6, 3</b> repeats. The first two numbers (11 and 16) never come back.</p>
-                  <p>From the 3rd number to the 26th number there are 26 − 2 = <b>24</b> numbers, which is exactly 4 blocks of 6. So the 26th number is the <b>last</b> number in a block: <b>3</b>.</p>
-                  <p class="why-not">16 (E) is the trap: it assumes the whole sequence repeats from the very start (11, 16, 8, 4, 2, 1, 11, …), but 1 is odd, so the next number is 6, not 11. 4 (B) uses 26 ÷ 6 = 4 remainder 2 and takes the 2nd number of the block, forgetting that the block doesn’t start until the 3rd number. 8 (D) gets the 24 right but treats “no remainder” as the first number of a block instead of the last. 6 (C) is the 25th number.</p>`
+        stem: `Mia threads beads on a string in a repeating pattern. The picture shows the first 10 beads (R = red, B = blue, Y = yellow, G = green).
+               <div class="figure">${BEADS_SVG}</div>
+               <p style="margin:10px 0 0">Mia keeps going with the same pattern until there are <b>43</b> beads on the string. How many of the 43 beads are <b>blue</b>?</p>`,
+        options: ["16", "17", "18", "19", "21"],
+        answer: 2,
+        skill: "patterns: using a repeating block and the leftover part",
+        explain: `<p>The pattern repeats every <b>5</b> beads: red, blue, blue, yellow, green. Each block of 5 has <b>2</b> blue beads.</p>
+                  <p>43 ÷ 5 = 8 remainder 3. So there are 8 whole blocks (40 beads) and then 3 more beads.</p>
+                  <p>8 blocks × 2 = <b>16</b> blue beads. The 3 extra beads start a new block: red, blue, blue, which adds <b>2</b> more.</p>
+                  <p>16 + 2 = <b>18</b> blue beads.</p>
+                  <p class="why-not">16 (A) is the trap: it counts the 8 whole blocks but forgets the 3 beads left over, two of which are blue. 17 (B) works out 2/5 of 43 (17.2) and rounds it, but the leftover beads aren’t spread evenly: they are the <em>start</em> of the pattern. 19 (D) treats all 3 leftover beads as blue. 21 (E) guesses that about half the beads are blue (43 ÷ 2), but only 2 beads in every 5 are.</p>`
       },
       {
         stem: `A car-park machine takes only <b>20c</b> and <b>50c</b> coins, and it does not give change. Tom must pay exactly <b>$2.10</b>.

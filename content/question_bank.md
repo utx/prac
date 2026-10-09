@@ -180,4 +180,4 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 112: uses 8 as the side of a square.
     - 80: 10 edge squares × 8.
   - Choose 4 or 5 of these.
-- **Used**: → Test 47 Maths Q2 (answer E, 28 cm). Inches changed to centimetres; options 112, 96, 80, 48, 28 cm; grid redrawn with A–D at the corners.
+- **Used**: → Test 47 Maths Q2 (answer E, 28 cm). Inches changed to centimetres; options 112, 96, 80, 48, 28 cm; grid redrawn with A–D at the corners. Redo (David, Oct 2026: "28 sticks out"): options changed to closer ones, 14, 20, 24, 28, 32 cm, so the answer is now D.
