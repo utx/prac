@@ -50,11 +50,12 @@
   .plan strong { display: block; margin-bottom: 4px; }
   .plan span { color: var(--ink-soft); font-size: 15px; }
 
-  button.primary {
+  button.primary, a.primary {
+    display: inline-block; text-decoration: none;
     background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
     padding: 12px 26px; cursor: pointer; font-family: inherit;
   }
-  button.primary:hover { background: var(--pitch-deep); }
+  button.primary:hover, a.primary:hover { background: var(--pitch-deep); }
   button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 
   /* passage + questions */
@@ -464,7 +465,7 @@ const SECTIONS = [
   }
 ];
 
-const TEST_META = {"version": 35, "reading_format": "missing sentences", "categories": {"reading": ["Sentence links", "Sentence links", "Sentence links"], "thinking": ["Whose reasoning", "Order & arrangement", "Spatial"], "maths": ["Time & timetables", "Fractions", "Chance & counting"]}, "stretch": {"reading": [2]}};
+const TEST_META = {"version": 35, "reading_format": "missing sentences", "categories": {"reading": ["Sentence links", "Sentence links", "Sentence links"], "thinking": ["Whose reasoning", "Order & arrangement", "Spatial"], "maths": ["Time & timetables", "Fractions", "Chance & counting"]}, "stretch": {"reading": [2]}, "status": "published"};
 const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
 /* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
    SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
@@ -862,8 +863,17 @@ function showFinal() {
   window.scrollTo(0, 0);
 }
 
+// A test held for review is only on the admin page; someone opening its address directly sees this instead.
+function showNotReady() {
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>This test isn’t ready yet</h1>
+      <p class="lead">It will appear on the list of tests once it has been checked.</p>
+      <a class="primary" href="../../index.html">Back to all tests</a>
+    </div>`;
+}
 
-showStart();
+if (TEST_META.status === "review" && !ADMIN) showNotReady(); else showStart();
 </script>
 </body>
 </html>

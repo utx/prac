@@ -6,10 +6,17 @@ David builds numbered practice tests ("Practice Test NN": v33, v34, …) here to
 Use the `new-test` skill (`.claude/skills/new-test/SKILL.md`): it is the full step-by-step procedure. Summary:
 1. Before writing, compare every planned question against the official sample papers, using `calibration/sample_notes.md` (own-words notes on all three papers; the papers themselves are never in the repo, see Copyright). Attached papers, when available, are a bonus for closer calibration. Check the coverage record in every `content/vNN.json` so no skill, topic or format repeats too soon.
 2. Write `content/vNN.js` (defines `passMode`, `INK`, the passage/diagram constants and `SECTIONS`; see `content/v33.js` for the shape) and `content/vNN.json` (version, date, reading title, reading_format, thinking/maths skill labels, sample_map, and `categories`: one question-type label per question, chosen from `CATEGORIES` in `tools/build.py`, which the stats page groups by).
-3. `python3 tools/build.py`, which builds `tests/vNN/index.html` and regenerates `index.html`. Never hand-edit generated files.
-4. `tools/check.sh NN` (runs the build, `check_lengths` (must report 0 longest) and `check_render` (must PASS)). `node tools/question_sheet.js content/vNN.js` makes the answer-free copy for the cold solve.
-5. Verify every answer by computation, then run an independent cold solve (a separate agent that never sees the answers). Fix what it finds, re-check, then commit and push.
-6. Finish by giving David a list of every question mapped to the sample-paper question(s) it most relates to, and the skill being tested.
+3. Held for review or published: see "Held for review, then released" below (`python3 tools/release.py`).
+4. `python3 tools/build.py`, which builds `tests/vNN/index.html` and regenerates `index.html`. Never hand-edit generated files.
+5. `tools/check.sh NN` (runs the build, `check_lengths` (must report 0 longest) and `check_render` (must PASS)). `node tools/question_sheet.js content/vNN.js` makes the answer-free copy for the cold solve.
+6. Verify every answer by computation, then run an independent cold solve (a separate agent that never sees the answers). Fix what it finds, re-check, then commit and push.
+7. Finish by giving David a list of every question mapped to the sample-paper question(s) it most relates to, and the skill being tested.
+
+## Held for review, then released (David, Oct 2026)
+- New tests are **held for David's review** while 10 or more tests are uncompleted on the student menu: `"status": "review"` in `content/vNN.json` builds the test but shows it only on the admin page ("New tests waiting for your review"), where David practises it and approves its questions or the whole test. Opened directly, a held test only says it isn't ready yet.
+- When fewer than 10 are uncompleted, approved held tests are released (oldest first, topping up to 10; extras stay approved in reserve): `tools/release.py --apply` sets `"status": "published"` and `"released"` (the date the menu shows). If the menu is still short after that, new tests are published directly (no `status`).
+- New tests for review are built only while fewer than 4 held tests are unapproved, so they don't pile up.
+- `python3 tools/release.py [--json]` applies these rules and says what to release and whether to build (`publish`, `review` or `none`). The nightly routine and the `overnight` skill follow it; so does a test built on request unless David says otherwise. Uncompleted counts (`tools/progress.py`) only count published tests.
 
 ## Question bank (David's own questions)
 - When David drops questions in chat ("add this", "remember this one"), save each one to **Waiting** in `content/question_bank.md`, word for word, with any picture in `content/bank/`. Then commit them through a small pull request and merge it when green, so the overnight run can see them. Check every answer straight away and tell David at once if one looks wrong or ambiguous.
@@ -85,11 +92,11 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 - `python3 tools/progress.py [--json]` summarises progress for Claude (needs `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` in the environment settings). `python3 tools/configure_sync.py` fills `site_config.json` from `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
 
 ## Overnight builds
-- A routine runs the `overnight` skill (`.claude/skills/overnight/SKILL.md`) at about 1 am Sydney time: it does any waiting redos, and when fewer than 10 published tests are uncompleted it builds 4 new ones, opens one pull request and merges it once the checks are green (agreed by David).
+- A routine runs the `overnight` skill (`.claude/skills/overnight/SKILL.md`) at about 1 am Sydney time: it does any waiting redos, releases approved held tests when the menu is short, and builds 4 new ones when `tools/release.py` says so (held for review, or published directly if the menu is still short), opens one pull request and merges it once the checks are green (agreed by David).
 
 ## How the routines run (cost)
 - David chose to keep usage low: there is **no hourly check**. Two routines, both waking a small dedicated session ("prac routine dispatcher (light)") on the lighter model:
-  - **"Overnight: redos and practice tests"** (12:50 am Sydney): runs `tools/reviews.py` and `tools/progress.py`; if redos are waiting or fewer than 10 tests are uncompleted, it starts a fresh full-strength session (`create_session` with this repo as source) to run the `overnight` skill; otherwise it stops.
+  - **"Overnight: redos and practice tests"** (12:50 am Sydney): runs `tools/reviews.py` and `tools/release.py --json`; if redos are waiting, tests are due for release, or `build` isn't `none`, it starts a fresh full-strength session (`create_session` with this repo as source) to run the `overnight` skill; otherwise it stops.
   - **"Do redos now (run on demand)"** (no schedule; David presses **Run now**): if redos are waiting, starts a fresh full-strength session to run the `redo` skill.
 - Never do heavy work inside the dispatcher session or a very long conversation: every message re-reads the whole conversation, so long sessions get expensive. Don't add more scheduled routines without asking David.
 - Routine sessions created with "a fresh session on each firing" can't push or use the GitHub tools here, so don't use that mode.

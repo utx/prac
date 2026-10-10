@@ -114,6 +114,8 @@
 /*__TESTS__*/
 /*__SYNC__*/
 const KEY = "prac.v1";
+// Tests held for review ("status": "review" in content/vNN.json) are not on the student menu yet.
+const MENU = TESTS.filter(t => t.status !== "review"), HELD = TESTS.filter(t => t.status === "review");
 const PIN_HASH = "88e4eb6c3c041225c1cec20d38f53a35bf13c9909242528f10224affc9a473b2"; // sha256("prac-admin:" + PIN)
 const SECTION_NAMES = { reading: "Reading", thinking: "Thinking Skills", maths: "Maths" };
 const app = document.getElementById("app");
@@ -205,8 +207,8 @@ function render() {
   document.getElementById("lock").hidden = false;
   const st = load();
   const { byV, first, retakes, qs } = analyse(st);
-  const totalTests = TESTS.length;
-  const completed = TESTS.filter(t => st.flags[t.version] && st.flags[t.version].completed).length;
+  const totalTests = MENU.length;
+  const completed = MENU.filter(t => st.flags[t.version] && st.flags[t.version].completed).length;
   const finishedFirst = first.filter(a => a.finished && typeof a.total === "number");
   const avg = finishedFirst.length ? (finishedFirst.reduce((n, a) => n + a.total, 0) / finishedFirst.length) : null;
   const correctAll = qs.filter(q => q.correct).length;
@@ -306,10 +308,18 @@ function render() {
         <td><a class="btn" href="../tests/v${q.v}/index.html?admin=1">Open</a></td></tr>`).join("")}</table></div>`
     : `<p class="empty">No mistakes recorded yet.</p>`}</div>`;
 
+  // new tests held for review: on this page only until approved and needed
+  const heldCard = HELD.length ? `<div class="card"><h2>New tests waiting for your review (${HELD.length})</h2>
+    <p class="sub">These aren’t on the student page yet. Open each one with Practice and approve its questions (or the whole test with Approve test), or send questions back for a redo. When fewer than 10 tests are left to do on the student page, the nightly run moves approved tests there, oldest first.</p>
+    <div class="tw"><table class="t"><tr><th>Test</th><th>Reading</th><th>Built</th><th>Your review</th><th></th></tr>
+    ${HELD.map(t => `<tr><td class="n"><b>Test ${t.version}</b></td><td>${esc(t.reading)}</td><td class="n">${esc(fmtDate(t.date))}</td>
+      <td>${reviewRows ? testReviewCell(t, true) : `<span class="chip none">${syncOn() ? "Loading…" : "Needs the online database"}</span>`}</td>
+      <td><a class="btn primary" href="../tests/v${t.version}/index.html?admin=1">Practice</a></td></tr>`).join("")}</table></div></div>` : "";
+
   // all tests
   const testsTable = `<div class="card"><h2>All tests</h2><p class="sub">“Practice” opens a test without recording anything. You can also mark tests done or not done here.</p>
     <div class="tw"><table class="t"><tr><th>Test</th><th>Reading</th><th>Status</th><th>First score</th><th>R / T / M</th><th>Time</th>${reviewRows ? "<th>Your review</th>" : ""}<th></th></tr>
-    ${[...TESTS].reverse().map(t => {
+    ${[...MENU].reverse().map(t => {
       const a = (byV[t.version] || [])[0];
       const f = st.flags[t.version];
       const sc = id => { const s = a && a.sections.find(x => x && x.id === id); return s ? s.answers.filter(x => x.correct).length : "–"; };
@@ -337,7 +347,7 @@ function render() {
     const open = r => `<a class="btn" href="../tests/v${r.version}/index.html?admin=1">Open</a>`;
     const lastRedo = h => [...h].reverse().find(r => r.kind === "redo");
     return `<div class="card"><h2>Question feedback</h2>
-      <p class="sub">In practice mode, each checked question has Approve and Send back buttons. Claude checks for sent-back questions every hour from 7 am to 10 pm (and overnight), redoes them and replies here. Ask Claude for an instant redo. ${approved} question${approved === 1 ? "" : "s"} approved so far.</p>
+      <p class="sub">In practice mode, each checked question has Approve and Send back buttons. Claude redoes sent-back questions overnight (about 1 am) and replies here; for sooner, press Run now on the “Do redos now” routine. ${approved} question${approved === 1 ? "" : "s"} approved so far.</p>
       <h3 style="margin:14px 0 6px;font-size:16px">Waiting for a redo (${waiting.length})</h3>
       ${waiting.length ? `<div class="tw"><table class="t"><tr><th>Question</th><th>Your comment</th><th>Sent</th><th></th></tr>
         ${waiting.map(i => `<tr><td class="n">${qname(i.last)}</td><td>${esc(i.last.comment)}</td><td class="n">${esc(fmtDate(i.last.at))}</td><td>${open(i.last)}</td></tr>`).join("")}</table></div>`
@@ -356,7 +366,7 @@ function render() {
       <button class="btn danger" id="clear">Clear all progress</button></div></div>`;
 
   app.innerHTML = `<h1>Progress</h1><p class="sub">Only tests done from the student page are counted. Tests opened from here are never recorded.</p>
-    ${tiles}${focus}<div class="grid2">${bySection}${byFormat}</div><div style="height:18px"></div>${scoreChart}${byType}${habits}${mistakes}${fbCard}${testsTable}${data}`;
+    ${heldCard}${tiles}${focus}<div class="grid2">${bySection}${byFormat}</div><div style="height:18px"></div>${scoreChart}${byType}${habits}${mistakes}${fbCard}${testsTable}${data}`;
 
   app.querySelectorAll("[data-approve]").forEach(b => b.onclick = () => approveTest(+b.dataset.approve, b));
   app.querySelectorAll("[data-flag]").forEach(b => b.onclick = () => {
@@ -401,9 +411,9 @@ function testReview(t) {
   const n = k => qs.filter(x => x.last === k).length;
   return { qs, total: qs.length, approved: n("approve"), waiting: n("redo"), redone: n("done") };
 }
-function testReviewCell(t) {
+function testReviewCell(t, held) {
   const r = testReview(t);
-  const chip = r.total && r.approved === r.total ? `<span class="chip good">✓ Approved</span>`
+  const chip = r.total && r.approved === r.total ? `<span class="chip good">✓ Approved${held ? ": goes on the student page when needed" : ""}</span>`
     : r.waiting ? `<span class="chip warn">${r.waiting} waiting for redo</span>`
     : r.redone ? `<span class="chip warn">${r.redone} redone: check</span>`
     : r.approved ? `<span class="chip none">${r.approved} / ${r.total} approved</span>` : `<span class="chip none">Not reviewed</span>`;

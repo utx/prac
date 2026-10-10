@@ -5,6 +5,8 @@ Needs two environment variables (set in the Claude Code environment settings, ne
   SUPABASE_URL          e.g. https://xxxx.supabase.co   (falls back to tools/site_config.json)
   SUPABASE_SERVICE_KEY  the project's secret / service_role key (read access)
 
+Only published tests count (tests held for review are listed separately; see tools/release.py).
+
 Usage:
   python3 tools/progress.py            human-readable summary
   python3 tools/progress.py --json     machine-readable summary (used by the overnight job)
@@ -46,12 +48,27 @@ def fetch_events(url, key):
         start += page
 
 
+def test_versions():
+    """{version: content/vNN.json metadata} for every test, in order."""
+    out = {}
+    for f in sorted((ROOT / "content").glob("v*.js")):
+        if m := re.fullmatch(r"v(\d+)", f.stem):
+            meta = f.with_suffix(".json")
+            out[int(m.group(1))] = json.loads(meta.read_text(encoding="utf-8")) if meta.exists() else {}
+    return dict(sorted(out.items()))
+
+
+def published(meta):
+    """Tests marked "status": "review" are held for David's review: on the admin page only, not the student menu."""
+    return meta.get("status", "published") != "review"
+
+
 def ts(s):
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
 def summarise(events):
-    versions = sorted(int(m.group(1)) for f in (ROOT / "content").glob("v*.js") if (m := re.fullmatch(r"v(\d+)", f.stem)))
+    versions = [v for v, meta in test_versions().items() if published(meta)]
     attempts, flags = {}, {}
     for e in events:
         p = e.get("payload") or {}
@@ -91,6 +108,7 @@ def summarise(events):
         "completed_tests": completed,
         "uncompleted_tests": [v for v in versions if v not in completed],
         "uncompleted_count": len(versions) - len(completed),
+        "held_for_review": [v for v, meta in test_versions().items() if not published(meta)],
         "first_attempt_scores": {v: a["total"] for v, a in sorted(first.items()) if a["finished"]},
         "by_section": {k: {"right": c, "of": n, "pct": pct(c, n)} for k, (c, n) in by_sec.items()},
         "by_type": sorted(({"section": k[0], "type": k[1], "right": c, "of": n, "pct": pct(c, n)} for k, (c, n) in by_cat.items()),
@@ -108,6 +126,8 @@ def main():
         return
     print(f"Published tests: {len(s['published_tests'])} (v{s['published_tests'][0]}–v{s['published_tests'][-1]})")
     print(f"Completed: {len(s['completed_tests'])}   Uncompleted: {s['uncompleted_count']}  {s['uncompleted_tests']}")
+    if s["held_for_review"]:
+        print(f"Held for review (not on the menu): {s['held_for_review']}")
     print("First-attempt scores:", ", ".join(f"T{v} {t}/9" for v, t in s["first_attempt_scores"].items()) or "none yet")
     for sec, r in s["by_section"].items():
         print(f"  {sec:9} {r['right']}/{r['of']} ({r['pct']}%)")
