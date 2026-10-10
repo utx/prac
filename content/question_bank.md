@@ -113,6 +113,25 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 69: 25 + 44, adding instead of multiplying at the end.
   - Choose 4 or 5 of these.
 
+### Four rectangles round a square hole (perimeter)
+- **Section**: maths (perimeter; a good Q2 or Q3, competition-style, so it counts as the test's one competition-style question)
+- **Added**: 2026-10-10
+- **Question**: Four congruent rectangles are arranged to form a square that has side length 19 as shown. What is the perimeter of one of the rectangles?
+  - Diagram (described in our own words; redraw it): a large square with its side marked 19. Inside it, four identical long, thin rectangles go round the edge in a pinwheel: one along the top, one down the right side, one along the bottom and one up the left side, each one butting against the end of the next. They leave a small square hole in the middle. The rectangles' own lengths are not marked.
+  - No options or answer were given.
+- **Answer** (checked): **38**. Along any side of the big square there is one rectangle's long side and one rectangle's short side (for example, across the top: the top rectangle's length, then the end of the right-hand rectangle). So length + width = 19, and the perimeter of one rectangle is 2 × 19 = 38. It doesn't matter how long or wide the rectangles are: 15 by 4, or 12 by 7, both give 38.
+- **Notes**:
+  - Written by David (his questions can be reworded). "Congruent" is above Year 4 wording: say "four identical rectangles" and add "cm" to the 19.
+  - Don't mark the rectangles' lengths, or the trick is lost. Draw it not to scale so it can't be measured.
+  - Perimeter was last a bank question in Test 47 (Twelve squares make a rectangle), so space it a few tests after that.
+  - Possible wrong options from real mistakes:
+    - 19: length + width, forgetting to double it.
+    - 76: the perimeter of the big square.
+    - 361: 19 × 19, the area of the big square.
+    - 57: 3 × 19, counting only three sides.
+    - 9.5: half of 19, thinking each rectangle is half the square's width.
+  - Choose 4 or 5 of these.
+
 ## Used
 
 ### Painted 4 × 4 × 4 cube → Test 49 Maths Q3 (stretch)
