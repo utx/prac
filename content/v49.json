@@ -1,0 +1,63 @@
+{
+  "version": 49,
+  "date": "2026-10-10",
+  "status": "review",
+  "reading": "Missing sentences: The Toughest Animal You’ve Never Seen",
+  "reading_format": "missing sentences",
+  "reading_topic": "tardigrades (water bears): tiny animals in moss, drying out into a tun, surviving cold, heat and radiation, and the 2007 TARDIS experiment on FOTON-M3 that exposed them to space",
+  "thinking": [
+    "Whose reasoning is correct (certainty / worst case: lucky-dip prizes)",
+    "Zoo keeper talks timetable: latest arrival time with walking times and talk lengths",
+    "Counting squares of all sizes in a grid with a missing corner (stretch)"
+  ],
+  "maths": [
+    "Quick-fire missing number: the equals sign with division",
+    "Fractions: a fraction of what is left, then as a fraction of the whole",
+    "Painted 4 × 4 × 4 cube: small cubes with exactly 2 blue sides (competition-style, stretch, supplied by David)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1-PT3 Q20-25 (missing sentences: reference words pointing back, e.g. 'The birds', 'they')",
+      "PT1-PT3 Q20-25 (missing sentences: elaboration of the sentence before; a plausible sentence that breaks the order)",
+      "PT1-PT3 Q20-25 (missing sentences: a closing sentence that fits the whole text), PT1-PT3 Q26-33 (main idea in different words) — stretch"
+    ],
+    "thinking": [
+      "PT2 Q24 and PT3 Q30 (whose reasoning: worst case / certainty)",
+      "PT2 Q19 (appointments in a working day), PT3 Q19 (timetable minus a cancelled day)",
+      "PT3 Q10 (count non-identical shapes), PT3 Q21 maths (shapes covering a grid) — stretch"
+    ],
+    "maths": [
+      "PT1 Q1 (missing number with equals sign), PT3 Q24 (inverse operations)",
+      "PT2 Q6 (fraction of a cake after sharing), PT1 Q20 (fractions of pocket money spent)",
+      "PT1 Q14 (hidden faces of a cube model), PT1 Q28 (visible faces of split objects), PT3 Q8 (objects from cubes) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Sentence links",
+      "Sentence links",
+      "Main idea"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Fractions",
+      "Area, perimeter & 3D"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
