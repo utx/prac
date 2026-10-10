@@ -3,9 +3,13 @@
 
 For each content/vNN.js (+ content/vNN.json metadata):
   - tests/vNN/index.html is assembled from tools/template.html
-Then index.html is regenerated with one button per test, newest first, and
-pracadmin/index.html (the PIN-protected stats page) is rebuilt from
+Then index.html is regenerated with one button per published test, newest
+first, and pracadmin/index.html (the PIN-protected stats page) is rebuilt from
 tools/admin.html.
+
+A test with "status": "review" in its vNN.json is held for David's review: its
+page is built, but it appears only on the admin page, not on the student menu.
+tools/release.py decides when approved tests are released ("status": "published").
 
 Usage:  python3 tools/build.py
 """
@@ -43,6 +47,18 @@ def check_stretch(n, meta):
             raise SystemExit(f"v{n}: needs exactly one stretch question in {', '.join(missing)} (\"stretch\" in content/v{n}.json)")
 
 
+STATUSES = ("review", "published")
+
+
+def check_status(n, meta):
+    if meta.get("status", "published") not in STATUSES:
+        raise SystemExit(f"v{n}: 'status' must be one of {STATUSES}, not {meta['status']!r}")
+
+
+def published(meta):
+    return meta.get("status", "published") == "published"
+
+
 def check_categories(n, meta):
     cats = meta.get("categories")
     if not cats:
@@ -70,7 +86,7 @@ def versions():
 
 def page_meta(n, meta):
     return {"version": n, "reading_format": meta.get("reading_format", ""), "categories": meta.get("categories", {}),
-            "stretch": meta.get("stretch", {})}
+            "stretch": meta.get("stretch", {}), "status": meta.get("status", "published")}
 
 
 def build_test(n, js, meta):
@@ -87,7 +103,7 @@ def card(n, meta):
     e = html.escape
     # Show only the title on the front page, not the reading format ("Cloze: Low Tide" -> "Low Tide").
     reading = e(meta.get("reading", "").split(": ", 1)[-1])
-    date = meta.get("date", "")
+    date = meta.get("released") or meta.get("date", "")
     try:
         d = datetime.date.fromisoformat(date)
         date = f"{d.day} {d.strftime('%B %Y')}"
@@ -107,7 +123,8 @@ def card(n, meta):
 
 def build_admin(vs):
     tests = [{"version": n, "reading": meta.get("reading", ""), "reading_format": meta.get("reading_format", ""),
-              "categories": meta.get("categories", {})} for n, _, meta in vs]
+              "categories": meta.get("categories", {}), "status": meta.get("status", "published"),
+              "date": meta.get("date", "")} for n, _, meta in vs]
     page = ADMIN_TEMPLATE.replace("/*__TESTS__*/", "const TESTS = " + json.dumps(tests, ensure_ascii=False) + ";\n"
                                   + "const CATEGORIES = " + json.dumps(CATEGORIES, ensure_ascii=False) + ";").replace("/*__SYNC__*/", SYNC_JS)
     dest = ROOT / "pracadmin" / "index.html"
@@ -236,10 +253,13 @@ INDEX = """<!DOCTYPE html>
 if __name__ == "__main__":
     vs = versions()
     for n, js, meta in vs:
+        check_status(n, meta)
         check_categories(n, meta)
         check_stretch(n, meta)
         print("built", build_test(n, js, meta).relative_to(ROOT))
-    build_index(vs)
+    menu = [t for t in vs if published(t[2])]
+    build_index(menu)
     build_admin(vs)
     print("built pracadmin/index.html")
-    print(f"index.html: {len(vs)} test(s)")
+    held = [n for n, _, meta in vs if not published(meta)]
+    print(f"index.html: {len(menu)} test(s)" + (f"; held for review (admin page only): {', '.join(f'v{n}' for n in held)}" if held else ""))

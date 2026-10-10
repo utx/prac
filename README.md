@@ -22,6 +22,7 @@ Short practice papers, each with 3 reading, 3 thinking skills and 3 maths questi
 | `tools/sync.js`, `tools/site_config.json` | Sends progress to the online database (Supabase) when configured. |
 | `supabase/setup.sql` | One-time database setup (paste into Supabase's SQL editor). |
 | `tools/progress.py` | Summarises online progress (uncompleted tests, weak areas) for the overnight job. |
+| `tools/release.py` | Decides which tests held for review to release to the menu, and whether to build new ones. |
 | `.claude/skills/overnight/` | The nightly build procedure. |
 | `tools/question_sheet.js` | Makes an answer-free text copy of a test for independent checking. |
 | `.claude/skills/new-test/` | Step-by-step procedure Claude follows to build a new test. |
@@ -41,5 +42,7 @@ Short practice papers, each with 3 reading, 3 thinking skills and 3 maths questi
 ## Progress and stats
 
 Finishing a test from the main page records the answers in that browser and marks the test as completed. The parent page at `pracadmin/` (PIN required) shows the stats and lets you open any test in practice mode, which records nothing. Once the online database is connected, progress is shared across devices and the admin page loads it after the PIN; until then it is stored per browser (Export/Import on the admin page moves it).
+
+New tests can be **held for review** (`"status": "review"` in `content/vNN.json`): they appear only under "New tests waiting for your review" on the admin page until they are approved and the menu has fewer than 10 tests left to do; then `tools/release.py --apply` moves them onto the menu.
 
 The official sample papers are copyright and are deliberately **not** stored here.

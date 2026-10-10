@@ -40,8 +40,11 @@ async function answerAll(p, pick, onReview) {
 (async () => {
   await new Promise(r => server.listen(0, "127.0.0.1", r));
   const B = `http://127.0.0.1:${server.address().port}`;
-  const versions = fs.readdirSync(path.join(ROOT, "content")).map(f => (f.match(/^v(\d+)\.js$/) || [])[1]).filter(Boolean).map(Number).sort((a, b) => a - b);
-  const [vA, vB, vC] = versions.slice(-3); // three most recent tests
+  const all = fs.readdirSync(path.join(ROOT, "content")).map(f => (f.match(/^v(\d+)\.js$/) || [])[1]).filter(Boolean).map(Number).sort((a, b) => a - b);
+  const status = v => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "content", `v${v}.json`), "utf8")).status || "published"; } catch (e) { return "published"; } };
+  const versions = all.filter(v => status(v) !== "review"); // on the student menu
+  const held = all.filter(v => status(v) === "review");     // admin page only, until approved and released
+  const [vA, vB, vC] = versions.slice(-3); // three most recent published tests
   const b = await chromium.launch();
   const ctx = await b.newContext({ viewport: { width: 1200, height: 900 } });
   const p = await ctx.newPage();
@@ -52,7 +55,12 @@ async function answerAll(p, pick, onReview) {
   await p.goto(B + "/index.html");
   ok(await p.locator(".test.done").count() === 0, "fresh menu shows no completed tests");
   const cards = await p.locator(".test[data-v]").count();
-  ok(cards === versions.length, `menu has one card per test (${cards})`);
+  ok(cards === versions.length, `menu has one card per published test (${cards})`);
+  if (held.length) {
+    ok(await p.locator(held.map(v => `.test[data-v="${v}"]`).join(", ")).count() === 0, `tests held for review (${held.join(", ")}) are not on the menu`);
+    await p.goto(`${B}/tests/v${held[0]}/index.html`);
+    ok(/isn’t ready yet/.test(await p.textContent("main")) && await p.locator("#start").count() === 0, `held Test ${held[0]} opened directly shows "not ready yet"`);
+  } else console.log("SKIP held-test checks (no test has \"status\": \"review\")");
 
   // Test vA: all right except Maths, with one changed answer in the first question.
   await p.goto(`${B}/tests/v${vA}/index.html`);
@@ -109,6 +117,13 @@ async function answerAll(p, pick, onReview) {
   ok(/Early signs|Focus here/.test(txt), "admin shows focus areas");
   ok(/Stretch questions/.test(txt) && /\d+ of \d+ right/.test(txt), "admin shows stretch-question results");
   await shot(p, "admin.png");
+  if (held.length) {
+    ok(/waiting for your review/.test(txt) && held.every(v => txt.includes(`Test ${v}`)), "admin lists the tests held for review");
+    await p.click(`a.btn.primary[href*="v${held[0]}/"]`);
+    ok(await p.evaluate(() => ADMIN) && await p.locator("#start").count() === 1, `held Test ${held[0]} opens in practice mode from the admin page`);
+    await p.goto(B + "/pracadmin/index.html");
+    await p.waitForSelector("h1:text('Progress')");
+  }
 
   const before = (await p.evaluate(() => JSON.parse(localStorage.getItem("prac.v1")))).attempts.length;
   await p.click(`a.btn.primary[href*="v${vC}/"]`);

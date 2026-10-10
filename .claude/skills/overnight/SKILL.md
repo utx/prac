@@ -1,6 +1,6 @@
 ---
 name: overnight
-description: Nightly unattended run (started by the 12:50 am Sydney routine). Does any waiting redos, checks online progress; if fewer than 10 published tests are uncompleted, builds 4 new tests to the full new-test standard, opens one pull request, waits for the automatic checks and merges it. Also finishes the online-progress setup when the environment provides the keys.
+description: Nightly unattended run (started by the 12:50 am Sydney routine). Does any waiting redos, checks online progress and David's approvals; releases approved held tests when fewer than 10 are uncompleted on the menu; builds 4 new tests (held for David's review, or published directly when the menu is still short) to the full new-test standard, opens one pull request, waits for the automatic checks and merges it. Also finishes the online-progress setup when the environment provides the keys.
 ---
 
 # Overnight build
@@ -14,12 +14,17 @@ Unattended: **never wait for or ask David anything.** If something blocks, stop 
 3. **Leftovers:** list open pull requests whose title starts with `Overnight:`. If one exists, do not build more. Drive it to green (read the failing check's log, fix, push; never skip a check) and merge it, then stop.
 4. **Redos first:** follow `.claude/skills/redo/SKILL.md` for any questions David sent back from the admin page. If tests are also being built tonight, include the redos in tonight's pull request and reply to them after it merges; otherwise give them their own pull request. If the reviews list can't be read, note it in the final message and carry on.
 
-## 1. Decide
+## 1. Decide (release, then build)
 
-`python3 tools/progress.py --json`
-- Exit code 2 (database not configured or unreachable): **stop**. Report the error line. Never build blind.
-- `uncompleted_count >= 10`: **stop**. Report "nothing to build" with the count.
-- Otherwise build **4** new tests, numbered from the highest existing `content/vNN.js` + 1.
+New tests are **held for David's review** (`"status": "review"` in `content/vNN.json`: on the admin page only, not the student menu) unless the menu is short. `tools/release.py` applies the rules agreed with David:
+
+`python3 tools/release.py --json` (also run `python3 tools/progress.py --json` for the weak areas in step 2)
+- Exit code 2 (database not configured or unreachable): **stop**. Report the error line. Never build or release blind.
+- **`release` not empty** (fewer than 10 uncompleted on the menu, and approved held tests exist): `python3 tools/release.py --apply` marks the oldest approved ones published (topping up to 10; extra approved tests stay in reserve). Include this in tonight's pull request, or, if nothing is built tonight, open a pull request just for it titled `Release: Tests NN, MM` (wait for green, merge, check the site went live as in step 5).
+- **`build` = `"none"`**: build nothing (10 or more uncompleted and 4 or more held tests still unapproved). Report the counts.
+- **`build` = `"review"`**: build **4** new tests with `"status": "review"` in each `vNN.json`. They go live only once David approves them and the menu needs them.
+- **`build` = `"publish"`**: the menu is short even after releasing, so build **4** new tests **without** a `status` field (published directly, as before).
+- New tests are numbered from the highest existing `content/vNN.js` + 1 (held tests included).
 
 ## 2. Plan all 4 first (in this session, before any writing)
 
@@ -35,6 +40,7 @@ Read `CLAUDE.md`, `.claude/skills/new-test/SKILL.md`, `calibration/sample_notes.
 
 Spawn 2 general-purpose subagents with `isolation: "worktree"`, each building **2** of the planned tests. Give each its rows of the plan table, the exact version numbers, and these instructions:
 - Follow `.claude/skills/new-test/SKILL.md` steps 1–3 (write `content/vNN.js` and `.json`, verify every answer by computation, `tools/check.sh NN`, look at the screenshots).
+- When step 1 said `"review"`, put `"status": "review"` in each `vNN.json` (otherwise leave `status` out).
 - Commit **only** `content/vNN.js` and `content/vNN.json` on a branch named `overnight-part-<k>`; do not commit generated files; do not push or open pull requests.
 - Report the branch name and any concerns.
 
@@ -46,11 +52,11 @@ Spawn 2 general-purpose subagents with `isolation: "worktree"`, each building **
 
 ## 5. Publish
 
-1. Commit, push, open **one** pull request titled `Overnight: Practice Tests NN–MM`, body = per-test summary (formats, topics, skills, what the cold solves fixed).
+1. Commit, push, open **one** pull request titled `Overnight: Practice Tests NN–MM`, body = per-test summary (formats, topics, skills, what the cold solves fixed), whether they are held for review or published, and any tests released tonight.
 2. Wait for the `check` run on the pull request to finish (re-read its status every few minutes; it takes about a minute). If red: read the log, fix, push, repeat.
 3. When green and mergeable: merge it (merge commit).
 4. **Check the site went live.** A few minutes after merging, list the workflow runs (GitHub `actions_list`, `list_workflow_runs`) and find the "pages build and deployment" run for the merge commit. If it failed, or is still queued after about 10 minutes, the site still shows the old tests. GitHub sometimes leaves that build stuck. The "Site is up to date" workflow (`site-watch.yml`) asks for a rebuild by itself; check that it went green. If it is red, re-run the Pages build if you can. Otherwise tell David in the final message so he can press **Re-run all jobs** on the Actions page.
 
 ## 6. Final message (the routine's notification)
 
-Short: how many tests were built and merged (with the link), which bank questions went in and which are still waiting, the uncompleted count before and after, the weakest areas the batch targeted, which sent-back questions were redone (and the replies), and anything that went wrong.
+Short: how many tests were built and merged (with the link) and whether they are **waiting for David's review on the admin page** or already on the menu, which approved tests were released to the menu (and how many approved remain in reserve), which bank questions went in and which are still waiting, the uncompleted count before and after, the weakest areas the batch targeted, which sent-back questions were redone (and the replies), and anything that went wrong.

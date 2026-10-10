@@ -33,4 +33,4 @@ One pull request for all redos: title `Redo: Test NN Section Qn[, …]`; the bod
 ## 5. Reply
 
 Only after the merge, for each question:
-`python3 tools/reviews.py done V SECTION Q "<reply>"` (Q 1-based). The reply is one or two plain sentences David will read on the admin page next to his comment: what changed (or why nothing did), and that it is live. Then tell David in chat which questions were redone and that they show under "Recently redone" on the admin page.
+`python3 tools/reviews.py done V SECTION Q "<reply>"` (Q 1-based). The reply is one or two plain sentences David will read on the admin page next to his comment: what changed (or why nothing did), and that it is live (for a test held for review, `"status": "review"`: that it is updated and waiting for his approval on the admin page; it stays held after a redo). Then tell David in chat which questions were redone and that they show under "Recently redone" on the admin page.

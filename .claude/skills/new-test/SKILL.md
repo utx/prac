@@ -22,7 +22,8 @@ Default batch size is **1–2 tests per run** (3 at most). Each test gets its ow
    - Maths Q1: next item in the quick-fire rotation; Q2–Q3: a new topic plus a loop-back.
 5. **Topic check.** The Reading topic must not appear in any `content/vNN.json` (`reading`, `reading_topic`) **or** in `content/used_topics_before_v33.md`. Until David confirms that list is complete, **tell David the planned Reading topic(s) in one line and wait for an OK before writing.**
 6. **Question bank.** Read **Waiting** in `content/question_bank.md`. Use **at most one** waiting question per test, mixed in with our own questions (oldest one that fits; about every second test, or every test when more than about 8 are waiting; rules in `CLAUDE.md` under "Question bank"). Write the rest of the test as usual. In the report, say which bank questions were used and which are still waiting, and why.
-7. **Supplied questions.** If David supplies questions, use them as given (they are his). Check every answer, write explanations, redraw diagrams (not to scale where measuring would give the answer away), and note "supplied by David" in the `vNN.json` labels. Ask the source only if it isn't clear they're his own.
+7. **Held for review or published?** Run `python3 tools/release.py`. If it says `Build: publish` (fewer than 10 uncompleted on the menu even after releasing approved tests), the new tests go straight onto the menu. Otherwise give each new `vNN.json` `"status": "review"`: the test is built and shows on the admin page for David to check, and `tools/release.py` releases it once he has approved it and the menu needs it. If David says which he wants for this batch, do that. If the database can't be reached, hold them for review.
+8. **Supplied questions.** If David supplies questions, use them as given (they are his). Check every answer, write explanations, redraw diagrams (not to scale where measuring would give the answer away), and note "supplied by David" in the `vNN.json` labels. Ask the source only if it isn't clear they're his own.
 
 ## 1. Write the content
 
@@ -63,7 +64,7 @@ Both must pass: `check_lengths` reports 0 longest, `check_render` reports PASS a
 ## 6. Report to David
 
 Reply with, per test:
-- the pull-request link and that merging publishes it,
+- the pull-request link, and whether merging publishes it to the menu or adds it to **New tests waiting for your review** on the admin page,
 - a table: question → answer letter → skill tested → related sample question(s) (mark the stretch questions),
 - what the checks and cold solve caught and what was fixed,
 - the rotation status (what comes next), and anything needing his decision.
