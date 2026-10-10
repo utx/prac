@@ -96,6 +96,23 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 81: 9 × 9.
   - Choose 4 or 5 of these.
 
+### Sum of lots of 44 (clever calculation)
+- **Section**: maths (number: clever calculation by grouping, the distributive law; competition-style, so it counts as the test's one competition-style question)
+- **Added**: 2026-10-10
+- **Question**: Compute (1×44)+(3×44)+(5×44)+(7×44)+(9×44).
+  - No options or answer were given. David's picture was the question text only (no diagram), so no picture is saved.
+- **Answer** (checked): **1100**. Every bracket is a lot of 44, so add the lots first: 1 + 3 + 5 + 7 + 9 = 25 lots of 44, and 25 × 44 = 1100 (4 × 25 = 100, so 44 × 25 = 11 × 100). Working out each bracket gives the same total: 44 + 132 + 220 + 308 + 396 = 1100.
+- **Notes**:
+  - Written by David (his questions can be reworded). Use the × sign with spaces, and a question stem such as "What is the value of …?".
+  - The skill is spotting the shortcut, so it suits Maths Q2 more than a quick-fire Q1, and the explanation should show the grouping. Brute force also works, so it is not too hard for a Year 4 child.
+  - Possible wrong options from real mistakes:
+    - 1056: 24 × 44, adding 1 + 3 + 5 + 7 + 9 wrongly as 24.
+    - 1144: 26 × 44, the same slip the other way.
+    - 220: 5 × 44, counting the brackets instead of adding the numbers.
+    - 1980: 45 × 44, adding all the numbers from 1 to 9.
+    - 69: 25 + 44, adding instead of multiplying at the end.
+  - Choose 4 or 5 of these.
+
 ## Used
 
 ### Painted 4 × 4 × 4 cube → Test 49 Maths Q3 (stretch)
