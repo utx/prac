@@ -1,0 +1,63 @@
+{
+  "version": 50,
+  "date": "2026-10-10",
+  "status": "review",
+  "reading": "Four extracts: Getting to the Other Side",
+  "reading_format": "four extracts",
+  "reading_topic": "bridges: a memoir of crossing a swaying swing bridge as a child, the Sydney Harbour Bridge (opened 1932, the Coathanger, the bridge climb, New Year's Eve fireworks), a girl waiting on a railway footbridge, an opinion piece about building a footbridge over a creek",
+  "thinking": [
+    "Spot the mistake (unfair comparison: cake stalls open for different lengths of time)",
+    "Side view of a cube model from the direction of an arrow",
+    "One liar: who got the medal (stretch, supplied by David)"
+  ],
+  "maths": [
+    "Quick-fire place value: 1000 less when the thousands digit is 0 (odometer)",
+    "Volume: cubes to fill a box, working out its size from a partly packed box",
+    "Sum and difference: two unknowns from a total and a swap that makes them equal (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT2 Q26-33 ('reveals the writer was out of place': feelings shown, not stated), PT1 Q26-33 (positive effect on one's outlook)",
+      "PT2 Q26-33 ('suggests newcomers are not always welcome': inference), PT1 Q1-6 (feelings shown rather than stated)",
+      "PT1 Q26-33 and PT3 Q26-33 (an idea expressed in completely different words; main idea) — stretch"
+    ],
+    "thinking": [
+      "PT3 Q18 (mistake: unfair comparison of win fractions), PT2 Q21 (mistake: unfair comparison of totals)",
+      "PT2 Q4 (side view of a block piece), PT2 Q22 (plan view from a side view), PT3 Q16 (view from a seat)",
+      "PT2 Q29 (one truth-teller among liars), PT1 Q27 (must happen) — stretch"
+    ],
+    "maths": [
+      "PT1 Q2 (subtract hundreds: place value), PT3 Q6 (thousands/hundreds/tens/ones regrouping)",
+      "PT2 Q34 (volume of a box in cm cubes), PT3 Q9 (layers of bricks)",
+      "PT3 Q31 (sum and difference: two unknowns), PT2 Q25 (splitting combined masses) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Feelings & inference",
+      "Feelings & inference",
+      "Main idea"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Spatial",
+      "Must or cannot be true"
+    ],
+    "maths": [
+      "Number & place value",
+      "Area, perimeter & 3D",
+      "Number & place value"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
