@@ -79,6 +79,23 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 54: 42 + 12, repeating the last jump.
     - 63: 7 × 9.
 
+### Rick and Nick skip-counting (common multiples)
+- **Section**: maths (multiples / common multiples; a quick-fire Q1, or a number-puzzle Q2 with a twist)
+- **Added**: 2026-10-10
+- **Question**: Rick skip-counts by 7's, starting at 7. Nick skip-counts by 9's, starting at 9. What is the only 2-digit number that Rick and Nick will both say?
+  - No options or answer were given. David's picture was the question text only (no diagram), so no picture is saved.
+- **Answer** (checked by listing both counts): **63**. Rick says 7, 14, 21, …, 98 and Nick says 9, 18, 27, …, 99. The numbers both say are the multiples of 63 (7 and 9 share no factor), so the only 2-digit one is 63; the next is 126.
+- **Notes**:
+  - David asked for "something based on this", so it can be reworded or given a twist. Use "7s" and "9s" (no apostrophes).
+  - On its own it is about quick-fire level (a child who knows 7 × 9 = 63 gets it at once), so use it as Maths Q1. To make it a Q2, add a twist that needs reasoning, for example a third counter (Mick counts by 3s: which number do all three say?), or ask how many numbers below 200 both children say (63 and 126, so 2).
+  - Possible wrong options from real mistakes:
+    - 16: 7 + 9.
+    - 56: 7 × 8, a number only Rick says.
+    - 72: 9 × 8, a number only Nick says.
+    - 126: the next number both say, but it has 3 digits.
+    - 81: 9 × 9.
+  - Choose 4 or 5 of these.
+
 ## Used
 
 ### Painted 4 × 4 × 4 cube → Test 49 Maths Q3 (stretch)
