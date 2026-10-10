@@ -1,0 +1,63 @@
+{
+  "version": 51,
+  "date": "2026-10-10",
+  "status": "review",
+  "reading": "Story extract: The Secret Garden (Frances Hodgson Burnett)",
+  "reading_format": "story",
+  "reading_topic": "Mary follows the robin along the garden wall and finds the buried key to the locked garden (classic extract, 1911, public domain)",
+  "thinking": [
+    "Supports the claim (a lock-up bike rack so more students ride to school)",
+    "Column graph with two sets of columns: most money from small and large cups",
+    "Cube net with symbols: which cube could it make (stretch)"
+  ],
+  "maths": [
+    "Quick-fire time: elapsed time across midnight (overnight train)",
+    "Dot plot statements: which are correct (students versus pets)",
+    "Rates: two people working together (raking leaves) (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1 Q1-6 (whole-paragraph point about a character), PT3 Q6 (overall impression of a character)",
+      "PT2 Q1-6 (why the writer includes a detail), PT3 Q1-6 (Edwardian classic extract)",
+      "PT3 Q1 (how a character feels), PT2 Q1-6 (feelings shown rather than stated) — stretch"
+    ],
+    "thinking": [
+      "PT1 Q2 (supports the claim), PT2 Q3, PT3 Q21",
+      "PT2 Q7 (bar chart totals), PT2 Q25 (best of two attempts table)",
+      "PT1 Q10 (dice nets, opposite faces), PT3 Q28 (dice with unusual opposite sums) — stretch"
+    ],
+    "maths": [
+      "PT1 Q3 (elapsed time across midnight), PT2 Q20 (clock + 555 minutes)",
+      "PT2 Q8 (dot plot: more/fewer than 3), PT1 Q27 (which graph claims are correct)",
+      "PT3 Q32 (two people working together), PT1 Q23 (proportional feeding: rates) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Main idea",
+      "Purpose of a detail",
+      "Feelings & inference"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Time & timetables",
+      "Graphs & data",
+      "Rates"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
