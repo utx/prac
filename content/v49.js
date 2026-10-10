@@ -9,7 +9,7 @@ const INK = "#1b2a41";
 const ARTICLE_TEXT = `
 <p>Next time you walk past a clump of moss on an old brick wall, you might like to give it a respectful nod. {1} These creatures are called tardigrades. Most of them are less than half a millimetre long, so you need a microscope to see one properly. When you do, you will find a plump little body, eight stubby legs tipped with tiny claws and a slow, lumbering walk. It is no wonder that people call them “water bears”.</p>
 <p>Water bears need a thin film of water around their bodies to move about and feed, so damp moss suits them well. But moss often dries out in hot weather, and when it does, a water bear does something remarkable. It pulls in its head and legs, loses almost all the water in its body and shrivels into a dry little barrel that scientists call a “tun”. {2} It can stay like this for years. Add a few drops of water, and within hours it may plump up, stretch out its legs and wander off as if nothing had happened.</p>
-<p>A tun can put up with much more than dry weather. In laboratories, tuns have been frozen to temperatures colder than anywhere on Earth, heated to temperatures that would cook most animals, and blasted with radiation hundreds of times stronger than a dose that would kill a person. Then, in September 2007, scientists put them to the ultimate test. Tuns were sent into orbit on an uncrewed Russian spacecraft called FOTON-M3, as part of an experiment cheekily named TARDIS (short for “Tardigrades In Space”). For ten days they were exposed to space itself: no air at all and, for some of them, the full glare of the Sun. Back on Earth, the scientists added water. Many of the water bears came back to life, and some even went on to lay eggs that hatched.</p>
+<p>A tun can put up with much more than dry weather. In laboratories, tuns have been frozen to temperatures colder than anywhere on Earth, heated to temperatures that would cook most animals, and blasted with radiation hundreds of times stronger than a dose that would kill a person. Then, in September 2007, scientists put them to the ultimate test. Tuns were sent into orbit on an uncrewed Russian spacecraft called FOTON-M3, as part of an experiment cheekily named TARDIS (short for “Tardigrades In Space”). For ten days they were exposed to space itself: no air at all and, for some of them, the full glare of the Sun. Back on Earth, the scientists added water. Many of the water bears came back to life, and some even went on to have young.</p>
 <p>{3}</p>`;
 
 const SENT_LETTERS = ["A", "B", "C", "D", "E"];
@@ -18,7 +18,7 @@ const SENTENCES = [
   "Living in it, quite possibly, are hundreds of tiny animals that can survive things that would kill almost anything else.",
   "This shows that a tun can stay alive in dry moss for many years.",
   "In this state it does not eat or move, and its body almost completely shuts down.",
-  "When the rain comes back, the moss turns soft and green again."
+  "So the space trip proved that water bears can survive absolutely anything."
 ];
 function articleHtml() {
   const si = SECTIONS.findIndex(s => s.id === "reading");
@@ -95,7 +95,7 @@ const SECTIONS = [
         answer: 1,
         skill: "using a reference word (“These creatures”) to place a sentence",
         explain: `<p>After the gap comes “<b>These creatures</b> are called tardigrades.” “These creatures” must point back to some creatures that have just been mentioned, but the sentence before the gap is only about moss. Sentence <b>B</b> brings in the creatures (“hundreds of tiny animals”), and “it” in B means the clump of moss. B also explains the odd advice to give the moss a “respectful nod”: something living in it is astonishingly tough.</p>
-                  <p class="why-not">A is the trap: it mentions a clump of moss and something living in it, so it seems to follow on. But “such a remarkable traveller” points back to a traveller we have already read about, and nobody has travelled anywhere yet: the space trip comes at the end. A also talks about one traveller, while “These creatures” needs more than one. E is about moss too, but it names no creatures for “These creatures” to point back to.</p>`
+                  <p class="why-not">A is the trap: it mentions a clump of moss and something living in it, so it seems to follow on. But “such a remarkable traveller” points back to a traveller we have already read about, and nobody has travelled anywhere yet: the space trip comes at the end. A also talks about one traveller, while “These creatures” needs more than one. E names no creatures for “These creatures” to point back to, and its “space trip” hasn’t happened yet.</p>`
       },
       {
         stem: "Which sentence best fits <b>gap 2</b>?",
@@ -104,7 +104,7 @@ const SECTIONS = [
         answer: 3,
         skill: "following a description across a gap (“In this state … like this”)",
         explain: `<p>Before the gap, the water bear shrivels into a dry barrel called a tun. After it: “It can stay <b>like this</b> for years. Add a few drops of water …” Sentence <b>D</b> fits between them. “<b>In this state</b>” points back to the tun, and D describes it more fully (no eating, no moving, its body almost shut down). Then “It can stay like this” means stay shut down as a tun, which makes sense.</p>
-                  <p class="why-not">E is the trap: moss drying out and rain coming back seem to belong together. But after E, “It can stay like this for years” would mean the moss stays soft and green, and “Add a few drops of water” would make no sense, because the rain has already come back. C uses the word “tun”, but “This shows” has nothing before it to show anything yet, and it would just repeat “for years” from the next sentence.</p>`
+                  <p class="why-not">C is the trap: it uses the word “tun” and talks about staying alive in dry moss for years, which is what this paragraph is about. But “This shows” has nothing before it to show anything yet, and it would just repeat “for years” from the next sentence. E talks about a space trip that hasn’t been described yet.</p>`
       },
       {
         stem: "Which sentence best fits <b>gap 3</b>, the last sentence of the article?",
@@ -113,7 +113,7 @@ const SECTIONS = [
         answer: 0,
         skill: "choosing an ending that sums up the main idea and links back to the start",
         explain: `<p>The last sentence should round off the <b>whole</b> article, not just the last paragraph. The article’s main idea is that a tiny creature living in something as ordinary as moss is amazingly tough. Sentence <b>A</b> does this. The “scruffy clump of moss” takes us back to the moss on the wall in the first sentence. “Such a remarkable traveller” sums up the water bears’ trip into space, which has just been described, even though A never uses the word “space”.</p>
-                  <p class="why-not">C is the trap: it sounds like a conclusion (“This shows that …”), and it repeats words from the article, such as “tun” and “years”. But “This” would point back to the space experiment, and the space experiment did not show anything about living in dry moss for years. C sums up paragraph 2, not the whole article. B can’t go here because “it” would have nothing to point back to, and E is about the moss in wet weather, which has nothing to do with the space trip.</p>`
+                  <p class="why-not">E is the trap: it follows straight on from the space trip and sounds like a strong ending. But it says more than the article does. Only <i>many</i> of the water bears came back to life, and only <i>some</i> faced the full glare of the Sun, so the trip did not prove that they can survive absolutely anything. E also leaves out the moss, so it doesn’t round off the whole article. C sounds like a conclusion too (“This shows that …”), but “This” would point back to the space experiment, which showed nothing about living in dry moss for years: C sums up paragraph 2, not the whole article. B can’t go here because “it” would have nothing to point back to.</p>`
       }
     ]
   },
@@ -152,15 +152,15 @@ const SECTIONS = [
       {
         stem: `How many squares of <b>any size</b> can be found in this shape?
                <div class="figure">${SQUARES_SVG}</div>`,
-        options: ["11", "14", "16", "17"],
-        answer: 3,
+        options: ["16", "17", "18", "20"],
+        answer: 1,
         skill: "counting squares of every size, including overlapping ones",
         explain: `<p>Count the squares one size at a time.</p>
                   <p><b>Small squares (1 by 1):</b> 3 rows of 4 would be 12, but one is missing, so <b>11</b>.</p>
                   <p><b>2 by 2 squares:</b> in a full 3-by-4 grid, a 2-by-2 square can start in 3 places along each row and 2 places down, which makes 6. One of them would use the missing top-right square, so there are <b>5</b>. Several of them overlap each other.</p>
                   <p><b>3 by 3 squares:</b> one uses the three left-hand columns; the other would need the missing square. So there is <b>1</b>.</p>
                   <p>11 + 5 + 1 = <b>17</b>.</p>
-                  <p class="why-not">16 (C) is the trap: it counts the small and 2-by-2 squares correctly but misses the big 3-by-3 square. 14 (B) only counts 2-by-2 squares that don’t overlap (just 2 of them), plus the big one. 11 (A) counts only the small squares.</p>`
+                  <p class="why-not">16 (A) is the trap: it counts the small and 2-by-2 squares correctly but misses the big 3-by-3 square. 18 (C) counts both 3-by-3 squares, but the right-hand one would need the missing square. 20 (D) counts the squares in a full 3-by-4 grid (12 + 6 + 2) and forgets that one square is missing.</p>`
       }
     ]
   },
@@ -193,7 +193,7 @@ const SECTIONS = [
       {
         stem: `Sixty-four small white cubes of the same size are glued together to form a large cube.
                <div class="figure">${PAINTED_SVG}</div>
-               <p style="margin:10px 0 0">After painting all six sides of the large cube blue, how many small cubes have <b>2</b> blue sides?</p>`,
+               <p style="margin:10px 0 0">After painting all six sides of the large cube blue, how many small cubes have <b>exactly 2</b> blue sides?</p>`,
         options: ["8", "12", "24", "48", "56"],
         answer: 2,
         skill: "3D: which small cubes in a painted cube have exactly two painted sides (supplied by David)",

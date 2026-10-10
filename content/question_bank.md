@@ -97,7 +97,7 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 12: one cube per edge.
     - 48: 4 cubes per edge, including the corners.
     - 56: every cube that has any paint (64 − 8).
-- **Used**: Test 49 Maths Q3, as given, with options 8, 12, 24, 48 and 56 (answer C, 24) and a redrawn 3D picture. Held for David's review.
+- **Used**: Test 49 Maths Q3, as given, with options 8, 12, 24, 48 and 56 (answer C, 24) and a redrawn 3D picture. “2 blue sides” became “exactly 2 blue sides” (corner cubes also have 2 blue sides). Note: the count with exactly 1 blue side is also 24, so a child who mixes the two still lands on 24; the explanation says so. Held for David's review.
 
 ### Who got the medal (one liar) → Test 50 Thinking Q3 (stretch)
 - **Section**: thinking (truth-tellers and liars: logic with one false statement; stretch-level, like the sample-paper liars questions around Q21–30)
@@ -121,7 +121,7 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - Dilly: Babul and Dilly contradict each other, so one of them must be lying, and a child may pick the wrong one.
     - Carl: "I received a medal" sounds like boasting.
   - Good as a Thinking Q2 (a type the fixed slots miss) or a stretch Q3. A small table of the four cases makes a clear explanation.
-- **Used**: Test 50 Thinking Q3, as given (options Anthony, Babul, Carl, Dilly; answer B, Babul). Held for David's review.
+- **Used**: Test 50 Thinking Q3, as given (options Anthony, Babul, Carl, Dilly; answer B, Babul), except that “Among the statements below, only one of them did not tell the truth” became “Only one of the four children did not tell the truth” (a statement can’t tell the truth; the cold solve flagged it). Held for David's review.
 
 ### Marbles in a jar
 - **Section**: thinking (number problem: worst case / "to be sure"). It could also go in maths.
