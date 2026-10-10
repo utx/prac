@@ -132,6 +132,21 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 9.5: half of 19, thinking each rectangle is half the square's width.
   - Choose 4 or 5 of these.
 
+### Irina's muffins (best value)
+- **Section**: maths (best value / money; a good Q2)
+- **Added**: 2026-10-10
+- **Question**: Innkeeper Irina wants to buy some muffins for her guests. The bakery sells single muffins for $3 each and packages of 6 muffins for $10 per package. What is the greatest number of muffins that Irina can buy for $49?
+  - No options or answer were given.
+- **Answer** (checked by trying every mix): **27**. Packages are better value (6 muffins for $10, against $18 for 6 singles), so buy as many as possible: 4 packages cost $40 and give 24 muffins. The $9 left buys 3 singles. 24 + 3 = 27, costing exactly $49. Fewer packages give fewer muffins: 3 packages and 6 singles ($48) give only 24.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Possible wrong options from real mistakes:
+    - 24: 4 packages, forgetting to spend the $9 left over.
+    - 30: 5 packages, but they cost $50, more than $49.
+    - 16: all singles ($49 ÷ 3 = 16 remainder 1).
+    - 29: 4.9 × 6, rounded, as if part of a package could be bought.
+  - With the answer, these four make the five options Maths needs.
+
 ## Used
 
 ### Painted 4 × 4 × 4 cube → Test 49 Maths Q3 (stretch)
