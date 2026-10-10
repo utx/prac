@@ -96,6 +96,42 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 81: 9 × 9.
   - Choose 4 or 5 of these.
 
+### Sum of lots of 44 (clever calculation)
+- **Section**: maths (number: clever calculation by grouping, the distributive law; competition-style, so it counts as the test's one competition-style question)
+- **Added**: 2026-10-10
+- **Question**: Compute (1×44)+(3×44)+(5×44)+(7×44)+(9×44).
+  - No options or answer were given. David's picture was the question text only (no diagram), so no picture is saved.
+- **Answer** (checked): **1100**. Every bracket is a lot of 44, so add the lots first: 1 + 3 + 5 + 7 + 9 = 25 lots of 44, and 25 × 44 = 1100 (4 × 25 = 100, so 44 × 25 = 11 × 100). Working out each bracket gives the same total: 44 + 132 + 220 + 308 + 396 = 1100.
+- **Notes**:
+  - Written by David (his questions can be reworded). Use the × sign with spaces, and a question stem such as "What is the value of …?".
+  - The skill is spotting the shortcut, so it suits Maths Q2 more than a quick-fire Q1, and the explanation should show the grouping. Brute force also works, so it is not too hard for a Year 4 child.
+  - Possible wrong options from real mistakes:
+    - 1056: 24 × 44, adding 1 + 3 + 5 + 7 + 9 wrongly as 24.
+    - 1144: 26 × 44, the same slip the other way.
+    - 220: 5 × 44, counting the brackets instead of adding the numbers.
+    - 1980: 45 × 44, adding all the numbers from 1 to 9.
+    - 69: 25 + 44, adding instead of multiplying at the end.
+  - Choose 4 or 5 of these.
+
+### Four rectangles round a square hole (perimeter)
+- **Section**: maths (perimeter; a good Q2 or Q3, competition-style, so it counts as the test's one competition-style question)
+- **Added**: 2026-10-10
+- **Question**: Four congruent rectangles are arranged to form a square that has side length 19 as shown. What is the perimeter of one of the rectangles?
+  - Diagram (described in our own words; redraw it): a large square with its side marked 19. Inside it, four identical long, thin rectangles go round the edge in a pinwheel: one along the top, one down the right side, one along the bottom and one up the left side, each one butting against the end of the next. They leave a small square hole in the middle. The rectangles' own lengths are not marked.
+  - No options or answer were given.
+- **Answer** (checked): **38**. Along any side of the big square there is one rectangle's long side and one rectangle's short side (for example, across the top: the top rectangle's length, then the end of the right-hand rectangle). So length + width = 19, and the perimeter of one rectangle is 2 × 19 = 38. It doesn't matter how long or wide the rectangles are: 15 by 4, or 12 by 7, both give 38.
+- **Notes**:
+  - Written by David (his questions can be reworded). "Congruent" is above Year 4 wording: say "four identical rectangles" and add "cm" to the 19.
+  - Don't mark the rectangles' lengths, or the trick is lost. Draw it not to scale so it can't be measured.
+  - Perimeter was last a bank question in Test 47 (Twelve squares make a rectangle), so space it a few tests after that.
+  - Possible wrong options from real mistakes:
+    - 19: length + width, forgetting to double it.
+    - 76: the perimeter of the big square.
+    - 361: 19 × 19, the area of the big square.
+    - 57: 3 × 19, counting only three sides.
+    - 9.5: half of 19, thinking each rectangle is half the square's width.
+  - Choose 4 or 5 of these.
+
 ## Used
 
 ### Painted 4 × 4 × 4 cube → Test 49 Maths Q3 (stretch)
