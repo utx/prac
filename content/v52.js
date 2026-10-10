@@ -169,20 +169,21 @@ const SECTIONS = [
       {
         stem: `Kai is standing in a field, facing <b>north</b>.
                <div class="figure">${COMPASS_SVG}</div>
-               <p style="margin:10px 0 0">“Turn left” and “turn right” always mean a <b>quarter turn</b>. Which set of instructions would leave Kai facing <b>east</b>?</p>`,
-        options: ["Turn right, then turn right again.",
-                  "Turn left three times.",
-                  "Make a half turn, then turn right.",
-                  "Make a three-quarter turn to the right."],
+               <p style="margin:10px 0 0">He follows these instructions. “Turn left” and “turn right” always mean a <b>quarter turn</b>, and all his steps are the same length.</p>
+               <p class="quote" style="margin:10px 0 0">Walk 3 steps forward. Turn right and walk 2 steps. Turn right and walk 5 steps. Turn left and walk 2 steps.</p>
+               <p style="margin:10px 0 0">Where does Kai finish, and which way is he facing?</p>`,
+        options: ["2 steps east and 2 steps south of his start, facing east",
+                  "4 steps east and 2 steps south of his start, facing east",
+                  "2 steps south of his start, facing west",
+                  "7 steps east and 5 steps north of his start, facing north"],
         answer: 1,
-        skill: "following a sequence of turns, keeping track of which way left and right point",
-        explain: `<p>Follow each set of instructions one turn at a time. Remember that “right” and “left” depend on which way Kai is facing at that moment.</p>
-                  <p>• A: north → turn right → east → turn right → <b>south</b> ✗<br>
-                     • B: north → turn left → west → turn left → south → turn left → <b>east</b> ✓<br>
-                     • C: north → half turn → south. Facing south, Kai’s right hand points west, so turning right → <b>west</b> ✗<br>
-                     • D: a three-quarter turn to the right goes north → east → south → <b>west</b> ✗</p>
-                  <p>Three quarter turns to the left end in the same place as one quarter turn to the right, so B leaves Kai facing east.</p>
-                  <p class="why-not">C is the trap: it treats “right” as always meaning east, as it does on a map. But after the half turn, Kai is facing south, and his right is then west. A catches the same idea: if “right” always meant east, two right turns would still leave Kai facing east, but the second turn takes him on from east to south. D mixes up a three-quarter turn with a quarter turn; one quarter turn to the right would give east, but three of them go on round to west.</p>`
+        skill: "following turns and steps together, keeping track of which way left and right point",
+        explain: `<p>Follow the instructions one at a time, keeping track of where Kai is <b>and</b> which way he faces. “Right” and “left” depend on the way he is facing at that moment.</p>
+                  <p>• Walk 3 steps forward: he is 3 steps <b>north</b> of his start, still facing north.<br>
+                     • Turn right: facing north, his right is <b>east</b>. Walk 2: now 2 east and 3 north.<br>
+                     • Turn right: facing east, his right is <b>south</b>. Walk 5: 3 of those steps bring him back level with his start, and 2 more take him 2 steps south. Now 2 east and 2 south.<br>
+                     • Turn left: facing south, his left is <b>east</b> (picture yourself facing south: your left hand points east). Walk 2: now <b>4 east and 2 south</b>, facing <b>east</b>.</p>
+                  <p class="why-not">C is the trap: it gets every step right until the last turn, then treats “left” as west, as it is on a map. But Kai is facing south, so his left is east. D treats both “right” turns as east on a map, so he never turns south: he walks 2 + 5 = 7 steps east, then turns left to face north. A forgets the last 2 steps after the final turn.</p>`
       }
     ]
   },
