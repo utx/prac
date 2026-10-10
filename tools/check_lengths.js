@@ -8,7 +8,8 @@ const stubEl = { textContent: "", innerHTML: "", classList: { add(){}, remove(){
 const document = { getElementById: () => stubEl };
 const window = { scrollTo(){} };
 const SECTIONS = new Function("document", "window", "confirm", "setInterval", "clearInterval",
-  js.replace(/showStart\(\);\s*$/m, "") + "\nreturn SECTIONS;")(document, window, () => true, () => 0, () => {});
+  // drop the page's last line, which starts the test (or shows "not ready yet" for a test held for review)
+  js.replace(/^(if \(TEST_META\.status[^\n]*|showStart\(\);)\s*$/m, "") + "\nreturn SECTIONS;")(document, window, () => true, () => 0, () => {});
 const strip = s => String(s).replace(/<[^>]*>/g, "").trim();
 let text = 0, longest = 0; const detail = [];
 SECTIONS.forEach(s => s.questions.forEach((q, i) => {

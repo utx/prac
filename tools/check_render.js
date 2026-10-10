@@ -14,6 +14,11 @@ const out = process.argv[3] || ".";
     const p = await b.newPage({ viewport: { width: w, height: 900 } });
     p.on("pageerror", e => errs.push(e.message));
     await p.goto("file://" + file);
+    if (await p.evaluate(() => TEST_META.status === "review")) {
+      // held for review: the student page only says "not ready yet", so open it as the admin page does
+      await p.evaluate(() => sessionStorage.setItem("prac.admin", "1"));
+      await p.goto("file://" + file + "?admin=1");
+    }
     await p.click("#start");
     const answers = await p.evaluate(() => SECTIONS.map(s => s.questions.map(q => q.answer)));
     for (let s = 0; s < answers.length; s++) {
