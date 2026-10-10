@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 50</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  @media (max-width: 760px) { .bar { flex-wrap: wrap; gap: 6px 14px; padding: 10px 16px; } }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary, a.primary {
+    display: inline-block; text-decoration: none;
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover, a.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  /* question feedback (practice mode only) */
+  .review-box { margin: 12px 0 0 38px; padding: 12px 16px; border: 1.5px dashed #c9a227; border-radius: 6px; background: #fffaf0; font-size: 15px; }
+  .review-box .rv-head { font-weight: 700; margin: 0 0 6px; }
+  .review-box ul { margin: 0 0 10px; padding-left: 18px; }
+  .review-box li { margin: 0 0 4px; overflow-wrap: anywhere; }
+  .review-box li.done { color: var(--correct); }
+  .review-box .rv-actions, .review-box .rv-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+  .review-box button { font: inherit; font-size: 15px; padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; }
+  .review-box button.rv-approve { border-color: var(--correct); color: var(--correct); }
+  .review-box button.rv-redo, .review-box button.rv-send { border-color: var(--wrong); color: var(--wrong); }
+  .review-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 8px; border: 1.5px solid var(--line); border-radius: 6px; }
+  .review-box .rv-msg { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+  .review-box .rv-diff { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 0; font-size: 14px; }
+  .review-box .rv-diff span { color: var(--ink-soft); margin-right: 2px; }
+  .review-box button.rv-chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; border-color: var(--line); }
+  .review-box button.rv-chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .review-box .rv-form { margin-top: 10px; }
+  .review-box .rv-chosen { margin: 0; width: 100%; font-weight: 600; }
+  .review-box .rv-msg:empty, .review-box .rv-form[hidden], .review-box [hidden] { display: none; }
+  @media (max-width: 760px) { .review-box { margin-left: 0; } }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 50</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 50
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: four extracts on one theme ---- */
+const EXTRACTS = [
+  `The swing bridge across the river at my grandparents’ farm was nothing more than a row of narrow planks hung from two wire ropes, and it shivered if anyone so much as breathed on it. I was seven. My cousins raced across as if it were a footpath, and the whole thing bucked and swayed beneath them while I gripped the wire at the start. Between the planks I could see brown water hurrying past, a long way below. My big brother, Tom, stepped on behind me. “One more plank,” he said, every time I stopped. “Just one more.” It took me ten minutes to reach the other bank. Ten minutes after that, I was asking Tom if we could go back across, just so I could do it again.`,
+  `When the Sydney Harbour Bridge opened on 19 March 1932, it gave the city something it had always lacked: a quick way across the harbour without catching a ferry. Its single steel arch had been built out from both shores at once, and the two halves finally met in the middle in August 1930. From the time it opened, trains, trams, cars and people on foot all crossed it. Sydneysiders nicknamed it “the Coathanger” because of its shape. Keeping its steel painted, to stop rust, is a job that never really ends. Since 1998, visitors have been able to put on special suits and climb to the top of the arch, 134 metres above the water. And every New Year’s Eve, fireworks are set off from the bridge while huge crowds watch from all around the harbour.`,
+  `“I’m not waiting for anyone,” Ivy told the old man with the dog. “I’m just watching the trains.” She had been watching them from the footbridge for nearly an hour. Each time one slid into the station below, she leaned over the rail and studied every door as it opened. Each time the doors closed again, she shrugged and looked carefully at her shoes. The 5:42 was late. When it finally hissed to a stop, a tall girl with a huge orange backpack stepped off and looked up. Ivy gave a small, careless wave and walked, without hurrying, to the top of the steps. Only when she was halfway down did she start to run.`,
+  `Every school morning, children from the east side of Millbrook take the long way round. They walk down to the old road bridge, squeeze along its narrow footpath beside the trucks and then climb back up the other side of the creek. It takes them twenty minutes. A footbridge from the end of Wattle Street would take them straight across in two. Some councillors say a footbridge would cost too much, and that the road bridge has done its job perfectly well for sixty years. But that bridge was built for cars, not for children carrying heavy schoolbags. A footbridge would mean safer walks, fewer cars at the school gate and, I suspect, a lot more people strolling by the creek on summer evenings. It is time the council stopped talking and started building.`
+];
+const PASSAGE = {
+  title: "Getting to the Other Side",
+  note: "Read the four extracts below about bridges.",
+  html: EXTRACTS.map((t, i) => `<div class="extract"><h4>Extract ${"ABCD"[i]}</h4><p>${t}</p></div>`).join("")
+};
+
+/* ---- Thinking Skills Q2: side view of a cube model ---- */
+// HEIGHTS[y][x]; y = 0 is the front row, x = 0 is the left (seen from the front)
+const HEIGHTS = [[1, 0, 1], [2, 1, 0], [3, 1, 2]];
+const MODEL_SVG = (() => {
+  const s = 42, d = s * 0.6, ox = 14, top = 3 * s + 3 * d + 12, base = top;
+  const P = (x, y, z) => [ox + x * s + y * d, base - z * s - y * d];
+  const pts = a => a.map(p => p.map(v => v.toFixed(1)).join(",")).join(" ");
+  const poly = (a, fill) => `<polygon points="${pts(a)}" fill="${fill}" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>`;
+  const cube = (x, y, z) =>
+    poly([P(x, y, z), P(x + 1, y, z), P(x + 1, y, z + 1), P(x, y, z + 1)], "#9fc3e6") +
+    poly([P(x + 1, y, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x + 1, y, z + 1)], "#6f9fcf") +
+    poly([P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], "#d6e6f5");
+  let g = "";
+  const L = (a, b) => `<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="#8d9bb0" stroke-width="1.3"/>`;
+  for (let y = 0; y <= 3; y++) g += L(P(0, y, 0), P(3, y, 0));
+  for (let x = 0; x <= 3; x++) g += L(P(x, 0, 0), P(x, 3, 0));
+  for (let y = 2; y >= 0; y--) for (let x = 0; x < 3; x++) for (let z = 0; z < HEIGHTS[y][x]; z++) g += cube(x, y, z);
+  // arrow on the right, pointing left at the right-hand side of the model
+  const [a1x, a1y] = P(4.8, 1.5, 0), [a2x] = P(3.45, 1.5, 0);
+  g += `<line x1="${a1x.toFixed(1)}" y1="${a1y.toFixed(1)}" x2="${(a2x + 10).toFixed(1)}" y2="${a1y.toFixed(1)}" stroke="#c0392b" stroke-width="4"/>
+        <path d="M${(a2x + 18).toFixed(1)} ${(a1y - 10).toFixed(1)} L${a2x.toFixed(1)} ${a1y.toFixed(1)} L${(a2x + 18).toFixed(1)} ${(a1y + 10).toFixed(1)} Z" fill="#c0392b"/>`;
+  const [fx, fy] = P(1.5, 0, 0);
+  g += `<text x="${fx.toFixed(1)}" y="${(fy + 22).toFixed(1)}" font-size="14" text-anchor="middle" fill="${INK}">front</text>`;
+  const W = Math.ceil(a1x + 8), H = Math.ceil(fy + 30);
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="A model made of 11 cubes standing on a 3 by 3 floor grid. Front row, left to right: a stack of 1, an empty place, a stack of 1. Middle row: a stack of 2, a stack of 1, an empty place. Back row: a stack of 3, a stack of 1, a stack of 2. A red arrow on the right-hand side points at the model from the right.">${g}</svg>`;
+})();
+const sideView = (cols, label) => {
+  const s = 24, W = cols.length * s + 20, H = 3 * s + 16;
+  let g = `<line x1="4" y1="${H - 6}" x2="${W - 4}" y2="${H - 6}" stroke="${INK}" stroke-width="1.5"/>`;
+  cols.forEach((h, k) => { for (let z = 0; z < h; z++) g += `<rect x="${10 + k * s}" y="${H - 6 - (z + 1) * s}" width="${s}" height="${s}" fill="#9fc3e6" stroke="${INK}" stroke-width="1.4"/>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${label}">${g}</svg>`;
+};
+const VIEW_OPTS = [
+  [3, 1, 2],   // the view from the front
+  [3, 2, 1],   // mirror image (the view from the left)
+  [1, 2, 3],   // correct: the view from the right
+  [1, 0, 2]    // only the stacks nearest the arrow (right-hand column)
+].map((cols, i) => sideView(cols, `Picture ${"ABCD"[i]}: columns of squares with heights ${cols.join(", ")} from left to right.`));
+
+/* ---- Maths Q2: a clear box being filled with centimetre cubes ---- */
+const BOX_SVG = (() => {
+  const L = 6, Wd = 4, Ht = 3, s = 30, d = s * 0.6, ox = 10, base = Ht * s + Wd * d + 12;
+  const P = (x, y, z) => [ox + x * s + y * d, base - z * s - y * d];
+  const pts = a => a.map(p => p.map(v => v.toFixed(1)).join(",")).join(" ");
+  const poly = (a, fill, extra = "") => `<polygon points="${pts(a)}" fill="${fill}" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round" ${extra}/>`;
+  const edge = (a, b) => `<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="#4a6a8a" stroke-width="2"/>`;
+  const cube = (x, y, z) =>
+    poly([P(x, y, z), P(x + 1, y, z), P(x + 1, y, z + 1), P(x, y, z + 1)], "#f4c27a") +
+    poly([P(x + 1, y, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x + 1, y, z + 1)], "#e0a24c") +
+    poly([P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], "#fbe0b5");
+  // inside walls of the clear box: floor, back wall, left wall
+  let g = `<polygon points="${pts([P(0, 0, 0), P(L, 0, 0), P(L, Wd, 0), P(0, Wd, 0)])}" fill="#e6eef6"/>
+           <polygon points="${pts([P(0, Wd, 0), P(L, Wd, 0), P(L, Wd, Ht), P(0, Wd, Ht)])}" fill="#f1f6fb"/>
+           <polygon points="${pts([P(0, 0, 0), P(0, Wd, 0), P(0, Wd, Ht), P(0, 0, Ht)])}" fill="#edf3f9"/>`;
+  g += edge(P(0, Wd, 0), P(L, Wd, 0)) + edge(P(0, 0, 0), P(0, Wd, 0)) + edge(P(0, Wd, 0), P(0, Wd, Ht));
+  const cubes = [];
+  for (let x = 0; x < L; x++) cubes.push([x, 0, 0]);              // row along the front
+  for (let y = 1; y < Wd; y++) cubes.push([L - 1, y, 0]);         // row along the right side
+  for (let z = 1; z < Ht; z++) cubes.push([L - 1, 0, z]);         // stack in the front right corner
+  cubes.sort((a, b) => b[1] - a[1] || a[0] - b[0] || a[2] - b[2]).forEach(c => g += cube(...c));
+  // the box's outer edges, drawn on top so the box looks clear
+  [[P(0, 0, 0), P(L, 0, 0)], [P(0, 0, Ht), P(L, 0, Ht)], [P(0, 0, 0), P(0, 0, Ht)], [P(L, 0, 0), P(L, 0, Ht)],
+   [P(L, 0, 0), P(L, Wd, 0)], [P(L, 0, Ht), P(L, Wd, Ht)], [P(L, Wd, 0), P(L, Wd, Ht)],
+   [P(0, Wd, Ht), P(L, Wd, Ht)], [P(0, 0, Ht), P(0, Wd, Ht)]].forEach(([a, b]) => g += edge(a, b));
+  const W = Math.ceil(ox + L * s + Wd * d + 10), H = base + 10;
+  return `<svg viewBox="0 0 ${W} ${H.toFixed(0)}" width="${W}" height="${H.toFixed(0)}" role="img" aria-label="A clear box with no lid, drawn in 3D. Inside it are 11 centimetre cubes: a row of 6 cubes along the front, which exactly fills the length of the box; a row of cubes along the right-hand side, which together with the front corner cube makes 4 cubes and exactly fills the width; and a stack in the front right corner, which is 3 cubes high and exactly reaches the top of the box.">${g}</svg>`;
+})();
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Read the four extracts about bridges. For each question, choose the extract (A, B, C or D) which best answers it.",
+    questions: [
+      {
+        stem: "In which extract does someone come to enjoy the very thing that frightened them?",
+        letterOptions: true,
+        options: ["Extract A", "Extract B", "Extract C", "Extract D"],
+        answer: 0,
+        skill: "inferring feelings that are shown, not stated",
+        explain: `<p>Extract A never uses the words “scared” or “frightened”, but the details show it: the writer “gripped the wire at the start”, kept stopping, and needed Tom to coax them on, one plank at a time. Yet ten minutes after reaching the other side, the writer wants to cross again “just so I could do it again”. The thing that frightened them has become something they enjoy.</p>
+                  <p class="why-not">Extract D is the trap: the children squeeze past trucks on a narrow footpath, which sounds frightening, but nobody comes to enjoy it; the writer wants it changed. In Extract C, Ivy is nervous and excited while she waits, but she is not afraid of anything. Extract B mentions climbing 134 metres above the water, but says nothing about anyone being frightened.</p>`
+      },
+      {
+        stem: "Which extract suggests that someone is trying to hide how much something matters to them?",
+        letterOptions: true,
+        options: ["Extract A", "Extract B", "Extract C", "Extract D"],
+        answer: 2,
+        skill: "inferring a hidden feeling from actions that don’t match words",
+        explain: `<p>In Extract C, Ivy says she is “not waiting for anyone”, but her actions give her away. She has been on the footbridge for nearly an hour, she studies every train door, and each time she is disappointed she “shrugged and looked carefully at her shoes”. When the girl finally arrives, Ivy gives only “a small, careless wave” and walks “without hurrying”, but once she thinks no one can see her face, she runs. She is pretending not to care, when the arrival really matters to her a great deal.</p>
+                  <p class="why-not">Extract A is the trap: the writer is clearly struggling on the bridge, but is not hiding it; gripping the wire and stopping at every plank show the fear openly. In Extract D the writer says plainly how much the footbridge matters (“It is time the council stopped talking”). Extract B gives facts and feelings belong to no one in it.</p>`
+      },
+      {
+        stem: "Which extract suggests that something made to solve an everyday problem has become far more than that to a great many people?",
+        letterOptions: true,
+        options: ["Extract A", "Extract B", "Extract C", "Extract D"],
+        answer: 1,
+        skill: "identifying the main idea of a text expressed in different words",
+        explain: `<p>Extract B starts with the everyday problem the bridge solved: getting across the harbour without catching a ferry. The rest of the extract shows what it has come to mean since. People gave it a fond nickname (“the Coathanger”), visitors pay to climb it, and every New Year’s Eve it is the centre of the fireworks while huge crowds watch. None of these has anything to do with getting across the harbour. The extract never says “the bridge means more to people now”: you have to work it out from the details.</p>
+                  <p class="why-not">Extract D is the trap: its footbridge would solve an everyday problem, and the writer hopes it would bring people “strolling by the creek” too. But that footbridge hasn’t even been built, so it can’t have become anything yet; the writer only “suspect[s]” it would. Extract A shows a bridge becoming fun for one child, on one afternoon, not for a great many people. In Extract C the footbridge is just the place where Ivy waits.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0">Two classes ran cake stalls to raise money for the school library. The Year 5 stall was open <b>all day on Saturday</b> and raised <b>$300</b>. The Year 6 stall was open for <b>one hour on Sunday morning</b> and raised <b>$150</b>.</p>
+               <p class="quote"><em class="speaker">Ella (Year 5):</em> “Our stall raised twice as much money as the Year 6 stall, so our cakes must have been more popular.”</p>
+               <p style="margin:10px 0 0">Which one of these sentences shows the mistake Ella has made?</p>`,
+        options: ["The Year 5 students may have spent many hours baking their cakes the night before.",
+                  "The money raised by both of the stalls may be spent on new books for the school library.",
+                  "Some of the money Year 6 raised may have come from selling drinks, not cakes.",
+                  "In the much shorter time it was open, the Year 6 stall may have sold cakes faster."],
+        answer: 3,
+        skill: "spotting the mistake (an unfair comparison: different amounts of time)",
+        explain: `<p>Ella compares the <b>totals</b>, but the two stalls were not open for the same length of time. Year 6 raised $150 in just one hour. Year 5 was open all day, perhaps eight hours or more, so it may have raised much less than $150 in each hour. Compared fairly, Year 6’s cakes may have sold faster, which means they may have been <em>more</em> popular, not less. D points out this mistake.</p>
+                  <p class="why-not">C is the trap: it is about the money Year 6 raised, so it seems to question the comparison. But if some of Year 6’s money came from drinks, Year 6 sold even <em>fewer</em> cakes, which would back Ella up rather than show her mistake. A is about how hard Year 5 worked, which says nothing about how popular the cakes were. B is about what the money will be spent on, which has nothing to do with Ella’s conclusion.</p>`
+      },
+      {
+        stem: `This model is made of <b>11</b> cubes standing on a floor grid.
+               <div class="figure">${MODEL_SVG}</div>
+               <p style="margin:10px 0 0">Which picture shows what you would see if you looked at the model from the direction of the <b>arrow</b>?</p>`,
+        visualOptions: true,
+        options: VIEW_OPTS,
+        answer: 2,
+        skill: "the side view of a cube model from a given direction",
+        explain: `<p><b>Step 1: which way round?</b> Stand where the arrow is and look at the model. The <b>front</b> row is now on your <b>left</b> and the back row is on your right.</p>
+                  <p><b>Step 2: how tall is each column?</b> From this side, each column of the view shows the <em>tallest</em> stack in one row (front to back) of the model; shorter stacks are hidden behind it.<br>
+                     • Front row (stacks 1, 0, 1): tallest is <b>1</b>.<br>
+                     • Middle row (stacks 2, 1, 0): tallest is <b>2</b>.<br>
+                     • Back row (stacks 3, 1, 2): tallest is <b>3</b>.</p>
+                  <p>So from left to right the view is 1, 2, 3. That is <b>C</b>.</p>
+                  <p class="why-not">B is the trap: it has the right heights but the wrong way round (3, 2, 1), with the front row on the right. That is the view from the <em>left</em>-hand side of the model. A is the view from the front (3, 1, 2). D shows only the stacks closest to the arrow (the right-hand column: 1, 0, 2), but taller stacks further away can still be seen above and behind them, and nothing in this view would look like a gap.</p>`
+      },
+      {
+        stem: `Anthony, Babul, Carl, and Dilly ran in a race. Only one of them received a medal. Only one of the four children did not tell the truth.
+               <p class="quote"><em class="speaker">Anthony</em> says, “Babul didn’t receive a medal.”</p>
+               <p class="quote"><em class="speaker">Babul</em> says, “Dilly received a medal.”</p>
+               <p class="quote"><em class="speaker">Carl</em> says, “I received a medal.”</p>
+               <p class="quote"><em class="speaker">Dilly</em> says, “I didn’t receive a medal.”</p>
+               <p style="margin:10px 0 0">Who did not tell the truth?</p>`,
+        options: ["Anthony", "Babul", "Carl", "Dilly"],
+        answer: 1,
+        skill: "logic: finding the one false statement by testing each case (supplied by David)",
+        explain: `<p>Try each runner as the medal winner, and count how many statements would be false. Only one case can have exactly <b>one</b> false statement.</p>
+                  <div class="table-wrap"><table class="grid">
+                    <tr><th>If the medal went to …</th><th style="text-align:center">Anthony</th><th style="text-align:center">Babul</th><th style="text-align:center">Carl</th><th style="text-align:center">Dilly</th><th style="text-align:center">false statements</th></tr>
+                    <tr><th>Anthony</th><td style="text-align:center">true</td><td style="text-align:center">false</td><td style="text-align:center">false</td><td style="text-align:center">true</td><td style="text-align:center">2 ✗</td></tr>
+                    <tr><th>Babul</th><td style="text-align:center">false</td><td style="text-align:center">false</td><td style="text-align:center">false</td><td style="text-align:center">true</td><td style="text-align:center">3 ✗</td></tr>
+                    <tr><th>Carl</th><td style="text-align:center">true</td><td style="text-align:center"><b>false</b></td><td style="text-align:center">true</td><td style="text-align:center">true</td><td style="text-align:center"><b>1 ✓</b></td></tr>
+                    <tr><th>Dilly</th><td style="text-align:center">true</td><td style="text-align:center">true</td><td style="text-align:center">false</td><td style="text-align:center">false</td><td style="text-align:center">2 ✗</td></tr>
+                  </table></div>
+                  <p>Only “Carl won the medal” gives exactly one false statement, and that statement is Babul’s. So <b>Babul</b> did not tell the truth.</p>
+                  <p>A quicker way: Babul says Dilly won, and Dilly says she didn’t, so one of those two must be lying. That means everyone else, Anthony and Carl, told the truth. Carl’s true statement says Carl won, so Dilly didn’t win, and Babul is the one who lied.</p>
+                  <p class="why-not">D (Dilly) is the trap: Babul and Dilly contradict each other, so one of them must be lying, and it is easy to pick the wrong one. If Dilly were lying, Dilly would have won, and then Carl’s statement would be false too: two liars. C (Carl) is tempting because “I received a medal” sounds like boasting, but if Carl were lying, Babul’s and Dilly’s statements would still clash, so there would be two liars. A (Anthony) would mean Babul won, which makes three statements false.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `A car’s odometer shows how many kilometres the car has travelled altogether. Today, Dad’s car shows <b>40 205 km</b>.
+               <p style="margin:10px 0 0">What did it show <b>1000 km</b> earlier?</p>`,
+        options: ["30 205 km", "39 205 km", "40 105 km", "40 195 km", "41 205 km"],
+        answer: 1,
+        skill: "place value: taking away 1000 when the thousands digit is 0",
+        explain: `<p>Taking away 1000 changes the <b>thousands</b> digit. In 40 205 the thousands digit is 0, so regroup: 40 thousands = 39 thousands + 1 thousand. Take the 1 thousand away and 39 thousands are left; the hundreds, tens and ones (205) do not change.</p>
+                  <p>40 205 − 1000 = <b>39 205 km</b>. Check: 39 205 + 1000 = 40 205 ✓</p>
+                  <p class="why-not">30 205 (A) is the trap: with no thousand to take away, it takes 1 from the ten-thousands digit instead, which takes away 10 000. 40 105 (C) takes 1 from the hundreds digit (100 less). 40 195 (D) takes away 10. 41 205 (E) adds 1000 instead of taking it away; “earlier” means the car had travelled less.</p>`
+      },
+      {
+        stem: `Leo is filling a clear box with centimetre cubes. So far he has put in a row of cubes along the front, a row along the right-hand side and a stack in the front right corner, as shown. Each row and the stack fit the inside of the box exactly.
+               <div class="figure">${BOX_SVG}</div>
+               <p style="margin:10px 0 0">How many cubes will be in the box when it is completely full?</p>`,
+        options: ["11", "13", "24", "61", "72"],
+        answer: 4,
+        skill: "volume: working out a box’s inside measurements from the cubes, then filling it in layers",
+        explain: `<p><b>Step 1: the inside measurements.</b> The front row has 6 cubes, so the box is 6 cubes long. The side row is 4 cubes deep (counting the corner cube). The corner stack is 3 cubes high.</p>
+                  <p><b>Step 2: fill it in layers.</b> One layer covering the floor is 6 rows of 4, or 6 × 4 = <b>24</b> cubes. The box is 3 layers high: 24 × 3 = <b>72</b> cubes.</p>
+                  <p class="why-not">24 (C) is the trap: it fills the bottom layer but forgets that the box is 3 layers high. 61 (D) answers a different question: 72 − 11 is how many <em>more</em> cubes Leo needs. 13 (B) adds the three measurements (6 + 4 + 3) instead of multiplying. 11 (A) counts the cubes already in the box.</p>`
+      },
+      {
+        stem: `Ruby and Tom collected <b>50</b> shells altogether at the beach. If Tom gave Ruby <b>6</b> of his shells, they would both have the same number.
+               <p style="margin:10px 0 0">How many shells did Ruby collect?</p>`,
+        options: ["19", "22", "25", "31", "38"],
+        answer: 0,
+        skill: "sum and difference: finding two numbers from their total and a hidden difference",
+        explain: `<p><b>Step 1: find the difference.</b> When Tom gives 6 shells away, he goes down by 6 and Ruby goes up by 6. They end up equal, so Tom must have started with 6 + 6 = <b>12</b> more than Ruby.</p>
+                  <p><b>Step 2: sum and difference.</b> Take the extra 12 away from the total: 50 − 12 = 38. Now the rest can be shared equally: 38 ÷ 2 = <b>19</b>. Ruby collected 19 and Tom collected 19 + 12 = 31.</p>
+                  <p>Check: 19 + 31 = 50 ✓. After the swap: Ruby 19 + 6 = 25 and Tom 31 − 6 = 25 ✓.</p>
+                  <p class="why-not">22 (B) is the trap: it thinks Tom has only 6 more than Ruby, forgetting that the swap changes <em>both</em> numbers, and works out (50 − 6) ÷ 2. 25 (C) is how many each would have <em>after</em> the swap. 31 (D) is Tom’s number, not Ruby’s. 38 (E) takes away the difference but forgets to share what is left between the two.</p>`
+      }
+    ]
+  }
+];
+
+const TEST_META = {"version": 50, "reading_format": "four extracts", "categories": {"reading": ["Feelings & inference", "Feelings & inference", "Main idea"], "thinking": ["Spot the mistake", "Spatial", "Must or cannot be true"], "maths": ["Number & place value", "Area, perimeter & 3D", "Number & place value"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}, "status": "review"};
+const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  const t = await r.text(); // functions that return nothing send an empty body
+  return t ? JSON.parse(t) : null;
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
+  persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 50</h1>
+      ${completedNote()}
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+      ${mode === "review" && ADMIN ? `<div class="review-box" data-q="${qi}"><p class="rv-msg">Loading feedback…</p></div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  sectionStart = Date.now();
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  if (ADMIN) fillReviews();
+  window.scrollTo(0, 0);
+}
+
+/* ---- question feedback (practice mode only): approve, or send back for a redo with a comment.
+   Saved online through add_review(pin, …); Claude answers each redo with a 'done' row. ---- */
+let reviewRows = [];
+const RV_DIFF = ["Much easier", "A bit easier", "A bit harder", "Much harder"];
+const RV_LABEL = { approve: "Approved", redo: "Sent back for a redo", done: "Redone by Claude" };
+const rvEsc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function reviewPin() { try { return sessionStorage.getItem("prac.admin.pin") || ""; } catch (e) { return ""; } }
+async function fillReviews() {
+  const si = current, boxes = app.querySelectorAll(".review-box");
+  const note = t => boxes.forEach(b => b.innerHTML = `<p class="rv-msg">${t}</p>`);
+  if (!syncOn() || !reviewPin()) return note("Question feedback needs the online database. Open this test from the admin page (after entering the PIN).");
+  try { reviewRows = (await syncRpc("admin_reviews", { p_pin: reviewPin() })) || []; }
+  catch (e) { return note("Couldn’t load question feedback. If this keeps happening, the database may need its update (ask Claude)."); }
+  if (current !== si || passMode !== "review") return;
+  boxes.forEach(b => renderReviewBox(b, SECTIONS[si].id, +b.dataset.q));
+}
+function renderReviewBox(box, sec, qi, msg) {
+  const hist = reviewRows.filter(r => r.version === TEST_META.version && r.section === sec && r.q === qi);
+  const when = t => { const d = new Date(t); return isNaN(d) ? "" : d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }); };
+  const last = hist[hist.length - 1];
+  box.innerHTML = `<p class="rv-head">Your review of question ${qi + 1}</p>
+    ${hist.length ? `<ul>${hist.map(r => `<li class="${r.kind}"><b>${RV_LABEL[r.kind] || rvEsc(r.kind)}</b> · ${when(r.at)}${r.comment ? `: ${rvEsc(r.comment)}` : ""}</li>`).join("")}</ul>` : ""}
+    ${last && last.kind === "redo" ? `<p class="rv-msg">Waiting for Claude to redo this question.</p>` : ""}
+    <div class="rv-actions">
+      <button type="button" class="rv-approve">${last && last.kind === "approve" ? "Approved ✓" : "Approve"}</button>
+      <button type="button" class="rv-redo">Send back for a redo</button>
+    </div>
+    <div class="rv-diff" role="group" aria-label="Quick difficulty change for question ${qi + 1}">
+      <span>Difficulty:</span>
+      ${RV_DIFF.map((d, k) => `<button type="button" class="rv-chip" data-d="${k}">${d}</button>`).join("")}
+    </div>
+    <div class="rv-form" hidden>
+      <p class="rv-chosen" hidden></p>
+      <textarea rows="3" maxlength="4000" aria-label="What needs changing in question ${qi + 1}?" placeholder="What needs changing? (e.g. too easy, two answers could be right, picture unclear)"></textarea>
+      <button type="button" class="rv-send">Send back</button>
+      <button type="button" class="rv-cancel">Cancel</button>
+    </div>
+    <p class="rv-msg" role="status">${msg || ""}</p>`;
+  const form = box.querySelector(".rv-form"), say = t => box.querySelector(".rv-msg[role=status]").textContent = t;
+  const chosen = box.querySelector(".rv-chosen"), ta = box.querySelector("textarea");
+  let diff = null;
+  const pick = k => {
+    diff = k;
+    box.querySelectorAll(".rv-chip").forEach(c => c.classList.toggle("on", +c.dataset.d === k));
+    chosen.hidden = k === null;
+    chosen.textContent = k === null ? "" : `Make it ${RV_DIFF[k].toLowerCase()}. Add a comment if you like, then press Send back.`;
+    ta.placeholder = k === null ? "What needs changing? (e.g. too easy, two answers could be right, picture unclear)" : "Optional: anything else to change?";
+    form.hidden = false; ta.focus(); say("");
+  };
+  box.querySelector(".rv-approve").onclick = () => submitReview(box, sec, qi, "approve", "");
+  box.querySelector(".rv-redo").onclick = () => pick(null);
+  box.querySelectorAll(".rv-chip").forEach(c => c.onclick = () => pick(+c.dataset.d));
+  box.querySelector(".rv-cancel").onclick = () => { form.hidden = true; diff = null; box.querySelectorAll(".rv-chip").forEach(c => c.classList.remove("on")); say(""); };
+  box.querySelector(".rv-send").onclick = () => {
+    const c = ta.value.trim();
+    if (diff === null && !c) { say("Add a comment (or pick a difficulty) so Claude knows what to change."); return; }
+    submitReview(box, sec, qi, "redo", (diff === null ? "" : `Difficulty: make it ${RV_DIFF[diff].toLowerCase()}.` + (c ? " " : "")) + c);
+  };
+}
+async function submitReview(box, sec, qi, kind, comment) {
+  box.querySelectorAll("button").forEach(b => b.disabled = true);
+  box.querySelector(".rv-msg[role=status]").textContent = "Saving…";
+  try {
+    await syncRpc("add_review", { p_pin: reviewPin(), p_version: TEST_META.version, p_section: sec, p_q: qi, p_kind: kind, p_comment: comment });
+  } catch (e) {
+    box.querySelectorAll("button").forEach(b => b.disabled = false);
+    box.querySelector(".rv-msg[role=status]").textContent = "Couldn’t save. Check the internet connection and try again.";
+    return;
+  }
+  reviewRows.push({ version: TEST_META.version, section: sec, q: qi, kind, comment, at: new Date().toISOString() });
+  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it overnight, or straight away if you run “Do redos now”.");
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  finishAttempt();
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+// A test held for review is only on the admin page; someone opening its address directly sees this instead.
+function showNotReady() {
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>This test isn’t ready yet</h1>
+      <p class="lead">It will appear on the list of tests once it has been checked.</p>
+      <a class="primary" href="../../index.html">Back to all tests</a>
+    </div>`;
+}
+
+if (TEST_META.status === "review" && !ADMIN) showNotReady(); else showStart();
+</script>
+</body>
+</html>

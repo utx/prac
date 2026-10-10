@@ -1,0 +1,63 @@
+{
+  "version": 52,
+  "date": "2026-10-10",
+  "status": "review",
+  "reading": "Cloze: The Jar on the Bench",
+  "reading_format": "cloze",
+  "reading_topic": "baking a first loaf of sourdough: growing and feeding a starter, the overnight rise, the oven and the first slice (first-person piece)",
+  "thinking": [
+    "Spot the mistake (ignoring another possible cause: music in the library versus colder weather)",
+    "Venn diagram: which shape is in the wrong place (line of symmetry and right angle)",
+    "Following turns and steps together: finishing place and facing direction (stretch)"
+  ],
+  "maths": [
+    "Quick-fire money: adding three prices, then change from $20",
+    "Round-robin games: every pair of players plays twice",
+    "Balance scales: removing equal weights, then the pineapple's mass in grams (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q13 (look-alike words: 'decrease/descent/decay/decline'), PT3 Q10 (word decided by the preposition)",
+      "PT1 Q12 ('paged/leafed': shade of meaning), PT3 Q13 ('decay/decline')",
+      "PT2 Q11 (word chosen from the meaning of the whole sentence), PT1 Q12 — stretch"
+    ],
+    "thinking": [
+      "PT3 Q8 (mistake: ignoring another possible cause), PT3 Q24 (one cause assumed to exclude another)",
+      "PT1 Q3 (which pets overlap: sets), PT2 Q2 (movie preferences: sets); nearby: Maths PT1 Q21 (symmetry)",
+      "PT2 Q28 (facing directions on a square), PT1 Q23 (compass positions) — stretch"
+    ],
+    "maths": [
+      "PT2 Q7 (price from change), PT3 Q7 (estimating change by rounding)",
+      "PT3 Q28 (round-robin matches), PT2 Q10 (combinations: shapes x colours)",
+      "PT3 Q15 (equal-weight fruit comparison), PT3 Q2 (balancing scales), PT2 Q25 (splitting combined masses) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Rules & codes",
+      "Spatial"
+    ],
+    "maths": [
+      "Money & best value",
+      "Chance & counting",
+      "Measurement & scales"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

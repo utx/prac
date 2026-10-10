@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 52</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  @media (max-width: 760px) { .bar { flex-wrap: wrap; gap: 6px 14px; padding: 10px 16px; } }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary, a.primary {
+    display: inline-block; text-decoration: none;
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover, a.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  /* question feedback (practice mode only) */
+  .review-box { margin: 12px 0 0 38px; padding: 12px 16px; border: 1.5px dashed #c9a227; border-radius: 6px; background: #fffaf0; font-size: 15px; }
+  .review-box .rv-head { font-weight: 700; margin: 0 0 6px; }
+  .review-box ul { margin: 0 0 10px; padding-left: 18px; }
+  .review-box li { margin: 0 0 4px; overflow-wrap: anywhere; }
+  .review-box li.done { color: var(--correct); }
+  .review-box .rv-actions, .review-box .rv-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+  .review-box button { font: inherit; font-size: 15px; padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; }
+  .review-box button.rv-approve { border-color: var(--correct); color: var(--correct); }
+  .review-box button.rv-redo, .review-box button.rv-send { border-color: var(--wrong); color: var(--wrong); }
+  .review-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 8px; border: 1.5px solid var(--line); border-radius: 6px; }
+  .review-box .rv-msg { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+  .review-box .rv-diff { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 0; font-size: 14px; }
+  .review-box .rv-diff span { color: var(--ink-soft); margin-right: 2px; }
+  .review-box button.rv-chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; border-color: var(--line); }
+  .review-box button.rv-chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .review-box .rv-form { margin-top: 10px; }
+  .review-box .rv-chosen { margin: 0; width: 100%; font-weight: 600; }
+  .review-box .rv-msg:empty, .review-box .rv-form[hidden], .review-box [hidden] { display: none; }
+  @media (max-width: 760px) { .review-box { margin-left: 0; } }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 52</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 52
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: cloze passage ---- */
+const CLOZE_TEXT = `
+<p>Sourdough bread doesn’t use yeast from a packet. Instead, it rises thanks to a “starter”: a jar of flour and water in which wild yeasts live. Before I could bake anything, I had to grow one. Dad, who had {1} to sharing the kitchen bench with “a jar of grey goo”, asked every single day when it would be gone.</p>
+<p>Every morning I tipped half of the starter away and stirred in fresh flour and water. For the first few days it lay {2} in its jar, flat, grey and silent, and I began to fear that I had killed it. Then, on the fifth morning, I found that it had doubled in size overnight. It was full of bubbles and smelt faintly of apples and vinegar. It was alive.</p>
+<p>On Saturday I mixed some of the starter with flour, water and salt. Every half an hour I stretched the sticky dough and folded it over on itself, until it felt smooth and springy. Then it spent the night in the fridge, rising slowly in a basket lined with a floured tea towel.</p>
+<p>On Sunday morning I baked it in a heavy pot, in the hottest oven I was allowed to use. When it came out, the loaf was tall and golden-brown, and as it cooled, its crust crackled softly, as if it were whispering. The recipe said to wait a whole hour before cutting it. It was the longest hour of my life.</p>
+<p>The first slice was chewy and tangy, with a crust that shattered when I bit into it. Even Dad was {3}: he ate one slice without a word, then quietly cut himself another.</p>`;
+
+function clozeHtml() {
+  const si = SECTIONS.findIndex(s => s.id === "reading");
+  let t = CLOZE_TEXT;
+  SECTIONS[si].questions.forEach((q, i) => {
+    const chosen = responses[si][i];
+    let fill;
+    if (passMode === "review") fill = `<span class="gap filled correct">(${i + 1}) ${q.options[q.answer]}</span>`;
+    else if (chosen !== null) fill = `<span class="gap filled">(${i + 1}) ${q.options[chosen]}</span>`;
+    else fill = `<span class="gap">(${i + 1}) ……</span>`;
+    t = t.replace(`{${i + 1}}`, fill);
+  });
+  return t;
+}
+const PASSAGE = {
+  title: "The Jar on the Bench",
+  note: "Read the text below and decide which answer best fits each gap.",
+  html: clozeHtml
+};
+
+/* ---- Thinking Skills Q2: shapes sorted in a Venn diagram ---- */
+const VENN_SHAPES = [
+  // [number, points, scale, x, y, right-angle vertices, description]
+  [1, [[20, 0], [40, 24], [20, 64], [0, 24]], 0.85, 40, 90, [], "a kite"],
+  [4, [[0, 0], [44, 0], [60, 26], [16, 26]], 0.8, 30, 190, [], "a slanting parallelogram (not a rectangle)"],
+  [2, [[0, 0], [0, 40], [40, 40]], 0.9, 132, 100, [1], "a right-angled triangle with two equal sides"],
+  [3, [[0, 0], [16, 0], [16, 24], [40, 24], [40, 40], [0, 40]], 0.9, 132, 186, [0, 1, 3, 4, 5], "an L shape with arms of equal length"],
+  [5, [[0, 0], [26, 0], [44, 32], [0, 32]], 0.8, 222, 110, [0, 3], "a trapezium with two right angles"],
+  [6, [[0, 0], [0, 30], [46, 30]], 0.8, 220, 190, [1], "a right-angled triangle with three different sides"],
+  [7, [[0, 30], [52, 30], [14, 0]], 0.7, 26, 262, [], "a triangle with three different sides and no right angle"]
+];
+const VENN_SVG = (() => {
+  let g = `<rect x="4" y="4" width="292" height="292" rx="6" fill="#fbfcfe" stroke="${INK}" stroke-width="1.6"/>
+    <circle cx="112" cy="170" r="98" fill="#e6f0fa" fill-opacity=".7" stroke="${INK}" stroke-width="1.8"/>
+    <circle cx="188" cy="170" r="98" fill="#fbeadf" fill-opacity=".7" stroke="${INK}" stroke-width="1.8"/>
+    <circle cx="112" cy="170" r="98" fill="none" stroke="${INK}" stroke-width="1.8"/>
+    <text x="84" y="44" font-size="13" text-anchor="middle" fill="${INK}" font-weight="600">has a line of symmetry</text>
+    <text x="230" y="44" font-size="13" text-anchor="middle" fill="${INK}" font-weight="600">has a right angle</text>`;
+  VENN_SHAPES.forEach(([n, pts, s, x, y, rights]) => {
+    const P = pts.map(([a, b]) => [x + a * s, y + b * s]);
+    g += `<polygon points="${P.map(p => p.map(v => v.toFixed(1)).join(",")).join(" ")}" fill="#ffffff" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>`;
+    rights.forEach(i => {
+      const b = P[i], a = P[(i + P.length - 1) % P.length], c = P[(i + 1) % P.length];
+      const unit = (p, q) => { const d = Math.hypot(q[0] - p[0], q[1] - p[1]); return [(q[0] - p[0]) / d * 6, (q[1] - p[1]) / d * 6]; };
+      const u = unit(b, a), v = unit(b, c);
+      g += `<polyline points="${[b[0] + u[0], b[1] + u[1]]} ${[b[0] + u[0] + v[0], b[1] + u[1] + v[1]]} ${[b[0] + v[0], b[1] + v[1]]}" fill="none" stroke="${INK}" stroke-width="1.2"/>`;
+    });
+    const xs = P.map(p => p[0]), ys = P.map(p => p[1]);
+    const [lx, ly, la] = n === 7 ? [Math.max(...xs) + 7, (Math.min(...ys) + Math.max(...ys)) / 2 + 5, "start"]
+                                 : [(Math.min(...xs) + Math.max(...xs)) / 2, Math.max(...ys) + 17, "middle"];
+    g += `<text x="${lx}" y="${ly}" font-size="15" font-weight="700" text-anchor="${la}" fill="#b5462f" stroke="#ffffff" stroke-width="3" paint-order="stroke">${n}</text>`;
+  });
+  const desc = VENN_SHAPES.map(([n, , , , , , d]) => `shape ${n} is ${d}`).join("; ");
+  return `<svg viewBox="0 0 300 300" width="300" height="300" role="img" aria-label="A Venn diagram with two overlapping circles: left circle 'has a line of symmetry', right circle 'has a right angle'. Left circle only: shapes 1 and 4. Overlap: shapes 2 and 3. Right circle only: shapes 5 and 6. Outside both circles: shape 7. Right angles are marked. ${desc}.">${g}</svg>`;
+})();
+
+/* ---- Thinking Skills Q3: compass ---- */
+const COMPASS_SVG = (() => {
+  const c = 70;
+  let g = `<circle cx="${c}" cy="${c}" r="46" fill="#f4f6fa" stroke="${INK}" stroke-width="1.6"/>`;
+  [["N", 0, -60], ["E", 60, 0], ["S", 0, 60], ["W", -60, 0]].forEach(([t, dx, dy]) => {
+    g += `<text x="${c + dx}" y="${c + dy + 5}" font-size="15" font-weight="700" text-anchor="middle" fill="${INK}">${t}</text>`;
+  });
+  g += `<line x1="${c}" y1="${c - 46}" x2="${c}" y2="${c + 46}" stroke="#c3cad6" stroke-width="1"/><line x1="${c - 46}" y1="${c}" x2="${c + 46}" y2="${c}" stroke="#c3cad6" stroke-width="1"/>`;
+  g += `<circle cx="${c}" cy="${c}" r="9" fill="#f2c14e" stroke="${INK}" stroke-width="1.6"/>`;
+  g += `<path d="M${c} ${c - 34} L${c - 8} ${c - 18} L${c + 8} ${c - 18} Z" fill="${INK}"/><line x1="${c}" y1="${c - 9}" x2="${c}" y2="${c - 19}" stroke="${INK}" stroke-width="3"/>`;
+  return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="A compass showing north at the top, east on the right, south at the bottom and west on the left. Kai stands in the middle, with an arrow showing that he is facing north.">${g}</svg>`;
+})();
+
+/* ---- Maths Q3: balance scales with fruit ---- */
+const FRUIT = {
+  apple: (x, y) => `<circle cx="${x}" cy="${y - 10}" r="10" fill="#d0453a" stroke="${INK}" stroke-width="1.5"/><line x1="${x}" y1="${y - 20}" x2="${x + 2}" y2="${y - 25}" stroke="${INK}" stroke-width="1.6"/>`,
+  orange: (x, y) => `<circle cx="${x}" cy="${y - 12}" r="12" fill="#f39c33" stroke="${INK}" stroke-width="1.5"/><circle cx="${x}" cy="${y - 20}" r="1.6" fill="${INK}"/>`,
+  pineapple: (x, y) => `<ellipse cx="${x}" cy="${y - 17}" rx="12" ry="17" fill="#e2b34a" stroke="${INK}" stroke-width="1.5"/><path d="M${x - 7} ${y - 22} L${x + 7} ${y - 10} M${x + 7} ${y - 22} L${x - 7} ${y - 10}" stroke="#9a6d1c" stroke-width="1.2"/><path d="M${x} ${y - 33} L${x - 8} ${y - 46} L${x - 2} ${y - 36} L${x} ${y - 50} L${x + 2} ${y - 36} L${x + 8} ${y - 46} Z" fill="#3f9a4a" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+};
+function fruitScale(left, right, label) {
+  const pan = (items, cx) => items.map((k, n) => FRUIT[k](cx + (n - (items.length - 1) / 2) * 24, 74)).join("");
+  const words = items => ["pineapple", "orange", "apple"].map(k => [k, items.filter(x => x === k).length]).filter(e => e[1])
+    .map(([k, c]) => `${c} ${k}${c > 1 ? "s" : ""}`).join(" and ");
+  const g = `<polygon points="130,82 117,120 143,120" fill="#d9dee7" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+    <line x1="18" y1="82" x2="242" y2="82" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="10" y1="74" x2="110" y2="74" stroke="${INK}" stroke-width="2.4"/><line x1="150" y1="74" x2="250" y2="74" stroke="${INK}" stroke-width="2.4"/>
+    <line x1="60" y1="74" x2="60" y2="82" stroke="${INK}" stroke-width="2"/><line x1="200" y1="74" x2="200" y2="82" stroke="${INK}" stroke-width="2"/>
+    ${pan(left, 60)}${pan(right, 200)}`;
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><svg viewBox="0 0 260 124" width="260" height="124" role="img"
+    aria-label="${label}: a balanced scale with ${words(left)} on the left and ${words(right)} on the right.">${g}</svg><span style="font-size:14px">${label}</span></div>`;
+}
+const FRUIT_KEY = `<div style="display:flex;flex-wrap:wrap;gap:6px 22px;justify-content:center;font-size:14px;align-items:center">${["apple", "orange", "pineapple"].map(k =>
+  `<span style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="-16 -54 32 56" width="22" height="38" aria-hidden="true">${FRUIT[k](0, 0)}</svg>${k}</span>`).join("")}</div>`;
+const FRUIT_SCALES = `<div style="display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:center">${fruitScale(["pineapple"], ["orange", "orange", "apple"], "Scale 1")}${fruitScale(["orange", "apple"], ["apple", "apple", "apple", "apple"], "Scale 2")}</div>${FRUIT_KEY}`;
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Read the text, then decide which answer (A, B, C or D) best fits each gap.",
+    questions: [
+      {
+        stem: "Which word best fits <b>gap 1</b>?",
+        options: ["rejected", "projected", "dejected", "objected"],
+        answer: 3,
+        skill: "choosing between look-alike words, using the little word that follows (“to”)",
+        explain: `<p>Dad didn’t want the jar on the bench: he kept asking “when it would be gone”. To <b>object to</b> something means to say you are against it, and “objected” is the only word here that can be followed by “to sharing”.</p>
+                  <p class="why-not">“Rejected” is the trap: its meaning is close (Dad didn’t want the jar), but you reject something, never reject <em>to</em> something, so “had rejected to sharing” doesn’t work. “Dejected” is a describing word meaning sad and low, so “Dad, who had dejected” makes no sense. “Projected” means thrown or shone forward (like a film on a screen), or worked out ahead of time, which has nothing to do with Dad’s complaints.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 2</b>?",
+        options: ["extinct", "dormant", "obsolete", "defunct"],
+        answer: 1,
+        skill: "choosing between words close in meaning, using what happens later in the text",
+        explain: `<p><b>Dormant</b> means alive but inactive, as if asleep, and able to wake up later (like a seed in winter or a volcano that hasn’t erupted for years). The starter looked lifeless, but on the fifth morning it had doubled in size: “It was alive.” So it had only been dormant.</p>
+                  <p class="why-not">“Extinct” is the trap: the writer feared the starter was dead, but extinct means gone for ever (and is used for whole kinds of animals or plants, or for volcanoes that will never erupt again), and the starter came back to life. “Defunct” also means dead or no longer working, so it is wrong for the same reason. “Obsolete” means out of date and no longer used, like an old machine, which isn’t what the writer means at all.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 3</b>?",
+        options: ["unmoved", "subdued", "converted", "unimpressed"],
+        answer: 2,
+        skill: "choosing a word from what a character’s actions show (inference)",
+        explain: `<p>Look at the word “<b>Even</b>”: it tells us that Dad, the person who complained about the starter all week, has now changed his mind like everyone else. His actions prove it: after one slice he “quietly cut himself another”. To be <b>converted</b> is to be won over to something you used to be against.</p>
+                  <p class="why-not">“Unimpressed” is the trap: it fits how Dad felt at the start, and he eats “without a word”, but “Even Dad was …” only makes sense if he has changed, and nobody cuts a second slice of bread they don’t like. “Unmoved” means not affected at all, which is wrong for the same reason. “Subdued” means quiet and low in spirits; Dad is quiet, but cutting another slice shows he is enjoying the bread, not feeling down.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0">At the start of Term 2, the school library began playing quiet music at lunchtime. During Term 2, about twice as many students went to the library at lunchtime as in Term 1.</p>
+               <p class="quote"><em class="speaker">Jess:</em> “The music is what has brought so many more students into the library.”</p>
+               <p style="margin:10px 0 0">Which one of these sentences shows the mistake Jess has made?</p>`,
+        options: ["The colder weather in Term 2 may have kept more students indoors at lunchtime.",
+                  "Some of the students who come to the library may not enjoy the music very much.",
+                  "The library may decide to keep on playing quiet music at lunchtime in Term 3 as well.",
+                  "Students who read in the library at lunchtime may do better in their weekly spelling tests."],
+        answer: 0,
+        skill: "spotting a mistake: ignoring another possible cause",
+        explain: `<p>Jess sees two things happen at the same time (the music started, and more students came) and decides that one caused the other. But something else changed between Term 1 and Term 2 as well: the weather. Term 2 runs into winter, and colder weather could have kept students indoors and sent more of them to the library, music or no music. A shows the mistake: Jess has ignored another possible cause.</p>
+                  <p class="why-not">B is the trap: it sounds like a point against Jess, but even if some students don’t enjoy the music, it could still be what brought the others in, so it doesn’t show the gap in her reasoning. C is about what might happen next term, not about why more students came this term. D is about a benefit of reading in the library, which has nothing to do with whether the music caused the change.</p>`
+      },
+      {
+        stem: `Seven shapes have been sorted into this diagram. Right angles are marked with a small square.
+               <div class="figure">${VENN_SVG}</div>
+               <p style="margin:10px 0 0">One shape has been put in the wrong place. Which shape is it?</p>`,
+        options: ["Shape 2", "Shape 3", "Shape 4", "Shape 5"],
+        answer: 2,
+        skill: "checking where items belong in a Venn diagram, using two rules",
+        explain: `<p>Check each shape against both rules: does it have a line of symmetry (can it be folded so the two halves match)? Does it have a right angle?</p>
+                  <p>• Shape 4, the slanting parallelogram, has <b>no</b> line of symmetry. Fold it along any line, across the middle, down the middle or corner to corner, and the halves don’t match. It has no right angles either, so it belongs <b>outside both circles</b>, next to shape 7. It is in the wrong place.</p>
+                  <p>• The other shapes are all in the right place. Shape 2 can be folded in half along a slanting line from its right angle. Shape 3, the L, can be folded along a slanting line through its corner, because its two arms are the same length. Shape 5, the trapezium, has right angles but no line of symmetry, because its slanting side doesn’t match its upright side.</p>
+                  <p class="why-not">Shape 2 (A) and shape 3 (B) are the traps: their lines of symmetry are slanting, so they are easy to miss, and then they look as if they don’t belong in the left circle. Shape 4 (C) is easy to overlook, because many people think a parallelogram has a line of symmetry like a rectangle does. Shape 5 (D) is chosen by people who think every trapezium has a line of symmetry; only some do, and this one doesn’t.</p>`
+      },
+      {
+        stem: `Kai is standing in a field, facing <b>north</b>.
+               <div class="figure">${COMPASS_SVG}</div>
+               <p style="margin:10px 0 0">He follows these instructions. “Turn left” and “turn right” always mean a <b>quarter turn</b>, and all his steps are the same length.</p>
+               <p class="quote" style="margin:10px 0 0">Walk 3 steps forward. Turn right and walk 2 steps. Turn right and walk 5 steps. Turn left and walk 2 steps.</p>
+               <p style="margin:10px 0 0">Where does Kai finish, and which way is he facing?</p>`,
+        options: ["2 steps east and 2 steps south of his start, facing east",
+                  "4 steps east and 2 steps south of his start, facing east",
+                  "2 steps south of his start, facing west",
+                  "7 steps east and 5 steps north of his start, facing north"],
+        answer: 1,
+        skill: "following turns and steps together, keeping track of which way left and right point",
+        explain: `<p>Follow the instructions one at a time, keeping track of where Kai is <b>and</b> which way he faces. “Right” and “left” depend on the way he is facing at that moment.</p>
+                  <p>• Walk 3 steps forward: he is 3 steps <b>north</b> of his start, still facing north.<br>
+                     • Turn right: facing north, his right is <b>east</b>. Walk 2: now 2 east and 3 north.<br>
+                     • Turn right: facing east, his right is <b>south</b>. Walk 5: 3 of those steps bring him back level with his start, and 2 more take him 2 steps south. Now 2 east and 2 south.<br>
+                     • Turn left: facing south, his left is <b>east</b> (picture yourself facing south: your left hand points east). Walk 2: now <b>4 east and 2 south</b>, facing <b>east</b>.</p>
+                  <p class="why-not">C is the trap: it gets every step right until the last turn, then treats “left” as west, as it is on a map. But Kai is facing south, so his left is east. D treats both “right” turns as east on a map, so he never turns south: he walks 2 + 5 = 7 steps east, then turns left to face north. A forgets the last 2 steps after the final turn.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `Mia buys a book for <b>$8.95</b>, a pencil case for <b>$4.50</b> and a ruler for <b>$1.75</b>. She pays with a <b>$20</b> note.
+               <p style="margin:10px 0 0">How much change should she get?</p>`,
+        options: ["$4.80", "$5.20", "$5.80", "$6.55", "$15.20"],
+        answer: 0,
+        skill: "money: adding several prices, then finding change",
+        explain: `<p>Add the prices: $8.95 + $4.50 = $13.45, then $13.45 + $1.75 = <b>$15.20</b>.</p>
+                  <p>Count on from $15.20 to $20: 80 cents makes $16, then $4 makes $20. Change = <b>$4.80</b>.</p>
+                  <p class="why-not">$5.80 (C) is the trap: it works out 20 − 15 = 5 and then 100 − 20 = 80 cents, but forgets that one of the dollars was used to make those cents, so $5.80 is a dollar too much. $5.20 (B) takes away the dollars and just keeps the 20 cents. $6.55 (D) forgets the ruler. $15.20 (E) is what Mia spends, not her change.</p>`
+      },
+      {
+        stem: `A table tennis club has <b>7 players</b>. Each player plays every other player <b>twice</b>.
+               <p style="margin:10px 0 0">How many games are played altogether?</p>`,
+        options: ["12", "14", "21", "42", "84"],
+        answer: 3,
+        skill: "counting combinations: every pair plays twice, without double counting",
+        explain: `<p>First count the <b>pairs</b> of players. The first player can be paired with 6 others, the second with 5 new ones, then 4, 3, 2, 1:</p>
+                  <p>6 + 5 + 4 + 3 + 2 + 1 = <b>21</b> pairs.</p>
+                  <p>Each pair plays twice, so there are 21 × 2 = <b>42</b> games.</p>
+                  <p>(Another way: each of the 7 players plays 6 opponents twice, which is 12 games each, and 7 × 12 = 84. But every game has two players, so each game has been counted twice: 84 ÷ 2 = 42.)</p>
+                  <p class="why-not">21 (C) is the trap: it counts every pair but forgets that each pair plays twice. 84 (E) counts every game from both players’ point of view, so each game is counted twice. 12 (A) is the number of games for just one player. 14 (B) gives each of the 7 players only 2 games.</p>`
+      },
+      {
+        stem: `Both scales balance. All the apples weigh the same, and all the oranges weigh the same.
+               <div class="figure">${FRUIT_SCALES}</div>
+               <p style="margin:10px 0 0">One apple weighs <b>120 g</b>. How much does the pineapple weigh?</p>`,
+        options: ["480 g", "720 g", "840 g", "960 g", "1080 g"],
+        answer: 2,
+        skill: "balance scales: removing the same from both sides, then swapping equal weights",
+        explain: `<p><b>Scale 2:</b> 1 orange and 1 apple balance 4 apples. Take one apple off each side and the scale still balances: <b>1 orange weighs the same as 3 apples</b>.</p>
+                  <p><b>Scale 1:</b> the pineapple balances 2 oranges and 1 apple. Swap each orange for 3 apples: 3 + 3 + 1 = <b>7 apples</b>.</p>
+                  <p>So the pineapple weighs 7 × 120 g = <b>840 g</b>.</p>
+                  <p class="why-not">1080 g (E) is the trap: it forgets to take the apple off the left side of Scale 2, so it thinks an orange weighs 4 apples (4 + 4 + 1 = 9 apples). 960 g (D) doubles Scale 2 to get 2 oranges and 2 apples = 8 apples, but the pineapple’s scale has only 1 apple with the oranges, not 2. 720 g (B) swaps the oranges correctly but forgets the apple on Scale 1 (6 apples). 480 g (A) just uses the 4 apples shown on Scale 2.</p>`
+      }
+    ]
+  }
+];
+
+const TEST_META = {"version": 52, "reading_format": "cloze", "categories": {"reading": ["Vocabulary & idioms", "Vocabulary & idioms", "Vocabulary & idioms"], "thinking": ["Spot the mistake", "Rules & codes", "Spatial"], "maths": ["Money & best value", "Chance & counting", "Measurement & scales"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}, "status": "review"};
+const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  const t = await r.text(); // functions that return nothing send an empty body
+  return t ? JSON.parse(t) : null;
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
+  persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 52</h1>
+      ${completedNote()}
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+      ${mode === "review" && ADMIN ? `<div class="review-box" data-q="${qi}"><p class="rv-msg">Loading feedback…</p></div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  sectionStart = Date.now();
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  if (ADMIN) fillReviews();
+  window.scrollTo(0, 0);
+}
+
+/* ---- question feedback (practice mode only): approve, or send back for a redo with a comment.
+   Saved online through add_review(pin, …); Claude answers each redo with a 'done' row. ---- */
+let reviewRows = [];
+const RV_DIFF = ["Much easier", "A bit easier", "A bit harder", "Much harder"];
+const RV_LABEL = { approve: "Approved", redo: "Sent back for a redo", done: "Redone by Claude" };
+const rvEsc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function reviewPin() { try { return sessionStorage.getItem("prac.admin.pin") || ""; } catch (e) { return ""; } }
+async function fillReviews() {
+  const si = current, boxes = app.querySelectorAll(".review-box");
+  const note = t => boxes.forEach(b => b.innerHTML = `<p class="rv-msg">${t}</p>`);
+  if (!syncOn() || !reviewPin()) return note("Question feedback needs the online database. Open this test from the admin page (after entering the PIN).");
+  try { reviewRows = (await syncRpc("admin_reviews", { p_pin: reviewPin() })) || []; }
+  catch (e) { return note("Couldn’t load question feedback. If this keeps happening, the database may need its update (ask Claude)."); }
+  if (current !== si || passMode !== "review") return;
+  boxes.forEach(b => renderReviewBox(b, SECTIONS[si].id, +b.dataset.q));
+}
+function renderReviewBox(box, sec, qi, msg) {
+  const hist = reviewRows.filter(r => r.version === TEST_META.version && r.section === sec && r.q === qi);
+  const when = t => { const d = new Date(t); return isNaN(d) ? "" : d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }); };
+  const last = hist[hist.length - 1];
+  box.innerHTML = `<p class="rv-head">Your review of question ${qi + 1}</p>
+    ${hist.length ? `<ul>${hist.map(r => `<li class="${r.kind}"><b>${RV_LABEL[r.kind] || rvEsc(r.kind)}</b> · ${when(r.at)}${r.comment ? `: ${rvEsc(r.comment)}` : ""}</li>`).join("")}</ul>` : ""}
+    ${last && last.kind === "redo" ? `<p class="rv-msg">Waiting for Claude to redo this question.</p>` : ""}
+    <div class="rv-actions">
+      <button type="button" class="rv-approve">${last && last.kind === "approve" ? "Approved ✓" : "Approve"}</button>
+      <button type="button" class="rv-redo">Send back for a redo</button>
+    </div>
+    <div class="rv-diff" role="group" aria-label="Quick difficulty change for question ${qi + 1}">
+      <span>Difficulty:</span>
+      ${RV_DIFF.map((d, k) => `<button type="button" class="rv-chip" data-d="${k}">${d}</button>`).join("")}
+    </div>
+    <div class="rv-form" hidden>
+      <p class="rv-chosen" hidden></p>
+      <textarea rows="3" maxlength="4000" aria-label="What needs changing in question ${qi + 1}?" placeholder="What needs changing? (e.g. too easy, two answers could be right, picture unclear)"></textarea>
+      <button type="button" class="rv-send">Send back</button>
+      <button type="button" class="rv-cancel">Cancel</button>
+    </div>
+    <p class="rv-msg" role="status">${msg || ""}</p>`;
+  const form = box.querySelector(".rv-form"), say = t => box.querySelector(".rv-msg[role=status]").textContent = t;
+  const chosen = box.querySelector(".rv-chosen"), ta = box.querySelector("textarea");
+  let diff = null;
+  const pick = k => {
+    diff = k;
+    box.querySelectorAll(".rv-chip").forEach(c => c.classList.toggle("on", +c.dataset.d === k));
+    chosen.hidden = k === null;
+    chosen.textContent = k === null ? "" : `Make it ${RV_DIFF[k].toLowerCase()}. Add a comment if you like, then press Send back.`;
+    ta.placeholder = k === null ? "What needs changing? (e.g. too easy, two answers could be right, picture unclear)" : "Optional: anything else to change?";
+    form.hidden = false; ta.focus(); say("");
+  };
+  box.querySelector(".rv-approve").onclick = () => submitReview(box, sec, qi, "approve", "");
+  box.querySelector(".rv-redo").onclick = () => pick(null);
+  box.querySelectorAll(".rv-chip").forEach(c => c.onclick = () => pick(+c.dataset.d));
+  box.querySelector(".rv-cancel").onclick = () => { form.hidden = true; diff = null; box.querySelectorAll(".rv-chip").forEach(c => c.classList.remove("on")); say(""); };
+  box.querySelector(".rv-send").onclick = () => {
+    const c = ta.value.trim();
+    if (diff === null && !c) { say("Add a comment (or pick a difficulty) so Claude knows what to change."); return; }
+    submitReview(box, sec, qi, "redo", (diff === null ? "" : `Difficulty: make it ${RV_DIFF[diff].toLowerCase()}.` + (c ? " " : "")) + c);
+  };
+}
+async function submitReview(box, sec, qi, kind, comment) {
+  box.querySelectorAll("button").forEach(b => b.disabled = true);
+  box.querySelector(".rv-msg[role=status]").textContent = "Saving…";
+  try {
+    await syncRpc("add_review", { p_pin: reviewPin(), p_version: TEST_META.version, p_section: sec, p_q: qi, p_kind: kind, p_comment: comment });
+  } catch (e) {
+    box.querySelectorAll("button").forEach(b => b.disabled = false);
+    box.querySelector(".rv-msg[role=status]").textContent = "Couldn’t save. Check the internet connection and try again.";
+    return;
+  }
+  reviewRows.push({ version: TEST_META.version, section: sec, q: qi, kind, comment, at: new Date().toISOString() });
+  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it overnight, or straight away if you run “Do redos now”.");
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  finishAttempt();
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+// A test held for review is only on the admin page; someone opening its address directly sees this instead.
+function showNotReady() {
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>This test isn’t ready yet</h1>
+      <p class="lead">It will appear on the list of tests once it has been checked.</p>
+      <a class="primary" href="../../index.html">Back to all tests</a>
+    </div>`;
+}
+
+if (TEST_META.status === "review" && !ADMIN) showNotReady(); else showStart();
+</script>
+</body>
+</html>

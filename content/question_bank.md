@@ -14,46 +14,6 @@ Never paste in questions from the official sample papers or other copyrighted bo
 
 ## Waiting
 
-### Painted 4 × 4 × 4 cube
-- **Section**: maths (3D: painted cube; competition-style, so it counts as the test's one competition-style question)
-- **Added**: 2026-10-07
-- **Question**: Sixty-four small white cubes of the same size are glued together to form a large cube. After painting all six sides of the large cube blue, how many small cubes have 2 blue sides?
-  - Diagram: a 4 × 4 × 4 cube drawn in 3D, painted blue.
-  - No options or answer were given. The answer was checked by counting: **24**. The cubes with 2 blue sides are on the edges but not at the corners: 12 edges × 2 middle cubes = 24.
-  - Full count: 8 cubes have 3 blue sides, 24 have 2, 24 have 1 and 8 have none.
-- **Notes**:
-  - Written by David (his questions can be reworded).
-  - v38 Maths Q2 was also a painted block (cubes with exactly one painted face), so space this a few tests after v38. It is the same skill with a different question.
-  - The number of cubes with 1 blue side is also 24. A child who mixes up "1 side" and "2 sides" still gets 24, so the explanation should mention it.
-  - Possible wrong options from real mistakes:
-    - 8: the corners (3 blue sides), or the hidden inside cubes.
-    - 12: one cube per edge.
-    - 48: 4 cubes per edge, including the corners.
-    - 56: every cube that has any paint (64 − 8).
-
-### Who got the medal (one liar)
-- **Section**: thinking (truth-tellers and liars: logic with one false statement; stretch-level, like the sample-paper liars questions around Q21–30)
-- **Added**: 2026-10-07
-- **Question**: Anthony, Babul, Carl, and Dilly ran in a race. Only one of them received a medal. Among the statements below, only one of them did not tell the truth.
-  - Anthony says, "Babul didn't receive a medal."
-  - Babul says, "Dilly received a medal."
-  - Carl says, "I received a medal."
-  - Dilly says, "I didn't receive a medal."
-
-  Who did not tell the truth?
-- **Answer** (checked by trying each runner as the medal winner): **Babul**. Carl got the medal.
-  - If Carl won, only Babul's statement is false.
-  - If Anthony won, both Babul and Carl lie.
-  - If Babul won, Anthony, Babul and Carl all lie.
-  - If Dilly won, both Carl and Dilly lie.
-- **Notes**:
-  - Written by David (his questions can be reworded).
-  - Options: Anthony, Babul, Carl, Dilly.
-  - Main traps:
-    - Dilly: Babul and Dilly contradict each other, so one of them must be lying, and a child may pick the wrong one.
-    - Carl: "I received a medal" sounds like boasting.
-  - Good as a Thinking Q2 (a type the fixed slots miss) or a stretch Q3. A small table of the four cases makes a clear explanation.
-
 ### Peyton's mix-up (working backwards)
 - **Section**: maths (inverse operations / working backwards; sample PT3 Q24-style, a good Q2 or Q3)
 - **Added**: 2026-10-07
@@ -120,6 +80,48 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 63: 7 × 9.
 
 ## Used
+
+### Painted 4 × 4 × 4 cube → Test 49 Maths Q3 (stretch)
+- **Section**: maths (3D: painted cube; competition-style, so it counts as the test's one competition-style question)
+- **Added**: 2026-10-07
+- **Question**: Sixty-four small white cubes of the same size are glued together to form a large cube. After painting all six sides of the large cube blue, how many small cubes have 2 blue sides?
+  - Diagram: a 4 × 4 × 4 cube drawn in 3D, painted blue.
+  - No options or answer were given. The answer was checked by counting: **24**. The cubes with 2 blue sides are on the edges but not at the corners: 12 edges × 2 middle cubes = 24.
+  - Full count: 8 cubes have 3 blue sides, 24 have 2, 24 have 1 and 8 have none.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - v38 Maths Q2 was also a painted block (cubes with exactly one painted face), so space this a few tests after v38. It is the same skill with a different question.
+  - The number of cubes with 1 blue side is also 24. A child who mixes up "1 side" and "2 sides" still gets 24, so the explanation should mention it.
+  - Possible wrong options from real mistakes:
+    - 8: the corners (3 blue sides), or the hidden inside cubes.
+    - 12: one cube per edge.
+    - 48: 4 cubes per edge, including the corners.
+    - 56: every cube that has any paint (64 − 8).
+- **Used**: Test 49 Maths Q3, as given, with options 8, 12, 24, 48 and 56 (answer C, 24) and a redrawn 3D picture. “2 blue sides” became “exactly 2 blue sides” (corner cubes also have 2 blue sides). Note: the count with exactly 1 blue side is also 24, so a child who mixes the two still lands on 24; the explanation says so. Held for David's review.
+
+### Who got the medal (one liar) → Test 50 Thinking Q3 (stretch)
+- **Section**: thinking (truth-tellers and liars: logic with one false statement; stretch-level, like the sample-paper liars questions around Q21–30)
+- **Added**: 2026-10-07
+- **Question**: Anthony, Babul, Carl, and Dilly ran in a race. Only one of them received a medal. Among the statements below, only one of them did not tell the truth.
+  - Anthony says, "Babul didn't receive a medal."
+  - Babul says, "Dilly received a medal."
+  - Carl says, "I received a medal."
+  - Dilly says, "I didn't receive a medal."
+
+  Who did not tell the truth?
+- **Answer** (checked by trying each runner as the medal winner): **Babul**. Carl got the medal.
+  - If Carl won, only Babul's statement is false.
+  - If Anthony won, both Babul and Carl lie.
+  - If Babul won, Anthony, Babul and Carl all lie.
+  - If Dilly won, both Carl and Dilly lie.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Options: Anthony, Babul, Carl, Dilly.
+  - Main traps:
+    - Dilly: Babul and Dilly contradict each other, so one of them must be lying, and a child may pick the wrong one.
+    - Carl: "I received a medal" sounds like boasting.
+  - Good as a Thinking Q2 (a type the fixed slots miss) or a stretch Q3. A small table of the four cases makes a clear explanation.
+- **Used**: Test 50 Thinking Q3, as given (options Anthony, Babul, Carl, Dilly; answer B, Babul), except that “Among the statements below, only one of them did not tell the truth” became “Only one of the four children did not tell the truth” (a statement can’t tell the truth; the cold solve flagged it). Held for David's review.
 
 ### Marbles in a jar
 - **Section**: thinking (number problem: worst case / "to be sure"). It could also go in maths.
