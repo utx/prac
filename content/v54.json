@@ -1,0 +1,63 @@
+{
+  "version": 54,
+  "date": "2026-10-11",
+  "status": "review",
+  "reading": "Four extracts: Reaching the Top",
+  "reading_format": "four extracts",
+  "reading_topic": "mountains and climbing: a memoir of a family walk to the cloudy summit of Mount Kosciuszko, a factual piece on Kosciuszko (2228 m, named by Strzelecki in 1840, winter dangers, alpine plants and the raised walkway), a girl turning back below a summit when the weather changes, an opinion piece against a chairlift to the top of a mountain",
+  "thinking": [
+    "Spot the mistake (judging from your own small group: asking only handball friends)",
+    "Order & arrangement: five friends in a row of cinema seats from four clues",
+    "Straight cuts across a hexagon: number of sides of each piece (stretch)"
+  ],
+  "maths": [
+    "Quick-fire scale reading: kitchen scale with unlabelled marks (40 g steps)",
+    "Distance on a line: Carter's trip back to the library (working out the stretch ridden twice, with a diagram, supplied by David)",
+    "Repeating pattern in a grid: which shape is in row 8, column 3 (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1 Q26-33 and PT3 Q26-33 (main idea expressed in different words), PT1 Q26-33 (positive effect on one's outlook)",
+      "PT1 Q1-6 (feelings shown rather than stated), PT2 Q26-33 ('reveals the writer was out of place': inference)",
+      "PT1-PT3 Q26-33 ('uses figurative language': spotting a technique and what it suggests), PT1 Q15-19 (what is compared with what) — stretch"
+    ],
+    "thinking": [
+      "PT3 Q5 (mistake: judging from own small group), PT2 Q6 (mistake: 'I've never seen it')",
+      "PT1 Q6 (left/right order of three), PT2 Q5 (race order from clues), PT3 Q12 (car seating)",
+      "PT3 Q34 maths (sides of pieces after cutting a shape), PT1 Q34 maths (straight cuts splitting a pentagon) — stretch"
+    ],
+    "maths": [
+      "PT2 Q11 (scale reading with different markings), PT1 Q9 (reading a jug scale)",
+      "PT3 Q24 (working backwards), PT2 Q3 (distance round a rectangle), PT1 Q6 (grid walk)",
+      "PT2 Q4 (repeating pattern in a grid), PT1 Q8 (bead pattern), PT1 Q26 (day of the week 41 days later: using the repeat) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Main idea",
+      "Feelings & inference",
+      "Comparisons & imagery"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Order & arrangement",
+      "Spatial"
+    ],
+    "maths": [
+      "Measurement & scales",
+      "Number & place value",
+      "Patterns & sequences"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

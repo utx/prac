@@ -1,0 +1,63 @@
+{
+  "version": 53,
+  "date": "2026-10-11",
+  "status": "review",
+  "reading": "Missing sentences: The Forest’s Greatest Copycat",
+  "reading_format": "missing sentences",
+  "reading_topic": "lyrebirds: Australia's master mimics (one bird sounding like a kookaburra, whipbird and rosella; on the ten-cent coin; the male's sixteen-feather tail and display mounds; copying car alarms, camera shutters and chainsaws; performing to win a female)",
+  "thinking": [
+    "Whose reasoning is correct (reversed rule: an \"only if\" rule used safely in both directions)",
+    "Long-jump results table: best two jumps, a foul and a tie-break",
+    "Views: which child at a square table sees the objects in this order (stretch)"
+  ],
+  "maths": [
+    "Quick-fire length: 12 panels of 2 m 40 cm, converting centimetres to metres",
+    "Working backwards: Peyton's mix-up (inverse operations, supplied by David)",
+    "Area of a triangle on a grid as halves of rectangles (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1-PT3 Q20-25 (missing sentences: reference words pointing back, e.g. 'The birds', 'it')",
+      "PT1-PT3 Q20-25 (missing sentences: elaboration and order; a plausible on-topic sentence that breaks the sequence)",
+      "PT1-PT3 Q20-25 (missing sentences: a closing sentence that fits the whole text), PT1-PT3 Q26-33 (main idea in different words) — stretch"
+    ],
+    "thinking": [
+      "PT1 Q18 (whose reasoning: 'only if', both correct), PT3 Q15 ('only' rule, both directions), PT2 Q8 (reversed rule)",
+      "PT2 Q25 (best of two attempts table), PT1 Q19 (marks table)",
+      "PT3 Q16 (view from a seat at a table), PT2 Q19 maths (which arrow gives this view) — stretch"
+    ],
+    "maths": [
+      "PT2 Q13 (grams to half a kilogram: unit conversion), PT2 Q3 (distance round a rectangle)",
+      "PT3 Q24 (inverse operations, working backwards), PT1 Q15 (sequence backwards)",
+      "PT3 Q20 (equal shaded area: squares versus triangles), PT3 Q14 (area of a shape from a smaller one), PT1 Q24 (area left after cut-outs) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Sentence links",
+      "Sentence links",
+      "Main idea"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Measurement & scales",
+      "Number & place value",
+      "Area, perimeter & 3D"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
