@@ -39,7 +39,7 @@ const HEX_SVG = (() => {
   };
   g += tick(V[3], V[4]) + tick(V[5], V[0]);
   const W = 240, H = 216;
-  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="A regular hexagon with a corner at the top. Two dashed cutting lines are drawn. The first joins the top corner to the lower-right corner, cutting off the upper-right corner. The second joins the middle of the lower-left side to the middle of the upper-left side, cutting off the left-hand corner. Small marks show that each of these two sides is cut exactly in half. The two dashed lines do not touch each other.">${g}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="A regular hexagon with a corner at the top. Two dashed cutting lines are drawn. The first joins the top corner to the lower-right corner, cutting off the upper-right corner. The second joins the middle of the lower-left side to the middle of the upper-left side, cutting off the two left-hand corners and the upright left side between them. Small marks show that each of these two sides is cut exactly in half. The two dashed lines do not touch each other.">${g}</svg>`;
 })();
 
 /* ---- Maths Q1: kitchen scale with unlabelled marks ---- */
