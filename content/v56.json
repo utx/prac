@@ -1,0 +1,63 @@
+{
+  "version": 56,
+  "date": "2026-10-11",
+  "status": "review",
+  "reading": "Story extract: Gerald",
+  "reading_format": "story",
+  "reading_topic": "a girl's first night camping in the backyard with her little brother: noises in the dark, and the possum she invents to calm him",
+  "thinking": [
+    "Spot the mistake (treating \"most\" as \"all\": strawberries at the market)",
+    "Logic grid: activities and hat colours, which statement must be true",
+    "Quarter turn clockwise of a tile (one option a mirror image) (stretch)"
+  ],
+  "maths": [
+    "Quick-fire common multiples: skip-counting by 7s and 9s (supplied by David)",
+    "Angles: equal jumps in a right angle, then 2 full turns",
+    "Chance statements: comparing jars with different totals (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT2 Q1-6 (feelings shown rather than stated), PT3 Q1 (how a character feels)",
+      "PT1 Q1-6 (what a detail shows / why the writer includes it), PT2 Q1-6",
+      "PT3 Q6 (overall impression of a character), PT1 Q6 (whole-text question) — stretch"
+    ],
+    "thinking": [
+      "PT2 Q14 (mistake: \"most\" treated as \"all\"), PT2 Q27 (\"most\" → \"probably\")",
+      "PT3 Q6 (must be true: levels of a structure), PT1 Q11 (must be true from a rule), PT2 Q23 (which colour is ambiguous)",
+      "PT3 Q22 (tiles that were rotated), PT2 Q16 (which way a tile goes), PT3 maths Q1 (quarter turn of a shape) — stretch"
+    ],
+    "maths": [
+      "PT2 Q18 (missing factor), PT3 Q22 (odd/even sums); nearby: multiples and skip-counting",
+      "PT2 Q15 (acute-angle turns to a full turn), PT1 Q11 (right angles in digit shapes)",
+      "PT1 Q33 (chance with counters 1–11), PT3 Q10 (chance statements), PT2 Q14 (chance statements) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Feelings & inference",
+      "Purpose of a detail",
+      "Character & structure"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Must or cannot be true",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Area, perimeter & 3D",
+      "Chance & counting"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
