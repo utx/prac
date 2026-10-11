@@ -43,12 +43,7 @@ const tileGrid = (dark, light, size, ox, oy) => {
 const TILE_SVG = (() => {
   const s = 30, ox = 8, oy = 8;
   let g = tileGrid(TILE_DARK, TILE_LIGHT, s, ox, oy);
-  // a curved arrow showing a quarter turn clockwise
-  g += `<defs><marker id="ta" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#c0392b"/></marker></defs>
-        <path d="M150 30 A 44 44 0 0 1 194 74" fill="none" stroke="#c0392b" stroke-width="3" marker-end="url(#ta)"/>
-        <text x="172" y="112" font-size="13" text-anchor="middle" fill="#c0392b">quarter turn</text>
-        <text x="172" y="128" font-size="13" text-anchor="middle" fill="#c0392b">clockwise</text>`;
-  return `<svg viewBox="0 0 226 140" width="226" height="140" role="img" aria-label="A 4 by 4 tile of blue (#), yellow (o) and white (.) squares, with a red arrow showing a quarter turn clockwise. Rows from the top: ${gridRows(TILE_DARK, TILE_LIGHT)}">${g}</svg>`;
+  return `<svg viewBox="0 0 136 136" width="136" height="136" role="img" aria-label="A 4 by 4 tile of blue (#), yellow (o) and white (.) squares. Rows from the top: ${gridRows(TILE_DARK, TILE_LIGHT)}">${g}</svg>`;
 })();
 const cw = cells => cells.map(([r, c]) => [c, 3 - r]);
 const acw = cells => cells.map(([r, c]) => [3 - c, r]);
@@ -88,7 +83,7 @@ const jarSvg = (name, red, blue) => {
   });
   g += `<text x="60" y="162" font-size="15" font-weight="700" text-anchor="middle" fill="${INK}">Jar ${name}</text>
         <text x="60" y="180" font-size="13" text-anchor="middle" fill="${INK}">${red} red, ${blue} blue</text>`;
-  return `<svg viewBox="0 0 120 186" width="120" height="186" role="img" aria-label="Jar ${name}: ${red} red marbles and ${blue} blue marbles.">${g}</svg>`;
+  return `<svg viewBox="0 0 120 186" width="120" height="186" role="img" aria-label="Jar ${name}: ${red} red marble${red === 1 ? "" : "s"} and ${blue} blue marble${blue === 1 ? "" : "s"}.">${g}</svg>`;
 };
 const JARS = `<div style="display:flex;flex-wrap:wrap;gap:10px 18px;justify-content:center">${jarSvg("P", 3, 1)}${jarSvg("Q", 5, 3)}${jarSvg("R", 2, 2)}</div>`;
 
@@ -175,18 +170,19 @@ const SECTIONS = [
                   <p class="why-not">A and C are the traps: each <em>could</em> be true (A if Aria did archery, C if Ben did), but neither <em>must</em> be, because the clues never decide between archery and climbing. D can’t be true: Cleo went canoeing, so she wore red.</p>`
       },
       {
-        stem: `This tile is given a <b>quarter turn clockwise</b>.
+        stem: `Mia gives this tile a <b>half turn</b>. Then she gives it a <b>quarter turn anticlockwise</b>.
                <div class="figure">${TILE_SVG}</div>
-               <p style="margin:10px 0 0">Which picture shows the tile after the turn?</p>`,
+               <p style="margin:10px 0 0">Which picture shows the tile now?</p>`,
         visualOptions: true,
         options: TILE_OPTS,
         answer: 2,
-        skill: "rotation: a quarter turn clockwise (not a flip)",
-        explain: `<p>In a quarter turn clockwise, the <b>top row</b> swings round to become the <b>right-hand column</b>, reading from top to bottom, and the <b>left-hand column</b> becomes the <b>top row</b>, reading from right to left.</p>
+        skill: "rotation: combining a half turn and a quarter turn (not a flip)",
+        explain: `<p>Put the two turns together first. A half turn is two quarter turns clockwise; turning one quarter back anticlockwise leaves <b>one quarter turn clockwise</b> altogether.</p>
+                  <p>In a quarter turn clockwise, the <b>top row</b> swings round to become the <b>right-hand column</b>, reading from top to bottom, and the <b>left-hand column</b> becomes the <b>top row</b>, reading from right to left.</p>
                   <p>Top row # # . o → right-hand column (top to bottom): blue, blue, white, yellow.<br>
                      Left-hand column (top to bottom) # # o . → top row (right to left): blue, blue, yellow, white, so the top row reads . o # #.</p>
                   <p>Only <b>C</b> has both. (Check one square: the yellow square in the top-right corner moves to the bottom-right corner.)</p>
-                  <p class="why-not">A is the trap: it is a quarter turn the other way (anticlockwise); there the top row ends up as the left-hand column. B is a mirror image: the tile has been flipped over left to right, not turned. D is a half turn (two quarter turns).</p>`
+                  <p class="why-not">A is the trap: it does only the last step, a quarter turn anticlockwise, and forgets the half turn first (there the top row ends up as the left-hand column). D stops after the half turn and forgets the quarter turn. B is a mirror image: the tile has been flipped over left to right, which no turn can do.</p>`
       }
     ]
   },
