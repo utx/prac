@@ -47,42 +47,29 @@ const STALL_GRAPH = (() => {
   return `<svg viewBox="0 0 ${W} ${yb + 28}" width="${W}" height="${yb + 28}" role="img" aria-label="Column graph of cups sold, with a small-cup column and a large-cup column for each child. Ana: 15 small, 4 large. Ben: 2 small, 11 large. Cara: 13 small, 7 large. Dev: 10 small, 9 large. The scale goes up in ones, labelled every 2.">${g}</svg>`;
 })();
 
-/* ---- Thinking Skills Q3: cube net with symbols ---- */
-// each symbol is drawn in a 1 by 1 square, then stretched onto a face
-const SYM = {
-  target: `<circle cx=".5" cy=".5" r=".3" fill="none" stroke="#c0392b" stroke-width=".08"/><circle cx=".5" cy=".5" r=".11" fill="#c0392b"/>`,
-  xcross: `<path d="M.24 .24 L.76 .76 M.76 .24 L.24 .76" stroke="${INK}" stroke-width=".12" stroke-linecap="round"/>`,
-  spot: `<circle cx=".5" cy=".5" r=".27" fill="#2f6fb5"/>`,
-  star: `<polygon points=".5,.12 .6,.4 .88,.5 .6,.6 .5,.88 .4,.6 .12,.5 .4,.4" fill="#e0a526" stroke="${INK}" stroke-width=".03"/>`,
-  dots5: [[.27, .27], [.73, .27], [.5, .5], [.27, .73], [.73, .73]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".09" fill="${INK}"/>`).join(""),
-  hollow: `<rect x=".25" y=".25" width=".5" height=".5" fill="none" stroke="#2f7d4f" stroke-width=".1"/>`
-};
-const SYM_NAME = { target: "a red target", xcross: "a black X", spot: "a blue spot", star: "a yellow star", dots5: "five dots", hollow: "a green square outline" };
-const NET = [[0, 0, "target"], [1, 0, "xcross"], [1, 1, "spot"], [1, 2, "star"], [1, 3, "dots5"], [2, 2, "hollow"]];
-const NET_SVG = (() => {
-  const u = 50, o = 4;
+/* ---- Thinking Skills Q3: two pieces, which shape can they make (turning only) ---- */
+// shapes are drawn on a square grid from rows of "#" (filled) and "." (empty)
+const PIECE_L = ["#.", "#.", "##"], PIECE_T = ["###", ".#."];
+const L_FILL = "#f2a65a", T_FILL = "#5fb3a8", SHAPE_FILL = "#dfe6f0";
+function gridSvg(rows, label, fillAt) {
+  const u = 26, o = 3, W = rows[0].length, H = rows.length;
   let g = "";
-  NET.forEach(([r, c, s]) => {
-    const x = o + c * u, y = o + r * u;
-    g += `<rect x="${x}" y="${y}" width="${u}" height="${u}" fill="#fff" stroke="${INK}" stroke-width="2"/><g transform="matrix(${u} 0 0 ${u} ${x} ${y})">${SYM[s]}</g>`;
-  });
-  return `<svg viewBox="0 0 ${4 * u + 2 * o} ${3 * u + 2 * o}" width="${4 * u + 2 * o}" height="${3 * u + 2 * o}" role="img" aria-label="A net of six squares. Middle row of four, from left to right: ${SYM_NAME.xcross}, ${SYM_NAME.spot}, ${SYM_NAME.star}, ${SYM_NAME.dots5}. Above the X: ${SYM_NAME.target}. Below the star: ${SYM_NAME.hollow}.">${g}</svg>`;
-})();
-function cubeSvg([top, left, right], letter) {
-  const a = 46, k = a * Math.cos(Math.PI / 6), cx = 6 + k, y0 = 6;
-  const T = [cx, y0], Rt = [cx + k, y0 + a / 2], Fr = [cx, y0 + a], Lf = [cx - k, y0 + a / 2];
-  const face = (o, u, v, s, fill) =>
-    `<polygon points="${[o, [o[0] + u[0], o[1] + u[1]], [o[0] + u[0] + v[0], o[1] + u[1] + v[1]], [o[0] + v[0], o[1] + v[1]]].map(p => p.join(",")).join(" ")}" fill="${fill}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
-     <g transform="matrix(${u[0]} ${u[1]} ${v[0]} ${v[1]} ${o[0]} ${o[1]})">${SYM[s]}</g>`;
-  const sub = (p, q) => [p[0] - q[0], p[1] - q[1]];
-  const g = face(Lf, sub(T, Lf), sub(Fr, Lf), top, "#ffffff") +
-            face(Lf, sub(Fr, Lf), [0, a], left, "#eef1f6") +
-            face(Fr, sub(Rt, Fr), [0, a], right, "#dfe4ec");
-  const W = 2 * k + 12, H = 2 * a + 12;
-  return `<svg viewBox="0 0 ${W.toFixed(1)} ${H}" width="${W.toFixed(1)}" height="${H}" role="img" aria-label="Cube ${letter}: top face ${SYM_NAME[top]}, front-left face ${SYM_NAME[left]}, front-right face ${SYM_NAME[right]}.">${g}</svg>`;
+  rows.forEach((r, y) => [...r].forEach((c, x) => {
+    if (c !== ".") g += `<rect x="${o + x * u}" y="${o + y * u}" width="${u}" height="${u}" fill="${fillAt(c)}" stroke="${INK}" stroke-width="1.6"/>`;
+  }));
+  return `<svg viewBox="0 0 ${W * u + 2 * o} ${H * u + 2 * o}" width="${W * u + 2 * o}" height="${H * u + 2 * o}" role="img" aria-label="${label}">${g}</svg>`;
 }
-const CUBE_OPTS = [["target", "xcross", "spot"], ["target", "xcross", "hollow"], ["spot", "xcross", "star"], ["target", "spot", "xcross"]]
-  .map((f, i) => cubeSvg(f, "ABCD"[i]));
+const PIECES_SVG = `<div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;justify-content:center">
+  <div style="text-align:center">${gridSvg(PIECE_L, "Piece 1: an L shape of four squares, a column of three squares with one more square to the right of the bottom square.", () => L_FILL)}<div>Piece 1</div></div>
+  <div style="text-align:center">${gridSvg(PIECE_T, "Piece 2: a T shape of four squares, a row of three squares with one more square below the middle square.", () => T_FILL)}<div>Piece 2</div></div></div>`;
+const SHAPE_OPTS = [
+  [["###.", ".###", ".##."], "Shape A, three rows: a row of 3 on the left; a row of 3 on the right; then 2 squares under the second and third places."],
+  [["##..", "####", "#.#."], "Shape B, three rows: 2 squares on the left; a row of 4; then squares under the first and third squares."],
+  [["###.", "###.", "..##"], "Shape C, three rows: a row of 3; a row of 3; then 2 squares under the third and fourth places."],
+  [["..##", "####", "##.."], "Shape D, three rows: 2 squares on the right; a row of 4; 2 squares on the left."]
+].map(([rows, label]) => gridSvg(rows, label, () => SHAPE_FILL));
+// shape A split into the two pieces (for the explanation): L = piece 1, T = piece 2
+const SHAPE_A_SPLIT = gridSvg(["LLT.", ".LTT", ".LT."], "Shape A split into the two pieces: the L, turned upside down, fills the first two squares of the top row and the second column; the T, turned onto its side so that it points right, fills the third column and the last square of the middle row.", c => c === "L" ? L_FILL : T_FILL);
 
 /* ---- Maths Q2: dot plot of pets ---- */
 const PETS = [5, 8, 6, 3, 0, 2];
@@ -174,18 +161,18 @@ const SECTIONS = [
                   <p class="why-not">Cara (C) is the trap: she sold the most cups altogether (13 + 7 = 20), but a lot of them were $1 cups, so the number of cups is not the same as the money. Ana (A) has the tallest column on the graph, but it is a column of $1 cups. Ben (B) sold the most $2 cups, but he sold hardly any small cups.</p>`
       },
       {
-        stem: `This net is folded to make a cube.
-               <div class="figure">${NET_SVG}</div>
-               <p style="margin:10px 0 0">Which cube could it make?</p>`,
+        stem: `Lily has these two pieces.
+               <div class="figure">${PIECES_SVG}</div>
+               <p style="margin:10px 0 0">She puts them together, without any gaps or overlaps, to make a new shape. She may <b>turn</b> the pieces round, but she must <b>not flip them over</b>.</p>
+               <p style="margin:10px 0 0">Which shape could she make?</p>`,
         visualOptions: true,
-        options: CUBE_OPTS,
+        options: SHAPE_OPTS,
         answer: 0,
-        skill: "picturing which faces of a net end up opposite each other, and which way round they meet",
-        explain: `<p>Two faces that end up <b>opposite</b> each other can never be seen together. First find the opposite pairs:</p>
-                  <p>• The four squares in the middle row fold round into a ring, like the four walls of a room. In a ring of four, faces with one square between them end up opposite: the <b>X and the star</b> are opposite, and so are the <b>blue spot and the five dots</b>.<br>
-                     • The target (above the X) and the square outline (below the star) fold over to close the two open ends of the ring, the roof and the floor, so the <b>target and the square outline</b> are opposite.</p>
-                  <p><b>A</b> shows the target, the X and the blue spot. No two of these are opposite. Now check which way round they go: on the net, the target is joined to the top of the X, and the blue spot is joined to the right of the X. Hold the X facing you and fold: the target goes on top and the blue spot goes on the right, exactly as in A ✓</p>
-                  <p class="why-not">B is the trap: the target and the square outline are far apart on the net and in different rows, so they don’t look like a pair, but they close the two ends of the ring, so they are opposite and can’t be seen together. C shows the X and the star together, which are an opposite pair too. D is the hardest trap: it shows the same three faces as A, but the blue spot and the X have swapped sides. With the target on top, the X must be on the left of the blue spot (as on the net), so D is a mirror image and no way of turning the cube can make it.</p>`
+        skill: "fitting two pieces into a shape by turning them in your head (and spotting when a piece would have to be flipped)",
+        explain: `<p>Every shape has 8 squares, the same as the two pieces together (4 + 4), so counting squares doesn’t help. Look for a place only one piece can go, then check what is left.</p>
+                  <p><b>A</b>: the square at the far right of the middle row only touches one other square, so it has to be the T’s point (an L there would cut squares off). The T, turned so it points right, fills the third column and that square. What is left is the first two squares of the top row and the second column below them: that is the L turned upside down (a half turn). Both pieces are only turned, so A works ✓</p>
+                  <div class="figure">${SHAPE_A_SPLIT}</div>
+                  <p class="why-not">B is the trap: the square sticking out under the third square can only be covered by the T (pointing down), and what is left is an L shape facing the wrong way: its short foot points left instead of right. Lily would have to <b>flip</b> the L over, which isn’t allowed. C: the two squares at the bottom right can only be covered by the L standing up the right-hand side, and that leaves a 2 by 2 square, which the T can’t fill. D: wherever the T goes, it cuts off single squares in the corners, so the L can’t cover what is left.</p>`
       }
     ]
   },
