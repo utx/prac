@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 55</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  @media (max-width: 760px) { .bar { flex-wrap: wrap; gap: 6px 14px; padding: 10px 16px; } }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary, a.primary {
+    display: inline-block; text-decoration: none;
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover, a.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  /* question feedback (practice mode only) */
+  .review-box { margin: 12px 0 0 38px; padding: 12px 16px; border: 1.5px dashed #c9a227; border-radius: 6px; background: #fffaf0; font-size: 15px; }
+  .review-box .rv-head { font-weight: 700; margin: 0 0 6px; }
+  .review-box ul { margin: 0 0 10px; padding-left: 18px; }
+  .review-box li { margin: 0 0 4px; overflow-wrap: anywhere; }
+  .review-box li.done { color: var(--correct); }
+  .review-box .rv-actions, .review-box .rv-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+  .review-box button { font: inherit; font-size: 15px; padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; }
+  .review-box button.rv-approve { border-color: var(--correct); color: var(--correct); }
+  .review-box button.rv-redo, .review-box button.rv-send { border-color: var(--wrong); color: var(--wrong); }
+  .review-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 8px; border: 1.5px solid var(--line); border-radius: 6px; }
+  .review-box .rv-msg { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+  .review-box .rv-diff { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 0; font-size: 14px; }
+  .review-box .rv-diff span { color: var(--ink-soft); margin-right: 2px; }
+  .review-box button.rv-chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; border-color: var(--line); }
+  .review-box button.rv-chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .review-box .rv-form { margin-top: 10px; }
+  .review-box .rv-chosen { margin: 0; width: 100%; font-weight: 600; }
+  .review-box .rv-msg:empty, .review-box .rv-form[hidden], .review-box [hidden] { display: none; }
+  @media (max-width: 760px) { .review-box { margin-left: 0; } }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 55</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 55
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: poem (public domain: William Wordsworth, 1770–1850) ----
+   The revised text first published in 1815 (the 1807 first version had no
+   "Continuous as the stars" verse). Text extracted programmatically from
+   Project Gutenberg eBook #12383 (The Poetical Works of William Wordsworth,
+   ed. William Knight, Vol. III, 1896). Only changes: the line numbers and
+   footnote markers are removed, and the double hyphen "--" is shown as a dash. */
+const STANZAS = [
+  [
+    "I wandered lonely as a cloud",
+    "That floats on high o'er vales and hills,",
+    "When all at once I saw a crowd,",
+    "A host, of golden daffodils;",
+    "Beside the lake, beneath the trees,",
+    "Fluttering and dancing in the breeze."
+  ],
+  [
+    "Continuous as the stars that shine",
+    "And twinkle on the milky way,",
+    "They stretched in never-ending line",
+    "Along the margin of a bay:",
+    "Ten thousand saw I at a glance,",
+    "Tossing their heads in sprightly dance."
+  ],
+  [
+    "The waves beside them danced; but they",
+    "Out-did the sparkling waves in glee:",
+    "A poet could not but be gay,",
+    "In such a jocund company:",
+    "I gazed—and gazed—but little thought",
+    "What wealth the show to me had brought:"
+  ],
+  [
+    "For oft, when on my couch I lie",
+    "In vacant or in pensive mood,",
+    "They flash upon that inward eye",
+    "Which is the bliss of solitude;",
+    "And then my heart with pleasure fills,",
+    "And dances with the daffodils."
+  ]
+];
+const PASSAGE = {
+  title: "I Wandered Lonely as a Cloud",
+  note: "Read the poem below by William Wordsworth (written in 1804; this is his revised version, first published in 1815), then answer the questions. The numbers show the verses. <i>o’er</i>: over; <i>host</i>: a very large crowd; <i>margin</i>: edge; <i>sprightly</i>: lively; <i>gay</i>: (here) cheerful; <i>jocund</i>: merry; <i>oft</i>: often; <i>couch</i>: a sofa or bed; <i>vacant</i>: with an empty mind; <i>pensive</i>: thoughtful; <i>solitude</i>: being alone.",
+  html: `<div class="poem">${STANZAS.map((s, i) => `<div class="stanza"><span class="vn">${i + 1}</span>${s.map(l => `<span class="line">${l}</span>`).join("")}</div>`).join("")}</div>`
+};
+
+/* ---- Thinking Skills Q2: number wheel (supplied by David; redrawn) ---- */
+const WHEEL_NUMS = ["3", "4", "5", "6", "7", "12", "20", "30", "42", "??"];
+const WHEEL_SVG = (() => {
+  const cx = 150, cy = 150, r = 98, rl = 124;
+  const pt = (i, rad) => {
+    const a = (-90 + 36 * i) * Math.PI / 180;
+    return [cx + rad * Math.cos(a), cy + rad * Math.sin(a)];
+  };
+  let g = `<defs><marker id="wh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="${INK}"/></marker></defs>`;
+  for (let i = 0; i < 5; i++) {
+    const [x1, y1] = pt(i, r), [x2, y2] = pt(i + 5, r);
+    g += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${INK}" stroke-width="2" marker-start="url(#wh)" marker-end="url(#wh)"/>`;
+  }
+  g += `<circle cx="${cx}" cy="${cy}" r="7" fill="#e9a23b" stroke="${INK}" stroke-width="1.5"/>`;
+  WHEEL_NUMS.forEach((n, i) => {
+    const [x, y] = pt(i, rl);
+    const q = n === "??";
+    g += `<text x="${x.toFixed(1)}" y="${(y + 7).toFixed(1)}" font-size="21" font-weight="700" text-anchor="middle" fill="${q ? "#c0392b" : INK}">${n}</text>`;
+  });
+  return `<svg viewBox="0 0 300 300" width="280" height="280" style="max-width:100%;height:auto" role="img" aria-label="A wheel of ten arrows going out from the centre, like spokes. They make five straight lines through the centre, so each number is at the opposite end of a straight line from another number. Going clockwise from the top, the numbers are 3, 4, 5, 6, 7, 12, 20, 30, 42 and ??. So 3 is opposite 12, 4 is opposite 20, 5 is opposite 30, 6 is opposite 42 and 7 is opposite ??.">${g}</svg>`;
+})();
+
+/* ---- Thinking Skills Q3: cube model views ---- */
+// Plan: rows from back to front, columns left to right; number = cubes in that stack.
+const PLAN_OK = [[1, 0, 1], [0, 3, 2], [2, 1, 0]];
+const viewSvg = (heights, labels, title) => {
+  const c = 30, W = 150, o = (W - heights.length * c) / 2, top = 18, H = top + 3 * c + 22;
+  let g = `<text x="${W / 2}" y="13" font-size="13" text-anchor="middle" fill="${INK}" font-weight="700">${title}</text>`;
+  heights.forEach((h, k) => {
+    for (let j = 0; j < h; j++) g += `<rect x="${o + k * c}" y="${top + (2 - j) * c}" width="${c}" height="${c}" fill="#6f9fcf" stroke="${INK}" stroke-width="1.6"/>`;
+  });
+  g += `<line x1="${o - 6}" y1="${top + 3 * c}" x2="${W - o + 6}" y2="${top + 3 * c}" stroke="${INK}" stroke-width="2"/>`;
+  if (labels) {
+    g += `<text x="${o}" y="${top + 3 * c + 16}" font-size="12" fill="#55607a">${labels[0]}</text>
+          <text x="${W - o}" y="${top + 3 * c + 16}" font-size="12" text-anchor="end" fill="#55607a">${labels[1]}</text>`;
+  }
+  return { g, W, H };
+};
+const VIEWS_SVG = (() => {
+  const f = viewSvg([2, 3, 2], ["left", "right"], "From the front");
+  const s = viewSvg([2, 3, 1], ["front", "back"], "From the right side");
+  return `<div style="display:flex;flex-wrap:wrap;gap:14px 40px;align-items:flex-end;justify-content:center">
+    <svg viewBox="0 0 ${f.W} ${f.H}" width="${f.W * 1.3}" height="${f.H * 1.3}" role="img" aria-label="The model seen from the front: three columns of cubes. From left to right they are 2, 3 and 2 cubes high.">${f.g}</svg>
+    <svg viewBox="0 0 ${s.W} ${s.H}" width="${s.W * 1.3}" height="${s.H * 1.3}" role="img" aria-label="The model seen from the right side: three columns of cubes. The front of the model is on the left of this view and the back is on the right. From front to back they are 2, 3 and 1 cubes high.">${s.g}</svg>
+  </div>`;
+})();
+const planGrid = (rows, label) => {
+  const c = 34, o = 6;
+  let g = "";
+  rows.forEach((row, r) => row.forEach((n, k) => {
+    g += `<rect x="${o + k * c}" y="${o + r * c}" width="${c}" height="${c}" fill="${n ? "#dce8f5" : "#fff"}" stroke="${n ? INK : "#c3ccd8"}" stroke-width="${n ? 1.6 : 1}"/>`;
+    if (n) g += `<text x="${o + k * c + c / 2}" y="${o + r * c + c / 2 + 7}" font-size="19" font-weight="700" text-anchor="middle" fill="${INK}">${n}</text>`;
+  }));
+  g += `<text x="${o + 1.5 * c}" y="${o + 3 * c + 16}" font-size="12" text-anchor="middle" fill="#55607a">front</text>`;
+  const W = 3 * c + 2 * o, H = 3 * c + o + 22;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${label}">${g}</svg>`;
+};
+const PLAN_OPTS = [
+  [[2, 0, 1], [0, 3, 2], [1, 1, 0]],   // matches the front view; side view back to front
+  PLAN_OK,                             // correct
+  [[1, 0, 1], [0, 2, 3], [2, 1, 0]],   // matches the side view only
+  [[1, 0, 1], [0, 2, 2], [2, 3, 0]]    // matches the front view only (tallest stack in the front row)
+].map((rows, i) => planGrid(rows, `Picture ${"ABCD"[i]}: top view, front at the bottom. Rows from back to front, number of cubes in each stack (0 = no cubes): ${rows.map(r => r.join(" ")).join(" / ")}`));
+
+/* ---- Maths Q1: column graph ---- */
+const BOOKS = [["4J", 30], ["4K", 35], ["4L", 20], ["4M", 10]];
+const GRAPH_SVG = (() => {
+  const x0 = 52, y0 = 230, h = 200, top = y0 - h, max = 40, bw = 44, gap = 26;
+  const yOf = v => y0 - (v / max) * h;
+  let g = "";
+  for (let v = 0; v <= max; v += 5) {
+    const big = v % 20 === 0;
+    g += `<line x1="${x0}" y1="${yOf(v)}" x2="${x0 + 4 * (bw + gap) + 10}" y2="${yOf(v)}" stroke="${big ? "#9aa7b8" : "#d5dce6"}" stroke-width="1"/>`;
+    if (big) g += `<text x="${x0 - 8}" y="${yOf(v) + 5}" font-size="14" text-anchor="end" fill="${INK}">${v}</text>`;
+  }
+  BOOKS.forEach(([name, v], i) => {
+    const x = x0 + 16 + i * (bw + gap);
+    g += `<rect x="${x}" y="${yOf(v)}" width="${bw}" height="${y0 - yOf(v)}" fill="#6f9fcf" stroke="${INK}" stroke-width="1.5"/>
+          <text x="${x + bw / 2}" y="${y0 + 20}" font-size="14" text-anchor="middle" fill="${INK}">${name}</text>`;
+  });
+  g += `<line x1="${x0}" y1="${top - 6}" x2="${x0}" y2="${y0}" stroke="${INK}" stroke-width="2"/>
+        <line x1="${x0}" y1="${y0}" x2="${x0 + 4 * (bw + gap) + 10}" y2="${y0}" stroke="${INK}" stroke-width="2"/>
+        <text x="16" y="${(top + y0) / 2}" font-size="13" text-anchor="middle" fill="${INK}" transform="rotate(-90 16 ${(top + y0) / 2})">number of books</text>
+        <text x="${x0 + 2 * (bw + gap) + 5}" y="${y0 + 42}" font-size="13" text-anchor="middle" fill="${INK}">class</text>`;
+  return `<svg viewBox="0 0 340 282" width="340" height="282" style="max-width:100%;height:auto" role="img" aria-label="Column graph of books read by four classes. The scale is labelled 0, 20 and 40, with three unlabelled lines between each pair of labels. 4J reaches the second line above 20. 4K reaches the third line above 20. 4L reaches 20. 4M reaches the second line above 0.">${g}</svg>`;
+})();
+
+/* ---- Maths Q2: fraction of a square ---- */
+const FRAC_SVG = (() => {
+  const o = 10, s = 200, q = s / 2, sh = "#2f5e95";
+  let g = `<rect x="${o}" y="${o}" width="${q}" height="${q}" fill="${sh}"/>`;                         // top-left quarter, shaded
+  g += `<rect x="${o + q + q / 2}" y="${o}" width="${q / 2}" height="${q / 2}" fill="${sh}"/>`;         // one small square, top right
+  g += `<path d="M${o} ${o + q} L${o} ${o + s} L${o + q} ${o + s} Z" fill="${sh}"/>`;                  // triangle, bottom left
+  g += `<line x1="${o + q}" y1="${o}" x2="${o + q}" y2="${o + s}" stroke="${INK}" stroke-width="2"/>
+        <line x1="${o}" y1="${o + q}" x2="${o + s}" y2="${o + q}" stroke="${INK}" stroke-width="2"/>
+        <line x1="${o + q + q / 2}" y1="${o}" x2="${o + q + q / 2}" y2="${o + q}" stroke="${INK}" stroke-width="1.5"/>
+        <line x1="${o + q}" y1="${o + q / 2}" x2="${o + s}" y2="${o + q / 2}" stroke="${INK}" stroke-width="1.5"/>
+        <line x1="${o}" y1="${o + q}" x2="${o + q}" y2="${o + s}" stroke="${INK}" stroke-width="1.5"/>
+        <rect x="${o}" y="${o}" width="${s}" height="${s}" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
+  return `<svg viewBox="0 0 220 220" width="220" height="220" role="img" aria-label="A large square split into four equal quarters. The top-left quarter is all shaded. The top-right quarter is split into four equal small squares, and the top-right small square is shaded. The bottom-left quarter is split by a diagonal into two equal triangles, and the triangle in its bottom-left corner is shaded. The bottom-right quarter is not shaded.">${g}</svg>`;
+})();
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Read the poem, then choose the best answer (A, B, C or D) for each question.",
+    questions: [
+      {
+        stem: "In verse 2, the daffodils are “Continuous as the stars that shine / And twinkle on the milky way”. What does this comparison mainly suggest about the daffodils?",
+        options: ["They were growing high up on a hill, so they seemed close to the sky.",
+                  "They were small and far away, so the speaker could hardly see them.",
+                  "They sparkled and shone even more brightly than the waves of the lake beside them.",
+                  "There were so many, in such a long line, that they seemed to go on for ever."],
+        answer: 3,
+        skill: "interpreting a comparison (imagery) in a poem",
+        explain: `<p>The Milky Way is a band of countless stars stretching right across the night sky. The very next lines explain the comparison: the daffodils “stretched in never-ending line / Along the margin of a bay” and there were “Ten thousand” of them. So, like the stars, they were so many and stretched so far that they seemed endless.</p>
+                  <p class="why-not">C is the trap: the waves do sparkle, but that is in verse 3, and it is the daffodils’ <em>glee</em> (their lively dancing) that outdoes the waves, not their brightness; it is not what the star comparison is about. A takes the comparison literally and borrows “on high” from verse 1, which describes the cloud, not the flowers; the daffodils are “Beside the lake”. B picks up that stars are small and distant, but the speaker saw ten thousand “at a glance”, so he could see them very well.</p>`
+      },
+      {
+        stem: "The poem begins with the speaker wandering “lonely as a cloud”. In verse 3 he says, “A poet could not but be gay, / In such a jocund company”. What do these lines suggest?",
+        options: ["He felt shy because there were so many other people walking beside the lake that day.",
+                  "He could not help being cheered up, as if the daffodils were merry friends.",
+                  "He was trying hard to look cheerful, although he still felt lonely inside.",
+                  "He wished he could write a poem as cheerful as the dancing waves were."],
+        answer: 1,
+        skill: "working out feelings shown rather than stated",
+        explain: `<p>“Could not but be gay” means <em>could not help being cheerful</em>, and the “jocund company” is the merry crowd of daffodils (and dancing waves) around him. The poem began with him “lonely”; now the flowers are described like cheerful friends whose happiness he catches. So his loneliness has turned into delight.</p>
+                  <p class="why-not">A is the trap: it reads “company” as a group of people, but the only crowd in the poem is the “crowd” of daffodils, and he is not shy but delighted. C misreads “could not but”: it means he couldn’t help it, not that he was pretending. D picks up the word “poet” and the dancing waves, but the lines are about how the scene made him feel, not about wanting to write.</p>`
+      },
+      {
+        stem: "In verse 3, the speaker says that when he saw the daffodils he “little thought / What wealth the show to me had brought”. What does the last verse show this “wealth” to be?",
+        options: ["The money that such a large field of daffodils would be worth if they were picked and sold.",
+                  "The time he now spends alone lying on his couch, resting and thinking about nothing at all.",
+                  "A memory that comes back to him whenever he is alone and fills him with happiness again.",
+                  "The friends he made by the lake, who keep him company whenever he is feeling lonely."],
+        answer: 2,
+        skill: "understanding the main idea of a whole poem (linking two verses)",
+        explain: `<p>At the time, he “little thought” (hardly realised) what the sight had given him. Verse 4 shows what it was: long afterwards, lying on his couch with an empty or thoughtful mind, the daffodils “flash upon that inward eye” (he sees them again in his memory) and his heart “with pleasure fills, / And dances with the daffodils”. So the “wealth” is not money but a happy memory he can enjoy again and again. Even being alone, which made him “lonely” at the start, has become “the bliss of solitude”.</p>
+                  <p class="why-not">A is the trap: it takes “wealth” literally, but nothing in the poem is about money or picking flowers; the word is used to show how valuable the memory is. B uses real details from verse 4 (his couch, his “vacant” mood), but those are just when the memory comes back; the empty-minded moments are not the treasure. D turns the “jocund company” of verse 3 into real people; his only company was the daffodils, and later he is alone.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0"><em class="speaker">Mr Patel:</em> “Our canteen should move the fruit bowl to the front of the counter, next to where students wait in line, so that students buy more fruit.”</p>
+               <p style="margin:10px 0 0">Which one of these statements, if true, most strongly supports Mr Patel’s claim?</p>`,
+        options: ["Students often add one more thing that they can see and reach while they wait in line.",
+                  "Fruit is much healthier for students than the chips and biscuits that the canteen also sells.",
+                  "Students who buy fruit at the canteen also tend to drink more water during the day.",
+                  "There is more space at the front of the counter than there is at the back of the canteen."],
+        answer: 0,
+        skill: "choosing the statement that best supports a claim",
+        explain: `<p>Mr Patel’s claim has two parts: <b>move the fruit next to the line</b> → <b>students buy more fruit</b>. The best support must link the two. A does: if students often add something they can see and reach while waiting, then fruit placed right beside the line is likely to be bought more often.</p>
+                  <p class="why-not">B is the trap: it is true and it is about fruit, but it only says why buying fruit would be <em>good</em>; it doesn’t show that moving the fruit would make students buy more of it. C is about students who already buy fruit, and drinking water, not about where the fruit is placed. D shows the move would be easy, but having room for the bowl doesn’t make anyone buy fruit.</p>`
+      },
+      {
+        stem: `Look at the numbers at the ends of the arrows on this wheel.
+               <div class="figure">${WHEEL_SVG}</div>
+               <p style="margin:10px 0 0">Which number should replace <b>??</b></p>`,
+        options: ["49", "54", "56", "63"],
+        answer: 2,
+        skill: "finding the rule that links numbers in a diagram (supplied by David)",
+        explain: `<p>Each straight line goes through the centre, so look at the two numbers at the ends of the same line:</p>
+                  <p>3 and 12 &nbsp; 4 and 20 &nbsp; 5 and 30 &nbsp; 6 and 42 &nbsp; 7 and ??</p>
+                  <p>Each big number is the small number times the next number: 3 × 4 = 12, 4 × 5 = 20, 5 × 6 = 30, 6 × 7 = 42. So ?? = 7 × 8 = <b>56</b>.</p>
+                  <p>(Check another way: 12, 20, 30, 42 go up by 8, 10, 12, so the next jump is 14, and 42 + 14 = 56.)</p>
+                  <p class="why-not">49 (A) is the trap: it multiplies 7 by itself, but every pair uses the number and the <em>next</em> number (3 × 4, not 3 × 3). 54 (B) adds 12 again, repeating the last jump instead of seeing that the jumps grow by 2 each time. 63 (D) works out 7 × 9, jumping one number too far.</p>`
+      },
+      {
+        stem: `A model is made of cubes standing on a 3 by 3 square grid. Here is what it looks like from the front and from the right side.
+               <div class="figure">${VIEWS_SVG}</div>
+               <p style="margin:10px 0 0">Each picture below shows the grid from above, with the front at the bottom. The numbers show how many cubes are stacked on each square. Which one could be the model?</p>`,
+        visualOptions: true,
+        options: PLAN_OPTS,
+        answer: 1,
+        skill: "matching a top view (with stack heights) to front and side views",
+        explain: `<p>From any side you see only the <b>tallest stack</b> in each line of squares.</p>
+                  <p><b>Front view</b> (left, middle, right columns): tallest stacks must be 2, 3, 2.<br>
+                  <b>Right-side view</b> (front, middle, back rows): tallest stacks must be 2, 3, 1. The front of the model is on the <em>left</em> of this view.</p>
+                  <p>Picture B: columns have tallest stacks 2, 3, 2 ✓; the front row has tallest 2, the middle row 3 and the back row 1 ✓. So <b>B</b> could be the model.</p>
+                  <p class="why-not">A is the trap: its columns match the front view, but its rows from front to back are 1, 3, 2, which is the side view read the wrong way round (front and back swapped). C matches the side view, but its columns are 2, 2, 3, so from the front the tallest stack would be on the right. D matches the front view, but its tallest stack (3) is in the front row, so from the side you would see 3, 2, 1.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `The graph shows how many books four classes read in a read-a-thon.
+               <div class="figure">${GRAPH_SVG}</div>
+               <p style="margin:10px 0 0">How many more books did class 4K read than class 4M?</p>`,
+        options: ["5", "21", "25", "35", "45"],
+        answer: 2,
+        skill: "reading a column graph with unlabelled lines",
+        explain: `<p>The labels go up in 20s, and there are 4 equal steps between 0 and 20, so each line is worth 20 ÷ 4 = <b>5</b> books.</p>
+                  <p>4K reaches the third line above 20: 20 + 15 = <b>35</b>. 4M reaches the second line above 0: <b>10</b>. So 4K read 35 − 10 = <b>25</b> more.</p>
+                  <p class="why-not">21 (B) is the trap: it reads each unlabelled line as 1 book, so 4K looks like 23 and 4M like 2. 5 (A) counts the 5 lines between the tops of the two columns but forgets each line is worth 5 books. 35 (D) is how many 4K read, not how many more. 45 (E) adds the two classes instead of finding the difference.</p>`
+      },
+      {
+        stem: `What fraction of this square is shaded?
+               <div class="figure">${FRAC_SVG}</div>`,
+        options: ["3/16", "1/4", "5/16", "3/8", "7/16"],
+        answer: 4,
+        skill: "fractions: shaded parts of different sizes (using sixteenths)",
+        explain: `<p>Change every piece into sixteenths of the big square. Each quarter is 4/16.</p>
+                  <ul>
+                    <li>The whole top-left quarter: <b>4/16</b>.</li>
+                    <li>One small square in the top-right quarter (a quarter of a quarter): <b>1/16</b>.</li>
+                    <li>One triangle in the bottom-left quarter (half of a quarter): <b>2/16</b>.</li>
+                  </ul>
+                  <p>Altogether 4/16 + 1/16 + 2/16 = <b>7/16</b>.</p>
+                  <p class="why-not">3/8 (D) is the trap: it counts pieces (3 shaded out of 8 pieces), but the pieces are different sizes. 5/16 (C) forgets the shaded triangle. 1/4 (B) counts only the fully shaded quarter. 3/16 (A) counts the 3 shaded pieces as if each one were a sixteenth.</p>`
+      },
+      {
+        stem: `Ruby catches the 8:34 am train. The train trip takes 47 minutes. Then she changes to a bus at the station.
+               <p style="margin:10px 0 0">Buses leave the station every 25 minutes. The first bus of the day leaves at 6:50 am.</p>
+               <p style="margin:10px 0 0">How long does Ruby wait at the station for the next bus?</p>`,
+        options: ["9 minutes", "19 minutes", "21 minutes", "24 minutes", "25 minutes"],
+        answer: 3,
+        skill: "time: arrival time, then the next departure from a repeating timetable",
+        explain: `<p><b>Step 1, when Ruby arrives:</b> 8:34 + 26 minutes = 9:00, and 21 more minutes makes 47, so she arrives at <b>9:21 am</b>.</p>
+                  <p><b>Step 2, the bus times:</b> count on in 25s from 6:50: 7:15, 7:40, 8:05, 8:30, 8:55, 9:20, <b>9:45</b>. She just misses the 9:20 bus, so the next one is at 9:45.</p>
+                  <p><b>Step 3:</b> from 9:21 to 9:45 is <b>24 minutes</b>.</p>
+                  <p class="why-not">19 minutes (B) is the trap: it assumes the buses leave at the same minutes every hour (:15 and :40, like 7:15 and 7:40), so it picks a 9:40 bus. But 25-minute gaps don’t fit evenly into an hour, so the minutes change. 21 minutes (C) uses 8:34, when the train leaves, instead of when it arrives (the next bus after 8:34 is 8:55). 9 minutes (A) counts in 25s from 7:00 instead of 6:50 (9:05, 9:30). 25 minutes (E) assumes she always waits the full gap between buses.</p>`
+      }
+    ]
+  }
+];
+
+const TEST_META = {"version": 55, "reading_format": "poem", "categories": {"reading": ["Comparisons & imagery", "Feelings & inference", "Main idea"], "thinking": ["Supports the claim", "Rules & codes", "Spatial"], "maths": ["Graphs & data", "Fractions", "Time & timetables"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}, "status": "review"};
+const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  const t = await r.text(); // functions that return nothing send an empty body
+  return t ? JSON.parse(t) : null;
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
+  persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 55</h1>
+      ${completedNote()}
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+      ${mode === "review" && ADMIN ? `<div class="review-box" data-q="${qi}"><p class="rv-msg">Loading feedback…</p></div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  sectionStart = Date.now();
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  if (ADMIN) fillReviews();
+  window.scrollTo(0, 0);
+}
+
+/* ---- question feedback (practice mode only): approve, or send back for a redo with a comment.
+   Saved online through add_review(pin, …); Claude answers each redo with a 'done' row. ---- */
+let reviewRows = [];
+const RV_DIFF = ["Much easier", "A bit easier", "A bit harder", "Much harder"];
+const RV_LABEL = { approve: "Approved", redo: "Sent back for a redo", done: "Redone by Claude" };
+const rvEsc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function reviewPin() { try { return sessionStorage.getItem("prac.admin.pin") || ""; } catch (e) { return ""; } }
+async function fillReviews() {
+  const si = current, boxes = app.querySelectorAll(".review-box");
+  const note = t => boxes.forEach(b => b.innerHTML = `<p class="rv-msg">${t}</p>`);
+  if (!syncOn() || !reviewPin()) return note("Question feedback needs the online database. Open this test from the admin page (after entering the PIN).");
+  try { reviewRows = (await syncRpc("admin_reviews", { p_pin: reviewPin() })) || []; }
+  catch (e) { return note("Couldn’t load question feedback. If this keeps happening, the database may need its update (ask Claude)."); }
+  if (current !== si || passMode !== "review") return;
+  boxes.forEach(b => renderReviewBox(b, SECTIONS[si].id, +b.dataset.q));
+}
+function renderReviewBox(box, sec, qi, msg) {
+  const hist = reviewRows.filter(r => r.version === TEST_META.version && r.section === sec && r.q === qi);
+  const when = t => { const d = new Date(t); return isNaN(d) ? "" : d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }); };
+  const last = hist[hist.length - 1];
+  box.innerHTML = `<p class="rv-head">Your review of question ${qi + 1}</p>
+    ${hist.length ? `<ul>${hist.map(r => `<li class="${r.kind}"><b>${RV_LABEL[r.kind] || rvEsc(r.kind)}</b> · ${when(r.at)}${r.comment ? `: ${rvEsc(r.comment)}` : ""}</li>`).join("")}</ul>` : ""}
+    ${last && last.kind === "redo" ? `<p class="rv-msg">Waiting for Claude to redo this question.</p>` : ""}
+    <div class="rv-actions">
+      <button type="button" class="rv-approve">${last && last.kind === "approve" ? "Approved ✓" : "Approve"}</button>
+      <button type="button" class="rv-redo">Send back for a redo</button>
+    </div>
+    <div class="rv-diff" role="group" aria-label="Quick difficulty change for question ${qi + 1}">
+      <span>Difficulty:</span>
+      ${RV_DIFF.map((d, k) => `<button type="button" class="rv-chip" data-d="${k}">${d}</button>`).join("")}
+    </div>
+    <div class="rv-form" hidden>
+      <p class="rv-chosen" hidden></p>
+      <textarea rows="3" maxlength="4000" aria-label="What needs changing in question ${qi + 1}?" placeholder="What needs changing? (e.g. too easy, two answers could be right, picture unclear)"></textarea>
+      <button type="button" class="rv-send">Send back</button>
+      <button type="button" class="rv-cancel">Cancel</button>
+    </div>
+    <p class="rv-msg" role="status">${msg || ""}</p>`;
+  const form = box.querySelector(".rv-form"), say = t => box.querySelector(".rv-msg[role=status]").textContent = t;
+  const chosen = box.querySelector(".rv-chosen"), ta = box.querySelector("textarea");
+  let diff = null;
+  const pick = k => {
+    diff = k;
+    box.querySelectorAll(".rv-chip").forEach(c => c.classList.toggle("on", +c.dataset.d === k));
+    chosen.hidden = k === null;
+    chosen.textContent = k === null ? "" : `Make it ${RV_DIFF[k].toLowerCase()}. Add a comment if you like, then press Send back.`;
+    ta.placeholder = k === null ? "What needs changing? (e.g. too easy, two answers could be right, picture unclear)" : "Optional: anything else to change?";
+    form.hidden = false; ta.focus(); say("");
+  };
+  box.querySelector(".rv-approve").onclick = () => submitReview(box, sec, qi, "approve", "");
+  box.querySelector(".rv-redo").onclick = () => pick(null);
+  box.querySelectorAll(".rv-chip").forEach(c => c.onclick = () => pick(+c.dataset.d));
+  box.querySelector(".rv-cancel").onclick = () => { form.hidden = true; diff = null; box.querySelectorAll(".rv-chip").forEach(c => c.classList.remove("on")); say(""); };
+  box.querySelector(".rv-send").onclick = () => {
+    const c = ta.value.trim();
+    if (diff === null && !c) { say("Add a comment (or pick a difficulty) so Claude knows what to change."); return; }
+    submitReview(box, sec, qi, "redo", (diff === null ? "" : `Difficulty: make it ${RV_DIFF[diff].toLowerCase()}.` + (c ? " " : "")) + c);
+  };
+}
+async function submitReview(box, sec, qi, kind, comment) {
+  box.querySelectorAll("button").forEach(b => b.disabled = true);
+  box.querySelector(".rv-msg[role=status]").textContent = "Saving…";
+  try {
+    await syncRpc("add_review", { p_pin: reviewPin(), p_version: TEST_META.version, p_section: sec, p_q: qi, p_kind: kind, p_comment: comment });
+  } catch (e) {
+    box.querySelectorAll("button").forEach(b => b.disabled = false);
+    box.querySelector(".rv-msg[role=status]").textContent = "Couldn’t save. Check the internet connection and try again.";
+    return;
+  }
+  reviewRows.push({ version: TEST_META.version, section: sec, q: qi, kind, comment, at: new Date().toISOString() });
+  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it overnight, or straight away if you run “Do redos now”.");
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  finishAttempt();
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+// A test held for review is only on the admin page; someone opening its address directly sees this instead.
+function showNotReady() {
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>This test isn’t ready yet</h1>
+      <p class="lead">It will appear on the list of tests once it has been checked.</p>
+      <a class="primary" href="../../index.html">Back to all tests</a>
+    </div>`;
+}
+
+if (TEST_META.status === "review" && !ADMIN) showNotReady(); else showStart();
+</script>
+</body>
+</html>

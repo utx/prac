@@ -14,38 +14,6 @@ Never paste in questions from the official sample papers or other copyrighted bo
 
 ## Waiting
 
-### Peyton's mix-up (working backwards)
-- **Section**: maths (inverse operations / working backwards; sample PT3 Q24-style, a good Q2 or Q3)
-- **Added**: 2026-10-07
-- **Question**: Peyton was supposed to add 4 to the number on the board and then multiply the result by 3. Instead, Peyton added 3 to the number on the board and then multiplied the result by 4. Peyton got an answer of 48. What answer would Peyton get if he solved the problem correctly?
-- **Answer** (checked): **39**. Work backwards: 48 ÷ 4 = 12, then 12 − 3 = 9 is the number on the board. The correct way gives (9 + 4) × 3 = 39.
-- **Notes**:
-  - Written by David (his questions can be reworded).
-  - Possible wrong options from real mistakes:
-    - 36: 12 × 3, undoing only the multiply.
-    - 9: stops at the number on the board.
-    - 13: 9 + 4, forgetting to multiply.
-    - 48: thinks the order of steps doesn't matter.
-    - 45: 48 − 3.
-  - Choose 4 or 5 of these.
-
-### Carter's trip back to the library
-- **Section**: maths (distance on a line, working backwards; a good Q2 or Q3, or a Thinking number problem)
-- **Added**: 2026-10-07
-- **Question**: Carter's school is 10 miles away from his home. The library is on his way from home to school. This morning, Carter biked to school from his home. After biking 7 miles, he realized that he forgot to stop at the library. He biked back to the library right away, and then he biked straight to school. He biked a total of 16 miles during this trip. How far is the library from Carter's home?
-- **Answer** (checked): **4**. The extra distance is 16 − 10 = 6, which is the distance back to the library and then over the same stretch again, so that stretch is 3. The library is 7 − 3 = 4 from home. Check: 7 + 3 + 6 = 16.
-- **Notes**:
-  - Written by David (his questions can be reworded).
-  - Use kilometres and the Australian spelling "realised".
-  - A number-line diagram (home, library, the turn-around point, school) helps the explanation, but don't mark the library's position in the question.
-  - Difficulty: medium-hard, around Q20–28 of the sample papers.
-  - **David's plan (step 1 of 3): use it WITH a diagram, as Maths Q2.** Show a number line with home, school and the 7 km turn-around point, but not the library. The next two entries follow on from it.
-  - Possible wrong options from real mistakes:
-    - 3: the distance he biked back, not the library's distance from home.
-    - 6: 16 − 10, forgetting the extra stretch is ridden twice.
-    - 1: 7 − 6.
-    - 9: 16 − 7.
-
 ### Follow-up 1: another "turned back" trip, with a diagram (step 2 of 3)
 - **Section**: maths Q2
 - **Added**: 2026-10-07
@@ -61,40 +29,6 @@ Never paste in questions from the official sample papers or other copyrighted bo
   - Make it one notch harder than step 2. For example, use two return trips, or a total that has to be worked out first.
   - The explanation should show the number line.
 - **Notes**: David's plan. Use it no sooner than **2 tests after** the test that used follow-up 1, and only once follow-up 1 is in **Used**.
-
-### Number wheel: opposite numbers (missing number)
-- **Section**: thinking (rules: find the rule linking numbers in a diagram) or a maths pattern question
-- **Added**: 2026-10-07
-- **Question** (described in our own words; redraw the diagram): ten arrows go out from a centre like the spokes of a wheel. Going clockwise from the top, the numbers at the ends are 3, 4, 5, 6, 7, 12, 20, 30, 42 and ??. Which number should replace ??
-- **Answer** (checked): **56**.
-  - Each number is linked to the one at the opposite end of its straight line: 3 ↔ 12, 4 ↔ 20, 5 ↔ 30, 6 ↔ 42, 7 ↔ ??.
-  - The rule is n × (n + 1): 3 × 4 = 12, 4 × 5 = 20, 5 × 6 = 30 and 6 × 7 = 42, so 7 × 8 = 56.
-  - The second half also goes up by 8, 10, 12, 14, so the next step of 14 gives the same answer.
-- **Notes**:
-  - Written by David (his questions can be reworded). Redraw the diagram.
-  - Make the opposite pairs clearly opposite: draw each pair as one straight line through the centre.
-  - Possible wrong options from real mistakes:
-    - 8: carries on 3, 4, 5, 6, 7.
-    - 49: 7 × 7.
-    - 54: 42 + 12, repeating the last jump.
-    - 63: 7 × 9.
-
-### Rick and Nick skip-counting (common multiples)
-- **Section**: maths (multiples / common multiples; a quick-fire Q1, or a number-puzzle Q2 with a twist)
-- **Added**: 2026-10-10
-- **Question**: Rick skip-counts by 7's, starting at 7. Nick skip-counts by 9's, starting at 9. What is the only 2-digit number that Rick and Nick will both say?
-  - No options or answer were given. David's picture was the question text only (no diagram), so no picture is saved.
-- **Answer** (checked by listing both counts): **63**. Rick says 7, 14, 21, …, 98 and Nick says 9, 18, 27, …, 99. The numbers both say are the multiples of 63 (7 and 9 share no factor), so the only 2-digit one is 63; the next is 126.
-- **Notes**:
-  - David asked for "something based on this", so it can be reworded or given a twist. Use "7s" and "9s" (no apostrophes).
-  - On its own it is about quick-fire level (a child who knows 7 × 9 = 63 gets it at once), so use it as Maths Q1. To make it a Q2, add a twist that needs reasoning, for example a third counter (Mick counts by 3s: which number do all three say?), or ask how many numbers below 200 both children say (63 and 126, so 2).
-  - Possible wrong options from real mistakes:
-    - 16: 7 + 9.
-    - 56: 7 × 8, a number only Rick says.
-    - 72: 9 × 8, a number only Nick says.
-    - 126: the next number both say, but it has 3 digits.
-    - 81: 9 × 9.
-  - Choose 4 or 5 of these.
 
 ### Sum of lots of 44 (clever calculation)
 - **Section**: maths (number: clever calculation by grouping, the distributive law; competition-style, so it counts as the test's one competition-style question)
@@ -148,6 +82,76 @@ Never paste in questions from the official sample papers or other copyrighted bo
   - With the answer, these four make the five options Maths needs.
 
 ## Used
+
+### Peyton's mix-up (working backwards) → Test 53 Maths Q2
+- **Section**: maths (inverse operations / working backwards; sample PT3 Q24-style, a good Q2 or Q3)
+- **Added**: 2026-10-07
+- **Question**: Peyton was supposed to add 4 to the number on the board and then multiply the result by 3. Instead, Peyton added 3 to the number on the board and then multiplied the result by 4. Peyton got an answer of 48. What answer would Peyton get if he solved the problem correctly?
+- **Answer** (checked): **39**. Work backwards: 48 ÷ 4 = 12, then 12 − 3 = 9 is the number on the board. The correct way gives (9 + 4) × 3 = 39.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Possible wrong options from real mistakes:
+    - 36: 12 × 3, undoing only the multiply.
+    - 9: stops at the number on the board.
+    - 13: 9 + 4, forgetting to multiply.
+    - 48: thinks the order of steps doesn't matter.
+    - 45: 48 − 3.
+  - Choose 4 or 5 of these.
+- **Used**: → Test 53 Maths Q2 (answer C, 39). Wording as given; options 9, 36, 39, 45, 48 (13 left out). Held for David's review.
+
+### Carter's trip back to the library → Test 54 Maths Q2
+- **Section**: maths (distance on a line, working backwards; a good Q2 or Q3, or a Thinking number problem)
+- **Added**: 2026-10-07
+- **Question**: Carter's school is 10 miles away from his home. The library is on his way from home to school. This morning, Carter biked to school from his home. After biking 7 miles, he realized that he forgot to stop at the library. He biked back to the library right away, and then he biked straight to school. He biked a total of 16 miles during this trip. How far is the library from Carter's home?
+- **Answer** (checked): **4**. The extra distance is 16 − 10 = 6, which is the distance back to the library and then over the same stretch again, so that stretch is 3. The library is 7 − 3 = 4 from home. Check: 7 + 3 + 6 = 16.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Use kilometres and the Australian spelling "realised".
+  - A number-line diagram (home, library, the turn-around point, school) helps the explanation, but don't mark the library's position in the question.
+  - Difficulty: medium-hard, around Q20–28 of the sample papers.
+  - **David's plan (step 1 of 3): use it WITH a diagram, as Maths Q2.** Show a number line with home, school and the 7 km turn-around point, but not the library. The next two entries follow on from it.
+  - Possible wrong options from real mistakes:
+    - 3: the distance he biked back, not the library's distance from home.
+    - 6: 16 − 10, forgetting the extra stretch is ridden twice.
+    - 1: 7 − 6.
+    - 9: 16 − 7.
+- **Used**: → Test 54 Maths Q2 (answer B, 4 km). Miles → km (10, 7, 16 km), "realized" → "realised"; number line added showing home 0 km, the 7 km turn-around point and school 10 km, not the library. Options 3, 4, 6, 7, 9 km (David's 1 left out; 7 km added: thinking the library is at the turn-around point). Held for David's review. Step 1 of 3 is done, so follow-up 1 can go in Test 56 or later (no sooner than 2 tests after Test 54).
+
+### Number wheel: opposite numbers → Test 55 Thinking Q2
+- **Section**: thinking (rules: find the rule linking numbers in a diagram) or a maths pattern question
+- **Added**: 2026-10-07
+- **Question** (described in our own words; redraw the diagram): ten arrows go out from a centre like the spokes of a wheel. Going clockwise from the top, the numbers at the ends are 3, 4, 5, 6, 7, 12, 20, 30, 42 and ??. Which number should replace ??
+- **Answer** (checked): **56**.
+  - Each number is linked to the one at the opposite end of its straight line: 3 ↔ 12, 4 ↔ 20, 5 ↔ 30, 6 ↔ 42, 7 ↔ ??.
+  - The rule is n × (n + 1): 3 × 4 = 12, 4 × 5 = 20, 5 × 6 = 30 and 6 × 7 = 42, so 7 × 8 = 56.
+  - The second half also goes up by 8, 10, 12, 14, so the next step of 14 gives the same answer.
+- **Notes**:
+  - Written by David (his questions can be reworded). Redraw the diagram.
+  - Make the opposite pairs clearly opposite: draw each pair as one straight line through the centre.
+  - Possible wrong options from real mistakes:
+    - 8: carries on 3, 4, 5, 6, 7.
+    - 49: 7 × 7.
+    - 54: 42 + 12, repeating the last jump.
+    - 63: 7 × 9.
+- **Used**: → Test 55 Thinking Q2 (answer C, 56). Diagram redrawn (five straight lines through the centre, arrows at both ends); stem reworded to "Look at the numbers at the ends of the arrows on this wheel. Which number should replace ??"; options 49, 54, 56, 63 (8 left out, as Thinking has four options). Held for David's review.
+
+### Rick and Nick skip-counting → Test 56 Maths Q1
+- **Section**: maths (multiples / common multiples; a quick-fire Q1, or a number-puzzle Q2 with a twist)
+- **Added**: 2026-10-10
+- **Question**: Rick skip-counts by 7's, starting at 7. Nick skip-counts by 9's, starting at 9. What is the only 2-digit number that Rick and Nick will both say?
+  - No options or answer were given. David's picture was the question text only (no diagram), so no picture is saved.
+- **Answer** (checked by listing both counts): **63**. Rick says 7, 14, 21, …, 98 and Nick says 9, 18, 27, …, 99. The numbers both say are the multiples of 63 (7 and 9 share no factor), so the only 2-digit one is 63; the next is 126.
+- **Notes**:
+  - David asked for "something based on this", so it can be reworded or given a twist. Use "7s" and "9s" (no apostrophes).
+  - On its own it is about quick-fire level (a child who knows 7 × 9 = 63 gets it at once), so use it as Maths Q1. To make it a Q2, add a twist that needs reasoning, for example a third counter (Mick counts by 3s: which number do all three say?), or ask how many numbers below 200 both children say (63 and 126, so 2).
+  - Possible wrong options from real mistakes:
+    - 16: 7 + 9.
+    - 56: 7 × 8, a number only Rick says.
+    - 72: 9 × 8, a number only Nick says.
+    - 126: the next number both say, but it has 3 digits.
+    - 81: 9 × 9.
+  - Choose 4 or 5 of these.
+- **Used**: → Test 56 Maths Q1 (answer C, 63). Wording as given with "7s" and "9s"; options 16, 56, 63, 72, 126 (81 left out). Held for David's review.
 
 ### Painted 4 × 4 × 4 cube → Test 49 Maths Q3 (stretch)
 - **Section**: maths (3D: painted cube; competition-style, so it counts as the test's one competition-style question)

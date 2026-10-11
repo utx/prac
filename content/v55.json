@@ -1,0 +1,63 @@
+{
+  "version": 55,
+  "date": "2026-10-11",
+  "status": "review",
+  "reading": "Poem: I Wandered Lonely as a Cloud (William Wordsworth)",
+  "reading_format": "poem",
+  "reading_topic": "a crowd of daffodils dancing beside a lake, and how the memory later brings 'the bliss of solitude' (classic poem, written 1804, revised text published 1815, public domain)",
+  "thinking": [
+    "Supports the claim (fruit next to the canteen line so students buy more)",
+    "Number wheel: rule linking opposite numbers, n × (n + 1) (supplied by David)",
+    "Cube model: top view with stack heights from front and side views (stretch)"
+  ],
+  "maths": [
+    "Quick-fire graph reading: column graph with unlabelled lines worth 5",
+    "Fractions: shaded parts of different sizes in sixteenths",
+    "Time: arrival time, then the wait for a bus every 25 minutes (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q15 (what is compared with what), PT2 Q15-19 (purpose of imagery in a poem)",
+      "PT1 Q15-19 (feelings shown rather than stated in a poem), PT2 Q1-6 (feelings shown, not stated)",
+      "PT1 Q19 and PT2 Q19 (whole-poem question: what the poem as a whole shows) — stretch"
+    ],
+    "thinking": [
+      "PT1 Q2, PT2 Q3, PT3 Q21 (supports the claim)",
+      "PT2 Q10 (shape sequence rules), PT3 Q13 (letter values: codes/number); maths PT3 Q4 (number grid puzzle)",
+      "PT2 Q22 (plan view from a side view), PT1 Q28 (floor plan from a view), PT2 Q4 (side view of a block piece) — stretch"
+    ],
+    "maths": [
+      "PT3 Q12 (bar graph: how many more), PT2 Q11 (scale reading with different markings)",
+      "PT1 Q4 (fraction of a shape to shade), PT3 Q5 (fraction closest to a value), PT1 Q18",
+      "PT1 Q30 (time spent between two buses), PT2 Q20 (clock + 555 minutes), PT2 Q2 (minutes in a timetable) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Comparisons & imagery",
+      "Feelings & inference",
+      "Main idea"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Rules & codes",
+      "Spatial"
+    ],
+    "maths": [
+      "Graphs & data",
+      "Fractions",
+      "Time & timetables"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
