@@ -99,6 +99,7 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
   - **"Overnight: redos and practice tests"** (12:50 am Sydney): runs `tools/reviews.py` and `tools/release.py --json`; if redos are waiting, tests are due for release, or `build` isn't `none`, it starts a fresh full-strength session (`create_session` with this repo as source) to run the `overnight` skill; otherwise it stops.
   - **"Do redos now (run on demand)"** (no schedule; David presses **Run now**): if redos are waiting, starts a fresh full-strength session to run the `redo` skill.
 - Never do heavy work inside the dispatcher session or a very long conversation: every message re-reads the whole conversation, so long sessions get expensive. Don't add more scheduled routines without asking David.
+- The dispatcher's history grows a little every night. When it passes about 100k tokens (`get_session` → `context_usage.used_tokens`; a fresh one starts near 58k), replace it: `create_session` (same environment, light model, `permission_mode` auto, a one-line "wait for routine messages, reply ready" prompt), recreate both routines with the same names, schedules and prompts bound to it (`update_trigger` can't move a routine to another session), delete the old routines, then archive the old session. Last reset: 18 Oct 2026.
 - Routine sessions created with "a fresh session on each firing" can't push or use the GitHub tools here, so don't use that mode.
 
 ## Automatic checks
