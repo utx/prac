@@ -1,0 +1,63 @@
+{
+  "version": 59,
+  "date": "2026-10-22",
+  "status": "review",
+  "reading": "Four extracts: Islands",
+  "reading_format": "four extracts",
+  "reading_topic": "islands: a memoir of a rough ferry crossing to stay with Nan on a small island, a factual piece on Lord Howe Island (World Heritage 1982, about 400 tourists at a time, Ball's Pyramid, the stick insect thought extinct after rats arrived in 1918 and found on Ball's Pyramid in 2001), a girl caught on a sandbar as the tide comes in, an opinion piece against a bridge to a small island",
+  "thinking": [
+    "Supports the claim (moving swimming training from 6 am to 6 pm so more members come)",
+    "Two-way table: excursion votes by year, a missing value from a clue in words",
+    "Counting cubes in a staircase model, including the hidden ones (stretch)"
+  ],
+  "maths": [
+    "Quick-fire place value: difference between the values of the two 7s in 47 375",
+    "Line graph statements: a sunflower's height with unlabelled grid lines (which are correct)",
+    "Combinations with a condition: odd 3-digit numbers from four number cards (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT2 Q26-33 ('suggests newcomers are not always welcome': feelings and attitudes shown, not stated), PT1 Q1-6 (feelings shown rather than stated)",
+      "PT1 Q1-6 (why the writer includes a detail), PT3 Q26-33 (an idea expressed in completely different words)",
+      "PT1-PT3 Q26-33 ('uses figurative language': spotting a technique), PT1 Q15-19 (what is compared with what; which thing is given human qualities) — stretch"
+    ],
+    "thinking": [
+      "PT1 Q2, PT2 Q3, PT3 Q3 (supports the claim), PT1 Q24 (supports the claim)",
+      "PT1 Q3 (which pets overlap: sets/table), PT2 Q25 (table with a rule), PT3 Q7 (packs table + a swap)",
+      "PT3 Q8 maths (how many objects from cubes), PT1 Q14 maths (hidden faces of a cube model), PT2 Q28 (layers of a pyramid) — stretch"
+    ],
+    "maths": [
+      "PT2 Q9 (which digit change increases most), PT1 Q2 (place value), PT3 Q6 (place-value regrouping)",
+      "PT1 Q27 (which graph claims are correct), PT2 Q11 (scale with different markings), PT3 Q12 (graph reading)",
+      "PT1 Q35 (combinations), PT2 Q10 (combinations: shapes × colours), PT2 Q31 (3-digit numbers with distinct digits) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Feelings & inference",
+      "Purpose of a detail",
+      "Comparisons & imagery"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Graphs & data",
+      "Chance & counting"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
