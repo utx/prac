@@ -36,11 +36,11 @@ const CUBES_SVG = (() => {
     poly([P(x, y, z), P(x + 1, y, z), P(x + 1, y, z + 1), P(x, y, z + 1)], "#f2c48d") +
     poly([P(x + 1, y, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x + 1, y, z + 1)], "#d9944a") +
     poly([P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], "#fbe3c4");
-  const HEIGHTS = [[1, 1, 1], [2, 2, 1], [3, 3, 2]]; // [front row, middle row, back row], left to right
+  const HEIGHTS = [[1, 1, 1], [2, 2, 2], [3, 3, 3]]; // [front row, middle row, back row], left to right
   let g = "";
   for (let y = rows - 1; y >= 0; y--) for (let x = 0; x < 3; x++) for (let z = 0; z < HEIGHTS[y][x]; z++) g += cube(x, y, z);
   const W = ox + 3 * s + rows * d + 12, Hh = base + 8;
-  return `<svg viewBox="0 0 ${W} ${Hh}" width="${W}" height="${Hh}" role="img" aria-label="A model made of identical cubes on a base 3 cubes long and 3 cubes deep, with no gaps in the base. It rises like a staircase towards the back. Front row, left to right: stacks of 1, 1 and 1 cube. Middle row: stacks of 2, 2 and 1. Back row: stacks of 3, 3 and 2.">${g}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${Hh}" width="${W}" height="${Hh}" role="img" aria-label="A model made of identical cubes, drawn from the front-right, so you can see the front, the top and the right-hand side of the model. The base is 3 cubes long and 3 cubes deep, with no gaps. It rises like a staircase towards the back: the front row is 3 stacks of 1 cube, the middle row is 3 stacks of 2 cubes, and the back row is 3 stacks of 3 cubes.">${g}</svg>`;
 })();
 
 /* ---- Maths Q2: line graph of a sunflower's height ---- */
@@ -140,16 +140,16 @@ const SECTIONS = [
                   <p class="why-not">12 (B) is the trap: it takes the 17 Year 3 zoo votes away from the Year 4 total, (41 − 17) ÷ 2 = 12, instead of first working out how many <em>Year 4</em> students chose the zoo. 28 (D) is the museum and beach votes together, before sharing them equally. 11 (A) is the number of <em>Year 3</em> students who voted for the museum.</p>`
       },
       {
-        stem: `This model is made of identical cubes. Its base is 3 cubes long and 3 cubes deep, with no gaps. Every cube sits on the table or on top of another cube.
+        stem: `This model is made of identical cubes. Its base is 3 cubes long and 3 cubes deep, with no gaps. Every cube sits on the table or on top of another cube. The picture shows the model from the front-right: you can see its front, its top and its right-hand side.
                <div class="figure">${CUBES_SVG}</div>
                <p style="margin:10px 0 0">How many of the cubes <b>cannot</b> be seen in the picture?</p>`,
-        options: ["4", "6", "7", "10"],
+        options: ["4", "6", "9", "12"],
         answer: 1,
         skill: "counting cubes in a model, including the hidden ones",
-        explain: `<p><b>Step 1: count all the cubes.</b> Every top you can see stands on a full stack, because there are no gaps. Front row: 1 + 1 + 1 = 3. Middle row: 2 + 2 + 1 = 5. Back row: 3 + 3 + 2 = 8. That makes <b>16 cubes</b>.</p>
-                  <p><b>Step 2: count the cubes you can see.</b> Front row 3, middle row 3 (the top cube of each 2-stack, and the single cube on the right), back row 4 (the top cube of each 3-stack, and both cubes of the right-hand stack, whose side you can see). That makes <b>10</b>.</p>
-                  <p><b>Step 3:</b> 16 − 10 = <b>6</b> hidden cubes: 2 under each of the two tall back stacks, and 1 under each of the two left-hand middle stacks.</p>
-                  <p class="why-not">4 (A) is the trap: it finds the hidden cubes under the tall back stacks but forgets the two hiding under the middle row. 7 (C) also counts the bottom cube of the back right-hand stack as hidden, but its right side is showing. 10 (D) is the number of cubes you <em>can</em> see.</p>`
+        explain: `<p><b>Step 1: count all the cubes.</b> Every top you can see stands on a full stack, because there are no gaps. Front row: 1 + 1 + 1 = 3. Middle row: 2 + 2 + 2 = 6. Back row: 3 + 3 + 3 = 9. That makes <b>18 cubes</b>.</p>
+                  <p><b>Step 2: count the cubes you can see.</b> All 3 cubes in the front row. In the middle row, the top cube of the left and middle stacks, and both cubes of the right-hand stack, whose side is showing: 4. In the back row, the top cube of the left and middle stacks, and all 3 cubes of the right-hand stack: 5. That makes 3 + 4 + 5 = <b>12</b>.</p>
+                  <p><b>Step 3:</b> 18 − 12 = <b>6</b> hidden cubes: 2 under each of the left and middle back stacks, and 1 under each of the left and middle stacks in the middle row.</p>
+                  <p class="why-not">4 (A) is the trap: it finds the hidden cubes under the tall back stacks but forgets the two hiding under the middle row. 9 (C) also counts the lower cubes of the right-hand stacks as hidden (2 at the back and 1 in the middle), but their right-hand sides are showing. 12 (D) is the number of cubes you <em>can</em> see.</p>`
       }
     ]
   },
@@ -191,15 +191,15 @@ const SECTIONS = [
       {
         stem: `Zoe has these four number cards.
                <div class="figure">${CARDS}</div>
-               <p style="margin:10px 0 0">She uses three of the cards to make a 3-digit number. How many <b>odd</b> 3-digit numbers can she make?</p>`,
-        options: ["6", "12", "18", "24", "32"],
+               <p style="margin:10px 0 0">She uses three of the cards to make a 3-digit number. How many of the numbers she can make are <b>odd</b> and <b>greater than 200</b>?</p>`,
+        options: ["6", "10", "12", "18", "24"],
         answer: 1,
-        skill: "counting combinations with a condition (each card used only once)",
-        explain: `<p>An odd number ends in an odd digit, so the <b>last</b> card must be <b>1</b> or <b>3</b>. Choose that card first.</p>
+        skill: "counting combinations with two conditions that affect each other (each card used only once)",
+        explain: `<p>An odd number ends in an odd digit, so the <b>last</b> card must be <b>1</b> or <b>3</b>. To be greater than 200, the <b>first</b> card must be 2, 3 or 4. Choose the last card first, because it changes what is left for the first card.</p>
                   <p><b>Ending in 1:</b> the first card can be 2, 3 or 4 (3 choices), then the middle card is one of the 2 cards left: 3 × 2 = <b>6</b> numbers (231, 241, 321, 341, 421, 431).<br>
-                     <b>Ending in 3:</b> in the same way, 3 × 2 = <b>6</b> numbers (123, 143, 213, 243, 413, 423).</p>
-                  <p>Altogether 6 + 6 = <b>12</b> odd numbers.</p>
-                  <p class="why-not">6 (A) is the trap: it counts only the numbers ending in 1 (or only those ending in 3) and forgets the other odd card. 24 (D) counts every 3-digit number she can make, odd or even (4 × 3 × 2). 18 (C) forgets that a card used for the first digit can’t be used again for the middle digit (3 × 3 × 2). 32 (E) lets her use the same card more than once (4 × 4 × 2).</p>`
+                     <b>Ending in 3:</b> the 3 is used up, so the first card can only be 2 or 4 (2 choices), then the middle card is one of the 2 left: 2 × 2 = <b>4</b> numbers (213, 243, 413, 423).</p>
+                  <p>Altogether 6 + 4 = <b>10</b> numbers.</p>
+                  <p class="why-not">12 (C) is the trap: it multiplies 3 choices for the first card × 2 for the last × 2 for the middle, forgetting that when the number ends in 3, the 3 can’t also be the first card. 6 (A) counts only the numbers ending in 1. 18 (D) forgets the numbers must be odd and counts every number greater than 200 (3 × 3 × 2). 24 (E) lets her use the same card more than once.</p>`
       }
     ]
   }
