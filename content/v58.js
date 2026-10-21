@@ -39,36 +39,36 @@ const PASSAGE = {
   html: articleHtml
 };
 
-/* ---- Thinking Skills Q3: reflection of a two-colour shape in a mirror line ---- */
+/* ---- Thinking Skills Q3: a reflection, then a quarter turn clockwise ---- */
 const BLUE = "#5b8fd1", ORANGE = "#f2a541";
 // the shape, on a grid 8 squares wide and 4 tall; the mirror line is the middle line (x = 4)
 const SHAPE = [[0, 0, BLUE], [1, 0, BLUE], [1, 1, BLUE], [1, 2, ORANGE], [2, 2, ORANGE]];
 const cellsDesc = cells => cells.map(([c, r, col]) => `${col === BLUE ? "blue" : "orange"} in column ${c + 1}, row ${r + 1}`).join("; ");
-function gridSvg(cols, cells, mirrorAt, label, s = 30) {
-  const o = 4, W = cols * s + 2 * o, H = 4 * s + 2 * o;
+function gridSvg(cols, rows, cells, mirrorAt, label, s = 30) {
+  const o = 4, W = cols * s + 2 * o, H = rows * s + 2 * o;
   let g = "";
   cells.forEach(([c, r, col]) => { g += `<rect x="${o + c * s}" y="${o + r * s}" width="${s}" height="${s}" fill="${col}"/>`; });
-  for (let k = 0; k <= cols; k++) g += `<line x1="${o + k * s}" y1="${o}" x2="${o + k * s}" y2="${o + 4 * s}" stroke="#9aa6b8" stroke-width="1"/>`;
-  for (let k = 0; k <= 4; k++) g += `<line x1="${o}" y1="${o + k * s}" x2="${o + cols * s}" y2="${o + k * s}" stroke="#9aa6b8" stroke-width="1"/>`;
+  for (let k = 0; k <= cols; k++) g += `<line x1="${o + k * s}" y1="${o}" x2="${o + k * s}" y2="${o + rows * s}" stroke="#9aa6b8" stroke-width="1"/>`;
+  for (let k = 0; k <= rows; k++) g += `<line x1="${o}" y1="${o + k * s}" x2="${o + cols * s}" y2="${o + k * s}" stroke="#9aa6b8" stroke-width="1"/>`;
   cells.forEach(([c, r]) => { g += `<rect x="${o + c * s}" y="${o + r * s}" width="${s}" height="${s}" fill="none" stroke="${INK}" stroke-width="1.6"/>`; });
-  g += `<line x1="${o + mirrorAt * s}" y1="${o - 4}" x2="${o + mirrorAt * s}" y2="${o + 4 * s + 4}" stroke="#c0392b" stroke-width="3.5" stroke-dasharray="7 4"/>`;
+  if (mirrorAt !== null) g += `<line x1="${o + mirrorAt * s}" y1="${o - 4}" x2="${o + mirrorAt * s}" y2="${o + rows * s + 4}" stroke="#c0392b" stroke-width="3.5" stroke-dasharray="7 4"/>`;
   return `<svg viewBox="0 0 ${W} ${H + 4}" width="${W}" height="${H + 4}" role="img" aria-label="${label}">${g}</svg>`;
 }
-const MIRROR_SVG = gridSvg(8, SHAPE, 4,
+const MIRROR_SVG = gridSvg(8, 4, SHAPE, 4,
   `A grid 8 squares wide and 4 squares tall, with a dashed red mirror line running down the middle, after column 4. On the left of the mirror line is a shape made of shaded squares: ${cellsDesc(SHAPE)} (rows counted from the top). The right half of the grid is empty.`);
-// options show only the right half of the grid (columns 5 to 8 become columns 1 to 4), mirror line on the left edge
+// each option shows a final shape on its own 3 by 3 grid (checked by computation: all four are different)
 const OPT_CELLS = [
-  // A: slid across without flipping
-  [[0, 0, BLUE], [1, 0, BLUE], [1, 1, BLUE], [1, 2, ORANGE], [2, 2, ORANGE]],
-  // B: turned upside down (half turn) instead of flipped
-  [[3, 3, BLUE], [2, 3, BLUE], [2, 2, BLUE], [2, 1, ORANGE], [1, 1, ORANGE]],
-  // C: flipped, but pushed up against the mirror line
-  [[2, 0, BLUE], [1, 0, BLUE], [1, 1, BLUE], [1, 2, ORANGE], [0, 2, ORANGE]],
-  // D: correct reflection
-  [[3, 0, BLUE], [2, 0, BLUE], [2, 1, BLUE], [2, 2, ORANGE], [1, 2, ORANGE]]
+  // A: reflected only (forgot the quarter turn)
+  [[0, 2, ORANGE], [1, 0, BLUE], [1, 1, BLUE], [1, 2, ORANGE], [2, 0, BLUE]],
+  // B: not flipped, just given a quarter turn clockwise (slide instead of flip)
+  [[0, 1, ORANGE], [0, 2, ORANGE], [1, 1, BLUE], [2, 0, BLUE], [2, 1, BLUE]],
+  // C: reflected, then a quarter turn anticlockwise (wrong direction)
+  [[0, 0, BLUE], [0, 1, BLUE], [1, 1, BLUE], [2, 1, ORANGE], [2, 2, ORANGE]],
+  // D: reflected, then a quarter turn clockwise (correct)
+  [[0, 0, ORANGE], [0, 1, ORANGE], [1, 1, BLUE], [2, 1, BLUE], [2, 2, BLUE]]
 ];
-const MIRROR_OPTS = OPT_CELLS.map((cells, i) => gridSvg(4, cells, 0,
-  `Option ${"ABCD"[i]}: the right-hand half of the grid, 4 squares wide, with the mirror line along its left edge. Shaded squares, counting columns from the mirror line and rows from the top: ${cellsDesc(cells)}.`, 26));
+const MIRROR_OPTS = OPT_CELLS.map((cells, i) => gridSvg(3, 3, cells, null,
+  `Option ${"ABCD"[i]}: a shape on a 3 by 3 grid. Shaded squares, counting columns from the left and rows from the top: ${cellsDesc(cells)}.`, 30));
 
 const SECTIONS = [
   {
@@ -138,18 +138,21 @@ const SECTIONS = [
                   <p class="why-not">12 (D) is the trap: it finds the 12 extra legs but forgets that each sheep adds 2 extra legs, not 1. 9 (C) is the number of ducks, not sheep. 7 (B) adds a duck’s and a sheep’s legs to get 6 and divides 42 by 6, which only works if there are the same number of ducks and sheep.</p>`
       },
       {
-        stem: `The shape is reflected in the dashed mirror line.
+        stem: `Zoe reflects this shape in the dashed mirror line. Then she gives the <b>reflected</b> shape a <b>quarter turn clockwise</b> (the way a clock’s hands move).
                <div class="figure">${MIRROR_SVG}</div>
-               <p style="margin:10px 0 0">Each answer shows the right-hand half of the grid, with the mirror line on its left edge. Which one shows the reflection?</p>`,
+               <p style="margin:10px 0 0">Which of these shows the shape she ends up with?</p>`,
         visualOptions: true,
         options: MIRROR_OPTS,
         answer: 3,
-        skill: "reflecting a two-colour shape in a mirror line: flipping it and keeping each square’s distance from the line",
-        explain: `<p>In a reflection, every square moves straight across the mirror line and ends up the <b>same distance</b> from the line on the other side. Rows stay the same; only the distance from the line is mirrored.</p>
-                  <p>• The orange square nearest the line is 1 square away from it (there is one empty column between them), so its reflection is 1 square away on the other side.<br>
-                     • The top-left blue square is the furthest from the line, 4 squares away, so its reflection is right at the far edge.<br>
-                     The shape comes out flipped like a mirror image: the blue square that was furthest left is now furthest right, and the orange pair is nearest the line, with one empty column between it and the line. That is <b>D</b>.</p>
-                  <p class="why-not">C is the trap: it is flipped the right way, but it has been pushed right up against the mirror line. The original shape doesn’t touch the line, so its reflection can’t either. A has been slid across without flipping, so it still faces the same way as the original. B has been turned upside down (a half turn): the blue part has moved to the bottom, but a reflection in an upright mirror line never moves squares up or down.</p>`
+        skill: "two moves in a row: a reflection in a mirror line, then a quarter turn clockwise of the reflected shape",
+        explain: `<p>Do the two moves one at a time, and draw the shape after the first move before you do the second.</p>
+                  <p><b>Step 1: reflect.</b> In an upright mirror line, left and right swap but nothing moves up or down. The original has two blue squares across the top with a blue square under the right one, and two orange squares along the bottom, sticking out to the right. The reflection has the two blue squares across the top with a blue square under the <b>left</b> one, and the two orange squares along the bottom sticking out to the <b>left</b>. (That is option A.)</p>
+                  <p><b>Step 2: a quarter turn clockwise.</b> Think of the shape on its own 3 by 3 grid. In a quarter turn clockwise, the top-left corner moves to the top-right, the top-right to the bottom-right, the bottom-right to the bottom-left, and the bottom-left to the top-left. So the <b>top row</b> becomes the <b>right-hand column</b>, and the <b>bottom row</b> becomes the <b>left-hand column</b>:</p>
+                  <p>• The top row of the reflected shape (empty, blue, blue) becomes the right-hand column, reading downwards: empty, blue, blue.<br>
+                     • The bottom row (orange, orange, empty) becomes the left-hand column, reading downwards: orange, orange, empty.<br>
+                     • The blue square in the very middle stays in the middle.</p>
+                  <p>That gives two orange squares down the top of the left column, and three blue squares making a hook in the middle and bottom-right. That is <b>D</b>.</p>
+                  <p class="why-not">A is the trap: it is the reflection done correctly, but the quarter turn has been forgotten. C does both moves, but turns the reflected shape <em>anticlockwise</em> instead of clockwise. B gives the quarter turn clockwise to the <em>original</em> shape without reflecting it first, as if it had just slid across the mirror line.</p>`
       }
     ]
   },
