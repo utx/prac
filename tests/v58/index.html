@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 58</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  @media (max-width: 760px) { .bar { flex-wrap: wrap; gap: 6px 14px; padding: 10px 16px; } }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary, a.primary {
+    display: inline-block; text-decoration: none;
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover, a.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  /* question feedback (practice mode only) */
+  .review-box { margin: 12px 0 0 38px; padding: 12px 16px; border: 1.5px dashed #c9a227; border-radius: 6px; background: #fffaf0; font-size: 15px; }
+  .review-box .rv-head { font-weight: 700; margin: 0 0 6px; }
+  .review-box ul { margin: 0 0 10px; padding-left: 18px; }
+  .review-box li { margin: 0 0 4px; overflow-wrap: anywhere; }
+  .review-box li.done { color: var(--correct); }
+  .review-box .rv-actions, .review-box .rv-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+  .review-box button { font: inherit; font-size: 15px; padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; }
+  .review-box button.rv-approve { border-color: var(--correct); color: var(--correct); }
+  .review-box button.rv-redo, .review-box button.rv-send { border-color: var(--wrong); color: var(--wrong); }
+  .review-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 8px; border: 1.5px solid var(--line); border-radius: 6px; }
+  .review-box .rv-msg { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+  .review-box .rv-diff { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 0; font-size: 14px; }
+  .review-box .rv-diff span { color: var(--ink-soft); margin-right: 2px; }
+  .review-box button.rv-chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; border-color: var(--line); }
+  .review-box button.rv-chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .review-box .rv-form { margin-top: 10px; }
+  .review-box .rv-chosen { margin: 0; width: 100%; font-weight: 600; }
+  .review-box .rv-msg:empty, .review-box .rv-form[hidden], .review-box [hidden] { display: none; }
+  @media (max-width: 760px) { .review-box { margin-left: 0; } }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 58</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 58
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: missing sentences ---- */
+const ARTICLE_TEXT = `
+<p>On 12 June 1817, a 32-year-old forestry official named Karl Drais set off from the German city of Mannheim on a machine of his own design. {1} Instead, Drais sat on a small seat between the wheels and pushed himself along with his feet, first one and then the other, like someone running while sitting down.</p>
+<p>Drais called his invention a <i>Laufmaschine</i>, German for “running machine”. That day he rode to a coaching inn and back, a round trip of about 14 kilometres, in roughly an hour. {2} Before long, newspapers were writing about the machine, and it had picked up a string of nicknames. In England it became known as the “hobby horse” or the “dandy horse”.</p>
+<p>But why would anyone want a horse with wheels instead of legs? Some historians think the answer begins with a volcano. In 1815, Mount Tambora, in what is now Indonesia, erupted so violently that its ash and gases dimmed the sunlight around the world. In Europe, 1816 became known as “the year without a summer”. Crops failed, food for animals ran short, and many horses died or were killed because their owners could not feed them. {3}</p>
+<p>The running machine was only a craze for a short time, and it was decades before anyone fitted pedals to a two-wheeler. But the next time you see a small child scooting along on a balance bike, pushing with both feet, you will know they are riding something very like the first bicycle of all.</p>`;
+
+const SENT_LETTERS = ["A", "B", "C", "D", "E"];
+const SENTENCES = [
+  "It had a wooden frame, two wheels set one behind the other and a handlebar for steering, but no pedals.",
+  "A “horse” that never needed to be fed must have seemed like a very good idea.",
+  "Within a few years, riders were being banned from footpaths in several countries, because they went too fast for the people walking there.",
+  "That may not sound like much today, but it was far quicker than walking the same distance.",
+  "This proves that Drais built his machine because so many horses had died."
+];
+function articleHtml() {
+  const si = SECTIONS.findIndex(s => s.id === "reading");
+  let t = ARTICLE_TEXT;
+  SECTIONS[si].questions.forEach((q, i) => {
+    const chosen = responses[si][i];
+    let fill;
+    if (passMode === "review") fill = `<span class="gap filled correct">(${i + 1}) ${SENTENCES[q.answer]}</span>`;
+    else if (chosen !== null) fill = `<span class="gap filled">(${i + 1}) ${SENTENCES[chosen]}</span>`;
+    else fill = `<span class="gap">(${i + 1}) …………</span>`;
+    t = t.replace(`{${i + 1}}`, fill);
+  });
+  return t;
+}
+const PASSAGE = {
+  title: "The Bicycle With No Pedals",
+  note: "Three sentences have been removed from the text below. Choose the sentence that fits each gap. There are two extra sentences you do not need to use.",
+  html: articleHtml
+};
+
+/* ---- Thinking Skills Q3: a reflection, then a quarter turn clockwise ---- */
+const BLUE = "#5b8fd1", ORANGE = "#f2a541";
+// the shape, on a grid 8 squares wide and 4 tall; the mirror line is the middle line (x = 4)
+const SHAPE = [[0, 0, BLUE], [1, 0, BLUE], [1, 1, BLUE], [1, 2, ORANGE], [2, 2, ORANGE]];
+const cellsDesc = cells => cells.map(([c, r, col]) => `${col === BLUE ? "blue" : "orange"} in column ${c + 1}, row ${r + 1}`).join("; ");
+function gridSvg(cols, rows, cells, mirrorAt, label, s = 30) {
+  const o = 4, W = cols * s + 2 * o, H = rows * s + 2 * o;
+  let g = "";
+  cells.forEach(([c, r, col]) => { g += `<rect x="${o + c * s}" y="${o + r * s}" width="${s}" height="${s}" fill="${col}"/>`; });
+  for (let k = 0; k <= cols; k++) g += `<line x1="${o + k * s}" y1="${o}" x2="${o + k * s}" y2="${o + rows * s}" stroke="#9aa6b8" stroke-width="1"/>`;
+  for (let k = 0; k <= rows; k++) g += `<line x1="${o}" y1="${o + k * s}" x2="${o + cols * s}" y2="${o + k * s}" stroke="#9aa6b8" stroke-width="1"/>`;
+  cells.forEach(([c, r]) => { g += `<rect x="${o + c * s}" y="${o + r * s}" width="${s}" height="${s}" fill="none" stroke="${INK}" stroke-width="1.6"/>`; });
+  if (mirrorAt !== null) g += `<line x1="${o + mirrorAt * s}" y1="${o - 4}" x2="${o + mirrorAt * s}" y2="${o + rows * s + 4}" stroke="#c0392b" stroke-width="3.5" stroke-dasharray="7 4"/>`;
+  return `<svg viewBox="0 0 ${W} ${H + 4}" width="${W}" height="${H + 4}" role="img" aria-label="${label}">${g}</svg>`;
+}
+const MIRROR_SVG = gridSvg(8, 4, SHAPE, 4,
+  `A grid 8 squares wide and 4 squares tall, with a dashed red mirror line running down the middle, after column 4. On the left of the mirror line is a shape made of shaded squares: ${cellsDesc(SHAPE)} (rows counted from the top). The right half of the grid is empty.`);
+// each option shows a final shape on its own 3 by 3 grid (checked by computation: all four are different)
+const OPT_CELLS = [
+  // A: reflected only (forgot the quarter turn)
+  [[0, 2, ORANGE], [1, 0, BLUE], [1, 1, BLUE], [1, 2, ORANGE], [2, 0, BLUE]],
+  // B: not flipped, just given a quarter turn clockwise (slide instead of flip)
+  [[0, 1, ORANGE], [0, 2, ORANGE], [1, 1, BLUE], [2, 0, BLUE], [2, 1, BLUE]],
+  // C: reflected, then a quarter turn anticlockwise (wrong direction)
+  [[0, 0, BLUE], [0, 1, BLUE], [1, 1, BLUE], [2, 1, ORANGE], [2, 2, ORANGE]],
+  // D: reflected, then a quarter turn clockwise (correct)
+  [[0, 0, ORANGE], [0, 1, ORANGE], [1, 1, BLUE], [2, 1, BLUE], [2, 2, BLUE]]
+];
+const MIRROR_OPTS = OPT_CELLS.map((cells, i) => gridSvg(3, 3, cells, null,
+  `Option ${"ABCD"[i]}: a shape on a 3 by 3 grid. Shaded squares, counting columns from the left and rows from the top: ${cellsDesc(cells)}.`, 30));
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Choose the sentence (A, B, C, D or E) that best fits each gap. There are two sentences you won’t use.",
+    preamble: `<div class="choice-list"><ol>${SENTENCES.map((t, i) =>
+      `<li><span class="letter">${SENT_LETTERS[i]}</span><span>${t}</span></li>`).join("")}</ol></div>`,
+    questions: [
+      {
+        stem: "Which sentence best fits <b>gap 1</b>?",
+        letterOptions: true,
+        options: ["A", "B", "C", "D", "E"],
+        answer: 0,
+        skill: "using a reference word (“It”) and a linking word (“Instead”) to place a sentence",
+        explain: `<p>Look at both sides of the gap. Before it, Drais sets off on “a machine of his own design”, but we aren’t told what it was like. After it comes “<b>Instead</b>, Drais … pushed himself along with his feet”. “Instead” means “in place of something just mentioned”, so the missing sentence must mention something the machine did <em>not</em> have. Sentence <b>A</b> does both jobs: “It” points back to the machine, and it ends with “but <b>no pedals</b>”, so “Instead, … pushed himself along with his feet” follows perfectly.</p>
+                  <p class="why-not">B is the trap: it calls the machine a “horse”, and the machine is a kind of horse with wheels. But nothing about feeding horses has been mentioned yet; that comes in the third paragraph with the volcano. B also gives “Instead” nothing to replace. D begins with “That”, which would have to point back to a distance or a time, and none has been given yet.</p>`
+      },
+      {
+        stem: "Which sentence best fits <b>gap 2</b>?",
+        letterOptions: true,
+        options: ["A", "B", "C", "D", "E"],
+        answer: 3,
+        skill: "using a reference word (“That”) and the order of events to place a sentence",
+        explain: `<p>Just before the gap, we learn how far Drais rode (about 14 kilometres) and how long it took (roughly an hour). Sentence <b>D</b> begins “<b>That</b> may not sound like much today”: “That” points back to the ride, and the sentence explains why it was impressive in 1817. It also leads naturally into the next sentence: because the machine was so much quicker than walking, “before long, newspapers were writing about the machine”.</p>
+                  <p class="why-not">C is the trap: it is about the running machine and it is true. But it is in the wrong place in the story. The next sentence says that “before long” newspapers began writing about the machine and it picked up nicknames, which is the start of its fame. Riders being banned “within a few years” belongs <em>after</em> the machine became popular, not before. E (“This proves …”) has nothing to point back to here: no horses have been mentioned.</p>`
+      },
+      {
+        stem: "Which sentence best fits <b>gap 3</b>?",
+        letterOptions: true,
+        options: ["A", "B", "C", "D", "E"],
+        answer: 1,
+        skill: "choosing the sentence that explains why a detail (the volcano) belongs in the article",
+        explain: `<p>The third paragraph starts with a question: “why would anyone want a horse with wheels instead of legs?” It then tells us about the volcano, the cold year, and the horses that died because there wasn’t enough food for them. But the volcano seems a long way from Drais’s machine, so the paragraph needs one more sentence to join the two and answer its own question. Sentence <b>B</b> does this. The “horse” in quotation marks is the running machine, and a “horse” that never needed to be fed would solve exactly the problem the paragraph has just described.</p>
+                  <p class="why-not">E is the trap: it also links the dead horses to the machine, and “This” can point back to the last sentence. But E says the volcano story “proves” why Drais built his machine. The article is careful to say only that “<b>some historians think</b>” this, which means it is an idea, not a proven fact. C is about riders being banned, which has nothing to do with the volcano or the horses, and it would break the paragraph’s answer to its own question.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0">Every student going on the Year 4 camp must bring a sleeping bag to school on Monday morning.</p>
+               <p class="quote"><em class="speaker">Mia:</em> “Tom has brought a sleeping bag to school this Monday morning, so he must be going on the Year 4 camp.”</p>
+               <p style="margin:10px 0 0">Which one of these sentences shows the mistake Mia has made?</p>`,
+        options: ["Tom may have forgotten to pack a torch, which he may need at the camp.",
+                  "Some students going on the camp may have borrowed a sleeping bag from a friend.",
+                  "Students who are not going on the camp may also have a reason to bring a sleeping bag.",
+                  "The camp may provide pillows and blankets, so students may not need to bring much else for sleeping."],
+        answer: 2,
+        skill: "spotting a mistake: reversing a rule",
+        explain: `<p>The rule goes one way: <b>if</b> a student is going on camp, <b>then</b> they bring a sleeping bag. Mia has turned it round: “Tom has a sleeping bag, so he is going on camp.” But the rule says nothing about students who are <em>not</em> going on camp. Tom might be going to a sleepover after school, or bringing it for a friend. C shows the mistake: other students may also have a reason to bring a sleeping bag.</p>
+                  <p class="why-not">B is the trap: it is about sleeping bags and the camp, but it is about where campers got their sleeping bags, which doesn’t change whether Tom is a camper. A is about what Tom might forget, which assumes he is going and doesn’t touch Mia’s reasoning. D is about what the camp provides, which has nothing to do with whether a sleeping bag shows that Tom is going.</p>`
+      },
+      {
+        stem: `Tilly counts the ducks and sheep in a paddock. She counts <b>15 heads</b> and <b>42 legs</b> altogether.
+               <p style="margin:10px 0 0">How many sheep are in the paddock?</p>`,
+        options: ["6", "7", "9", "12"],
+        answer: 0,
+        skill: "number problem: heads and legs (two animals with different numbers of legs)",
+        explain: `<p>Every animal has 1 head, so there are 15 animals. Imagine first that all 15 were ducks: that would be 15 × 2 = <b>30 legs</b>.</p>
+                  <p>But there are 42 legs, which is 42 − 30 = <b>12 legs</b> more. Each sheep has 2 more legs than a duck, so there are 12 ÷ 2 = <b>6 sheep</b> (and 9 ducks).</p>
+                  <p>Check: 6 sheep × 4 = 24 legs, 9 ducks × 2 = 18 legs, 24 + 18 = 42 ✓ and 6 + 9 = 15 heads ✓</p>
+                  <p class="why-not">12 (D) is the trap: it finds the 12 extra legs but forgets that each sheep adds 2 extra legs, not 1. 9 (C) is the number of ducks, not sheep. 7 (B) adds a duck’s and a sheep’s legs to get 6 and divides 42 by 6, which only works if there are the same number of ducks and sheep.</p>`
+      },
+      {
+        stem: `Zoe reflects this shape in the dashed mirror line. Then she gives the <b>reflected</b> shape a <b>quarter turn clockwise</b> (the way a clock’s hands move).
+               <div class="figure">${MIRROR_SVG}</div>
+               <p style="margin:10px 0 0">Which of these shows the shape she ends up with?</p>`,
+        visualOptions: true,
+        options: MIRROR_OPTS,
+        answer: 3,
+        skill: "two moves in a row: a reflection in a mirror line, then a quarter turn clockwise of the reflected shape",
+        explain: `<p>Do the two moves one at a time, and draw the shape after the first move before you do the second.</p>
+                  <p><b>Step 1: reflect.</b> In an upright mirror line, left and right swap but nothing moves up or down. The original has two blue squares across the top with a blue square under the right one, and two orange squares along the bottom, sticking out to the right. The reflection has the two blue squares across the top with a blue square under the <b>left</b> one, and the two orange squares along the bottom sticking out to the <b>left</b>. (That is option A.)</p>
+                  <p><b>Step 2: a quarter turn clockwise.</b> Think of the shape on its own 3 by 3 grid. In a quarter turn clockwise, the top-left corner moves to the top-right, the top-right to the bottom-right, the bottom-right to the bottom-left, and the bottom-left to the top-left. So the <b>top row</b> becomes the <b>right-hand column</b>, and the <b>bottom row</b> becomes the <b>left-hand column</b>:</p>
+                  <p>• The top row of the reflected shape (empty, blue, blue) becomes the right-hand column, reading downwards: empty, blue, blue.<br>
+                     • The bottom row (orange, orange, empty) becomes the left-hand column, reading downwards: orange, orange, empty.<br>
+                     • The blue square in the very middle stays in the middle.</p>
+                  <p>That gives two orange squares down the top of the left column, and three blue squares making a hook in the middle and bottom-right. That is <b>D</b>.</p>
+                  <p class="why-not">A is the trap: it is the reflection done correctly, but the quarter turn has been forgotten. C does both moves, but turns the reflected shape <em>anticlockwise</em> instead of clockwise. B gives the quarter turn clockwise to the <em>original</em> shape without reflecting it first, as if it had just slid across the mirror line.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `What number goes in the box?
+               <p style="margin:12px 0 0;font-size:1.25em;text-align:center">□ − 27 = 84 − 39</p>`,
+        options: ["18", "45", "57", "72", "96"],
+        answer: 3,
+        skill: "missing number: making both sides of the equals sign the same value",
+        explain: `<p>The equals sign means both sides have the same value. Work out the right side first: 84 − 39 = <b>45</b>.</p>
+                  <p>So □ − 27 = 45. The box must be 27 more than 45: 45 + 27 = <b>72</b>.</p>
+                  <p>Check: 72 − 27 = 45 ✓</p>
+                  <p class="why-not">45 (B) is the trap: it is the value of the right-hand side, not the number in the box. 18 (A) takes 27 away from 45 instead of adding it back. 57 (C) does 84 − 27 and ignores the 39. 96 (E) notices that 27 is 12 less than 39 but moves the 84 the wrong way: taking away less means the starting number must be 12 <em>smaller</em>, not bigger (84 − 12 = 72).</p>`
+      },
+      {
+        stem: `What is the value of
+               <p style="margin:12px 0 0;font-size:1.15em;text-align:center">(1 × 44) + (3 × 44) + (5 × 44) + (7 × 44) + (9 × 44)?</p>`,
+        options: ["1100", "1056", "1004", "220", "69"],
+        answer: 0,
+        skill: "clever calculation: grouping lots of the same number (supplied by David)",
+        explain: `<p>Every bracket is some lots of 44, so add up the lots first:</p>
+                  <p>1 + 3 + 5 + 7 + 9 = <b>25</b> lots of 44.</p>
+                  <p>25 × 44: four 25s make 100, and 44 is 11 fours, so 25 × 44 = 11 × 100 = <b>1100</b>.</p>
+                  <p>(Working out each bracket also gives 44 + 132 + 220 + 308 + 396 = 1100, but it takes much longer.)</p>
+                  <p class="why-not">1056 (B) is the trap: it adds 1 + 3 + 5 + 7 + 9 wrongly as 24, and 24 × 44 = 1056. 1004 (C) works out 25 × 40 = 1000 but then adds just 4, instead of 25 × 4 = 100. 220 (D) counts the 5 brackets instead of adding the numbers in them: 5 × 44. 69 (E) adds 25 and 44 instead of multiplying.</p>`
+      },
+      {
+        stem: `Grandma picked some lemons from her tree. She gave <b>one third</b> of them to her neighbour. Then she used <b>one quarter</b> of the lemons she had left to make lemonade.
+               <p style="margin:10px 0 0">She now has <b>24</b> lemons. How many lemons did she pick?</p>`,
+        options: ["30", "32", "36", "40", "48"],
+        answer: 4,
+        skill: "fractions: working backwards through two steps, each a fraction of a different whole",
+        explain: `<p>Work backwards, one step at a time.</p>
+                  <p><b>Undo the lemonade.</b> She used one quarter of what she had left, so the 24 lemons are the other <b>three quarters</b>. One quarter is 24 ÷ 3 = 8, so before the lemonade she had 4 × 8 = <b>32</b>.</p>
+                  <p><b>Undo the neighbour.</b> She gave away one third, so the 32 lemons are the other <b>two thirds</b>. One third is 32 ÷ 2 = 16, so she picked 3 × 16 = <b>48</b>.</p>
+                  <p>Check: 48 − 16 = 32, then a quarter of 32 is 8, and 32 − 8 = 24 ✓</p>
+                  <p class="why-not">40 (D) is the trap: it adds back a quarter of 24 (24 + 6 = 30) and then a third of 30 (30 + 10 = 40). But the quarter was a quarter of the bigger amount she had before, not of the 24 left. 30 (A) makes the same mistake and stops after one step. 32 (B) undoes the lemonade correctly but forgets the neighbour. 36 (C) undoes only the neighbour’s third, as if 24 were two thirds of the lemons she picked.</p>`
+      }
+    ]
+  }
+];
+
+const TEST_META = {"version": 58, "reading_format": "missing sentences", "categories": {"reading": ["Sentence links", "Sentence links", "Purpose of a detail"], "thinking": ["Spot the mistake", "Number problems", "Spatial"], "maths": ["Number & place value", "Number & place value", "Fractions"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}, "status": "review"};
+const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  const t = await r.text(); // functions that return nothing send an empty body
+  return t ? JSON.parse(t) : null;
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
+  persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 58</h1>
+      ${completedNote()}
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+      ${mode === "review" && ADMIN ? `<div class="review-box" data-q="${qi}"><p class="rv-msg">Loading feedback…</p></div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  sectionStart = Date.now();
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  if (ADMIN) fillReviews();
+  window.scrollTo(0, 0);
+}
+
+/* ---- question feedback (practice mode only): approve, or send back for a redo with a comment.
+   Saved online through add_review(pin, …); Claude answers each redo with a 'done' row. ---- */
+let reviewRows = [];
+const RV_DIFF = ["Much easier", "A bit easier", "A bit harder", "Much harder"];
+const RV_LABEL = { approve: "Approved", redo: "Sent back for a redo", done: "Redone by Claude" };
+const rvEsc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function reviewPin() { try { return sessionStorage.getItem("prac.admin.pin") || ""; } catch (e) { return ""; } }
+async function fillReviews() {
+  const si = current, boxes = app.querySelectorAll(".review-box");
+  const note = t => boxes.forEach(b => b.innerHTML = `<p class="rv-msg">${t}</p>`);
+  if (!syncOn() || !reviewPin()) return note("Question feedback needs the online database. Open this test from the admin page (after entering the PIN).");
+  try { reviewRows = (await syncRpc("admin_reviews", { p_pin: reviewPin() })) || []; }
+  catch (e) { return note("Couldn’t load question feedback. If this keeps happening, the database may need its update (ask Claude)."); }
+  if (current !== si || passMode !== "review") return;
+  boxes.forEach(b => renderReviewBox(b, SECTIONS[si].id, +b.dataset.q));
+}
+function renderReviewBox(box, sec, qi, msg) {
+  const hist = reviewRows.filter(r => r.version === TEST_META.version && r.section === sec && r.q === qi);
+  const when = t => { const d = new Date(t); return isNaN(d) ? "" : d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }); };
+  const last = hist[hist.length - 1];
+  box.innerHTML = `<p class="rv-head">Your review of question ${qi + 1}</p>
+    ${hist.length ? `<ul>${hist.map(r => `<li class="${r.kind}"><b>${RV_LABEL[r.kind] || rvEsc(r.kind)}</b> · ${when(r.at)}${r.comment ? `: ${rvEsc(r.comment)}` : ""}</li>`).join("")}</ul>` : ""}
+    ${last && last.kind === "redo" ? `<p class="rv-msg">Waiting for Claude to redo this question.</p>` : ""}
+    <div class="rv-actions">
+      <button type="button" class="rv-approve">${last && last.kind === "approve" ? "Approved ✓" : "Approve"}</button>
+      <button type="button" class="rv-redo">Send back for a redo</button>
+    </div>
+    <div class="rv-diff" role="group" aria-label="Quick difficulty change for question ${qi + 1}">
+      <span>Difficulty:</span>
+      ${RV_DIFF.map((d, k) => `<button type="button" class="rv-chip" data-d="${k}">${d}</button>`).join("")}
+    </div>
+    <div class="rv-form" hidden>
+      <p class="rv-chosen" hidden></p>
+      <textarea rows="3" maxlength="4000" aria-label="What needs changing in question ${qi + 1}?" placeholder="What needs changing? (e.g. too easy, two answers could be right, picture unclear)"></textarea>
+      <button type="button" class="rv-send">Send back</button>
+      <button type="button" class="rv-cancel">Cancel</button>
+    </div>
+    <p class="rv-msg" role="status">${msg || ""}</p>`;
+  const form = box.querySelector(".rv-form"), say = t => box.querySelector(".rv-msg[role=status]").textContent = t;
+  const chosen = box.querySelector(".rv-chosen"), ta = box.querySelector("textarea");
+  let diff = null;
+  const pick = k => {
+    diff = k;
+    box.querySelectorAll(".rv-chip").forEach(c => c.classList.toggle("on", +c.dataset.d === k));
+    chosen.hidden = k === null;
+    chosen.textContent = k === null ? "" : `Make it ${RV_DIFF[k].toLowerCase()}. Add a comment if you like, then press Send back.`;
+    ta.placeholder = k === null ? "What needs changing? (e.g. too easy, two answers could be right, picture unclear)" : "Optional: anything else to change?";
+    form.hidden = false; ta.focus(); say("");
+  };
+  box.querySelector(".rv-approve").onclick = () => submitReview(box, sec, qi, "approve", "");
+  box.querySelector(".rv-redo").onclick = () => pick(null);
+  box.querySelectorAll(".rv-chip").forEach(c => c.onclick = () => pick(+c.dataset.d));
+  box.querySelector(".rv-cancel").onclick = () => { form.hidden = true; diff = null; box.querySelectorAll(".rv-chip").forEach(c => c.classList.remove("on")); say(""); };
+  box.querySelector(".rv-send").onclick = () => {
+    const c = ta.value.trim();
+    if (diff === null && !c) { say("Add a comment (or pick a difficulty) so Claude knows what to change."); return; }
+    submitReview(box, sec, qi, "redo", (diff === null ? "" : `Difficulty: make it ${RV_DIFF[diff].toLowerCase()}.` + (c ? " " : "")) + c);
+  };
+}
+async function submitReview(box, sec, qi, kind, comment) {
+  box.querySelectorAll("button").forEach(b => b.disabled = true);
+  box.querySelector(".rv-msg[role=status]").textContent = "Saving…";
+  try {
+    await syncRpc("add_review", { p_pin: reviewPin(), p_version: TEST_META.version, p_section: sec, p_q: qi, p_kind: kind, p_comment: comment });
+  } catch (e) {
+    box.querySelectorAll("button").forEach(b => b.disabled = false);
+    box.querySelector(".rv-msg[role=status]").textContent = "Couldn’t save. Check the internet connection and try again.";
+    return;
+  }
+  reviewRows.push({ version: TEST_META.version, section: sec, q: qi, kind, comment, at: new Date().toISOString() });
+  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it overnight, or straight away if you run “Do redos now”.");
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  finishAttempt();
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+// A test held for review is only on the admin page; someone opening its address directly sees this instead.
+function showNotReady() {
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>This test isn’t ready yet</h1>
+      <p class="lead">It will appear on the list of tests once it has been checked.</p>
+      <a class="primary" href="../../index.html">Back to all tests</a>
+    </div>`;
+}
+
+if (TEST_META.status === "review" && !ADMIN) showNotReady(); else showStart();
+</script>
+</body>
+</html>

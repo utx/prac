@@ -1,0 +1,63 @@
+{
+  "version": 60,
+  "date": "2026-10-22",
+  "status": "review",
+  "reading": "Story extract: The Gnome",
+  "reading_format": "story",
+  "reading_topic": "a girl accidentally breaks her elderly neighbour's garden gnome (painted by his late wife) with a cricket ball, nobody sees, and she decides to own up; they glue it together",
+  "thinking": [
+    "Spot the mistake (treating something needed as a guarantee: watering bean seeds)",
+    "Rules in a sequence of shapes: an arrow turning a quarter turn each time and dots repeating 1, 2, 3",
+    "Jigsaw: which piece fills a gap in a square when turned, not flipped (two options are mirror images) (stretch)"
+  ],
+  "maths": [
+    "Quick-fire time: 24-hour arrival time, counting back 2 hours 50 minutes",
+    "Best value: Irina's muffins, the most muffins for $49 with singles and packages of 6 (supplied by David)",
+    "Timetables: train then bus with a walk between, elapsed time (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1 Q1-6 (feelings shown rather than stated), PT3 Q1-6 (how a character feels at a moment)",
+      "PT1 Q1-6 and PT2 Q1-6 (why the writer includes a detail / what a detail shows)",
+      "PT1-PT3 Q6 (whole-text question: what the ending reveals, overall impression of a character) — stretch"
+    ],
+    "thinking": [
+      "PT2 Q17 (mistake: needed treated as guarantee), PT1 Q21 (mistake: minimum needed treated as guarantee)",
+      "PT2 Q10 (shape sequence rules), PT3 Q22 (tiles that were rotated)",
+      "PT1 Q22 (dominoes completing a square), PT3 Q4 (puzzle pieces pairing into layers), PT2 Q16 (which way a tile goes) — stretch"
+    ],
+    "maths": [
+      "PT1 Q3 (elapsed time across midnight), PT2 Q20 (clock + 555 minutes), PT2 Q2 (minutes in a timetable)",
+      "PT1 Q12 (cheapest way to buy a mass: best value), PT1 Q25 (change with coin constraints); supplied by David",
+      "PT3 Q30 (time spent between two buses), PT2 Q19 (appointments in a working day), PT3 Q19 (timetable) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Feelings & inference",
+      "Purpose of a detail",
+      "Main idea"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Rules & codes",
+      "Spatial"
+    ],
+    "maths": [
+      "Time & timetables",
+      "Money & best value",
+      "Time & timetables"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

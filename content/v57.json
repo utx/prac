@@ -1,0 +1,63 @@
+{
+  "version": 57,
+  "date": "2026-10-22",
+  "status": "review",
+  "reading": "Cloze: Three Beanbags",
+  "reading_format": "cloze",
+  "reading_topic": "learning to juggle: three beanbags, the \"cascade\", endless drops, practising over a bed, the first 20 catches (first-person piece)",
+  "thinking": [
+    "Whose reasoning is correct (needed versus guaranteed: a swimming time needed for the zone team)",
+    "Bus and ferry timetables: latest bus with a 10-minute connection",
+    "Cube nets: which net folds into the cube shown (opposite faces) (stretch)"
+  ],
+  "maths": [
+    "Quick-fire word problem: pages read on school days and weekend days",
+    "Distance on a line: how far past the picnic hut they turned back (follow-up to Carter's trip, with a diagram, supplied by David)",
+    "Perimeter of a stepped shape with unmarked sides, not to scale (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q13 (look-alike words: 'decrease/descent/decay/decline'), PT1 Q12 (shade of meaning)",
+      "PT3 Q10 (word decided by the preposition that follows), PT1 Q12 ('paged/leafed': near-synonyms where only one fits)",
+      "PT2 Q11 (word chosen from the meaning of the whole sentence), PT3 Q13 (look-alike words) — stretch"
+    ],
+    "thinking": [
+      "PT1 Q5 (whose reasoning: needed vs guaranteed), PT2 Q17 (needed treated as guarantee)",
+      "PT3 Q19 (timetable with a twist), PT2 Q19 (appointments in a working day)",
+      "PT1 Q10 (dice nets, opposite faces), PT3 Q28 (dice with unusual opposite sums) — stretch"
+    ],
+    "maths": [
+      "PT2 Q1 (people on a bus: two-step word problem), PT3 Q33 (savings over days)",
+      "PT2 Q3 (distance round a rectangle), PT3 Q24 (working backwards) — supplied by David",
+      "PT3 Q17 (fence posts round a square: perimeter), PT1 Q31 (perimeter change from an added rectangle), PT1 Q10 (perimeter: missing side) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Number & place value",
+      "Area, perimeter & 3D"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

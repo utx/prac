@@ -1,0 +1,63 @@
+{
+  "version": 58,
+  "date": "2026-10-22",
+  "status": "review",
+  "reading": "Missing sentences: The Bicycle With No Pedals",
+  "reading_format": "missing sentences",
+  "reading_topic": "the first bicycle: Karl Drais's \"running machine\" (Laufmaschine, hobby horse / dandy horse), Mannheim, first ride 12 June 1817 (about 14 km round trip in roughly an hour), no pedals, pushed with the feet; some historians link it to horse deaths after the 1815 Tambora eruption's \"year without a summer\"; pedals decades later; balance bikes today",
+  "thinking": [
+    "Spot the mistake (reversing a rule: a sleeping bag for camp)",
+    "Number problem: heads and legs (ducks and sheep)",
+    "Two moves: reflection in a mirror line, then a quarter turn clockwise of the reflected shape (stretch)"
+  ],
+  "maths": [
+    "Quick-fire missing number: box minus 27 equals 84 minus 39",
+    "Clever calculation: sum of lots of 44 (competition-style, supplied by David)",
+    "Fractions: a third, then a quarter of what is left, working back to the whole (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1-PT3 Q20-25 (missing sentences: reference words pointing back, e.g. 'it'; contrast clue 'Instead')",
+      "PT1-PT3 Q20-25 (missing sentences: 'This/That' reference and order of events; a true, on-topic sentence in the wrong place)",
+      "PT1-PT3 Q20-25 (missing sentences: elaboration that explains why a detail matters), PT1-PT3 Q1-6 (why the writer includes a detail) — stretch"
+    ],
+    "thinking": [
+      "PT3 Q29 (mistake: reversed rule), PT2 Q8 (reversed rule)",
+      "PT1 Q1 (number problem), PT1 Q7 (counting over days); nearby: Maths PT3 Q31 (two unknowns from a sum)",
+      "PT3 Q22 (tiles that were rotated), PT2 Q16 (which way a tile goes), Maths PT3 Q1 (quarter turn of a shape), Maths PT1 Q21 (symmetry on a grid) — stretch"
+    ],
+    "maths": [
+      "PT1 Q1 (missing number with equals sign), PT2 Q18 (missing factor)",
+      "PT1 Q13 (addition pyramid, then product), PT2 Q35 (competition-style) — supplied by David",
+      "PT1 Q20 (fractions of pocket money spent), PT2 Q6 (fraction of a cake after sharing), PT3 Q24 (inverse operations) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Sentence links",
+      "Sentence links",
+      "Purpose of a detail"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Number problems",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Number & place value",
+      "Fractions"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
