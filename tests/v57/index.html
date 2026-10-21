@@ -256,7 +256,7 @@ const CLOZE_TEXT = `
 <p>On the first day of the holidays, my aunt handed me three small beanbags and made a promise: “By the time school goes back, you’ll be juggling.” I laughed. I could barely catch one beanbag, let alone keep three of them in the air at once.</p>
 <p>She showed me a pattern called the “cascade”. You throw the first beanbag in a gentle arc from one hand to the other. Just as it reaches the top of its arc, you throw the second one back the other way, underneath it. Then comes the third, and so on, with each hand throwing and catching in turn. Written down, it sounds simple. In my hands, it was chaos.</p>
 <p>For the first week, the beanbags spent more time on the carpet than in the air. I would throw two, panic, and fling the third one at the ceiling. After a few days of endless drops, my enthusiasm had begun to {1}.</p>
-<p>Then my aunt suggested that I practise standing over my bed. That way, every dropped beanbag would land on the quilt instead of rolling under the desk. It {2} to reason, she said, that I would practise for longer if I didn’t spend half my time crawling about on my hands and knees. She was right. I began practising for an hour at a time.</p>
+<p>I was close to giving up, but my aunt urged me to {2} with it. She suggested that I practise standing over my bed. That way, every dropped beanbag would land on the quilt instead of rolling under the desk, and I wouldn’t spend half my time crawling about on my hands and knees. It worked. Soon I was practising for an hour at a time.</p>
 <p>Slowly, the drops grew fewer. Five catches became ten, and ten became fifteen. Then, on the last Sunday of the holidays, I counted twenty catches in a row before a beanbag finally thudded onto the quilt. When I looked up, my aunt was leaning in the doorway. She didn’t say a word. She just gave me a slow, {3} smile.</p>`;
 
 function clozeHtml() {
@@ -381,11 +381,11 @@ const SECTIONS = [
       },
       {
         stem: "Which word best fits <b>gap 2</b>?",
-        options: ["stands", "holds", "follows", "comes"],
+        options: ["persevere", "endure", "recommence", "insist"],
         answer: 0,
-        skill: "fixed expressions: only one verb makes the phrase “… to reason”",
-        explain: `<p>“It <b>stands to reason</b>” is a fixed expression meaning “it is obvious if you think about it”. The aunt is making a sensible point: if you don’t keep crawling under the desk for dropped beanbags, you’ll have more time and energy to practise.</p>
-                  <p class="why-not">“Follows” is the trap: “it follows that …” also means “so it must be true that …”, and it would fit if the sentence were “It follows that I would practise for longer”. But it can’t be joined to “to reason”: “it follows to reason” isn’t English. “Holds” belongs in “it holds true”, not “holds to reason”. “Comes” belongs in “comes to mind”. Each is part of a different expression.</p>`
+        skill: "choosing between words close in meaning, using the little word that follows (“with”)",
+        explain: `<p>The writer was about to give up, so the aunt wanted the writer to keep going even though it was hard. To <b>persevere with</b> something means to keep trying at it in spite of difficulties, and “persevere” is the only word here that can be followed by “with it”.</p>
+                  <p class="why-not">“Endure” is the trap: it is close in meaning (to put up with something hard, like endless drops), but you endure something, never “endure <em>with</em>” it, so “urged me to endure with it” doesn’t work. “Recommence” means to start again after a pause; you recommence something (“recommence practising”), not recommence <em>with</em> it, and the writer hadn’t stopped yet. “Insist” is followed by “on”, not “with” (“insist on practising”), and it means to demand something firmly, which doesn’t fit what the aunt wants the writer to do.</p>`
       },
       {
         stem: "Which word best fits <b>gap 3</b>?",
@@ -393,7 +393,7 @@ const SECTIONS = [
         answer: 3,
         skill: "choosing a word from the meaning of the whole text: linking the ending back to the beginning",
         explain: `<p>Go back to the first paragraph. The aunt promised: “By the time school goes back, you’ll be juggling.” Now, on the last Sunday of the holidays, her promise has come true, just as she said it would. A <b>knowing</b> smile is the smile of someone who knew all along what would happen. She doesn’t need to say a word: the smile says “I told you so”.</p>
-                  <p class="why-not">“Knowledgeable” is the trap: it looks like “knowing” and the aunt clearly knows a lot about juggling. But knowledgeable describes a <em>person</em> who knows a lot (“a knowledgeable guide”); a smile can’t be knowledgeable. “Bewildered” means puzzled and confused, the opposite of how someone feels when their own prediction comes true; it might describe the writer at the start, who laughed at the promise. “Grudging” means given unwillingly, as if she didn’t want to admit something, but the aunt wanted the writer to succeed and helped her get there.</p>`
+                  <p class="why-not">“Knowledgeable” is the trap: it looks like “knowing” and the aunt clearly knows a lot about juggling. But knowledgeable describes a <em>person</em> who knows a lot (“a knowledgeable guide”); a smile can’t be knowledgeable. “Bewildered” means puzzled and confused, the opposite of how someone feels when their own prediction comes true; it might describe the writer at the start, who laughed at the promise. “Grudging” means given unwillingly, as if she didn’t want to admit something, but the aunt wanted the writer to succeed and helped make it happen.</p>`
       }
     ]
   },

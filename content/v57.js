@@ -135,11 +135,11 @@ const SECTIONS = [
       },
       {
         stem: "Which word best fits <b>gap 2</b>?",
-        options: ["persevere", "endure", "resume", "insist"],
+        options: ["persevere", "endure", "recommence", "insist"],
         answer: 0,
         skill: "choosing between words close in meaning, using the little word that follows (“with”)",
         explain: `<p>The writer was about to give up, so the aunt wanted the writer to keep going even though it was hard. To <b>persevere with</b> something means to keep trying at it in spite of difficulties, and “persevere” is the only word here that can be followed by “with it”.</p>
-                  <p class="why-not">“Endure” is the trap: it is close in meaning (to put up with something hard, like endless drops), but you endure something, never “endure <em>with</em>” it, so “urged me to endure with it” doesn’t work. “Resume” means to start again after a pause; you resume something (“resume practising”), not resume <em>with</em> it, and the writer hadn’t stopped yet. “Insist” is followed by “on”, not “with” (“insist on practising”), and it means to demand something firmly, which doesn’t fit what the aunt wants the writer to do.</p>`
+                  <p class="why-not">“Endure” is the trap: it is close in meaning (to put up with something hard, like endless drops), but you endure something, never “endure <em>with</em>” it, so “urged me to endure with it” doesn’t work. “Recommence” means to start again after a pause; you recommence something (“recommence practising”), not recommence <em>with</em> it, and the writer hadn’t stopped yet. “Insist” is followed by “on”, not “with” (“insist on practising”), and it means to demand something firmly, which doesn’t fit what the aunt wants the writer to do.</p>`
       },
       {
         stem: "Which word best fits <b>gap 3</b>?",
