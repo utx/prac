@@ -14,14 +14,6 @@ Never paste in questions from the official sample papers or other copyrighted bo
 
 ## Waiting
 
-### Follow-up 1: another "turned back" trip, with a diagram (step 2 of 3)
-- **Section**: maths Q2
-- **Added**: 2026-10-07
-- **Question**: write a fresh question of the same kind as Carter's library trip: someone travels part of the way, turns back to a stop on the way, then carries on, and the total distance is given.
-  - Change the context, the numbers and what is asked. For example, ask how far the turn-around point is from the stop, or what the total distance was.
-  - Give a number-line diagram, as in step 1.
-- **Notes**: David's plan. Use it no sooner than **2 tests after** the test that used step 1, and only once step 1 is in **Used**.
-
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3)
 - **Section**: maths Q3 (stretch)
 - **Added**: 2026-10-07
@@ -29,23 +21,6 @@ Never paste in questions from the official sample papers or other copyrighted bo
   - Make it one notch harder than step 2. For example, use two return trips, or a total that has to be worked out first.
   - The explanation should show the number line.
 - **Notes**: David's plan. Use it no sooner than **2 tests after** the test that used follow-up 1, and only once follow-up 1 is in **Used**.
-
-### Sum of lots of 44 (clever calculation)
-- **Section**: maths (number: clever calculation by grouping, the distributive law; competition-style, so it counts as the test's one competition-style question)
-- **Added**: 2026-10-10
-- **Question**: Compute (1×44)+(3×44)+(5×44)+(7×44)+(9×44).
-  - No options or answer were given. David's picture was the question text only (no diagram), so no picture is saved.
-- **Answer** (checked): **1100**. Every bracket is a lot of 44, so add the lots first: 1 + 3 + 5 + 7 + 9 = 25 lots of 44, and 25 × 44 = 1100 (4 × 25 = 100, so 44 × 25 = 11 × 100). Working out each bracket gives the same total: 44 + 132 + 220 + 308 + 396 = 1100.
-- **Notes**:
-  - Written by David (his questions can be reworded). Use the × sign with spaces, and a question stem such as "What is the value of …?".
-  - The skill is spotting the shortcut, so it suits Maths Q2 more than a quick-fire Q1, and the explanation should show the grouping. Brute force also works, so it is not too hard for a Year 4 child.
-  - Possible wrong options from real mistakes:
-    - 1056: 24 × 44, adding 1 + 3 + 5 + 7 + 9 wrongly as 24.
-    - 1144: 26 × 44, the same slip the other way.
-    - 220: 5 × 44, counting the brackets instead of adding the numbers.
-    - 1980: 45 × 44, adding all the numbers from 1 to 9.
-    - 69: 25 + 44, adding instead of multiplying at the end.
-  - Choose 4 or 5 of these.
 
 ### Four rectangles round a square hole (perimeter)
 - **Section**: maths (perimeter; a good Q2 or Q3, competition-style, so it counts as the test's one competition-style question)
@@ -66,7 +41,36 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 9.5: half of 19, thinking each rectangle is half the square's width.
   - Choose 4 or 5 of these.
 
-### Irina's muffins (best value)
+## Used
+
+### Follow-up 1: another "turned back" trip, with a diagram (step 2 of 3) → Test 57 Maths Q2
+- **Section**: maths Q2
+- **Added**: 2026-10-07
+- **Question**: write a fresh question of the same kind as Carter's library trip: someone travels part of the way, turns back to a stop on the way, then carries on, and the total distance is given.
+  - Change the context, the numbers and what is asked. For example, ask how far the turn-around point is from the stop, or what the total distance was.
+  - Give a number-line diagram, as in step 1.
+- **Notes**: David's plan. Use it no sooner than **2 tests after** the test that used step 1, and only once step 1 is in **Used**.
+- **Changes**: new context (bike path from a campsite to a waterfall, picnic hut at 5 km, 12 km path, 18 km ridden); asks how far past the hut they turned back (3 km); number line shows campsite, hut and waterfall but not the turn-around point.
+
+### Sum of lots of 44 (clever calculation) → Test 58 Maths Q2
+- **Section**: maths (number: clever calculation by grouping, the distributive law; competition-style, so it counts as the test's one competition-style question)
+- **Added**: 2026-10-10
+- **Question**: Compute (1×44)+(3×44)+(5×44)+(7×44)+(9×44).
+  - No options or answer were given. David's picture was the question text only (no diagram), so no picture is saved.
+- **Answer** (checked): **1100**. Every bracket is a lot of 44, so add the lots first: 1 + 3 + 5 + 7 + 9 = 25 lots of 44, and 25 × 44 = 1100 (4 × 25 = 100, so 44 × 25 = 11 × 100). Working out each bracket gives the same total: 44 + 132 + 220 + 308 + 396 = 1100.
+- **Notes**:
+  - Written by David (his questions can be reworded). Use the × sign with spaces, and a question stem such as "What is the value of …?".
+  - The skill is spotting the shortcut, so it suits Maths Q2 more than a quick-fire Q1, and the explanation should show the grouping. Brute force also works, so it is not too hard for a Year 4 child.
+  - Possible wrong options from real mistakes:
+    - 1056: 24 × 44, adding 1 + 3 + 5 + 7 + 9 wrongly as 24.
+    - 1144: 26 × 44, the same slip the other way.
+    - 220: 5 × 44, counting the brackets instead of adding the numbers.
+    - 1980: 45 × 44, adding all the numbers from 1 to 9.
+    - 69: 25 + 44, adding instead of multiplying at the end.
+  - Choose 4 or 5 of these.
+- **Changes**: stem "What is the value of …?"; options 1100, 1056, 1004, 220, 69 (1004 is a new trap: 25 × 40 + 4), listed largest first so the answer is A.
+
+### Irina's muffins (best value) → Test 60 Maths Q2
 - **Section**: maths (best value / money; a good Q2)
 - **Added**: 2026-10-10
 - **Question**: Innkeeper Irina wants to buy some muffins for her guests. The bakery sells single muffins for $3 each and packages of 6 muffins for $10 per package. What is the greatest number of muffins that Irina can buy for $49?
@@ -80,9 +84,7 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 16: all singles ($49 ÷ 3 = 16 remainder 1).
     - 29: 4.9 × 6, rounded, as if part of a package could be bought.
   - With the answer, these four make the five options Maths needs.
-
-## Used
-
+- **Changes**: wording as given; options 16, 24, 27, 29, 30 from David's mistake notes (answer C).
 ### Peyton's mix-up (working backwards) → Test 53 Maths Q2
 - **Section**: maths (inverse operations / working backwards; sample PT3 Q24-style, a good Q2 or Q3)
 - **Added**: 2026-10-07
