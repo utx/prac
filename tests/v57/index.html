@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 57</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  @media (max-width: 760px) { .bar { flex-wrap: wrap; gap: 6px 14px; padding: 10px 16px; } }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary, a.primary {
+    display: inline-block; text-decoration: none;
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover, a.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  /* question feedback (practice mode only) */
+  .review-box { margin: 12px 0 0 38px; padding: 12px 16px; border: 1.5px dashed #c9a227; border-radius: 6px; background: #fffaf0; font-size: 15px; }
+  .review-box .rv-head { font-weight: 700; margin: 0 0 6px; }
+  .review-box ul { margin: 0 0 10px; padding-left: 18px; }
+  .review-box li { margin: 0 0 4px; overflow-wrap: anywhere; }
+  .review-box li.done { color: var(--correct); }
+  .review-box .rv-actions, .review-box .rv-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+  .review-box button { font: inherit; font-size: 15px; padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; }
+  .review-box button.rv-approve { border-color: var(--correct); color: var(--correct); }
+  .review-box button.rv-redo, .review-box button.rv-send { border-color: var(--wrong); color: var(--wrong); }
+  .review-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 8px; border: 1.5px solid var(--line); border-radius: 6px; }
+  .review-box .rv-msg { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+  .review-box .rv-diff { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 0; font-size: 14px; }
+  .review-box .rv-diff span { color: var(--ink-soft); margin-right: 2px; }
+  .review-box button.rv-chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; border-color: var(--line); }
+  .review-box button.rv-chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .review-box .rv-form { margin-top: 10px; }
+  .review-box .rv-chosen { margin: 0; width: 100%; font-weight: 600; }
+  .review-box .rv-msg:empty, .review-box .rv-form[hidden], .review-box [hidden] { display: none; }
+  @media (max-width: 760px) { .review-box { margin-left: 0; } }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 57</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 57
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: cloze passage ---- */
+const CLOZE_TEXT = `
+<p>On the first day of the holidays, my aunt handed me three small beanbags and made a promise: “By the time school goes back, you’ll be juggling.” I laughed. I could barely catch one beanbag, let alone keep three of them in the air at once.</p>
+<p>She showed me a pattern called the “cascade”. You throw the first beanbag in a gentle arc from one hand to the other. Just as it reaches the top of its arc, you throw the second one back the other way, underneath it. Then comes the third, and so on, with each hand throwing and catching in turn. Written down, it sounds simple. In my hands, it was chaos.</p>
+<p>For the first week, the beanbags spent more time on the carpet than in the air. I would throw two, panic, and fling the third one at the ceiling. After a few days of endless drops, my enthusiasm had begun to {1}.</p>
+<p>Then my aunt suggested that I practise standing over my bed. That way, every dropped beanbag would land on the quilt instead of rolling under the desk. It {2} to reason, she said, that I would practise for longer if I didn’t spend half my time crawling about on my hands and knees. She was right. I began practising for an hour at a time.</p>
+<p>Slowly, the drops grew fewer. Five catches became ten, and ten became fifteen. Then, on the last Sunday of the holidays, I counted twenty catches in a row before a beanbag finally thudded onto the quilt. When I looked up, my aunt was leaning in the doorway. She didn’t say a word. She just gave me a slow, {3} smile.</p>`;
+
+function clozeHtml() {
+  const si = SECTIONS.findIndex(s => s.id === "reading");
+  let t = CLOZE_TEXT;
+  SECTIONS[si].questions.forEach((q, i) => {
+    const chosen = responses[si][i];
+    let fill;
+    if (passMode === "review") fill = `<span class="gap filled correct">(${i + 1}) ${q.options[q.answer]}</span>`;
+    else if (chosen !== null) fill = `<span class="gap filled">(${i + 1}) ${q.options[chosen]}</span>`;
+    else fill = `<span class="gap">(${i + 1}) ……</span>`;
+    t = t.replace(`{${i + 1}}`, fill);
+  });
+  return t;
+}
+const PASSAGE = {
+  title: "Three Beanbags",
+  note: "Read the text below and decide which answer best fits each gap.",
+  html: clozeHtml
+};
+
+/* ---- Thinking Skills Q2: bus and ferry timetables ---- */
+const tc = s => `<td style="text-align:center;white-space:nowrap">${s}</td>`;
+const timetable = (title, a, b, rows) => `<div class="table-wrap"><table class="grid">
+  <tr><th colspan="2" style="text-align:center">${title}</th></tr>
+  <tr><th style="text-align:center">${a}</th><th style="text-align:center">${b}</th></tr>
+  ${rows.map(([x, y]) => `<tr>${tc(x)}${tc(y)}</tr>`).join("")}
+</table></div>`;
+const TRIP_TABLES = `<div style="display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:center;align-items:flex-start">
+  ${timetable("Bus", "leaves Hillview", "arrives at the wharf",
+    [["9:20 am", "9:45 am"], ["9:35 am", "10:00 am"], ["9:50 am", "10:15 am"], ["10:05 am", "10:30 am"], ["10:20 am", "10:45 am"], ["10:35 am", "11:00 am"]])}
+  ${timetable("Ferry", "leaves the wharf", "arrives at Seal Island",
+    [["9:00 am", "9:50 am"], ["9:45 am", "10:35 am"], ["10:30 am", "11:20 am"], ["11:15 am", "12:05 pm"]])}
+</div>`;
+
+/* ---- Thinking Skills Q3: which net makes this cube ---- */
+// each symbol is drawn in a 1 by 1 square, then stretched onto a face
+const SYM = {
+  circle: `<circle cx=".5" cy=".5" r=".25" fill="${INK}"/>`,
+  ring: `<circle cx=".5" cy=".5" r=".25" fill="none" stroke="${INK}" stroke-width=".09"/>`,
+  plus: `<rect x=".43" y=".2" width=".14" height=".6" fill="${INK}"/><rect x=".2" y=".43" width=".6" height=".14" fill="${INK}"/>`,
+  cross: `<rect x=".08" y=".08" width=".84" height=".84" fill="#e8796e"/>`,
+  square: `<rect x=".3" y=".3" width=".4" height=".4" fill="#2f7d4f"/>`,
+  dots: [[.3, .3], [.7, .3], [.3, .7], [.7, .7]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".09" fill="${INK}"/>`).join("")
+};
+const SYM_NAME = { circle: "a black dot", ring: "a ring", plus: "a plus sign", cross: "red shading", square: "a small green square", dots: "four small dots" };
+function cubeSvg([top, left, right]) {
+  const a = 52, k = a * Math.cos(Math.PI / 6), cx = 6 + k, y0 = 6;
+  const T = [cx, y0], Rt = [cx + k, y0 + a / 2], Fr = [cx, y0 + a], Lf = [cx - k, y0 + a / 2];
+  const face = (o, u, v, s, fill) =>
+    `<polygon points="${[o, [o[0] + u[0], o[1] + u[1]], [o[0] + u[0] + v[0], o[1] + u[1] + v[1]], [o[0] + v[0], o[1] + v[1]]].map(p => p.join(",")).join(" ")}" fill="${fill}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+     <g transform="matrix(${u[0]} ${u[1]} ${v[0]} ${v[1]} ${o[0]} ${o[1]})">${SYM[s]}</g>`;
+  const sub = (p, q) => [p[0] - q[0], p[1] - q[1]];
+  const g = face(Lf, sub(T, Lf), sub(Fr, Lf), top, "#ffffff") +
+            face(Lf, sub(Fr, Lf), [0, a], left, "#eef1f6") +
+            face(Fr, sub(Rt, Fr), [0, a], right, "#dfe4ec");
+  const W = 2 * k + 12, H = 2 * a + 12;
+  return `<svg viewBox="0 0 ${W.toFixed(1)} ${H}" width="${W.toFixed(1)}" height="${H}" role="img" aria-label="A cube: top face ${SYM_NAME[top]}, front-left face ${SYM_NAME[left]}, front-right face ${SYM_NAME[right]}.">${g}</svg>`;
+}
+const CUBE_SHOWN = cubeSvg(["plus", "ring", "dots"]);
+// [row, column, symbol]; rows go down the page
+const NETS = [
+  { cells: [[0, 1, "plus"], [1, 0, "ring"], [1, 1, "dots"], [1, 2, "circle"], [1, 3, "square"], [2, 1, "cross"]],
+    desc: "Top row: a plus sign in the second column. Middle row, four squares: a ring, four dots (under the plus sign), a black dot, a green square. Bottom row: red shading in the second column, under the four dots." },
+  { cells: [[0, 0, "dots"], [0, 1, "ring"], [0, 2, "square"], [1, 2, "circle"], [1, 3, "plus"], [1, 4, "cross"]],
+    desc: "Top row, three squares: four dots, a ring, a green square. Bottom row, three squares starting under the green square: a black dot, a plus sign, red shading." },
+  { cells: [[0, 0, "cross"], [1, 0, "plus"], [1, 1, "square"], [1, 2, "dots"], [1, 3, "ring"], [2, 3, "circle"]],
+    desc: "Top row: red shading in the first column. Middle row, four squares: a plus sign (under the red shading), a green square, four dots, a ring. Bottom row: a black dot in the fourth column, under the ring." },
+  { cells: [[0, 0, "square"], [0, 1, "ring"], [1, 1, "plus"], [1, 2, "circle"], [2, 2, "dots"], [2, 3, "cross"]],
+    desc: "A staircase of three rows of two squares. Top row: a green square, a ring. Middle row, starting under the ring: a plus sign, a black dot. Bottom row, starting under the black dot: four dots, red shading." }
+];
+function netSvg({ cells, desc }, letter) {
+  const u = 30, o = 3;
+  const cols = Math.max(...cells.map(c => c[1])) + 1, rows = Math.max(...cells.map(c => c[0])) + 1;
+  let g = "";
+  cells.forEach(([r, c, s]) => {
+    const x = o + c * u, y = o + r * u;
+    g += `<rect x="${x}" y="${y}" width="${u}" height="${u}" fill="#fff" stroke="${INK}" stroke-width="1.8"/><g transform="matrix(${u} 0 0 ${u} ${x} ${y})">${SYM[s]}</g>`;
+  });
+  const W = cols * u + 2 * o, H = rows * u + 2 * o;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Net ${letter}. ${desc}">${g}</svg>`;
+}
+const NET_OPTS = NETS.map((n, i) => netSvg(n, "ABCD"[i]));
+
+/* ---- Maths Q2: the ride to the waterfall (supplied by David: follow-up to Carter's trip) ---- */
+const PATH_SVG = (() => {
+  const x0 = 34, u = 25, W = x0 * 2 + 12 * u, y = 46;
+  let g = `<line x1="${x0}" y1="${y}" x2="${x0 + 12 * u}" y2="${y}" stroke="${INK}" stroke-width="3"/>`;
+  for (let k = 0; k <= 12; k++) g += `<line x1="${x0 + k * u}" y1="${y - 5}" x2="${x0 + k * u}" y2="${y + 5}" stroke="${INK}" stroke-width="1.4"/>`;
+  const lab = (k, top, bot, col) => `<circle cx="${x0 + k * u}" cy="${y}" r="5.5" fill="${col}" stroke="${INK}" stroke-width="1.4"/>` +
+    `<text x="${x0 + k * u}" y="${y - 14}" font-size="13" font-weight="700" text-anchor="middle" fill="${INK}">${top}</text>` +
+    `<text x="${x0 + k * u}" y="${y + 24}" font-size="13" text-anchor="middle" fill="${INK}">${bot}</text>`;
+  g += lab(0, "Campsite", "0 km", "#ffffff") + lab(12, "Waterfall", "12 km", "#ffffff") + lab(5, "Picnic hut", "5 km", "#f2b45a");
+  const H = y + 34;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="A straight bike path from the Campsite at 0 km to the Waterfall at 12 km, with a small mark for every kilometre. The Picnic hut is marked at 5 km. The place where Noah turned back is not marked.">${g}</svg>`;
+})();
+
+/* ---- Maths Q3: perimeter of a stepped garden bed (not to scale) ---- */
+const STEP_SVG = (() => {
+  // drawn deliberately NOT to scale: [x, y] in drawing units (y down)
+  const P = [[20, 210], [320, 210], [320, 165], [215, 165], [215, 95], [110, 95], [110, 30], [20, 30]];
+  let g = `<polygon points="${P.map(p => p.join(",")).join(" ")}" fill="#dff0d8" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/>`;
+  const t = (x, y, s, a = "middle") => `<text x="${x}" y="${y}" font-size="15" font-weight="700" text-anchor="${a}" fill="${INK}">${s}</text>`;
+  g += t(170, 232, "15 m") + t(14, 125, "10 m", "end") + t(65, 22, "4 m") + t(162, 87, "5 m") + t(328, 193, "3 m", "start");
+  return `<svg viewBox="-30 0 400 245" width="360" height="221" role="img" aria-label="A garden bed shaped like a staircase, with every corner a right angle. The bottom side is 15 m and the left side is 10 m. Going along the top from the left: a 4 m side, then a step down, then a 5 m side, then another step down, then a side with no length marked, then down the right-hand side, which is 3 m. The two step-down sides and the lowest top side are not marked. The diagram is not drawn to scale.">${g}</svg>`;
+})();
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Read the text, then decide which answer (A, B, C or D) best fits each gap.",
+    questions: [
+      {
+        stem: "Which word best fits <b>gap 1</b>?",
+        options: ["wean", "waive", "wane", "wan"],
+        answer: 2,
+        skill: "choosing between look-alike words: which one fits the meaning and the grammar",
+        explain: `<p>After “a few days of endless drops”, the writer was losing interest. Enthusiasm that slowly shrinks or fades is said to <b>wane</b> (like the moon, which wanes as it grows thinner). “My enthusiasm had begun to wane” means it was fading away.</p>
+                  <p class="why-not">“Wean” is the trap: it looks and sounds close, but to wean means to get a baby or young animal used to food other than milk, or to help someone slowly give up a habit (“wean yourself off sweets”). Enthusiasm can’t “begin to wean”. “Waive” means to give up a right or let someone off a rule (“the school waived the fee”), and it needs something after it, so “begun to waive” is unfinished. “Wan” is a describing word meaning pale and tired-looking (“a wan face”); it isn’t a doing word, so “begun to wan” makes no sense.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 2</b>?",
+        options: ["stands", "holds", "follows", "comes"],
+        answer: 0,
+        skill: "fixed expressions: only one verb makes the phrase “… to reason”",
+        explain: `<p>“It <b>stands to reason</b>” is a fixed expression meaning “it is obvious if you think about it”. The aunt is making a sensible point: if you don’t keep crawling under the desk for dropped beanbags, you’ll have more time and energy to practise.</p>
+                  <p class="why-not">“Follows” is the trap: “it follows that …” also means “so it must be true that …”, and it would fit if the sentence were “It follows that I would practise for longer”. But it can’t be joined to “to reason”: “it follows to reason” isn’t English. “Holds” belongs in “it holds true”, not “holds to reason”. “Comes” belongs in “comes to mind”. Each is part of a different expression.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 3</b>?",
+        options: ["grudging", "knowledgeable", "bewildered", "knowing"],
+        answer: 3,
+        skill: "choosing a word from the meaning of the whole text: linking the ending back to the beginning",
+        explain: `<p>Go back to the first paragraph. The aunt promised: “By the time school goes back, you’ll be juggling.” Now, on the last Sunday of the holidays, her promise has come true, just as she said it would. A <b>knowing</b> smile is the smile of someone who knew all along what would happen. She doesn’t need to say a word: the smile says “I told you so”.</p>
+                  <p class="why-not">“Knowledgeable” is the trap: it looks like “knowing” and the aunt clearly knows a lot about juggling. But knowledgeable describes a <em>person</em> who knows a lot (“a knowledgeable guide”); a smile can’t be knowledgeable. “Bewildered” means puzzled and confused, the opposite of how someone feels when their own prediction comes true; it might describe the writer at the start, who laughed at the promise. “Grudging” means given unwillingly, as if she didn’t want to admit something, but the aunt wanted the writer to succeed and helped her get there.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0">To be picked for the zone swimming team, a swimmer must swim 50 metres in under 45 seconds at the school carnival.</p>
+               <p class="quote"><em class="speaker">Ruby:</em> “Jack swam 50 metres in 41 seconds at the carnival, so he will be picked for the zone team.”</p>
+               <p class="quote"><em class="speaker">Omar:</em> “Ella took 48 seconds to swim 50 metres at the carnival, so she won’t be picked for the zone team.”</p>
+               <p style="margin:10px 0 0">If the information in the first box is true, whose reasoning is correct?</p>`,
+        options: ["Ruby only", "Omar only", "Both Ruby and Omar", "Neither Ruby nor Omar"],
+        answer: 1,
+        skill: "deciding whose reasoning is correct: something needed is not a guarantee",
+        explain: `<p>The rule says a time under 45 seconds is <b>needed</b> to be picked. It does not say that every swimmer with a time under 45 seconds <em>will</em> be picked.</p>
+                  <p><b>Ruby:</b> Jack has what is needed, but that doesn’t guarantee a place. The team might only take the fastest few swimmers, and many children may have swum under 45 seconds. Ruby is not correct.</p>
+                  <p><b>Omar:</b> Ella took 48 seconds, so she doesn’t have what is needed. She can’t be picked. Omar is correct.</p>
+                  <p>So the answer is <b>B</b>, Omar only.</p>
+                  <p class="why-not">C (both) is the trap: Ruby’s reasoning sounds just as sure as Omar’s, but she has treated something needed as if it were enough. A (Ruby only) is for students who think that Ella could still get in some other way, but the rule says <em>must</em>. D (neither) is for students who think Omar has turned the rule around; he hasn’t: he uses it the safe way, from not having what is needed.</p>`
+      },
+      {
+        stem: `Ava is going from Hillview to Seal Island. She will catch a bus to the wharf, then a ferry to the island.
+               ${TRIP_TABLES}
+               <p style="margin:10px 0 0">Ava must be on Seal Island by <b>11:30 am</b>. After she gets off the bus, it takes her <b>10 minutes</b> to walk to the ferry and buy her ticket.</p>
+               <p style="margin:10px 0 0">What is the <b>latest</b> bus Ava can catch from Hillview?</p>`,
+        options: ["10:35 am", "10:20 am", "10:05 am", "9:50 am"],
+        answer: 3,
+        skill: "working backwards through two timetables with a connection time",
+        explain: `<p><b>Step 1: the ferry.</b> Work backwards from 11:30 am. The 11:15 am ferry arrives at 12:05 pm, too late. The <b>10:30 am</b> ferry arrives at 11:20 am, in time. So Ava needs the 10:30 am ferry.</p>
+                  <p><b>Step 2: the walk.</b> She needs 10 minutes after the bus to reach the ferry, so her bus must <b>arrive</b> at the wharf by 10:20 am.</p>
+                  <p><b>Step 3: the bus.</b> The bus arriving at 10:15 am is the latest one that arrives by 10:20 am. It leaves Hillview at <b>9:50 am</b>.</p>
+                  <p class="why-not">10:05 am (C) is the trap: that bus arrives at 10:30 am, exactly when the ferry leaves, which forgets the 10 minutes Ava needs to walk and buy her ticket. 10:20 am (B) uses the time the bus <em>leaves</em> Hillview instead of the time it arrives at the wharf. 10:35 am (A) picks the 11:15 am ferry because it leaves before 11:30 am, but Ava has to <em>be on the island</em> by then, and that ferry doesn’t arrive until 12:05 pm.</p>`
+      },
+      {
+        stem: `This is a cube.
+               <div class="figure">${CUBE_SHOWN}</div>
+               <p style="margin:10px 0 0">Which net could be folded to make this cube?</p>`,
+        visualOptions: true,
+        options: NET_OPTS,
+        answer: 0,
+        skill: "finding opposite faces on a net: faces that are opposite can never be seen together",
+        explain: `<p>The cube shows the plus sign, the ring and the four dots all at once, so on the right net <b>none of these three can be opposite each other</b>. A quick way to find opposite faces on a net: two squares in a straight line with <b>one square between them</b> are opposite. When two opposite pairs are found, the last two faces left over must be the third pair.</p>
+                  <p><b>Net A:</b> in the long row, the ring and the black dot are opposite, and so are the four dots and the green square. In the upright column, the plus sign and the red shading are opposite. So the plus, ring and four dots are never opposite each other ✓ Fold it to check the way round: with the four dots at the front, the plus sign folds up to make the top and the ring folds back to make the left side, exactly as on the cube.</p>
+                  <p class="why-not">B is the trap: the plus sign and the ring are far apart and not in a line, so they don’t look opposite. But the four dots and the green square are opposite (one square between them in the top row), and so are the black dot and the red shading (bottom row). The two faces left over, the ring and the plus sign, must be opposite, so they can’t both be seen. C is the easiest to rule out: the plus sign and the four dots are in a straight line with the green square between them, so they are opposite. D is a staircase: fold it with the plus sign on the table, and the ring folds up at the back while the four dots (joined below the black dot, which folds up on the right) fold round to the front. So the ring and the four dots are opposite.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `Lena reads <b>15 pages</b> on each school day, Monday to Friday. On Saturday and on Sunday she reads <b>25 pages</b> each day.
+               <p style="margin:10px 0 0">How many pages does Lena read in one whole week?</p>`,
+        options: ["40", "100", "105", "115", "125"],
+        answer: 4,
+        skill: "simple word problem: two different daily amounts across a week",
+        explain: `<p>School days: 5 × 15 = <b>75</b> pages. Weekend: 2 × 25 = <b>50</b> pages.</p>
+                  <p>Whole week: 75 + 50 = <b>125</b> pages.</p>
+                  <p class="why-not">100 (B) is the trap: it counts the weekend as one day of 25 pages, but Lena reads 25 pages on Saturday <em>and</em> on Sunday. 115 (D) counts 6 school days. 105 (C) uses 15 pages for all 7 days. 40 (A) just adds 15 and 25.</p>`
+      },
+      {
+        stem: `Noah and his mum rode their bikes along a straight 12 km bike path from the campsite to the waterfall. The picnic hut is on the path, 5 km from the campsite.
+               <div class="figure">${PATH_SVG}</div>
+               <p style="margin:10px 0 0">They meant to stop at the picnic hut to fill their water bottles, but they rode straight past it. When they realised, they rode back to the hut, filled their bottles, and then rode on to the waterfall. Altogether they rode <b>18 km</b>.</p>
+               <p style="margin:10px 0 0">How far past the picnic hut did they turn back?</p>`,
+        options: ["2 km", "3 km", "6 km", "8 km", "13 km"],
+        answer: 1,
+        skill: "distance on a line: the extra stretch is ridden twice (supplied by David: follow-up to Carter’s trip)",
+        explain: `<p><b>Step 1: the extra distance.</b> Riding straight to the waterfall would have been 12 km, but they rode 18 km. So they rode 18 − 12 = <b>6 km</b> extra.</p>
+                  <p><b>Step 2: why the extra?</b> The stretch between the hut and the turning point was ridden <b>three</b> times: past the hut, back to the hut, and forwards again. Riding it once is part of the normal 12 km, so the extra 6 km is that stretch ridden <b>twice</b>: 6 ÷ 2 = <b>3 km</b>.</p>
+                  <p>Check: they turned back at 5 + 3 = 8 km. 8 km out + 3 km back to the hut + 7 km from the hut to the waterfall = 18 km ✓</p>
+                  <p class="why-not">6 km (C) is the trap: it is the extra distance, but that extra stretch was ridden twice, so it must be halved. 2 km (A) divides the 6 km by 3, because the stretch was ridden three times, but one of those three rides is part of the normal 12 km. 8 km (D) is how far from the <em>campsite</em> they turned back, not how far past the hut. 13 km (E) is 18 − 5, which doesn’t stand for any part of the ride.</p>`
+      },
+      {
+        stem: `This garden bed has a stepped shape. Every corner is a right angle. Some side lengths are not marked, and the diagram is <b>not drawn to scale</b>.
+               <div class="figure">${STEP_SVG}</div>
+               <p style="margin:10px 0 0">What is the perimeter of the garden bed?</p>`,
+        options: ["37 m", "43 m", "50 m", "53 m", "59 m"],
+        answer: 2,
+        skill: "perimeter of a stepped shape with unmarked sides: moving the steps to make a rectangle",
+        explain: `<p>Three sides are not marked, and the two step-down sides can’t be worked out one at a time. But you don’t need them separately.</p>
+                  <p><b>Across:</b> the three top sides (4 m, 5 m and the unmarked one) together stretch across the whole width of the bed, so they add up to the bottom side: <b>15 m</b>. (The unmarked one is 15 − 4 − 5 = 6 m.)</p>
+                  <p><b>Up and down:</b> the three upright sides on the right (the two steps and the 3 m side) together go all the way from the bottom to the top, so they add up to the left side: <b>10 m</b>.</p>
+                  <p>Perimeter = 15 + 15 + 10 + 10 = <b>50 m</b>. It is the same as the perimeter of a 15 m by 10 m rectangle, as if the steps were pushed out to the corner.</p>
+                  <p class="why-not">37 m (A) is the trap: it adds only the five marked sides (15 + 10 + 4 + 5 + 3) and leaves out the three unmarked ones. 43 m (B) finds the unmarked 6 m top side but forgets the two step-down sides. 53 m (D) counts the right-hand uprights as 10 m and then adds the 3 m side again, although it is already part of the 10 m. 59 m (E) makes the same double-count across the top, adding the 4 m and 5 m again on top of the 15 m.</p>`
+      }
+    ]
+  }
+];
+
+const TEST_META = {"version": 57, "reading_format": "cloze", "categories": {"reading": ["Vocabulary & idioms", "Vocabulary & idioms", "Vocabulary & idioms"], "thinking": ["Whose reasoning", "Tables & timetables", "Spatial"], "maths": ["Number & place value", "Number & place value", "Area, perimeter & 3D"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}, "status": "review"};
+const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  const t = await r.text(); // functions that return nothing send an empty body
+  return t ? JSON.parse(t) : null;
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
+  persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 57</h1>
+      ${completedNote()}
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+      ${mode === "review" && ADMIN ? `<div class="review-box" data-q="${qi}"><p class="rv-msg">Loading feedback…</p></div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  sectionStart = Date.now();
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  if (ADMIN) fillReviews();
+  window.scrollTo(0, 0);
+}
+
+/* ---- question feedback (practice mode only): approve, or send back for a redo with a comment.
+   Saved online through add_review(pin, …); Claude answers each redo with a 'done' row. ---- */
+let reviewRows = [];
+const RV_DIFF = ["Much easier", "A bit easier", "A bit harder", "Much harder"];
+const RV_LABEL = { approve: "Approved", redo: "Sent back for a redo", done: "Redone by Claude" };
+const rvEsc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function reviewPin() { try { return sessionStorage.getItem("prac.admin.pin") || ""; } catch (e) { return ""; } }
+async function fillReviews() {
+  const si = current, boxes = app.querySelectorAll(".review-box");
+  const note = t => boxes.forEach(b => b.innerHTML = `<p class="rv-msg">${t}</p>`);
+  if (!syncOn() || !reviewPin()) return note("Question feedback needs the online database. Open this test from the admin page (after entering the PIN).");
+  try { reviewRows = (await syncRpc("admin_reviews", { p_pin: reviewPin() })) || []; }
+  catch (e) { return note("Couldn’t load question feedback. If this keeps happening, the database may need its update (ask Claude)."); }
+  if (current !== si || passMode !== "review") return;
+  boxes.forEach(b => renderReviewBox(b, SECTIONS[si].id, +b.dataset.q));
+}
+function renderReviewBox(box, sec, qi, msg) {
+  const hist = reviewRows.filter(r => r.version === TEST_META.version && r.section === sec && r.q === qi);
+  const when = t => { const d = new Date(t); return isNaN(d) ? "" : d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }); };
+  const last = hist[hist.length - 1];
+  box.innerHTML = `<p class="rv-head">Your review of question ${qi + 1}</p>
+    ${hist.length ? `<ul>${hist.map(r => `<li class="${r.kind}"><b>${RV_LABEL[r.kind] || rvEsc(r.kind)}</b> · ${when(r.at)}${r.comment ? `: ${rvEsc(r.comment)}` : ""}</li>`).join("")}</ul>` : ""}
+    ${last && last.kind === "redo" ? `<p class="rv-msg">Waiting for Claude to redo this question.</p>` : ""}
+    <div class="rv-actions">
+      <button type="button" class="rv-approve">${last && last.kind === "approve" ? "Approved ✓" : "Approve"}</button>
+      <button type="button" class="rv-redo">Send back for a redo</button>
+    </div>
+    <div class="rv-diff" role="group" aria-label="Quick difficulty change for question ${qi + 1}">
+      <span>Difficulty:</span>
+      ${RV_DIFF.map((d, k) => `<button type="button" class="rv-chip" data-d="${k}">${d}</button>`).join("")}
+    </div>
+    <div class="rv-form" hidden>
+      <p class="rv-chosen" hidden></p>
+      <textarea rows="3" maxlength="4000" aria-label="What needs changing in question ${qi + 1}?" placeholder="What needs changing? (e.g. too easy, two answers could be right, picture unclear)"></textarea>
+      <button type="button" class="rv-send">Send back</button>
+      <button type="button" class="rv-cancel">Cancel</button>
+    </div>
+    <p class="rv-msg" role="status">${msg || ""}</p>`;
+  const form = box.querySelector(".rv-form"), say = t => box.querySelector(".rv-msg[role=status]").textContent = t;
+  const chosen = box.querySelector(".rv-chosen"), ta = box.querySelector("textarea");
+  let diff = null;
+  const pick = k => {
+    diff = k;
+    box.querySelectorAll(".rv-chip").forEach(c => c.classList.toggle("on", +c.dataset.d === k));
+    chosen.hidden = k === null;
+    chosen.textContent = k === null ? "" : `Make it ${RV_DIFF[k].toLowerCase()}. Add a comment if you like, then press Send back.`;
+    ta.placeholder = k === null ? "What needs changing? (e.g. too easy, two answers could be right, picture unclear)" : "Optional: anything else to change?";
+    form.hidden = false; ta.focus(); say("");
+  };
+  box.querySelector(".rv-approve").onclick = () => submitReview(box, sec, qi, "approve", "");
+  box.querySelector(".rv-redo").onclick = () => pick(null);
+  box.querySelectorAll(".rv-chip").forEach(c => c.onclick = () => pick(+c.dataset.d));
+  box.querySelector(".rv-cancel").onclick = () => { form.hidden = true; diff = null; box.querySelectorAll(".rv-chip").forEach(c => c.classList.remove("on")); say(""); };
+  box.querySelector(".rv-send").onclick = () => {
+    const c = ta.value.trim();
+    if (diff === null && !c) { say("Add a comment (or pick a difficulty) so Claude knows what to change."); return; }
+    submitReview(box, sec, qi, "redo", (diff === null ? "" : `Difficulty: make it ${RV_DIFF[diff].toLowerCase()}.` + (c ? " " : "")) + c);
+  };
+}
+async function submitReview(box, sec, qi, kind, comment) {
+  box.querySelectorAll("button").forEach(b => b.disabled = true);
+  box.querySelector(".rv-msg[role=status]").textContent = "Saving…";
+  try {
+    await syncRpc("add_review", { p_pin: reviewPin(), p_version: TEST_META.version, p_section: sec, p_q: qi, p_kind: kind, p_comment: comment });
+  } catch (e) {
+    box.querySelectorAll("button").forEach(b => b.disabled = false);
+    box.querySelector(".rv-msg[role=status]").textContent = "Couldn’t save. Check the internet connection and try again.";
+    return;
+  }
+  reviewRows.push({ version: TEST_META.version, section: sec, q: qi, kind, comment, at: new Date().toISOString() });
+  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it overnight, or straight away if you run “Do redos now”.");
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  finishAttempt();
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+// A test held for review is only on the admin page; someone opening its address directly sees this instead.
+function showNotReady() {
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>This test isn’t ready yet</h1>
+      <p class="lead">It will appear on the list of tests once it has been checked.</p>
+      <a class="primary" href="../../index.html">Back to all tests</a>
+    </div>`;
+}
+
+if (TEST_META.status === "review" && !ADMIN) showNotReady(); else showStart();
+</script>
+</body>
+</html>
