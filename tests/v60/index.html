@@ -253,7 +253,7 @@ const INK = "#1b2a41";
 
 /* ---- Reading: narrative (original) ---- */
 const PARAS = [
-  `The ball came off Nina’s bat with a crack, and she knew straight away it was her best shot all summer. It sailed clean over the side fence. Then came a second sound, smaller and sadder: a kind of crunch.`,
+  `The cricket ball came off Nina’s bat with a crack, and she knew straight away it was her best shot all summer. It sailed clean over the side fence. Then came a second sound, smaller and sadder: a kind of crunch.`,
   `Nina stood very still. Then she climbed onto the wheelie bin and looked over.`,
   `Mr Petrakis’s garden gnome lay on its side among the tomato plants. Its fishing rod had snapped off, and a crack ran right through its red hat. Mr Petrakis hardly ever spoke to anyone in the street; he just nodded and went inside. His car was gone. Nobody had seen.`,
   `Nina climbed down. She put the bat back in the shed very carefully, as though it might go off again. Then she went inside and watched a whole cooking show without being able to say afterwards what anyone had cooked.`,
@@ -316,7 +316,7 @@ const PIECES = [
   [[[0, 1], [0, 2], [1, 0], [1, 1], [1, 2]], "top row . # #, bottom row # # # (5 squares)"],
   [[[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]], "top row # # #, bottom row # . # (5 squares)"],
   [[[0, 0], [0, 1], [0, 2], [1, 1], [1, 2]], "top row # # #, bottom row . # # (5 squares)"],
-  [[[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2]], "top row # # #, bottom row # # # (6 squares)"]
+  [[[0, 0], [0, 1], [1, 0], [1, 1], [2, 1]], "top row # #, middle row # #, bottom row . # (5 squares)"]
 ].map(([cells, d], i) => pieceSvg(cells, `Piece ${"ABCD"[i]}`, d));
 
 /* ---- Maths Q3: train and bus timetables ---- */
@@ -366,15 +366,15 @@ const SECTIONS = [
                   <p class="why-not">D is the trap: the detail does show that he will be very upset, but it doesn’t show that he can’t forgive, and in fact he does forgive Nina at the end. A is about where the gnome was kept, which the detail doesn’t explain. B picks up the words “Mum had told her once”, but the story mentions Mum telling her only this one thing; the point is the gnome, not Mum’s habits.</p>`
       },
       {
-        stem: "Mr Petrakis “hardly ever spoke to anyone”, yet at the end he spends the evening telling Nina about every piece of the gnome. What does this suggest the story is mostly about?",
-        options: ["Owning up to a mistake can lead to something good, like a new friendship.",
-                  "Old people living alone usually want to be left alone by their neighbours.",
-                  "Playing cricket close to other people’s gardens always ends in some trouble.",
-                  "It is wiser to keep quiet about an accident if nobody saw it happen at all."],
+        stem: "At the end, Mr Petrakis spends the evening at the kitchen table with Nina, “fitting the pieces together, and he told her about every one of them.” What does this ending suggest has changed?",
+        options: ["Owning up has brought Nina and her lonely neighbour closer together.",
+                  "Mr Petrakis is mostly glad that his precious gnome will now be mended.",
+                  "Nina has paid for the damage, so she has no reason to feel guilty now.",
+                  "Mr Petrakis has finally stopped feeling sad about losing his wife."],
         answer: 0,
-        skill: "understanding the main idea from how a story ends (inference)",
-        explain: `<p>At the start, Mr Petrakis keeps to himself: he “just nodded and went inside”. Nina could have kept quiet, because “Nobody had seen”. Instead she owns up, and the ending is not about punishment at all. He invites her in, trusts her steady hands with the glue, and talks to her all evening about every piece of the gnome his wife painted. Owning up hasn’t just mended the gnome; it has started a friendship between two people who barely knew each other. That is the main idea: <b>A</b>.</p>
-                  <p class="why-not">D is the trap: it uses the real detail “Nobody had seen”, but the story shows the opposite: keeping quiet makes Nina miserable, and owning up makes things better. B takes the early detail about Mr Petrakis keeping to himself and turns it into a rule, but the ending shows he is glad of Nina’s company. C turns one accident into “always”; the story is about what Nina does after the accident, not about where to play cricket.</p>`
+        skill: "understanding what a story's ending reveals (inference across the whole story)",
+        explain: `<p>Put the start and the end side by side. At the start, Mr Petrakis “hardly ever spoke to anyone in the street”: he “just nodded and went inside”, and he lives alone since his wife died. Nina, for her part, could have kept quiet, because “Nobody had seen”. Instead she owns up. He invites her in, trusts her steady hands with the glue, and talks to her all evening about every piece of the gnome his wife painted. A man who barely speaks to anyone is now sharing his memories with the girl next door. Owning up has done more than mend a gnome: it has brought the two of them closer. That is <b>A</b>.</p>
+                  <p class="why-not">B is the trap: he does want the gnome mended (he has the glue ready), but if mending were all that mattered, he wouldn’t spend the evening telling her the story of every piece; the ending is about the two of them, not only the gnome. C is built on a real detail, the pocket-money tin, but Nina never pays: Mr Petrakis asks for her steady hands, not her money. D goes too far: talking about the gnome his wife painted shows he is sharing her memory, not that his sadness is over.</p>`
       }
     ]
   },
@@ -419,7 +419,7 @@ const SECTIONS = [
         skill: "jigsaw: which piece fills a gap when it is turned (not flipped)",
         explain: `<p>The gap has <b>5</b> squares: a 2 by 2 block on the right edge, with one more square sticking down below the <b>left</b> half of the block.</p>
                   <p>Piece C is a row of 3 with 2 squares under the right-hand end, so it is a 2 by 2 block with one extra square sticking out to the <b>left</b> of its <b>top</b> row. Turn it a quarter turn anticlockwise: the extra square swings round to sit <b>below the left</b> half of the block, which is exactly the shape of the gap.</p>
-                  <p class="why-not">A is the trap: it is the right size and nearly the right shape, but it is a mirror image. Its extra square sticks out to the left of the <em>bottom</em> row, so turning it puts the extra square below the <em>right</em> half of the block. It would fit only if it were flipped over, which isn’t allowed. B has 5 squares, but it has a gap in the middle of its bottom row, so it is a different shape. D has 6 squares, one too many.</p>`
+                  <p class="why-not">A is the trap: it is the right size and nearly the right shape, but it is a mirror image. Its extra square sticks out to the left of the <em>bottom</em> row, so turning it puts the extra square below the <em>right</em> half of the block. It would fit only if it were flipped over, which isn’t allowed. D is the same mirror-image piece standing upright: it looks like a copy of the gap, but its extra square is under the <em>right</em> half of the block instead of the left, and no turn can move it across; only a flip could. B has 5 squares, but it has a gap in the middle of its bottom row, so it is a different shape.</p>`
       }
     ]
   },
