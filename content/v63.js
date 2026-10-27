@@ -222,16 +222,20 @@ const SECTIONS = [
                  <tr><th>Drinks</th><td>water, juice, milk, slushie</td></tr>
                  <tr><th>Desserts</th><td>ice cream, fruit cup</td></tr>
                </table></div>
-               <p style="margin:10px 0 0">There is one rule: you can’t choose the <b>slushie</b> and the <b>ice cream</b> in the same meal deal.</p>
+               <p style="margin:10px 0 0">There are two rules:</p>
+               <ul><li>you can’t choose the <b>slushie</b> and the <b>ice cream</b> in the same meal deal;</li>
+               <li>you can’t choose the <b>wrap</b> and the <b>ice cream</b> in the same meal deal.</li></ul>
                <p style="margin:6px 0 0">How many different meal deals can you choose?</p>`,
-        options: ["10", "16", "24", "28", "32"],
-        answer: 3,
-        skill: "counting combinations of three choices with one pairing not allowed",
+        options: ["16", "24", "25", "28", "32"],
+        answer: 2,
+        skill: "counting combinations of three choices with two pairings not allowed (one deal breaks both rules)",
         explain: `<p><b>Step 1: without the rule.</b> Each of the 4 mains can go with each of the 4 drinks and each of the 2 desserts: 4 × 4 × 2 = <b>32</b> meal deals.</p>
-                  <p><b>Step 2: take away the ones that break the rule.</b> A deal with a slushie and an ice cream can still have any of the 4 mains: burger, wrap, pasta or sushi. That is <b>4</b> deals, not just 1.</p>
-                  <p>32 − 4 = <b>28</b>.</p>
-                  <p>(Check another way: with a slushie you must have the fruit cup: 4 × 1 = 4 deals. With any of the other 3 drinks, either dessert is fine: 4 × 3 × 2 = 24. And 24 + 4 = 28 ✓.)</p>
-                  <p class="why-not">24 (C) is the trap: it leaves the slushie out of <em>every</em> meal deal, but the slushie is allowed with the fruit cup. 32 (E) ignores the rule. 16 (B) forgets the desserts (4 × 4). 10 (A) adds the choices (4 + 4 + 2) instead of multiplying.</p>`
+                  <p><b>Step 2: deals that break the first rule.</b> A slushie with an ice cream can still have any of the 4 mains: <b>4</b> deals.</p>
+                  <p><b>Step 3: deals that break the second rule.</b> A wrap with an ice cream can still have any of the 4 drinks: <b>4</b> deals.</p>
+                  <p><b>Step 4: don’t count a deal twice.</b> Wrap + slushie + ice cream breaks <em>both</em> rules, so it is in both lists. The deals that break a rule are 4 + 4 − 1 = <b>7</b>, not 8.</p>
+                  <p>32 − 7 = <b>25</b>.</p>
+                  <p>(Check another way: every fruit-cup deal is fine: 4 × 4 = 16. Ice-cream deals can’t have the wrap or the slushie: 3 mains × 3 drinks = 9. And 16 + 9 = 25 ✓.)</p>
+                  <p class="why-not">24 (B) is the trap: it takes away 4 + 4 = 8, counting the wrap + slushie + ice cream deal twice. 28 (D) uses only the first rule. 32 (E) ignores both rules. 16 (A) counts only the fruit-cup deals, forgetting that ice cream is still allowed with the other mains and drinks.</p>`
       }
     ]
   }

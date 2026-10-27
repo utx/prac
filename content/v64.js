@@ -127,14 +127,14 @@ const SECTIONS = [
       },
       {
         stem: "In verse 2, the poet lists one sight after another: a child, a tramp, a green, a cart, a mill and a river. Why does he list them in this way?",
-        options: ["To show that the countryside is much busier and more crowded than the town.",
-                  "To make us feel each sight appear for a moment and be replaced by the next.",
-                  "To show that the speaker is bored and is counting things to pass the time.",
-                  "To show that the speaker has plenty of time to look at each thing closely."],
+        options: ["To show how many different kinds of people and places there are in the country.",
+                  "To make us feel the speed of the train without describing the train at all.",
+                  "To show that the speaker is trying hard to remember every sight he passes.",
+                  "To show that the speaker wishes the train would stop so he could join in."],
         answer: 1,
         skill: "understanding why a writer includes a detail (the effect of a list)",
-        explain: `<p>Each sight gets only a line or two, and many lines begin “Here is …” or “And here is …”, as if the speaker were pointing at each one as it flashes past the window. Before we can think about the tramp, we are at the green; before we can think about the green, a cart is lumping along the road. The rush of different sights makes us feel what it is like to look out of a fast train, and the last line says it outright: “Each a glimpse and gone forever!”</p>
-                  <p class="why-not">D is the trap: the tramp in the poem “stands and gazes”, taking his time, but the speaker can’t: each thing is only “a glimpse”. A uses real details (a child, a cart with a man, a mill), but the poem never compares the countryside with a town, and these are just single sights flashing past. C is the opposite of the speaker’s mood: the exclamation marks show excitement, not boredom.</p>`
+        explain: `<p>Verse 2 never mentions the train, but we feel its speed. Each sight gets only a line or two, and many lines begin “Here is …” or “And here is …”, as if the speaker were pointing at each one as it flashes past the window. Before we can think about the tramp, we are at the green; before we can think about the green, a cart is lumping along the road. The quick change from one sight to the next is how fast the train is going, as the last line says: “Each a glimpse and gone forever!”</p>
+                  <p class="why-not">A is the trap: the list really does include different people and places (a child, a tramp, a man with a cart, a mill, a river), but the poem is not about how varied the countryside is; each one is only a glimpse from a speeding train. C picks up on “gone forever”, but the speaker never tries to remember anything; he is excited by each new sight and lets it go. D picks up on the child gathering brambles and the green for daisy chains, but the speaker never says he wants to stop; the exclamation marks show he is enjoying the ride.</p>`
       }
     ]
   },
