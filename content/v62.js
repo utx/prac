@@ -155,8 +155,8 @@ const SECTIONS = [
         stem: `This model is made of identical cubes standing on a square floor 3 squares long and 3 squares wide. There are no gaps under any cube: every cube sits on the floor or on top of another cube.
                <div class="figure">${MODEL_SVG}</div>
                <p style="margin:10px 0 0">How many <b>more</b> cubes are needed to turn the model into a solid cube that is 3 cubes long, 3 cubes wide and 3 cubes high?</p>`,
-        options: ["7", "8", "13", "14"],
-        answer: 3,
+        options: ["18", "14", "13", "8"],
+        answer: 1,
         skill: "cube model: working out the height of every stack, including cubes you can’t see, then finding what is missing",
         explain: `<p>A solid 3 × 3 × 3 cube needs 3 × 3 × 3 = <b>27</b> cubes.</p>
                   <p><b>Step 1: count the model stack by stack.</b> You can see the top of every stack, so count how high each one is (the cubes underneath are hidden, but they must be there, because there are no gaps).<br>
@@ -165,7 +165,7 @@ const SECTIONS = [
                      • Front row: 2 + 1 + 0 = 3<br>
                      The model has 6 + 4 + 3 = <b>13</b> cubes.</p>
                   <p><b>Step 2: what is missing?</b> 27 − 13 = <b>14</b> cubes. (Check stack by stack: back row 0 + 1 + 2 = 3, middle row 0 + 2 + 3 = 5, front row 1 + 2 + 3 = 6, and 3 + 5 + 6 = 14 ✓)</p>
-                  <p class="why-not">13 (C) is the trap: it is the number of cubes already in the model, not the number still needed. 8 (B) fills every stack up to 3 but forgets the two empty floor squares on the right, which each need a whole stack of 3 cubes. 7 (A) only fills the gaps in the top layer.</p>`
+                  <p class="why-not">18 (A) is the trap: it counts only the 9 cubes you can see (27 − 9 = 18) and forgets the cubes hidden underneath the taller stacks, which must be there because there are no gaps. 13 (C) is the number of cubes already in the model, not the number still needed. 8 (D) fills every stack up to 3 but forgets the two empty floor squares on the right, which each need a whole stack of 3 cubes.</p>`
       }
     ]
   },
