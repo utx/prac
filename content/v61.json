@@ -1,0 +1,62 @@
+{
+  "version": 61,
+  "date": "2026-10-28",
+  "reading": "Cloze: Bars 52 to 60",
+  "reading_format": "cloze",
+  "reading_topic": "a child's first school orchestra concert on violin: practising a tricky run (bars 52 to 60) slowly with a teacher, nerves backstage, the performance and the feeling afterwards (first-person piece)",
+  "thinking": [
+    "Whose reasoning is correct (\"most\" leading to \"probably\": most students who walk live close, used the right way round and reversed)",
+    "Holiday program timetable: two activities on the same day with a 15-minute gap and a leaving time",
+    "Compass directions on a map with north pointing to the right: where a walk of three legs ends (stretch)"
+  ],
+  "maths": [
+    "Quick-fire money: greatest number of rides after paying an entry fee",
+    "Repeating tile pattern with a visible block of 6: the tile number of the 20th yellow tile",
+    "Distance on a line with two turn-backs and no diagram: how far past the shop she first turned back (follow-up 2 to Carter's trip, stretch, supplied by David)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q10 (word decided by the preposition that follows), PT1 Q12 (near-synonyms where only one fits)",
+      "PT3 Q13 (look-alike words: 'decrease/descent/decay/decline'), PT3 Q10 (grammar fit)",
+      "PT2 Q11 (word chosen from the meaning of the whole passage), PT1-PT3 Q1-6 (feelings shown rather than stated) — stretch"
+    ],
+    "thinking": [
+      "PT2 Q27 (whose reasoning: \"most\" → \"probably\"), PT3 Q15 (rule used in both directions)",
+      "PT3 Q19 (timetable minus a cancelled day), PT2 Q19 (appointments in a working day), PT1 Q20 (selection conditions)",
+      "PT1 Q23 (compass positions of towns), PT2 Q28 (facing directions on a square), Maths PT1 Q22 (compass bearing on a grid map) — stretch"
+    ],
+    "maths": [
+      "PT2 Q7 (price from change), PT3 Q7 (estimating change), PT1 Q25 (change with coin constraints)",
+      "PT2 Q4 (repeating pattern in a grid), PT1 Q8 (bead pattern ratio), PT2 Q5 (10th term of a sequence)",
+      "PT2 Q3 (distance round a rectangle), PT3 Q24 (working backwards), PT3 Q31 (two unknowns) — stretch, supplied by David"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Money & best value",
+      "Patterns & sequences",
+      "Number & place value"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

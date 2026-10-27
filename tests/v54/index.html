@@ -273,19 +273,19 @@ const HEX_SVG = (() => {
   });
   const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
   const f = p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`;
-  const M34 = mid(V[3], V[4]), M50 = mid(V[5], V[0]);
+  const M45 = mid(V[4], V[5]), M12 = mid(V[1], V[2]);
   let g = `<polygon points="${V.map(f).join(" ")}" fill="#d9ecf7" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/>`;
   const dash = (p, q) => `<line x1="${p[0].toFixed(1)}" y1="${p[1].toFixed(1)}" x2="${q[0].toFixed(1)}" y2="${q[1].toFixed(1)}" stroke="#c0392b" stroke-width="2.6" stroke-dasharray="9 6"/>`;
-  g += dash(V[0], V[2]) + dash(M34, M50);
+  g += dash(V[0], V[2]) + dash(M45, M12);
   // small ticks showing the midpoints of the two sides
   const tick = (p, q) => {
     const m = mid(p, q), dx = q[0] - p[0], dy = q[1] - p[1], L = Math.hypot(dx, dy), nx = -dy / L * 7, ny = dx / L * 7;
     const t = (a, b) => `<line x1="${(a[0] - nx / 2).toFixed(1)}" y1="${(a[1] - ny / 2).toFixed(1)}" x2="${(a[0] + nx / 2).toFixed(1)}" y2="${(a[1] + ny / 2).toFixed(1)}" stroke="${INK}" stroke-width="2"/>`;
     return t(mid(p, m)) + t(mid(m, q));
   };
-  g += tick(V[3], V[4]) + tick(V[5], V[0]);
+  g += tick(V[4], V[5]) + tick(V[1], V[2]);
   const W = 240, H = 216;
-  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="A regular hexagon with a corner at the top. Two dashed cutting lines are drawn. The first joins the top corner to the lower-right corner, cutting off the upper-right corner. The second joins the middle of the lower-left side to the middle of the upper-left side, cutting off the two left-hand corners and the upright left side between them. Small marks show that each of these two sides is cut exactly in half. The two dashed lines do not touch each other.">${g}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="A regular hexagon with a corner at the top and upright sides on the left and right. Two dashed cutting lines are drawn. The first joins the top corner to the lower-right corner. The second goes straight across, from the middle of the left upright side to the middle of the right upright side. Small marks show that each of these two sides is cut exactly in half. The two dashed lines cross each other inside the hexagon, near its right-hand side.">${g}</svg>`;
 })();
 
 /* ---- Maths Q1: kitchen scale with unlabelled marks ---- */
@@ -425,18 +425,19 @@ const SECTIONS = [
                   <p class="why-not">C (Dev) is the trap: it comes from putting Eli in seat 1 and Ben in seat 2 and then working the last clue the wrong way (Ana two seats to the right of Ben), which gives Eli, Ben, Dev, Ana, Tom. A (Ana) counts Ana’s own seat when moving “two seats to the right”, which puts Ana in seat 3 and Ben straight next to her. B (Ben) is next to Eli at the end of the row, in seat 4, not in the middle.</p>`
       },
       {
-        stem: `Kim has a hexagon cut from card. She cuts it along the <b>two dashed lines</b>. One line joins two corners. The other joins the middles of two sides.
+        stem: `Kim has a hexagon cut from card. She cuts it along the <b>two dashed lines</b>. One line joins two corners. The other goes straight across, joining the middles of the two upright sides, and it crosses the first line.
                <div class="figure">${HEX_SVG}</div>
-               <p style="margin:10px 0 0">How many sides does each of the three pieces have?</p>`,
-        options: ["3 sides, 4 sides and 5 sides", "3 sides, 4 sides and 4 sides", "3 sides, 3 sides and 5 sides", "3 sides, 4 sides and 6 sides"],
+               <p style="margin:10px 0 0">How many sides does each of the <b>four</b> pieces have?</p>`,
+        options: ["3, 4, 4 and 5 sides", "3, 3, 4 and 5 sides", "3, 4, 4 and 4 sides", "3, 4, 4 and 6 sides"],
         answer: 0,
-        skill: "the shapes made by straight cuts: counting the corners of each piece",
-        explain: `<p>Count the <b>corners</b> of each piece. A corner of the hexagon stays a corner, and every place where a cut meets the edge in the middle of a side makes a <b>new</b> corner.</p>
-                  <p><b>Piece 1 (top right):</b> the cut from corner to corner cuts off one corner of the hexagon. Its corners are the two ends of the cut and the corner it cuts off: <b>3 sides</b> (a triangle).</p>
-                  <p><b>Piece 2 (left):</b> the other cut starts and ends in the middle of a side. This piece has the left two corners of the hexagon plus the two ends of the cut: <b>4 sides</b>.</p>
-                  <p><b>Piece 3 (the big piece):</b> its corners are the top corner, the lower-right corner, the bottom corner, and the two ends of the second cut: <b>5 sides</b>.</p>
-                  <p>So the pieces have 3, 4 and 5 sides: <b>A</b>.</p>
-                  <p class="why-not">B is the trap: it counts the big piece as having 4 sides, forgetting that the two ends of the second cut both make new corners on it. C counts the left-hand piece as a triangle, as if the second cut went through a corner. D thinks the big piece still has the hexagon’s 6 sides, but two of its corners (and part of two sides) were cut away.</p>`
+        skill: "the shapes made by two crossing straight cuts: counting the corners of each piece",
+        explain: `<p>Count the <b>corners</b> of each piece. A corner of the hexagon stays a corner. Every place where a cut meets the edge in the middle of a side makes a <b>new</b> corner, and so does the point where the two cuts <b>cross</b>: it is a corner of all four pieces.</p>
+                  <p><b>Top-right piece:</b> the top corner, the upper-right corner, the end of the straight-across cut on the right side, and the crossing point → <b>4 sides</b>.</p>
+                  <p><b>Small piece (right, below the straight cut):</b> the crossing point, the end of the straight cut on the right side, and the lower-right corner → <b>3 sides</b> (a triangle).</p>
+                  <p><b>Top-left piece:</b> the top corner, the crossing point, the end of the straight cut on the left side, and the upper-left corner → <b>4 sides</b>.</p>
+                  <p><b>Big bottom piece:</b> the crossing point, the lower-right corner, the bottom corner, the lower-left corner and the end of the straight cut on the left side → <b>5 sides</b>.</p>
+                  <p>So the pieces have 3, 4, 4 and 5 sides → <b>A</b>.</p>
+                  <p class="why-not">B is the trap: it forgets that the crossing point is a corner of the top-left piece too, so it sees that piece as a triangle (top corner, left middle, upper-left corner). C forgets that the end of the straight cut in the middle of the left side makes a new corner on the big bottom piece, so counts only 4. D thinks the big bottom piece still has the hexagon’s 6 sides, but its top two corners were cut away.</p>`
       }
     ]
   },

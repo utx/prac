@@ -14,15 +14,20 @@ Never paste in questions from the official sample papers or other copyrighted bo
 
 ## Waiting
 
-### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3)
+(None waiting.)
+
+## Used
+
+### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
 - **Section**: maths Q3 (stretch)
 - **Added**: 2026-10-07
 - **Question**: write another fresh question of the same kind, with **no diagram**, so the child has to picture or sketch the route.
   - Make it one notch harder than step 2. For example, use two return trips, or a total that has to be worked out first.
   - The explanation should show the number line.
 - **Notes**: David's plan. Use it no sooner than **2 tests after** the test that used follow-up 1, and only once follow-up 1 is in **Used**.
+- **Changes**: no diagram; two turn-backs (15 km path, shop at 6 km, a second turn-back 2 km before the beach, 35 km in total); asks how far past the shop the first turn-back was (3 km); the explanation shows the number line.
 
-### Four rectangles round a square hole (perimeter)
+### Four rectangles round a square hole (perimeter) → Test 63 Maths Q2 (competition-style)
 - **Section**: maths (perimeter; a good Q2 or Q3, competition-style, so it counts as the test's one competition-style question)
 - **Added**: 2026-10-10
 - **Question**: Four congruent rectangles are arranged to form a square that has side length 19 as shown. What is the perimeter of one of the rectangles?
@@ -40,8 +45,7 @@ Never paste in questions from the official sample papers or other copyrighted bo
     - 57: 3 × 19, counting only three sides.
     - 9.5: half of 19, thinking each rectangle is half the square's width.
   - Choose 4 or 5 of these.
-
-## Used
+- **Changes**: "four identical rectangles", 19 cm; pinwheel redrawn not to scale, rectangle lengths unmarked; options 76, 19, 361, 57, 38 cm (answer E, so not in number order).
 
 ### Follow-up 1: another "turned back" trip, with a diagram (step 2 of 3) → Test 57 Maths Q2
 - **Section**: maths Q2
