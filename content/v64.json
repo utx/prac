@@ -1,0 +1,62 @@
+{
+  "version": 64,
+  "date": "2026-10-28",
+  "reading": "Poem: From a Railway Carriage (Robert Louis Stevenson)",
+  "reading_format": "poem",
+  "reading_topic": "the view from a speeding train: fields, animals, stations and people flashing past, each 'a glimpse and gone forever' (classic poem from A Child's Garden of Verses, 1885, public domain)",
+  "thinking": [
+    "Whose reasoning is correct (certainty / worst case: socks taken from a drawer in the dark; neither is right)",
+    "Rules & codes: a digit code that also writes the word backwards, worked out from two examples",
+    "Two clear cards: one given a quarter turn clockwise and laid on the other, which pattern is seen (stretch)"
+  ],
+  "maths": [
+    "Quick-fire graph reading: column graph with unlabelled lines worth 2, how many more",
+    "3D shapes: straws (edges) and clay balls (vertices) for a pentagonal prism",
+    "Best value: the cheapest way to buy exactly 26 bottles from singles, 6-packs and 10-packs, and the saving (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT3 Q15 (what is compared with what), PT2 Q15-19 (purpose of imagery in a poem)",
+      "PT1 Q15-19 (feelings shown rather than stated in a poem), PT1 Q1-6 (feelings shown, not stated)",
+      "PT1-PT3 Q15-19 (what a group of lines is doing; the purpose of repetition) — stretch"
+    ],
+    "thinking": [
+      "PT2 Q24 (whose reasoning: worst case / certainty), PT3 Q30 (whose reasoning: certainty/worst case)",
+      "PT2 Q15 (letter-shift code), PT3 Q13 (letter values in words), maths PT2 Q35 (product code for letters)",
+      "PT2 Q16 (which way a tile goes), PT3 Q22 (tiles that were rotated), maths PT3 Q1 (quarter turn of a shape) — stretch"
+    ],
+    "maths": [
+      "PT3 Q12 (bar graph: how many more), PT2 Q11 (scale reading with different markings), PT3 Q27 (graph scale)",
+      "PT1 Q14 (hidden faces of a cube model), PT3 Q8 (how many objects from cubes), PT1 Q28 (visible faces of split objects)",
+      "PT1 Q12 (cheapest way to buy a mass: best value), PT1 Q25 (change with coin constraints) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Comparisons & imagery",
+      "Feelings & inference",
+      "Purpose of a detail"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Rules & codes",
+      "Spatial"
+    ],
+    "maths": [
+      "Graphs & data",
+      "Area, perimeter & 3D",
+      "Money & best value"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

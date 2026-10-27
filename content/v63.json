@@ -1,0 +1,62 @@
+{
+  "version": 63,
+  "date": "2026-10-28",
+  "reading": "Four extracts: Lighthouses",
+  "reading_format": "four extracts",
+  "reading_topic": "lighthouses: a memoir of climbing a lighthouse on a family holiday and spotting whales, a factual piece on Cape Byron Lighthouse (first lit December 1901, Australia's most easterly mainland point, most powerful light in Australia, French glass lens, automated 1989, keepers' cottages now holiday rentals), a short story of a keeper's night in a storm watching a ship near the reef, an opinion piece arguing that old lighthouses should be kept now ships use GPS",
+  "thinking": [
+    "Supports the claim (shady trees round the playground so more students play outside in summer)",
+    "Quiz scores table: two missing values in one row, found through another row and a column total",
+    "The same cube in three positions: which symbol is opposite the heart (stretch)"
+  ],
+  "maths": [
+    "Quick-fire scale reading: thermometer with unlabelled marks worth 2 degrees, then the rise in temperature",
+    "Perimeter: four identical rectangles round a square hole in a 19 cm square (competition-style, supplied by David)",
+    "Combinations: meal deals of main, drink and dessert with one pairing not allowed (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1-PT3 Q26-33 (which extract: main idea expressed in different words), PT2 Q26-33 (opinion piece among the extracts)",
+      "PT1 Q1-6 (why the writer includes a detail), PT3 Q26-33 (an idea expressed in completely different words)",
+      "PT1-PT3 Q26-33 ('uses figurative language': spotting a technique and what it suggests), PT1 Q15-19 (what is compared with what) — stretch"
+    ],
+    "thinking": [
+      "PT1 Q2, PT2 Q3, PT3 Q3 (supports the claim), PT2 Q26 (supports the claim)",
+      "PT1 Q19 (marks table), PT2 Q25 (best of two attempts table), PT3 Q7 (packs table + a swap)",
+      "PT1 Q10 (dice nets, opposite faces), PT3 Q28 (dice with unusual opposite sums) — stretch"
+    ],
+    "maths": [
+      "PT3 Q18 (two thermometers, difference), PT2 Q11 (scale reading with different markings), PT1 Q9 (reading a jug scale)",
+      "PT1 Q31 (perimeter change from an added rectangle), PT2 Q17 (same perimeter), PT2 Q35 (competition-style); supplied by David",
+      "PT2 Q10 (combinations: shapes × colours), PT2 Q28 (round-robin matches), PT1 Q35 (combinations) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Main idea",
+      "Purpose of a detail",
+      "Comparisons & imagery"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Measurement & scales",
+      "Area, perimeter & 3D",
+      "Chance & counting"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
