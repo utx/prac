@@ -1,0 +1,62 @@
+{
+  "version": 62,
+  "date": "2026-10-28",
+  "reading": "Missing sentences: Fathers on the Ice",
+  "reading_format": "missing sentences",
+  "reading_topic": "emperor penguins surviving the Antarctic winter: walking inland across the sea ice while other animals leave, the female laying one egg in May or early June and going to sea, the father keeping the egg on his feet under a flap of skin for about two months without eating, huddling and taking turns at the windy edge, the mother returning around hatching (July or August), the father having fasted about four months and lost almost half his weight",
+  "thinking": [
+    "Spot the mistake (an unfair comparison: two brands of sunflower seeds grown in sun and in shade)",
+    "Must be true: three balance scales, the heaviest parcel is one of two",
+    "Cube model: how many more cubes to complete a 3 × 3 × 3 cube, counting hidden cubes stack by stack (stretch)"
+  ],
+  "maths": [
+    "Quick-fire mass: 2 kg of flour minus 350 g and 475 g, answer in kg and g",
+    "Fractions: one third of a collection, then three eighths of what is left",
+    "Rates: a faster machine catching up with one that started 5 minutes earlier (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1-PT3 Q20-25 (missing sentences: contrast clue 'however' and a reference word 'they' that needs a name to point back to)",
+      "PT1-PT3 Q20-25 (missing sentences: elaboration that gives the reason for the sentence before; reference word 'it')",
+      "PT1-PT3 Q20-25 (missing sentences: a sentence that explains why a detail matters), PT1-PT3 Q1-6 (why the writer includes a detail) — stretch"
+    ],
+    "thinking": [
+      "PT3 Q18 (mistake: unfair comparison of win fractions), PT2 Q21 (mistake: unfair comparison of totals)",
+      "PT1 Q11 (must be true from a rule), PT2 Q9 (cannot be true: heights on steps), Maths PT3 Q2 (balancing scales)",
+      "PT1 Q14 (hidden faces of a cube model), PT2 Q28 (layers of a pyramid), Maths PT3 Q8 (how many objects from cubes) — stretch"
+    ],
+    "maths": [
+      "PT2 Q13 (grams to half a kilogram), PT2 Q25 (splitting combined masses)",
+      "PT1 Q20 (fractions of pocket money spent), PT2 Q6 (fraction of a cake after sharing)",
+      "PT3 Q32 (two people working together: rates), PT1 Q23 (proportional feeding) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Sentence links",
+      "Sentence links",
+      "Purpose of a detail"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Must or cannot be true",
+      "Spatial"
+    ],
+    "maths": [
+      "Measurement & scales",
+      "Fractions",
+      "Rates"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
