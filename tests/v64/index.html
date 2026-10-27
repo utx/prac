@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Test 64</title>
+<style>
+  :root {
+    --ink: #1b2a41;
+    --ink-soft: #55627a;
+    --line: #d8dde6;
+    --paper: #ffffff;
+    --field: #f3f5f8;
+    --pitch: #2e7d4f;
+    --pitch-deep: #23603c;
+    --correct: #1e8e5a;
+    --wrong: #c43d3d;
+    --correct-bg: #e6f5ec;
+    --wrong-bg: #fbe9e9;
+    --amber: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--field); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+
+  header {
+    background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 5;
+  }
+  .bar { max-width: 960px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+  .bar .title { font-weight: 600; }
+  .bar a.home { color: #fff; opacity: .85; text-decoration: none; font-size: .9em; border: 1px solid rgba(255,255,255,.4); border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+  .bar a.home:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .bar .section-name { color: #c6d0e0; }
+  .bar .spacer { flex: 1; }
+  .bar .admin-badge { display: none; background: #f2c14e; color: #1b2a41; font-size: 13px; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  body.admin .bar .admin-badge { display: inline-block; }
+  @media (max-width: 760px) { .bar { flex-wrap: wrap; gap: 6px 14px; padding: 10px 16px; } }
+  .done-note { background: var(--correct-bg); color: var(--correct); border-radius: 6px; padding: 10px 14px; margin: 0 0 18px; font-weight: 600; }
+
+  main { max-width: 960px; margin: 28px auto 80px; padding: 0 24px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 32px 40px; }
+  h1 { font-size: 28px; margin: 0 0 6px; font-weight: 700; }
+  h2 { font-size: 22px; margin: 0 0 16px; font-weight: 700; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; }
+
+  .instructions ol { padding-left: 22px; }
+  .instructions li { margin-bottom: 6px; }
+  .plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .plan div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .plan strong { display: block; margin-bottom: 4px; }
+  .plan span { color: var(--ink-soft); font-size: 15px; }
+
+  button.primary, a.primary {
+    display: inline-block; text-decoration: none;
+    background: var(--pitch); color: #fff; border: 0; border-radius: 6px; font-size: 17px; font-weight: 600;
+    padding: 12px 26px; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover, a.primary:hover { background: var(--pitch-deep); }
+  button.primary:focus-visible, .option:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  /* passage + questions */
+  .two-col { display: grid; grid-template-columns: 5fr 6fr; gap: 40px; align-items: start; }
+  .passage { position: sticky; top: 76px; }
+  .passage-note { margin: 0 0 14px; font-style: italic; color: var(--ink-soft); }
+
+  .question { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .question:last-of-type { border-bottom: 0; }
+  .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+  .qnum { font-weight: 700; min-width: 26px; }
+  .stem { margin: 0; }
+  .stem em.speaker { font-style: normal; font-weight: 600; }
+  .stem .facts { margin: 8px 0 0 0; padding-left: 20px; }
+  .stem .facts li { margin: 2px 0; }
+  .stem .quote { margin: 10px 0 0 0; padding: 10px 14px; background: var(--field); border-left: 3px solid var(--line); border-radius: 0 4px 4px 0; }
+  .options { display: grid; gap: 8px; margin: 14px 0 0 38px; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    cursor: pointer; font: inherit; color: inherit;
+  }
+  .option:hover { border-color: var(--ink-soft); }
+  .option .letter { flex: 0 0 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .option.selected { border-color: var(--ink); background: #eef2f8; }
+  .option.selected .letter { background: var(--ink); color: #fff; }
+
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .submit-row .status { color: var(--ink-soft); font-size: 15px; }
+
+
+  /* prose passage */
+  .prose { font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.6; }
+  .prose h3 { font-family: inherit; font-size: 22px; margin: 0 0 14px; font-weight: 700; }
+  .prose p { margin: 0 0 12px; }
+  .passage { max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+
+
+  /* poem passage */
+  .poem { font-size: 17px; line-height: 1.6; }
+  .poem .stanza { margin: 0 0 18px; position: relative; padding-left: 32px; }
+  .poem .stanza .vn { position: absolute; left: 0; top: 1px; font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; color: var(--ink-soft); }
+  .poem .stanza .line { display: block; }
+
+
+
+  /* letter-only options and shared option lists */
+  .options.letters { grid-template-columns: repeat(5, 54px); gap: 10px; }
+  .options.letters .option { justify-content: center; padding: 9px; }
+  .choice-list { border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 0 0 26px; }
+  .choice-list ol { list-style: none; margin: 0; padding: 0; }
+  .choice-list li { display: flex; gap: 12px; margin-bottom: 8px; }
+  .choice-list li:last-child { margin-bottom: 0; }
+  .choice-list .letter { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+
+
+  /* multi-extract passage */
+  .extract { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
+  .extract h4 { font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; margin: 0 0 6px; letter-spacing: .02em; }
+  .extract p { margin: 0; font-size: 16px; line-height: 1.55; }
+  .options.letters.four { grid-template-columns: repeat(4, 54px); }
+
+  /* cloze gaps */
+  .gap { color: var(--ink-soft); }
+  .gap.filled { color: var(--ink); font-weight: 600; background: #eef2f8; box-shadow: inset 0 -2px 0 var(--pitch); }
+  .gap.filled.correct { color: var(--correct); background: var(--correct-bg); box-shadow: inset 0 -2px 0 var(--correct); }
+
+  /* data tables inside stems */
+  table.grid { border-collapse: collapse; margin: 10px 0 0; font-size: 16px; }
+  table.grid th, table.grid td { border: 1px solid var(--ink); padding: 5px 14px; text-align: left; }
+  table.grid th { background: var(--field); font-weight: 600; }
+
+  /* visual (picture) options */
+  .options.visual { grid-template-columns: repeat(auto-fit, minmax(0, max-content)); gap: 14px; }
+  .options.visual .option { flex-direction: column; align-items: center; gap: 8px; padding: 10px; }
+  .options.visual .option .letter { flex: none; width: 28px; height: 28px; }
+  .options.visual .option svg { display: block; }
+  @media (max-width: 760px) { .options.visual { grid-template-columns: repeat(2, max-content); } }
+
+
+  /* v7 additions */
+  .stem .note { margin: 0 0 8px; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .stem ol.statements { margin: 10px 0 0; padding-left: 26px; }
+  .stem ol.statements li { margin: 4px 0; padding-left: 4px; }
+  .figure { margin: 12px 0; }
+  .figure svg { display: block; max-width: 100%; height: auto; }
+  .option svg { display: block; max-width: 100%; height: auto; }
+  .option:has(svg) { align-items: center; }
+  .digit-cards { display: flex; gap: 22px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .digit-card { width: 80px; height: 106px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fdf3e1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .digit-card span { font-size: 56px; font-weight: 700; line-height: 1; }
+  .digit-card small { font-size: 12px; margin-top: 6px; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  @media (max-width: 760px) { table.grid th, table.grid td { padding: 4px 8px; font-size: 14px; } }
+  .poem .stanza .line { padding-left: 1.2em; text-indent: -1.2em; }
+  .tags { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .tag { border: 1.5px solid var(--ink); border-radius: 8px 22px 22px 8px; padding: 8px 22px 8px 14px; background: #fdf3e1;
+    display: flex; flex-direction: column; min-width: 96px; }
+  .tag small { font-size: 13px; color: var(--ink-soft); }
+  .tag span { font-size: 22px; font-weight: 700; }
+  .hrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px; margin: 14px 0 16px; }
+  .hnum { display: inline-flex; gap: 3px; }
+  .hnum .dig, .hnum .hid { width: 30px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--ink); border-radius: 5px; font-size: 22px; font-weight: 700; background: #fff; }
+  .hnum .hid { background: var(--ink); color: #fff; font-size: 18px; }
+  .hnum .hid.sq { color: #f2c14e; }
+  .hnum .hid.tri { color: #8fd3c7; }
+  .explain .skill { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  /* review */
+  .result-line { display: flex; gap: 10px; align-items: center; font-weight: 600; margin-bottom: 10px; }
+  .badge { padding: 2px 10px; border-radius: 4px; font-size: 14px; }
+  .badge.ok { background: var(--correct-bg); color: var(--correct); }
+  .badge.no { background: var(--wrong-bg); color: var(--wrong); }
+  .option.is-correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option.is-correct .letter { border-color: var(--correct); background: var(--correct); color: #fff; }
+  .option.is-wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .option.is-wrong .letter { border-color: var(--wrong); background: var(--wrong); color: #fff; }
+  .option[disabled] { cursor: default; }
+  .explain { margin: 14px 0 0 38px; padding: 14px 16px; background: var(--field); border-radius: 6px; font-size: 16px; }
+  .explain p { margin: 0 0 8px; }
+  .explain p:last-child { margin: 0; }
+  .explain .why-not { color: var(--ink-soft); }
+
+  /* question feedback (practice mode only) */
+  .review-box { margin: 12px 0 0 38px; padding: 12px 16px; border: 1.5px dashed #c9a227; border-radius: 6px; background: #fffaf0; font-size: 15px; }
+  .review-box .rv-head { font-weight: 700; margin: 0 0 6px; }
+  .review-box ul { margin: 0 0 10px; padding-left: 18px; }
+  .review-box li { margin: 0 0 4px; overflow-wrap: anywhere; }
+  .review-box li.done { color: var(--correct); }
+  .review-box .rv-actions, .review-box .rv-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+  .review-box button { font: inherit; font-size: 15px; padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; }
+  .review-box button.rv-approve { border-color: var(--correct); color: var(--correct); }
+  .review-box button.rv-redo, .review-box button.rv-send { border-color: var(--wrong); color: var(--wrong); }
+  .review-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 8px; border: 1.5px solid var(--line); border-radius: 6px; }
+  .review-box .rv-msg { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+  .review-box .rv-diff { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 0; font-size: 14px; }
+  .review-box .rv-diff span { color: var(--ink-soft); margin-right: 2px; }
+  .review-box button.rv-chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; border-color: var(--line); }
+  .review-box button.rv-chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .review-box .rv-form { margin-top: 10px; }
+  .review-box .rv-chosen { margin: 0; width: 100%; font-weight: 600; }
+  .review-box .rv-msg:empty, .review-box .rv-form[hidden], .review-box [hidden] { display: none; }
+  @media (max-width: 760px) { .review-box { margin-left: 0; } }
+
+  .section-score { font-size: 18px; margin: 0 0 24px; }
+  .section-score b { font-size: 26px; }
+
+  /* final */
+  .final-score { text-align: center; padding: 20px 0 10px; }
+  .final-score .big { font-size: 64px; font-weight: 700; line-height: 1; }
+  .final-score .of { color: var(--ink-soft); font-size: 20px; }
+  .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0 30px; }
+  .breakdown div { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .breakdown strong { display: block; font-size: 24px; }
+  .breakdown span { color: var(--ink-soft); font-size: 15px; }
+  .verdict { margin: 0 0 24px; }
+  .center { text-align: center; }
+
+  @media (max-width: 760px) {
+    .two-col { grid-template-columns: 1fr; }
+    .passage { position: static; }
+    .plan, .breakdown { grid-template-columns: 1fr; }
+    .sheet { padding: 22px; }
+    .options, .explain { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .option { transition: background .12s, border-color .12s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">Practice Test 64</span>
+    <span class="section-name" id="hdr-section"></span>
+    <span class="spacer"></span>
+    <span class="admin-badge">Admin · not recorded</span>
+    <a class="home" id="home-link" href="../../index.html">All tests</a>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------------------------------------------------------------
+   TEST CONTENT — Practice Test 64
+   --------------------------------------------------------------- */
+
+let passMode = "answer";
+const INK = "#1b2a41";
+
+/* ---- Reading: poem (public domain: Robert Louis Stevenson, 1850–1894) ----
+   "From a Railway Carriage", A Child's Garden of Verses (1885). Text extracted
+   programmatically from Project Gutenberg eBook #136 (GitHub mirror). No changes. */
+const STANZAS = [
+  [
+    "Faster than fairies, faster than witches,",
+    "Bridges and houses, hedges and ditches;",
+    "And charging along like troops in a battle",
+    "All through the meadows the horses and cattle:",
+    "All of the sights of the hill and the plain",
+    "Fly as thick as driving rain;",
+    "And ever again, in the wink of an eye,",
+    "Painted stations whistle by."
+  ],
+  [
+    "Here is a child who clambers and scrambles,",
+    "All by himself and gathering brambles;",
+    "Here is a tramp who stands and gazes;",
+    "And here is the green for stringing the daisies!",
+    "Here is a cart run away in the road",
+    "Lumping along with man and load;",
+    "And here is a mill, and there is a river:",
+    "Each a glimpse and gone forever!"
+  ]
+];
+const PASSAGE = {
+  title: "From a Railway Carriage",
+  note: "Read the poem below by Robert Louis Stevenson (from <i>A Child’s Garden of Verses</i>, 1885), then answer the questions. The numbers show the verses. <i>troops</i>: soldiers; <i>driving rain</i>: rain blown hard by the wind; <i>clambers</i>: climbs using hands and feet; <i>brambles</i>: prickly bushes such as blackberries; <i>tramp</i>: a homeless person who travels about on foot; <i>green</i>: a grassy field in a village; <i>stringing the daisies</i>: making daisy chains; <i>lumping</i>: moving heavily and clumsily; <i>mill</i>: a building where grain is ground into flour.",
+  html: `<div class="poem">${STANZAS.map((s, i) => `<div class="stanza"><span class="vn">${i + 1}</span>${s.map(l => `<span class="line">${l}</span>`).join("")}</div>`).join("")}</div>`
+};
+
+/* ---- Thinking Skills Q3: clear cards with painted squares ---- */
+const CARD1 = ["#..", ".#.", ".#."];
+const CARD2 = [".##", "...", "..#"];
+const cardSvg = (rows, label, c = 30) => {
+  const o = 4, W = 3 * c + 2 * o;
+  let g = "";
+  rows.forEach((row, r) => [...row].forEach((ch, k) => {
+    g += `<rect x="${o + k * c}" y="${o + r * c}" width="${c}" height="${c}" fill="${ch === "#" ? INK : "#eef6fb"}" stroke="#7d8da3" stroke-width="1.2"/>`;
+  }));
+  g += `<rect x="${o}" y="${o}" width="${3 * c}" height="${3 * c}" fill="none" stroke="${INK}" stroke-width="2.4"/>`;
+  return `<svg viewBox="0 0 ${W} ${W}" width="${W}" height="${W}" role="img" aria-label="${label}: a 3 by 3 grid; rows from top to bottom, # painted black, . clear: ${rows.join(" / ")}">${g}</svg>`;
+};
+const CARDS_ROW = `<div style="display:flex;flex-wrap:wrap;gap:12px 36px;justify-content:center">
+  <figure style="margin:0;text-align:center">${cardSvg(CARD1, "Card 1", 36)}<figcaption style="font-size:14px">Card 1</figcaption></figure>
+  <figure style="margin:0;text-align:center">${cardSvg(CARD2, "Card 2", 36)}<figcaption style="font-size:14px">Card 2</figcaption></figure>
+</div>`;
+const CARD_OPTS = [
+  ["###", ".#.", ".##"],   // card 2 not turned
+  ["#.#", "##.", ".#."],   // turned anticlockwise
+  ["#..", ".##", "###"],   // correct: turned clockwise
+  ["##.", ".#.", "##."]    // card 2 flipped over instead of turned
+].map((rows, i) => cardSvg(rows, `Picture ${"ABCD"[i]}`));
+
+/* ---- Maths Q1: column graph with unlabelled lines ---- */
+const LAPS = [["Ana", 14], ["Ben", 22], ["Cy", 8], ["Dee", 18]];
+const LAPS_SVG = (() => {
+  const x0 = 50, y0 = 236, h = 210, max = 30, bw = 42, gap = 26;
+  const Y = v => y0 - (v / max) * h, right = x0 + 4 * (bw + gap) + 10;
+  let g = "";
+  for (let v = 0; v <= max; v += 2) {
+    const big = v % 10 === 0;
+    g += `<line x1="${x0}" y1="${Y(v)}" x2="${right}" y2="${Y(v)}" stroke="${big ? "#9aa7b8" : "#dde2ea"}" stroke-width="1"/>`;
+    if (big) g += `<text x="${x0 - 8}" y="${Y(v) + 5}" font-size="14" text-anchor="end" fill="${INK}">${v}</text>`;
+  }
+  LAPS.forEach(([name, v], i) => {
+    const x = x0 + 16 + i * (bw + gap);
+    g += `<rect x="${x}" y="${Y(v)}" width="${bw}" height="${y0 - Y(v)}" fill="#6f9fcf" stroke="${INK}" stroke-width="1.5"/>
+          <text x="${x + bw / 2}" y="${y0 + 20}" font-size="14" text-anchor="middle" fill="${INK}">${name}</text>`;
+  });
+  g += `<line x1="${x0}" y1="${Y(max) - 6}" x2="${x0}" y2="${y0}" stroke="${INK}" stroke-width="2"/>
+        <line x1="${x0}" y1="${y0}" x2="${right}" y2="${y0}" stroke="${INK}" stroke-width="2"/>
+        <text x="15" y="${(Y(max) + y0) / 2}" font-size="13" text-anchor="middle" fill="${INK}" transform="rotate(-90 15 ${(Y(max) + y0) / 2})">number of laps</text>`;
+  return `<svg viewBox="0 0 ${right + 8} ${y0 + 30}" width="${right + 8}" height="${y0 + 30}" style="max-width:100%;height:auto" role="img" aria-label="Column graph of laps swum by four children. The scale is labelled 0, 10, 20 and 30, with four unlabelled lines between each pair of labels. Ana reaches the second line above 10. Ben reaches the first line above 20. Cy reaches the fourth line above 0. Dee reaches the fourth line above 10.">${g}</svg>`;
+})();
+
+/* ---- Maths Q2: pentagonal prism (solid; hidden edges not shown) ---- */
+const PRISM_SVG = (() => {
+  const cx = 92, cy = 150, R = 72, o = [92, -56];
+  const front = [...Array(5)].map((_, i) => { const a = -Math.PI / 2 + i * 2 * Math.PI / 5; return [cx + R * Math.cos(a), cy + R * Math.sin(a)]; });
+  const back = front.map(([x, y]) => [x + o[0], y + o[1]]);
+  const f = pts => pts.map(p => p.map(v => v.toFixed(1)).join(",")).join(" ");
+  let g = "";
+  for (let i = 0; i < 5; i++) {
+    const j = (i + 1) % 5, mx = (front[i][0] + front[j][0]) / 2 - cx, my = (front[i][1] + front[j][1]) / 2 - cy;
+    if (mx * o[0] + my * o[1] > 0) g += `<polygon points="${f([front[i], front[j], back[j], back[i]])}" fill="${i % 2 ? "#cfe0f2" : "#b4cde8"}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`;
+  }
+  g += `<polygon points="${f(front)}" fill="#e6f0fa" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`;
+  return `<svg viewBox="0 0 270 236" width="270" height="236" role="img" aria-label="A solid prism whose two ends are pentagons (5-sided shapes). The front pentagon faces you, and the prism stretches back and to the right, so you can see the front end and some of the rectangular side faces. The hidden edges at the back are not drawn.">${g}</svg>`;
+})();
+
+const SECTIONS = [
+  {
+    id: "reading",
+    name: "Reading",
+    passage: PASSAGE,
+    intro: "Read the poem, then choose the best answer (A, B, C or D) for each question.",
+    questions: [
+      {
+        stem: "In verse 1, the horses and cattle are “charging along like troops in a battle”. What does this comparison mainly suggest?",
+        options: ["From the speeding train, the animals seem to rush past, though really it is the train that moves.",
+                  "The horses and cattle were frightened by the loud noise of the train and stampeded across the meadows.",
+                  "The horses and cattle were fighting one another for space in the crowded meadows beside the line.",
+                  "Soldiers on horseback were riding through the fields close beside the railway line."],
+        answer: 0,
+        skill: "interpreting a comparison (imagery) in a poem",
+        explain: `<p>Troops charging in a battle rush forward at great speed. But the horses and cattle are in the meadows, probably standing still and grazing: it is the speaker, in the train, who is moving fast. From the carriage window, though, they seem to rush past, just as the “Bridges and houses, hedges and ditches” do and the “Painted stations whistle by”. The comparison shows how fast the train is going by making everything outside seem to charge past it.</p>
+                  <p class="why-not">B is the trap: it explains the charging by inventing a reason (the animals were frightened by the train), but the poem never says the animals move at all. Stations don’t really whistle by either: it is all how things look from the train. C takes the word “battle” literally, as if the animals were fighting. D takes “troops” literally, as if there were real soldiers; the comparison only says the animals are <em>like</em> troops.</p>`
+      },
+      {
+        stem: "Read this line from verse 2: “And here is the green for stringing the daisies!” What does it suggest about the speaker?",
+        options: ["He is sad because he is not allowed to get off the train and play there.",
+                  "He remembers a day when he made daisy chains on that very green.",
+                  "He spots a perfect place to play and is delighted by it for a moment.",
+                  "He is bored with the view and wishes the train would go even faster."],
+        answer: 2,
+        skill: "working out feelings shown rather than stated",
+        explain: `<p>The speaker doesn’t say how he feels, but the line shows it. He calls it “the green for stringing the daisies”, as if this patch of grass were made for making daisy chains, which is just what a child would love to do. The exclamation mark shows his excitement. But the very next line moves straight on to a cart, because the train has already carried him past: “Each a glimpse and gone forever!” So he is delighted by the green, but only for a moment.</p>
+                  <p class="why-not">A is the trap: the green does disappear at once, and it is easy to imagine a child being disappointed. But nothing in the poem says he is sad or wants to get off; the exclamation mark shows excitement, and he is just as excited by the next sight. B adds something the poem never mentions: there is no sign he has been there before. D is the opposite of the poem’s mood: everything flashes past “in the wink of an eye”, and he is eager to point out each new sight.</p>`
+      },
+      {
+        stem: "In verse 2, the poet lists one sight after another: a child, a tramp, a green, a cart, a mill and a river. Why does he list them in this way?",
+        options: ["To show how many different kinds of people and places there are in the country.",
+                  "To make us feel the speed of the train without describing the train at all.",
+                  "To show that the speaker is trying hard to remember every sight he passes.",
+                  "To show that the speaker wishes the train would stop so he could join in."],
+        answer: 1,
+        skill: "understanding why a writer includes a detail (the effect of a list)",
+        explain: `<p>Verse 2 never mentions the train, but we feel its speed. Each sight gets only a line or two, and many lines begin “Here is …” or “And here is …”, as if the speaker were pointing at each one as it flashes past the window. Before we can think about the tramp, we are at the green; before we can think about the green, a cart is lumping along the road. The quick change from one sight to the next is how fast the train is going, as the last line says: “Each a glimpse and gone forever!”</p>
+                  <p class="why-not">A is the trap: the list really does include different people and places (a child, a tramp, a man with a cart, a mill, a river), but the poem is not about how varied the countryside is; each one is only a glimpse from a speeding train. C picks up on “gone forever”, but the speaker never tries to remember anything; he is excited by each new sight and lets it go. D picks up on the child gathering brambles and the green for daisy chains, but the speaker never says he wants to stop; the exclamation marks show he is enjoying the ride.</p>`
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    name: "Thinking Skills",
+    intro: "Choose the one correct answer (A, B, C or D).",
+    questions: [
+      {
+        stem: `<p class="quote" style="margin-top:0">Jack’s drawer holds 12 loose socks: <b>6 black</b>, <b>4 grey</b> and <b>2 white</b>. It is dark, so he takes socks out without being able to see their colours.</p>
+               <p class="quote"><em class="speaker">Mia:</em> “If Jack takes out 3 socks, he can be sure that at least two of them are the same colour.”</p>
+               <p class="quote"><em class="speaker">Leo:</em> “If Jack takes out 10 socks, he can be sure that at least two of them are white.”</p>
+               <p style="margin:10px 0 0">If the information in the first box is true, whose reasoning is correct?</p>`,
+        options: ["Mia only", "Leo only", "Both Mia and Leo", "Neither of them"],
+        answer: 3,
+        skill: "deciding whose reasoning is correct (certainty: thinking about the worst case)",
+        explain: `<p>“Sure” means it must happen even if Jack is as unlucky as possible. So check the <b>worst case</b> for each person.</p>
+                  <p><b>Mia:</b> the unluckiest 3 socks are one of each colour: black, grey and white. Then no two are the same colour, so 3 socks are not enough to be sure (it takes 4). Mia is wrong.</p>
+                  <p><b>Leo:</b> the unluckiest start is every sock that is <em>not</em> white: 6 black + 4 grey = 10 socks, with no white at all. To be sure of two white socks, Jack must take all 12. Leo is wrong.</p>
+                  <p>Neither is correct, so the answer is <b>D</b>.</p>
+                  <p class="why-not">C (both) is the trap: Mia’s 3 matches the 3 colours, and Leo’s 10 is exactly the number of socks that aren’t white, so both sound right. But 3 socks can be one of each colour, and after the 10 non-white socks Jack still needs 2 more. A (Mia only) and B (Leo only) each fall for one of those two traps.</p>`
+      },
+      {
+        stem: `In a secret code, each letter is always changed into the same digit, and the code follows one more rule.
+               <div class="table-wrap"><table class="grid">
+                 <tr><th>Word</th><th style="text-align:center">Code</th></tr>
+                 <tr><td>BEAT</td><td style="text-align:center">2 4 9 6</td></tr>
+                 <tr><td>TUBE</td><td style="text-align:center">9 6 8 2</td></tr>
+               </table></div>
+               <p style="margin:10px 0 0">What is the code for <b>TUBA</b>?</p>`,
+        options: ["2 8 6 4", "4 6 8 2", "4 8 6 2", "2 6 8 4"],
+        answer: 1,
+        skill: "working out a code with an extra rule from two examples",
+        explain: `<p><b>Step 1: try reading the codes forwards.</b> BEAT would give T = 6, but TUBE would give T = 9. A letter always has the same digit, so the codes can’t be read forwards.</p>
+                  <p><b>Step 2: try the codes backwards.</b> BEAT backwards is T A E B → 2 4 9 6, so T = 2, A = 4, E = 9, B = 6. TUBE backwards is E B U T → 9 6 8 2: E = 9 ✓, B = 6 ✓, U = 8, T = 2 ✓. Everything fits, so the extra rule is that the word is written <b>backwards</b>.</p>
+                  <p><b>Step 3:</b> TUBA backwards is A B U T → <b>4 6 8 2</b>.</p>
+                  <p class="why-not">2 8 6 4 (A) is the trap: it has the right digit for every letter but forgets the extra rule, so the word isn’t written backwards. 4 8 6 2 (C) writes the word backwards but mixes up U and B, whose digits 6 and 8 sit side by side in TUBE’s code. 2 6 8 4 (D) makes both mistakes.</p>`
+      },
+      {
+        stem: `These two cards are made of clear plastic, with some squares painted black.
+               <div class="figure">${CARDS_ROW}</div>
+               <p style="margin:10px 0 0">Card 2 is given a <b>quarter turn clockwise</b> and then laid exactly on top of card 1. Which picture shows what you see?</p>`,
+        visualOptions: true,
+        options: CARD_OPTS,
+        answer: 2,
+        skill: "turning a pattern a quarter turn and combining it with another",
+        explain: `<p><b>Step 1: turn card 2 a quarter turn clockwise.</b> The top row turns to become the right-hand column (read from top to bottom), and the bottom-right corner moves to the bottom-left corner. So card 2’s squares at the top-middle and top-right move to the middle-right and bottom-right, and its bottom-right square moves to the bottom-left.</p>
+                  <p><b>Step 2: lay it on card 1.</b> Card 1 has the top-left, the centre and the bottom-middle. Together you see the top-left, the centre and middle-right, and the whole bottom row. That is picture <b>C</b>.</p>
+                  <p class="why-not">A is the trap: it lays card 2 on top without turning it. B turns card 2 anticlockwise instead of clockwise. D flips card 2 over like a page instead of turning it, so its pattern becomes a mirror image.</p>`
+      }
+    ]
+  },
+  {
+    id: "maths",
+    name: "Mathematical Reasoning",
+    intro: "Choose the one correct answer (A, B, C, D or E). No calculators.",
+    questions: [
+      {
+        stem: `The graph shows how many laps four children swam.
+               <div class="figure">${LAPS_SVG}</div>
+               <p style="margin:10px 0 0">How many more laps did Ben swim than Cy?</p>`,
+        options: ["7", "8", "14", "17", "30"],
+        answer: 2,
+        skill: "reading a column graph with unlabelled lines",
+        explain: `<p>From 0 to 10 there are 5 equal steps (4 unlabelled lines in between), so each line is worth 10 ÷ 5 = <b>2 laps</b>.</p>
+                  <p>Ben reaches the first line above 20: 20 + 2 = <b>22</b>. Cy reaches the fourth line above 0: 4 × 2 = <b>8</b>. So Ben swam 22 − 8 = <b>14</b> more laps.</p>
+                  <p class="why-not">17 (D) is the trap: it counts each line as 1 lap, so Ben looks like 21 and Cy like 4. 7 (A) counts the 7 lines between the tops of the two columns but forgets that each line is worth 2. 8 (B) is how many laps Cy swam, not how many more Ben swam. 30 (E) adds the two children’s laps instead of finding the difference.</p>`
+      },
+      {
+        stem: `Mia wants to build a skeleton model of this prism. She will use a straw for each edge and a small ball of modelling clay for each corner (vertex). Both ends of the prism are pentagons (5-sided shapes).
+               <div class="figure">${PRISM_SVG}</div>
+               <p style="margin:10px 0 0">How many straws and balls of clay will she need altogether?</p>`,
+        options: ["25", "30", "32", "40", "45"],
+        answer: 0,
+        skill: "3D shapes: edges and vertices of a prism, including the hidden ones",
+        explain: `<p><b>Straws (edges):</b> 5 round the front pentagon, 5 round the back pentagon and 5 joining the front to the back: 5 + 5 + 5 = <b>15</b>.</p>
+                  <p><b>Clay balls (corners):</b> 5 at the front and 5 at the back: <b>10</b>.</p>
+                  <p>Altogether 15 + 10 = <b>25</b>.</p>
+                  <p class="why-not">30 (B) is the trap: it counts the edges joining front and back once for each rectangle beside them, but each of those edges is shared by two rectangles, so it is only one straw. 40 (D) counts the edges face by face (5 + 5 + 5 × 4 = 30 straws), so every edge is counted twice. 45 (E) gives every straw its own ball at each end (30 balls), but each corner joins three straws. 32 (C) adds the 7 faces too, though faces don’t need straws or clay.</p>`
+      },
+      {
+        stem: `Coach Lee needs exactly 26 bottles of water for sports day. The shop sells water like this:
+               <div class="table-wrap"><table class="grid">
+                 <tr><th>single bottle</th><td style="text-align:center">$2</td></tr>
+                 <tr><th>pack of 6 bottles</th><td style="text-align:center">$9</td></tr>
+                 <tr><th>pack of 10 bottles</th><td style="text-align:center">$16</td></tr>
+               </table></div>
+               <p style="margin:10px 0 0">She buys exactly 26 bottles in the cheapest possible way. How much less does she pay than she would pay for 26 single bottles?</p>`,
+        options: ["$7", "$8", "$10", "$11", "$12"],
+        answer: 4,
+        skill: "best value: comparing price per item and making an exact number",
+        explain: `<p><b>Step 1: price per bottle.</b> Single: $2. Pack of 6: $9 ÷ 6 = <b>$1.50</b>. Pack of 10: $16 ÷ 10 = $1.60. The pack of 6 is the best value, even though the pack of 10 is bigger.</p>
+                  <p><b>Step 2: make 26 with as many packs of 6 as possible.</b> 4 packs of 6 = 24 bottles for $36, and 2 single bottles for $4: <b>$40</b>. (Every other way costs more, for example 10 + 10 + 6 costs $41, and 10 + 6 + 6 + 4 singles costs $42.)</p>
+                  <p><b>Step 3:</b> 26 single bottles cost 26 × $2 = $52, so she pays $52 − $40 = <b>$12</b> less.</p>
+                  <p class="why-not">$11 (D) is the trap: it uses the biggest packs first (two packs of 10 and a pack of 6, $41), but the pack of 10 costs more per bottle. $8 (B) buys two packs of 10 and 6 single bottles ($44). $10 (C) buys one pack of 10, two packs of 6 and 4 single bottles ($42). $7 (A) buys 5 packs of 6 ($45), which is 30 bottles, not exactly 26.</p>`
+      }
+    ]
+  }
+];
+
+const TEST_META = {"version": 64, "reading_format": "poem", "categories": {"reading": ["Comparisons & imagery", "Feelings & inference", "Purpose of a detail"], "thinking": ["Whose reasoning", "Rules & codes", "Spatial"], "maths": ["Graphs & data", "Area, perimeter & 3D", "Money & best value"]}, "stretch": {"reading": [2], "thinking": [2], "maths": [2]}, "status": "published"};
+const SYNC_CONFIG = {"supabase_url": "https://cmqnjheeeedyhzpylsxn.supabase.co", "supabase_publishable_key": "sb_publishable_tcZeQ_NcvsLzqsMnLSunDw_If5geLf8"};
+/* ---- online progress sync (Supabase). Injected into every page by tools/build.py ----
+   SYNC_CONFIG comes from tools/site_config.json. With no URL/key set, everything here
+   is a no-op and the site works from browser storage alone. Events that can't be sent
+   (offline, server down) wait in localStorage and are retried on the next page load. */
+const SYNC_OUTBOX = "prac.outbox";
+// Automated test browsers (Playwright sets navigator.webdriver) never touch the real database.
+const syncOn = () => !!(SYNC_CONFIG.supabase_url && SYNC_CONFIG.supabase_publishable_key)
+  && !(typeof navigator !== "undefined" && navigator.webdriver);
+function syncHeaders() {
+  const k = SYNC_CONFIG.supabase_publishable_key;
+  const h = { "apikey": k, "Content-Type": "application/json" };
+  if (/^eyJ/.test(k)) h["Authorization"] = "Bearer " + k; // legacy anon JWT keys
+  return h;
+}
+function syncReadOutbox() { try { return JSON.parse(localStorage.getItem(SYNC_OUTBOX)) || []; } catch (e) { return []; } }
+function syncWriteOutbox(q) { try { localStorage.setItem(SYNC_OUTBOX, JSON.stringify(q.slice(-500))); } catch (e) {} }
+async function syncSend(rows) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/events", {
+    method: "POST", headers: Object.assign(syncHeaders(), { "Prefer": "return=minimal" }),
+    body: JSON.stringify(rows), keepalive: true
+  });
+  if (!r.ok) throw new Error("sync " + r.status);
+}
+let syncBusy = false, syncAgain = false;
+async function syncFlush() {
+  if (!syncOn()) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try {
+    do {
+      syncAgain = false;
+      const q = syncReadOutbox();
+      if (!q.length) break;
+      await syncSend(q);
+      syncWriteOutbox(syncReadOutbox().slice(q.length)); // keep anything added while sending
+    } while (syncAgain);
+  } catch (e) { /* offline or server error: rows stay queued */ }
+  finally { syncBusy = false; }
+}
+function syncPost(kind, version, attemptId, payload) {
+  if (!syncOn()) return;
+  const row = { kind, version: Number(version), attempt_id: attemptId || null, payload: payload || {}, at: new Date().toISOString() };
+  syncWriteOutbox(syncReadOutbox().concat([row]));
+  syncFlush();
+}
+async function syncRpc(name, args) {
+  const r = await fetch(SYNC_CONFIG.supabase_url.replace(/\/+$/, "").replace(/\/rest\/v1$/, "") + "/rest/v1/rpc/" + name, {
+    method: "POST", headers: syncHeaders(), body: JSON.stringify(args || {})
+  });
+  if (!r.ok) throw new Error(name + " " + r.status);
+  const t = await r.text(); // functions that return nothing send an empty body
+  return t ? JSON.parse(t) : null;
+}
+/* Merge remote state into a local store ({attempts, flags}). Flags: latest timestamp wins. */
+function syncMergeFlags(store, rows) {
+  rows.forEach(f => {
+    const cur = store.flags[f.version];
+    const newer = f.at && (!cur || !cur.at || Date.parse(f.at) > Date.parse(cur.at));
+    if (newer) store.flags[f.version] = { completed: !!f.completed, at: f.at, total: f.first_total };
+    else if (cur && f.first_total != null && cur.total == null) cur.total = f.first_total;
+  });
+  return store;
+}
+function syncMergeEvents(store, events) {
+  const byId = {};
+  store.attempts.forEach(a => byId[a.id] = a);
+  const flagRows = {};
+  events.forEach(e => {
+    const p = e.payload || {};
+    if (e.kind === "section" || e.kind === "finish") {
+      const a = byId[e.attempt_id] || (byId[e.attempt_id] = { id: e.attempt_id, v: e.version, started: p.started || e.at, finished: null, sections: [] });
+      if (e.kind === "section" && p.section && p.index != null && !a.sections[p.index]) a.sections[p.index] = p.section;
+      if (e.kind === "finish") { a.finished = a.finished || p.finished || e.at; if (p.total != null) a.total = p.total; }
+    }
+    if (e.kind !== "section" && (!flagRows[e.version] || Date.parse(e.at) >= Date.parse(flagRows[e.version].at)))
+      flagRows[e.version] = { version: e.version, completed: e.kind !== "unflag", at: e.at };
+  });
+  store.attempts = Object.values(byId);
+  return syncMergeFlags(store, Object.values(flagRows));
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncFlush(); } catch (e) {} }
+/* One-time upload of progress recorded in this browser before the online database was connected. */
+function syncBackfill() {
+  if (!syncOn()) return;
+  try {
+    if (localStorage.getItem("prac.backfilled")) return;
+    const st = JSON.parse(localStorage.getItem("prac.v1") || "null");
+    const rows = [];
+    if (st && Array.isArray(st.attempts)) {
+      st.attempts.forEach(a => {
+        (a.sections || []).forEach((s, i) => { if (s) rows.push({ kind: "section", version: Number(a.v), attempt_id: a.id, at: a.started, payload: { started: a.started, index: i, section: s, backfill: true } }); });
+        if (a.finished) rows.push({ kind: "finish", version: Number(a.v), attempt_id: a.id, at: a.finished, payload: { started: a.started, finished: a.finished, total: a.total, backfill: true } });
+      });
+      Object.entries(st.flags || {}).forEach(([v, f]) => {
+        if (f && f.at && (f.manual || !f.completed)) rows.push({ kind: f.completed ? "flag" : "unflag", version: Number(v), attempt_id: null, at: f.at, payload: { backfill: true } });
+      });
+    }
+    localStorage.setItem("prac.backfilled", new Date().toISOString());
+    if (rows.length) { syncWriteOutbox(syncReadOutbox().concat(rows)); syncFlush(); }
+  } catch (e) {}
+}
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") { try { syncBackfill(); } catch (e) {} }
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+const app = document.getElementById("app");
+const hdrSection = document.getElementById("hdr-section");
+let responses = SECTIONS.map(s => s.questions.map(() => null));
+let current = 0;
+
+/* ---- progress tracking (stored in this browser only; skipped in admin mode) ---- */
+const STORE_KEY = "prac.v1";
+const ADMIN = (() => {
+  try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; }
+  catch (e) { return false; }
+})();
+if (ADMIN) {
+  document.body.classList.add("admin");
+  document.getElementById("home-link").href = "../../pracadmin/index.html";
+  document.getElementById("home-link").textContent = "Admin";
+}
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.attempts)) return Object.assign({ flags: {} }, s); }
+  catch (e) {}
+  return { attempts: [], flags: {} };
+}
+function saveStore(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+let attempt = null, sectionStart = 0, changes = [];
+function beginAttempt() {
+  changes = SECTIONS.map(s => s.questions.map(() => 0));
+  if (ADMIN) { attempt = null; return; }
+  attempt = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), v: TEST_META.version,
+              started: new Date().toISOString(), finished: null, sections: [] };
+}
+function persistAttempt() {
+  if (!attempt) return;
+  const st = loadStore();
+  const k = st.attempts.findIndex(a => a.id === attempt.id);
+  if (k >= 0) st.attempts[k] = attempt; else st.attempts.push(attempt);
+  if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
+  saveStore(st);
+}
+function recordSection(i) {
+  if (!attempt) return;
+  const s = SECTIONS[i];
+  attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
+    answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
+  persistAttempt();
+  syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
+}
+function finishAttempt() {
+  if (!attempt) return;
+  attempt.finished = new Date().toISOString();
+  attempt.total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  persistAttempt();
+  syncPost("finish", attempt.v, attempt.id, { started: attempt.started, finished: attempt.finished, total: attempt.total });
+  attempt = null;
+}
+function completedNote() {
+  if (ADMIN) return `<p class="done-note" style="background:#fdf3e1;color:#7a5a00">Admin preview: answers in this test are not recorded.</p>`;
+  const f = loadStore().flags[TEST_META.version];
+  if (!f || !f.completed) return "";
+  const d = new Date(f.at);
+  return `<p class="done-note">✓ Completed${isNaN(d) ? "" : ` on ${d.toLocaleDateString("en-AU", { day: "numeric", month: "long" })}`}. You can still do it again or look back through it.</p>`;
+}
+
+function showStart() {
+  hdrSection.textContent = "";
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>Practice paper 64</h1>
+      ${completedNote()}
+      <p class="lead">Three short sections: reading, thinking skills and maths.</p>
+      <div class="plan">
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+      </div>
+      <ol>
+        <li>Take as long as you need — there is no time limit.</li>
+        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>You don’t lose marks for wrong answers, so attempt every question.</li>
+        <li>Your overall mark out of 9 is shown at the end.</li>
+      </ol>
+      <button class="primary" id="start">Start the reading section</button>
+    </div>`;
+  document.getElementById("start").onclick = () => { current = 0; responses = SECTIONS.map(s => s.questions.map(() => null)); beginAttempt(); showSection(); };
+}
+
+function renderPassage(pass) {
+  return `<div class="passage">
+    <p class="passage-note">${pass.note}</p>
+    <div class="prose"><h3>${pass.title}</h3><div id="passage-body">${typeof pass.html === "function" ? pass.html() : pass.html}</div></div>
+  </div>`;
+}
+
+function refreshPassage() {
+  const pass = SECTIONS[current].passage;
+  const el = document.getElementById("passage-body");
+  if (el && pass && typeof pass.html === "function") el.innerHTML = pass.html();
+}
+
+function renderQuestions(section, mode) {
+  return section.questions.map((q, qi) => {
+    const chosen = responses[current][qi];
+    const opts = q.options.map((o, oi) => {
+      let cls = "option";
+      if (mode === "answer" && chosen === oi) cls += " selected";
+      if (mode === "review") {
+        if (oi === q.answer) cls += " is-correct";
+        else if (chosen === oi) cls += " is-wrong";
+      }
+      return `<button type="button" class="${cls}" data-q="${qi}" data-o="${oi}" ${mode === "review" ? "disabled" : ""}>
+                <span class="letter">${LETTERS[oi]}</span>${q.letterOptions ? "" : `<span>${o}</span>`}</button>`;
+    }).join("");
+    const optCls = q.visualOptions ? "options visual" : (q.letterOptions ? "options letters" : "options");
+    let result = "";
+    if (mode === "review") {
+      const right = chosen === q.answer;
+      const label = chosen === null ? "Not answered" : (right ? "Correct" : "Incorrect");
+      result = `<div class="result-line"><span class="badge ${right ? "ok" : "no"}">${label}</span>
+                <span>Correct answer: ${LETTERS[q.answer]}${chosen !== null && !right ? ` · You chose ${LETTERS[chosen]}` : ""}</span></div>`;
+    }
+    return `<div class="question">
+      <div class="qhead"><span class="qnum">${qi + 1}</span><div class="stem">${q.stem}</div></div>
+      ${result}
+      <div class="${optCls}">${opts}</div>
+      ${mode === "review" ? `<div class="explain">${q.skill ? `<p class="skill">Skill tested: ${q.skill}</p>` : ""}${q.explain}</div>` : ""}
+      ${mode === "review" && ADMIN ? `<div class="review-box" data-q="${qi}"><p class="rv-msg">Loading feedback…</p></div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function showSection() {
+  passMode = "answer";
+  sectionStart = Date.now();
+  const s = SECTIONS[current];
+  hdrSection.textContent = `${s.name} · Section ${current + 1} of ${SECTIONS.length}`;
+  const qs = `<div>
+      <h2>${s.name}</h2>
+      <p class="lead">${s.intro}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "answer")}
+      <div class="submit-row">
+        <button class="primary" id="submit">Submit answers</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${qs}</div>` : qs}</div>`;
+
+  app.querySelectorAll(".option").forEach(btn => {
+    btn.onclick = () => {
+      const qi = +btn.dataset.q, oi = +btn.dataset.o;
+      if (responses[current][qi] !== null && responses[current][qi] !== oi && changes[current]) changes[current][qi]++;
+      responses[current][qi] = oi;
+      app.querySelectorAll(`.option[data-q="${qi}"]`).forEach(b => b.classList.toggle("selected", +b.dataset.o === oi));
+      refreshPassage();
+      updateStatus();
+    };
+  });
+  document.getElementById("submit").onclick = () => {
+    const unanswered = responses[current].filter(r => r === null).length;
+    if (unanswered && !confirm(`You have ${unanswered} unanswered question${unanswered > 1 ? "s" : ""}. Submit anyway?`)) return;
+    recordSection(current);
+    showReview();
+  };
+  updateStatus();
+  window.scrollTo(0, 0);
+}
+
+function updateStatus() {
+  const done = responses[current].filter(r => r !== null).length;
+  const el = document.getElementById("status");
+  if (el) el.textContent = `${done} of ${SECTIONS[current].questions.length} answered`;
+}
+
+function sectionScore(i) {
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+}
+
+function showReview() {
+  passMode = "review";
+  const s = SECTIONS[current];
+  const score = sectionScore(current);
+  const last = current === SECTIONS.length - 1;
+  hdrSection.textContent = `${s.name} · Review`;
+  const body = `<div>
+      <h2>${s.name} — review</h2>
+      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      ${s.preamble || ""}
+      ${renderQuestions(s, "review")}
+      <div class="submit-row">
+        <button class="primary" id="next">${last ? "See your overall mark" : `Start the ${SECTIONS[current + 1].name.split(" — ")[0].toLowerCase()} section`}</button>
+      </div>
+    </div>`;
+  app.innerHTML = `<div class="sheet">${s.passage ? `<div class="two-col">${renderPassage(s.passage)}${body}</div>` : body}</div>`;
+  document.getElementById("next").onclick = () => { if (last) showFinal(); else { current++; showSection(); } };
+  if (ADMIN) fillReviews();
+  window.scrollTo(0, 0);
+}
+
+/* ---- question feedback (practice mode only): approve, or send back for a redo with a comment.
+   Saved online through add_review(pin, …); Claude answers each redo with a 'done' row. ---- */
+let reviewRows = [];
+const RV_DIFF = ["Much easier", "A bit easier", "A bit harder", "Much harder"];
+const RV_LABEL = { approve: "Approved", redo: "Sent back for a redo", done: "Redone by Claude" };
+const rvEsc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function reviewPin() { try { return sessionStorage.getItem("prac.admin.pin") || ""; } catch (e) { return ""; } }
+async function fillReviews() {
+  const si = current, boxes = app.querySelectorAll(".review-box");
+  const note = t => boxes.forEach(b => b.innerHTML = `<p class="rv-msg">${t}</p>`);
+  if (!syncOn() || !reviewPin()) return note("Question feedback needs the online database. Open this test from the admin page (after entering the PIN).");
+  try { reviewRows = (await syncRpc("admin_reviews", { p_pin: reviewPin() })) || []; }
+  catch (e) { return note("Couldn’t load question feedback. If this keeps happening, the database may need its update (ask Claude)."); }
+  if (current !== si || passMode !== "review") return;
+  boxes.forEach(b => renderReviewBox(b, SECTIONS[si].id, +b.dataset.q));
+}
+function renderReviewBox(box, sec, qi, msg) {
+  const hist = reviewRows.filter(r => r.version === TEST_META.version && r.section === sec && r.q === qi);
+  const when = t => { const d = new Date(t); return isNaN(d) ? "" : d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }); };
+  const last = hist[hist.length - 1];
+  box.innerHTML = `<p class="rv-head">Your review of question ${qi + 1}</p>
+    ${hist.length ? `<ul>${hist.map(r => `<li class="${r.kind}"><b>${RV_LABEL[r.kind] || rvEsc(r.kind)}</b> · ${when(r.at)}${r.comment ? `: ${rvEsc(r.comment)}` : ""}</li>`).join("")}</ul>` : ""}
+    ${last && last.kind === "redo" ? `<p class="rv-msg">Waiting for Claude to redo this question.</p>` : ""}
+    <div class="rv-actions">
+      <button type="button" class="rv-approve">${last && last.kind === "approve" ? "Approved ✓" : "Approve"}</button>
+      <button type="button" class="rv-redo">Send back for a redo</button>
+    </div>
+    <div class="rv-diff" role="group" aria-label="Quick difficulty change for question ${qi + 1}">
+      <span>Difficulty:</span>
+      ${RV_DIFF.map((d, k) => `<button type="button" class="rv-chip" data-d="${k}">${d}</button>`).join("")}
+    </div>
+    <div class="rv-form" hidden>
+      <p class="rv-chosen" hidden></p>
+      <textarea rows="3" maxlength="4000" aria-label="What needs changing in question ${qi + 1}?" placeholder="What needs changing? (e.g. too easy, two answers could be right, picture unclear)"></textarea>
+      <button type="button" class="rv-send">Send back</button>
+      <button type="button" class="rv-cancel">Cancel</button>
+    </div>
+    <p class="rv-msg" role="status">${msg || ""}</p>`;
+  const form = box.querySelector(".rv-form"), say = t => box.querySelector(".rv-msg[role=status]").textContent = t;
+  const chosen = box.querySelector(".rv-chosen"), ta = box.querySelector("textarea");
+  let diff = null;
+  const pick = k => {
+    diff = k;
+    box.querySelectorAll(".rv-chip").forEach(c => c.classList.toggle("on", +c.dataset.d === k));
+    chosen.hidden = k === null;
+    chosen.textContent = k === null ? "" : `Make it ${RV_DIFF[k].toLowerCase()}. Add a comment if you like, then press Send back.`;
+    ta.placeholder = k === null ? "What needs changing? (e.g. too easy, two answers could be right, picture unclear)" : "Optional: anything else to change?";
+    form.hidden = false; ta.focus(); say("");
+  };
+  box.querySelector(".rv-approve").onclick = () => submitReview(box, sec, qi, "approve", "");
+  box.querySelector(".rv-redo").onclick = () => pick(null);
+  box.querySelectorAll(".rv-chip").forEach(c => c.onclick = () => pick(+c.dataset.d));
+  box.querySelector(".rv-cancel").onclick = () => { form.hidden = true; diff = null; box.querySelectorAll(".rv-chip").forEach(c => c.classList.remove("on")); say(""); };
+  box.querySelector(".rv-send").onclick = () => {
+    const c = ta.value.trim();
+    if (diff === null && !c) { say("Add a comment (or pick a difficulty) so Claude knows what to change."); return; }
+    submitReview(box, sec, qi, "redo", (diff === null ? "" : `Difficulty: make it ${RV_DIFF[diff].toLowerCase()}.` + (c ? " " : "")) + c);
+  };
+}
+async function submitReview(box, sec, qi, kind, comment) {
+  box.querySelectorAll("button").forEach(b => b.disabled = true);
+  box.querySelector(".rv-msg[role=status]").textContent = "Saving…";
+  try {
+    await syncRpc("add_review", { p_pin: reviewPin(), p_version: TEST_META.version, p_section: sec, p_q: qi, p_kind: kind, p_comment: comment });
+  } catch (e) {
+    box.querySelectorAll("button").forEach(b => b.disabled = false);
+    box.querySelector(".rv-msg[role=status]").textContent = "Couldn’t save. Check the internet connection and try again.";
+    return;
+  }
+  reviewRows.push({ version: TEST_META.version, section: sec, q: qi, kind, comment, at: new Date().toISOString() });
+  renderReviewBox(box, sec, qi, kind === "approve" ? "Saved: approved." : "Sent back. Claude will redo it overnight, or straight away if you run “Do redos now”.");
+}
+
+function showFinal() {
+  hdrSection.textContent = "Results";
+  finishAttempt();
+  const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
+  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  let verdict;
+  if (total === max) verdict = "Full marks. Every question right, across all three sections.";
+  else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
+  else if (total >= 5) verdict = "A solid attempt. The sections where you dropped marks are the ones to practise next.";
+  else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
+  app.innerHTML = `
+    <div class="sheet">
+      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="breakdown">
+        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+      </div>
+      <p class="verdict center">${verdict}</p>
+      <div class="center"><button class="primary" id="again">Try the paper again</button></div>
+    </div>`;
+  document.getElementById("again").onclick = showStart;
+  window.scrollTo(0, 0);
+}
+
+// A test held for review is only on the admin page; someone opening its address directly sees this instead.
+function showNotReady() {
+  app.innerHTML = `
+    <div class="sheet instructions">
+      <h1>This test isn’t ready yet</h1>
+      <p class="lead">It will appear on the list of tests once it has been checked.</p>
+      <a class="primary" href="../../index.html">Back to all tests</a>
+    </div>`;
+}
+
+if (TEST_META.status === "review" && !ADMIN) showNotReady(); else showStart();
+</script>
+</body>
+</html>
