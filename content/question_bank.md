@@ -14,7 +14,59 @@ Never paste in questions from the official sample papers or other copyrighted bo
 
 ## Waiting
 
-(None waiting.)
+These three are one family ("which statements are correct" about shapes). Use them in different tests, at least 3 tests apart, oldest (David's) first.
+
+### Which shape statements are correct (quadrilaterals)
+- **Section**: maths (2D shapes: classifying quadrilaterals, in a "which statements are correct" format; the samples have a quadrilateral classification question around Q16)
+- **Added**: 2026-10-31
+- **Question**: Which of these statements is/are correct?
+  - 1 All rhombuses are parallelograms.
+  - 2 All rectangles are kites.
+  - 3 All quadrilaterals are squares.
+  - No options or answer were given.
+- **Answer** (checked): **1 only**.
+  - 1 is correct: a rhombus has both pairs of opposite sides parallel, so it is a parallelogram.
+  - 2 is wrong: a kite has two pairs of equal sides next to each other. A long, thin rectangle doesn't (only a square is both a rectangle and a kite).
+  - 3 is wrong: a quadrilateral is any four-sided shape, and most are not squares (it is the rule turned round: all squares are quadrilaterals).
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Options (A–E): 1 only; 2 only; 1 and 2; 1 and 3; none of them. Main traps: "1 and 2" (a square is a rectangle and a kite, so a child thinks all rectangles are), "1 and 3" (reads 3 the wrong way round) and "none of them" (thinks a rhombus is a tilted square, not a parallelogram).
+  - The explanation should show a small picture of each shape, with a rectangle that is clearly not a kite.
+
+### Squares, rhombuses and rectangles (inspired by David's shape statements)
+- **Section**: maths (2D shapes: which statements are correct; a Q2)
+- **Added**: 2026-10-31
+- **Question** (our own, written in the style of David's question above): Which of these statements is/are correct?
+  - 1 Every square is also a rectangle.
+  - 2 Every rhombus is also a square.
+  - 3 Every rectangle is also a parallelogram.
+  - Options: A 1 only, B 3 only, C 1 and 3, D 2 and 3, E 1, 2 and 3.
+- **Answer** (checked): **C, 1 and 3**.
+  - 1 is correct: a square has four right angles, which is all a rectangle needs.
+  - 2 is wrong: a rhombus has four equal sides, but its angles need not be right angles (a "pushed-over" square).
+  - 3 is correct: a rectangle's opposite sides are parallel.
+- **Notes**:
+  - Written by Claude, inspired by David's question (David asked for some like it).
+  - Traps: B (thinks a square can't be a rectangle because its sides are all equal), D (mixes up which shape is the special case) and E (thinks a rhombus is just a tilted square).
+  - Draw a square, a rhombus that is not a square, and a rectangle in the explanation.
+
+### Which 3D shape statements are correct (inspired by David's shape statements)
+- **Section**: maths (3D shapes: faces, edges and vertices, in a "which statements are correct" format; a Q2)
+- **Added**: 2026-10-31
+- **Question** (our own, written in the style of David's question above): Which of these statements is/are correct?
+  - 1 Every cube is also a rectangular prism.
+  - 2 A cylinder has no vertices (corners).
+  - 3 A triangular prism has 6 faces.
+  - Options: A 1 only, B 2 only, C 1 and 2, D 2 and 3, E 1, 2 and 3.
+- **Answer** (checked): **C, 1 and 2**.
+  - 1 is correct: a cube's six faces are squares, and squares are rectangles, so a cube is a special rectangular prism.
+  - 2 is correct: a cylinder's edges are curves with no corners where they meet.
+  - 3 is wrong: a triangular prism has 2 triangles and 3 rectangles, so 5 faces (it has 6 vertices, which is the mix-up).
+- **Notes**:
+  - Written by Claude, inspired by David's question (David asked for some like it).
+  - Traps: B (thinks a cube can't be a rectangular prism), D (counts 6 faces, mixing up faces and vertices) and E (both slips).
+  - Test 64 Maths Q2 was 3D shapes (edges and vertices of a pentagonal prism), so use this a few tests after Test 64.
+  - A picture of each shape helps in the explanation, not in the question.
 
 ## Used
 
