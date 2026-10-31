@@ -14,7 +14,91 @@ Never paste in questions from the official sample papers or other copyrighted bo
 
 ## Waiting
 
-(None waiting.)
+These three are one family ("which statements are correct" about shapes). Use them in different tests, at least 3 tests apart, oldest (David's) first.
+
+### Which shape statements are correct (quadrilaterals)
+- **Section**: maths (2D shapes: classifying quadrilaterals, in a "which statements are correct" format; the samples have a quadrilateral classification question around Q16)
+- **Added**: 2026-10-31
+- **Question**: Which of these statements is/are correct?
+  - 1 All rhombuses are parallelograms.
+  - 2 All rectangles are kites.
+  - 3 All quadrilaterals are squares.
+  - No options or answer were given.
+- **Answer** (checked): **1 only**.
+  - 1 is correct: a rhombus has both pairs of opposite sides parallel, so it is a parallelogram.
+  - 2 is wrong: a kite has two pairs of equal sides next to each other. A long, thin rectangle doesn't (only a square is both a rectangle and a kite).
+  - 3 is wrong: a quadrilateral is any four-sided shape, and most are not squares (it is the rule turned round: all squares are quadrilaterals).
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Options (A–E): 1 only; 2 only; 1 and 2; 1 and 3; none of them. Main traps: "1 and 2" (a square is a rectangle and a kite, so a child thinks all rectangles are), "1 and 3" (reads 3 the wrong way round) and "none of them" (thinks a rhombus is a tilted square, not a parallelogram).
+  - The explanation should show a small picture of each shape, with a rectangle that is clearly not a kite.
+
+### Squares, rhombuses and rectangles (inspired by David's shape statements)
+- **Section**: maths (2D shapes: which statements are correct; a Q2)
+- **Added**: 2026-10-31
+- **Question** (our own, written in the style of David's question above): Which of these statements is/are correct?
+  - 1 Every square is also a rectangle.
+  - 2 Every rhombus is also a square.
+  - 3 Every rectangle is also a parallelogram.
+  - Options: A 1 only, B 3 only, C 1 and 3, D 2 and 3, E 1, 2 and 3.
+- **Answer** (checked): **C, 1 and 3**.
+  - 1 is correct: a square has four right angles, which is all a rectangle needs.
+  - 2 is wrong: a rhombus has four equal sides, but its angles need not be right angles (a "pushed-over" square).
+  - 3 is correct: a rectangle's opposite sides are parallel.
+- **Notes**:
+  - Written by Claude, inspired by David's question (David asked for some like it).
+  - Traps: B (thinks a square can't be a rectangle because its sides are all equal), D (mixes up which shape is the special case) and E (thinks a rhombus is just a tilted square).
+  - Draw a square, a rhombus that is not a square, and a rectangle in the explanation.
+
+### Which 3D shape statements are correct (inspired by David's shape statements)
+- **Section**: maths (3D shapes: faces, edges and vertices, in a "which statements are correct" format; a Q2)
+- **Added**: 2026-10-31
+- **Question** (our own, written in the style of David's question above): Which of these statements is/are correct?
+  - 1 Every cube is also a rectangular prism.
+  - 2 A cylinder has no vertices (corners).
+  - 3 A triangular prism has 6 faces.
+  - Options: A 1 only, B 2 only, C 1 and 2, D 2 and 3, E 1, 2 and 3.
+- **Answer** (checked): **C, 1 and 2**.
+  - 1 is correct: a cube's six faces are squares, and squares are rectangles, so a cube is a special rectangular prism.
+  - 2 is correct: a cylinder's edges are curves with no corners where they meet.
+  - 3 is wrong: a triangular prism has 2 triangles and 3 rectangles, so 5 faces (it has 6 vertices, which is the mix-up).
+- **Notes**:
+  - Written by Claude, inspired by David's question (David asked for some like it).
+  - Traps: B (thinks a cube can't be a rectangular prism), D (counts 6 faces, mixing up faces and vertices) and E (both slips).
+  - Test 64 Maths Q2 was 3D shapes (edges and vertices of a pentagonal prism), so use this a few tests after Test 64.
+  - A picture of each shape helps in the explanation, not in the question.
+
+### Staying behind for the homework (whose reasoning: reversed rule)
+- **Section**: thinking (critical thinking: whose reasoning is correct, the "reversed rule" pattern; a Q1)
+- **Added**: 2026-10-31
+- **Question**: The deadline to complete the Geography homework was last Friday. Anyone who didn't complete it on time will have to stay behind after school tomorrow to finish it off.
+  - Kalinda: "I know Abby didn't hand in the homework on time, so she'll definitely be staying behind tomorrow."
+  - Keira: "Lottie has to stay behind tomorrow, so she must have failed to complete the homework on time too!"
+  - If the information in the box is true, whose reasoning is correct?
+  - No options or answer were given.
+- **Answer** (checked): **Kalinda only**.
+  - Kalinda uses the rule the right way round: not finished on time → stays behind.
+  - Keira turns the rule round. The box says who must stay behind, not that only they will; Lottie could be staying behind for another reason (detention, a different subject).
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - One wording gap: the rule is about *completing* the homework, but Kalinda says Abby didn't *hand it in*. A sharp child could argue Abby finished it but forgot to hand it in, which would make Kalinda wrong too. Change Kalinda's line to "Abby didn't complete the homework on time" (or make the rule about handing it in), so the only trap is Keira's reversed rule.
+  - Options (A–D): Kalinda only; Keira only; both Kalinda and Keira; neither Kalinda nor Keira. Traps: "both" (Keira's line sounds just as sure) and "Keira only".
+
+### Art prize entries (inspired by David's homework question)
+- **Section**: thinking (critical thinking: whose reasoning is correct, the "needed versus guaranteed" pattern; a Q1)
+- **Added**: 2026-10-31
+- **Question** (our own, written in the style of David's question above): Paintings for the school art prize must be handed in by Friday. Only paintings handed in by Friday can win a prize.
+  - Tom: "Mia handed her painting in on Thursday, so she will win a prize."
+  - Ava: "Leo's painting won a prize, so it must have been handed in by Friday."
+  - If the information in the box is true, whose reasoning is correct?
+  - Options: A Tom only, B Ava only, C both Tom and Ava, D neither Tom nor Ava.
+- **Answer** (checked): **B, Ava only**.
+  - Ava is right: only paintings handed in by Friday can win, so a painting that won must have been handed in by Friday.
+  - Tom is wrong: handing in on time is needed to win, but it doesn't guarantee a prize; the painting still has to be judged one of the best.
+- **Notes**:
+  - Written by Claude, inspired by David's question (David asked for one like it). It is a different trap from David's (needed treated as a guarantee, not a reversed rule), and the correct speaker is the second one, so the two don't feel the same.
+  - Traps: A (thinks being on time is enough), C (both sound sure) and D (thinks Ava can't know without seeing the date).
+  - Use it at least 3 tests after David's homework question.
 
 ## Used
 
