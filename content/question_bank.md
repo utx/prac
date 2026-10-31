@@ -68,6 +68,38 @@ These three are one family ("which statements are correct" about shapes). Use th
   - Test 64 Maths Q2 was 3D shapes (edges and vertices of a pentagonal prism), so use this a few tests after Test 64.
   - A picture of each shape helps in the explanation, not in the question.
 
+### Staying behind for the homework (whose reasoning: reversed rule)
+- **Section**: thinking (critical thinking: whose reasoning is correct, the "reversed rule" pattern; a Q1)
+- **Added**: 2026-10-31
+- **Question**: The deadline to complete the Geography homework was last Friday. Anyone who didn't complete it on time will have to stay behind after school tomorrow to finish it off.
+  - Kalinda: "I know Abby didn't hand in the homework on time, so she'll definitely be staying behind tomorrow."
+  - Keira: "Lottie has to stay behind tomorrow, so she must have failed to complete the homework on time too!"
+  - If the information in the box is true, whose reasoning is correct?
+  - No options or answer were given.
+- **Answer** (checked): **Kalinda only**.
+  - Kalinda uses the rule the right way round: not finished on time → stays behind.
+  - Keira turns the rule round. The box says who must stay behind, not that only they will; Lottie could be staying behind for another reason (detention, a different subject).
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - One wording gap: the rule is about *completing* the homework, but Kalinda says Abby didn't *hand it in*. A sharp child could argue Abby finished it but forgot to hand it in, which would make Kalinda wrong too. Change Kalinda's line to "Abby didn't complete the homework on time" (or make the rule about handing it in), so the only trap is Keira's reversed rule.
+  - Options (A–D): Kalinda only; Keira only; both Kalinda and Keira; neither Kalinda nor Keira. Traps: "both" (Keira's line sounds just as sure) and "Keira only".
+
+### Art prize entries (inspired by David's homework question)
+- **Section**: thinking (critical thinking: whose reasoning is correct, the "needed versus guaranteed" pattern; a Q1)
+- **Added**: 2026-10-31
+- **Question** (our own, written in the style of David's question above): Paintings for the school art prize must be handed in by Friday. Only paintings handed in by Friday can win a prize.
+  - Tom: "Mia handed her painting in on Thursday, so she will win a prize."
+  - Ava: "Leo's painting won a prize, so it must have been handed in by Friday."
+  - If the information in the box is true, whose reasoning is correct?
+  - Options: A Tom only, B Ava only, C both Tom and Ava, D neither Tom nor Ava.
+- **Answer** (checked): **B, Ava only**.
+  - Ava is right: only paintings handed in by Friday can win, so a painting that won must have been handed in by Friday.
+  - Tom is wrong: handing in on time is needed to win, but it doesn't guarantee a prize; the painting still has to be judged one of the best.
+- **Notes**:
+  - Written by Claude, inspired by David's question (David asked for one like it). It is a different trap from David's (needed treated as a guarantee, not a reversed rule), and the correct speaker is the second one, so the two don't feel the same.
+  - Traps: A (thinks being on time is enough), C (both sound sure) and D (thinks Ava can't know without seeing the date).
+  - Use it at least 3 tests after David's homework question.
+
 ## Used
 
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
