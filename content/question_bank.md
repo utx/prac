@@ -152,6 +152,24 @@ These three are one family ("which statements are correct" about shapes). Use th
     - 6: halves twice (24 ÷ 2 ÷ 2).
   - Choose 4 of these, so with the answer there are 5 options.
 
+### Rectangle area from its perimeter
+- **Section**: maths (perimeter and area; a quick-fire Q1 or a gentle Q2)
+- **Added**: 2026-11-01
+- **Question**: A rectangle has a perimeter of **30 cm**. Its length is **9 cm**. What is the **area** of the rectangle?
+  - No options or answer were given.
+- **Answer** (checked): **54 cm²**. The two lengths use 9 + 9 = 18 cm of the perimeter, which leaves 30 − 18 = 12 cm for the two widths, so each width is 6 cm. Area = 9 × 6 = 54 cm². (Or: half the perimeter is length + width = 15, so the width is 15 − 9 = 6.)
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Perimeter was in Test 57 Maths Q3 and Test 63 Maths Q2, so space it a few tests after Test 63.
+  - A diagram of the rectangle with only "9 cm" marked on one long side helps; leave the width unmarked.
+  - Possible wrong options from real mistakes:
+    - 108 cm²: takes the width as 12 (30 − 18), forgetting the 12 is shared by two sides.
+    - 189 cm²: takes the width as 21 (30 − 9).
+    - 81 cm²: 9 × 9, treating it as a square.
+    - 270 cm²: 30 × 9, multiplying the numbers given.
+    - 30 cm²: confuses area with the perimeter.
+  - Choose 4 of these, so with the answer there are 5 options.
+
 ## Used
 
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
