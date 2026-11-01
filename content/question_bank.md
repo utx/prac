@@ -100,6 +100,23 @@ These three are one family ("which statements are correct" about shapes). Use th
   - Traps: A (thinks being on time is enough), C (both sound sure) and D (thinks Ava can't know without seeing the date).
   - Use it at least 3 tests after David's homework question.
 
+### Train stations in a repeating cycle
+- **Section**: maths (repeating pattern; quick-fire Q1) or thinking (sequence)
+- **Added**: 2026-11-01
+- **Question**: A train passes stations in this repeating cycle:
+  - A → B → C → D → A → B → C → D → …
+  - If the first station the train passes is A (station #1), which station will be the 24th station it passes?
+  - No options or answer were given.
+- **Answer** (checked): **D**. The cycle has 4 stations, and every 4th station is D (4th, 8th, 12th, …). 24 = 6 × 4, so the 24th is D.
+- **Notes**:
+  - Written by David (his questions can be reworded). The repeat is shown clearly, as the pattern rule asks.
+  - **Level**: it is easier than the sample papers' pattern questions (one division, no remainder), so use it only as a quick, gentle question (Maths Q1, or a light Thinking slot), not as a stretch. David has been told.
+  - **Options**: there are only 4 stations, so the natural options are A, B, C and D, but Maths needs 5 (A–E). Waiting for David to choose: use it in Thinking (A–D) as a gentle sequence question, or as Maths Q1 with a fifth option he picks.
+  - Traps:
+    - A: 24 ÷ 4 = 6 with no remainder, so a child thinks the cycle has just started again at A.
+    - C: works out 23 ÷ 4 = 5 remainder 3 and takes the 3rd station, so mixes up the two ways of counting.
+    - B: guesses from 24 being even.
+
 ## Used
 
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
