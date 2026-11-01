@@ -117,6 +117,24 @@ These three are one family ("which statements are correct" about shapes). Use th
     - C: works out 23 ÷ 4 = 5 remainder 3 and takes the 3rd station, so mixes up the two ways of counting.
     - B: guesses from 24 being even.
 
+### Race finishing order (order and arrangement)
+- **Section**: thinking (order and arrangement; counts towards the limit of about one arrangement question in every 6 tests, last used in Test 54)
+- **Added**: 2026-11-01
+- **Question**: Four children ran a race.
+  - Mia finished ahead of Tom.
+  - Tom finished ahead of Zoe.
+  - Zoe finished ahead of Raj.
+  - Who came **last**?
+  - No options or answer were given.
+- **Answer** (checked): **Raj**. The clues join up into one chain: Mia, Tom, Zoe, Raj.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Options (A–D): Mia, Tom, Zoe, Raj. The only real trap is Mia (reads "last" as "first").
+  - **Level: well below the sample papers.** The clues are already in order, and each one links straight to the next, so there is no reasoning to do. David has been told and asked whether to keep it as is (as a warm-up) or make it harder. **Don't use it until he answers.**
+  - Ways to bring it up to sample level, if David agrees:
+    - Give the clues out of order, and make some of them "not" clues or gaps. For example, "Raj was not last", "Zoe finished two places behind Mia", and ask who came second.
+    - Add a fifth runner and a clue that leaves two possible orders, and ask which statement must be true.
+
 ## Used
 
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
