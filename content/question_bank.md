@@ -189,6 +189,24 @@ These three are one family ("which statements are correct" about shapes). Use th
   - Repeating patterns were in Test 48 Maths Q2, Test 54 and Test 61 Maths Q2, so space it a few tests after Test 61. The answer letter can be moved for spread when it is used.
   - A small picture of one step (two strawberries, a grape, three melon pieces on a stick) helps in the question.
 
+### Right angles in words (inspired by a sample question David showed)
+- **Section**: maths (angles: counting right angles in letters made of horizontal and vertical lines; a Q2)
+- **Added**: 2026-11-03
+- **Question** (our own, inspired by a sample-paper question David pasted: the sample's digit-cards question, PT1 Q11, is not saved here): Jack writes words in capital letters made only of horizontal and vertical lines, like this: E F H I L T (draw them; I is a single line with no top or bottom bars). Which word has the **most** right angles?
+  - Options: A FLEET, B THEFT, C HEEL, D ELITE, E TITLE.
+- **Answer** (checked): **B, THEFT (15)**.
+  - Right angles in each letter: L 1 (one corner), I 0, T 2 (where the stem meets the bar there is a right angle on each side), F 3 (corner 1 + middle bar 2), E 4 (two corners 1 + 1, middle bar 2), H 4 (each end of the crossbar makes 2).
+  - FLEET = 3 + 1 + 4 + 4 + 2 = 14; **THEFT = 2 + 4 + 4 + 3 + 2 = 15**; HEEL = 4 + 4 + 4 + 1 = 13; ELITE = 4 + 1 + 0 + 2 + 4 = 11; TITLE = 2 + 0 + 2 + 1 + 4 = 9.
+- **Notes**:
+  - Written by Claude, inspired by the sample question David showed. Same skill (count right angles carefully, including both angles where one line meets the middle of another), but comparing words instead of choosing cards.
+  - Traps:
+    - A FLEET: the main trap. It wins if a child counts each meeting point only once (FLEET 10, THEFT 9), or counts only the corners (FLEET 6, THEFT 3). It is only 1 behind with the right method, so careless counting also picks it.
+    - C HEEL: only 4 letters but has 13, so a child who expects fewer letters to mean fewer angles rules it out too quickly, while one who scores H and E high but forgets T's two angles picks it.
+    - D ELITE: picked by a child who thinks every letter with corners scores well and doesn't count.
+    - E TITLE: has the most "T" shapes at a glance (three Ts if L and E are skimmed), but the I adds nothing.
+  - The letters **must** be drawn in the question (as the sample draws its digits), with E, F and H in the plain block style above, so the counts aren't open to argument. The explanation should mark the right angles on THEFT and FLEET.
+  - Angles were in Test 56 Maths and Test 57 Maths (PT1 Q11 mapped there), so space it a few tests after Test 57. It is a gentle stretch; keep the five words short.
+
 ## Used
 
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
