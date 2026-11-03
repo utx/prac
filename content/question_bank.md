@@ -202,8 +202,8 @@ These three are one family ("which statements are correct" about shapes). Use th
   - Traps:
     - A FLEET: the main trap. It wins if a child counts each meeting point only once (FLEET 10, THEFT 9), or counts only the corners (FLEET 6, THEFT 3). It is only 1 behind with the right method, so careless counting also picks it.
     - C HEEL: only 4 letters but has 13, so a child who expects fewer letters to mean fewer angles rules it out too quickly, while one who scores H and E high but forgets T's two angles picks it.
-    - D ELITE: picked by a child who thinks every letter with corners scores well and doesn't count.
-    - E TITLE: has the most "T" shapes at a glance (three Ts if L and E are skimmed), but the I adds nothing.
+    - D ELITE: picked by a child who pictures I with top and bottom bars (4 right angles), which would make ELITE 15 and tie THEFT. This is why the plain I must be drawn.
+    - E TITLE: the only word with two Ts and two of the 5-letter words' "busy" letters, so it looks like a lot at a glance, but the I adds nothing and it has just 9.
   - The letters **must** be drawn in the question (as the sample draws its digits), with E, F and H in the plain block style above, so the counts aren't open to argument. The explanation should mark the right angles on THEFT and FLEET.
   - Angles were in Test 56 Maths and Test 57 Maths (PT1 Q11 mapped there), so space it a few tests after Test 57. It is a gentle stretch; keep the five words short.
 
