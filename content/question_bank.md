@@ -207,6 +207,51 @@ These three are one family ("which statements are correct" about shapes). Use th
   - The letters **must** be drawn in the question (as the sample draws its digits), with E, F and H in the plain block style above, so the counts aren't open to argument. The explanation should mark the right angles on THEFT and FLEET.
   - Angles were in Test 56 Maths and Test 57 Maths (PT1 Q11 mapped there), so space it a few tests after Test 57. It is a gentle stretch; keep the five words short.
 
+### Staircase of cubes: faces you can see (inspired by a sample question David showed)
+- **Section**: maths (3D: hidden and visible faces of a cube model; a Q2 or a gentle stretch)
+- **Added**: 2026-11-03
+- **Question** (our own, inspired by a sample-paper question David pasted: the sample's 3 × 3 slab question, PT1 Q14, is not saved here): Kai glues 10 identical cubes together to make a staircase one cube deep: a bottom row of 4 cubes, then rows of 3, 2 and 1 on top, all lined up on the left (draw it). He can pick it up and look at it from any direction. How many faces of the cubes can he **see**?
+  - Options: A 20, B 24, C 36, D 48, E 60.
+- **Answer** (checked by computation): **C, 36**. There are 10 × 6 = 60 faces in all. There are 12 places where two cubes are glued (6 side by side within the rows: 3 + 2 + 1, and 6 where a cube sits on another: 3 + 2 + 1), and each glued place hides 2 faces, so 24 are hidden and 60 − 24 = 36 can be seen. (Check by views: front 10 + back 10 + top 4 + bottom 4 + left 4 + right 4 = 36.)
+- **Notes**:
+  - Written by Claude, inspired by the sample question David showed. The sample asks for the hidden faces of a flat 3 × 3 slab; this asks for the faces that can be seen, on a staircase, so the counting can't be copied from the sample.
+  - Traps:
+    - B 24: the hidden faces (answers the sample's kind of question, not this one).
+    - D 48: 60 − 12, counting only one hidden face for each glued place.
+    - A 20: counts only the front and back.
+    - E 60: every face of every cube.
+  - Cube models were in Tests 59, 62 and 64 (hidden cubes and faces), so space it a few tests after Test 64.
+
+### Zara's lollies (fractions shared out; inspired by a sample question David showed)
+- **Section**: maths (fractions of an amount, working out how many equal shares; a Q2)
+- **Added**: 2026-11-03
+- **Question** (our own, inspired by a sample-paper question David pasted: the sample's pocket-money question, PT1 Q20, is not saved here): Zara has a bag of lollies. She gives 1/4 of them to her brother. Then she gives 1/8 of them to each of her friends. She has 1/8 of the lollies left for herself. How many friends does she give lollies to?
+  - Options: A 3, B 5, C 6, D 7, E 8.
+- **Answer** (checked by computation): **B, 5**. In eighths: the brother gets 1/4 = 2/8, and Zara keeps 1/8, so the friends get 8/8 − 2/8 − 1/8 = 5/8. That is 1/8 each, so 5 friends.
+- **Notes**:
+  - Written by Claude, inspired by the sample question David showed. Same skill (change to a common fraction, take away the known parts, count the equal shares), but it asks for the friends only, not every share, so the brother and the leftover are both things to take away.
+  - Traps:
+    - C 6: forgets Zara's leftover 1/8 (6/8 ÷ 1/8), or counts the brother as one of the shares.
+    - D 7: forgets the brother's quarter.
+    - A 3: thinks 1/4 is 4/8 (8 − 4 − 1).
+    - E 8: "1/8 each, so 8 people".
+  - Pocket-money fractions were in Test 58 and Test 62 (stretch), so space it a few tests after Test 62.
+
+### Cut-outs from squared paper, no folding (inspired by a sample question David showed)
+- **Section**: maths (area: whole and half squares on centimetre squared paper; a Q2)
+- **Added**: 2026-11-03
+- **Question** (our own, inspired by a sample-paper question David pasted: the sample's fold-and-cut question, PT1 Q24, is not saved here): A 6 cm × 6 cm piece of centimetre squared paper has these black parts cut out and thrown away (draw it): a 2 cm × 1 cm rectangle, a small triangle at each of the four corners (each half of one square, cut along its diagonal), and one larger triangle that is half of a 2 × 2 block of squares (cut along the block's diagonal). What is the area of the paper that is left?
+  - Options: A 6 cm², B 26 cm², C 28 cm², D 30 cm², E 32 cm².
+- **Answer** (checked by computation): **D, 30 cm²**. The paper is 36 cm². Cut out: rectangle 2 + corners 4 × ½ = 2 + large triangle ½ × 4 = 2, so 6 cm². 36 − 6 = 30 cm².
+- **Notes**:
+  - Written by Claude, inspired by the sample question David showed. **No folding** (David, Oct 2026: no folding questions for now), so it keeps the sample's area skill (whole squares, half squares and a bigger triangle) without the fold. It is gentler than the sample's Q24, so use it as a Q2, not a stretch. A folded version can be written when folding questions come back.
+  - Traps:
+    - A 6 cm²: the area cut out, not the area left.
+    - B 26 cm²: counts every square a triangle touches as a whole square (corners 4, large triangle 4), so 10 cut out.
+    - C 28 cm²: counts each corner triangle as a whole square.
+    - E 32 cm²: forgets the large triangle.
+  - Draw the larger triangle so its diagonal clearly runs corner to corner of the 2 × 2 block, not to scale for measuring. Area left after cut-outs was in Test 43 and Test 53, so it can be used any time.
+
 ## Used
 
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
