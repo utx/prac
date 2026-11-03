@@ -170,6 +170,25 @@ These three are one family ("which statements are correct" about shapes). Use th
     - 30 cm²: confuses area with the perimeter.
   - Choose 4 of these, so with the answer there are 5 options.
 
+### Fruit skewers (repeating step, scaling up; inspired by a sample question David showed)
+- **Section**: maths (repeating pattern / ratio from a repeating step; a quick-fire Q1 or a gentle Q2)
+- **Added**: 2026-11-03
+- **Question** (our own, inspired by a sample-paper question David pasted: the sample's bead question, PT1 Q8, is not saved here): Priya makes a long fruit skewer by repeating this step:
+  - Add 2 strawberries, then 1 grape, then 3 pieces of melon.
+  - When the skewer is finished, it has 15 pieces of melon.
+  - How many pieces of fruit are on the skewer altogether?
+  - Options: A 10, B 20, C 25, D 30, E 90.
+- **Answer** (checked): **D, 30**. Each step adds 3 melon pieces, so 15 melon pieces means 15 ÷ 3 = 5 steps. Each step adds 2 + 1 + 3 = 6 pieces of fruit, so 5 × 6 = 30. (Check: 10 strawberries + 5 grapes + 15 melon = 30.)
+- **Notes**:
+  - Written by Claude, inspired by the sample question David showed. It tests the same skill (find the number of repeats from one colour, then scale up) with a twist: three kinds instead of two, and it asks for the total, not the other kind.
+  - Traps:
+    - A 10: the strawberries only (answers the sample's kind of question, not this one).
+    - B 20: 15 + 5, adds the grapes but forgets the strawberries.
+    - C 25: 15 + 10, adds the strawberries but forgets the grapes.
+    - E 90: 15 × 6, multiplies the melon pieces (not the steps) by the 6 pieces in a step.
+  - Repeating patterns were in Test 48 Maths Q2, Test 54 and Test 61 Maths Q2, so space it a few tests after Test 61. The answer letter can be moved for spread when it is used.
+  - A small picture of one step (two strawberries, a grape, three melon pieces on a stick) helps in the question.
+
 ## Used
 
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
