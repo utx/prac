@@ -170,6 +170,43 @@ These three are one family ("which statements are correct" about shapes). Use th
     - 30 cm²: confuses area with the perimeter.
   - Choose 4 of these, so with the answer there are 5 options.
 
+### Fruit skewers (repeating step, scaling up; inspired by a sample question David showed)
+- **Section**: maths (repeating pattern / ratio from a repeating step; a quick-fire Q1 or a gentle Q2)
+- **Added**: 2026-11-03
+- **Question** (our own, inspired by a sample-paper question David pasted: the sample's bead question, PT1 Q8, is not saved here): Priya makes a long fruit skewer by repeating this step:
+  - Add 2 strawberries, then 1 grape, then 3 pieces of melon.
+  - When the skewer is finished, it has 15 pieces of melon.
+  - How many pieces of fruit are on the skewer altogether?
+  - Options: A 10, B 20, C 25, D 30, E 90.
+- **Answer** (checked): **D, 30**. Each step adds 3 melon pieces, so 15 melon pieces means 15 ÷ 3 = 5 steps. Each step adds 2 + 1 + 3 = 6 pieces of fruit, so 5 × 6 = 30. (Check: 10 strawberries + 5 grapes + 15 melon = 30.)
+- **Notes**:
+  - Written by Claude, inspired by the sample question David showed. It tests the same skill (find the number of repeats from one colour, then scale up) with a twist: three kinds instead of two, and it asks for the total, not the other kind.
+  - Traps:
+    - A 10: the strawberries only (answers the sample's kind of question, not this one).
+    - B 20: 15 + 5, adds the grapes but forgets the strawberries.
+    - C 25: 15 + 10, adds the strawberries but forgets the grapes.
+    - E 90: 15 × 6, multiplies the melon pieces (not the steps) by the 6 pieces in a step.
+  - Repeating patterns were in Test 48 Maths Q2, Test 54 and Test 61 Maths Q2, so space it a few tests after Test 61. The answer letter can be moved for spread when it is used.
+  - A small picture of one step (two strawberries, a grape, three melon pieces on a stick) helps in the question.
+
+### Right angles in words (inspired by a sample question David showed)
+- **Section**: maths (angles: counting right angles in letters made of horizontal and vertical lines; a Q2)
+- **Added**: 2026-11-03
+- **Question** (our own, inspired by a sample-paper question David pasted: the sample's digit-cards question, PT1 Q11, is not saved here): Jack writes words in capital letters made only of horizontal and vertical lines, like this: E F H I L T (draw them; I is a single line with no top or bottom bars). Which word has the **most** right angles?
+  - Options: A FLEET, B THEFT, C HEEL, D ELITE, E TITLE.
+- **Answer** (checked): **B, THEFT (15)**.
+  - Right angles in each letter: L 1 (one corner), I 0, T 2 (where the stem meets the bar there is a right angle on each side), F 3 (corner 1 + middle bar 2), E 4 (two corners 1 + 1, middle bar 2), H 4 (each end of the crossbar makes 2).
+  - FLEET = 3 + 1 + 4 + 4 + 2 = 14; **THEFT = 2 + 4 + 4 + 3 + 2 = 15**; HEEL = 4 + 4 + 4 + 1 = 13; ELITE = 4 + 1 + 0 + 2 + 4 = 11; TITLE = 2 + 0 + 2 + 1 + 4 = 9.
+- **Notes**:
+  - Written by Claude, inspired by the sample question David showed. Same skill (count right angles carefully, including both angles where one line meets the middle of another), but comparing words instead of choosing cards.
+  - Traps:
+    - A FLEET: the main trap. It wins if a child counts each meeting point only once (FLEET 10, THEFT 9), or counts only the corners (FLEET 6, THEFT 3). It is only 1 behind with the right method, so careless counting also picks it.
+    - C HEEL: only 4 letters but has 13, so a child who expects fewer letters to mean fewer angles rules it out too quickly, while one who scores H and E high but forgets T's two angles picks it.
+    - D ELITE: picked by a child who pictures I with top and bottom bars (4 right angles), which would make ELITE 15 and tie THEFT. This is why the plain I must be drawn.
+    - E TITLE: picked by a child who judges by the Ts (TITLE and THEFT both have two) without counting the other letters; the I adds nothing, so TITLE has just 9.
+  - The letters **must** be drawn in the question (as the sample draws its digits), with E, F and H in the plain block style above, so the counts aren't open to argument. The explanation should mark the right angles on THEFT and FLEET.
+  - Angles were in Test 56 Maths and Test 57 Maths (PT1 Q11 mapped there), so space it a few tests after Test 57. It is a gentle stretch; keep the five words short.
+
 ## Used
 
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
