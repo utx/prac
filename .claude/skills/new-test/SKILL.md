@@ -18,6 +18,7 @@ Default batch size is **1–2 tests per run** (3 at most). Each test gets its ow
    - Reading format: aim over any 9 versions for cloze ×2, four extracts ×2, story ×2, missing sentences ×2, poem ×1. Every few versions use a public-domain classic.
    - Thinking Q1: rotate spot the mistake → supports the claim → whose reasoning (spot the mistake slightly more often); cycle the sub-patterns listed in `CLAUDE.md`, choosing one not used recently.
    - Thinking Q2: table / timetable / data / arrangement, varied from the last few — but every few versions swap in a type the fixed slots would miss (rules/codes/sets, number problems, must/cannot be true, or a nearby type), so the whole question base gets covered (see `CLAUDE.md`).
+   - **Practice focus:** if `CLAUDE.md` has a "Practice focus" section that is still running (tables with totals and missing numbers, Nov 2026), check whether this test is due one and at which step of the build-up, and put it in the slot it names.
    - Thinking Q3: spatial type not used recently (look at the `thinking` labels).
    - Maths Q1: next item in the quick-fire rotation; Q2–Q3: a new topic plus a loop-back.
 5. **Topic check.** The Reading topic must not appear in any `content/vNN.json` (`reading`, `reading_topic`) **or** in `content/used_topics_before_v33.md`. Until David confirms that list is complete, **tell David the planned Reading topic(s) in one line and wait for an OK before writing.**

@@ -18,6 +18,18 @@ Use the `new-test` skill (`.claude/skills/new-test/SKILL.md`): it is the full st
 - New tests for review are built only while fewer than 4 held tests are unapproved, so they don't pile up.
 - `python3 tools/release.py [--json]` applies these rules and says what to release and whether to build (`publish`, `review` or `none`). The nightly routine and the `overnight` skill follow it; so does a test built on request unless David says otherwise. Uncompleted counts (`tools/progress.py`) only count published tests.
 
+## Practice focus: tables with totals and missing numbers (David, Nov 2026)
+David's son found Test 63 Thinking Q2 (quiz scores table: rows and columns with totals, some numbers missing) hard. The sums were easy; it was the idea of the totals and how to start that he didn't get. He wants to see this question type repeated until it clicks.
+- **How often:** one in about every second test, starting at Test 65, for 4 questions (so roughly Tests 65, 67, 69 and 71). Count the earlier ones by the label "totals table" in the `thinking`/`maths` labels of each `content/vNN.json`. After 4, go back to the normal rotation and ask David whether he wants more.
+- **Where:** usually Thinking Q2, the table slot. Sometimes put it in Maths Q1 or Q2 (with A–E options) for variety. It doesn't use up the question-bank slot.
+- **Build up slowly**, one step harder each time, with a new context each time (for example books read, money raised at a stall, pets in each class, fruit sold each day):
+  1. One gap in each row or column, so each one is a single subtraction, and the question asks for the grand total. The explanation shows that the row totals and the column totals add up to the same grand total.
+  2. A two-step chain, like Test 63: filling one gap opens up another.
+  3. A gap that can only be found through the grand total (for example a row total that is missing).
+  4. A three-step chain or a two-way table (for example boys and girls in each class, with totals), as the stretch question.
+- **Same method, same words, every time.** Every explanation starts with this method: "Find a row or column with only **one** number missing. Total − the numbers you know = the missing number. Fill it in, then look again: a new row or column may now have only one gap." Show the completed table with each filled-in number marked in the order it was found (①, ②, ③). The traps come from real mistakes: adding the total into the sum, taking a number from the wrong row, answering with the first number found instead of the one asked for, or stopping one step early.
+- Label each one in `content/vNN.json` with "totals table" (for example "Totals table: books read, two-step chain"), and use the category "Tables & timetables" (Thinking) or "Graphs & data" (Maths) as usual.
+
 ## Question bank (David's own questions)
 - When David drops questions in chat ("add this", "remember this one"), save each one to **Waiting** in `content/question_bank.md`, word for word, with any picture in `content/bank/`. Then commit them through a small pull request and merge it when green, so the overnight run can see them. Check every answer straight away and tell David at once if one looks wrong or ambiguous.
 - **Mix them in evenly with our own questions** (David, Oct 2026: don't fill tests with his). Use **at most one bank question per test**, in about every second test. When more than about 8 are waiting, use one in every test so the list keeps moving. All of them must be used eventually: take the oldest one that fits, and don't let any question wait more than about 8 tests.
