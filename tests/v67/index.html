@@ -334,9 +334,9 @@ const U_SVG = (() => {
   const P = [[30, 40], [150, 40], [150, 120], [215, 120], [215, 40], [300, 40], [300, 200], [30, 200]];
   let g = `<polygon points="${P.map(p => p.join(",")).join(" ")}" fill="#dff0d8" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/>`;
   const t = (x, y, s, a = "middle") => `<text x="${x}" y="${y}" font-size="18" font-weight="700" text-anchor="${a}" fill="${INK}">${s}</text>`;
-  g += t(165, 224, "12 m") + t(22, 126, "7 m", "end") + t(90, 32, "5 m") + t(258, 32, "3 m") + t(144, 86, "4 m", "end");
+  g += t(165, 224, "12 m") + t(22, 126, "7 m", "end") + t(308, 126, "7 m", "start") + t(90, 32, "5 m") + t(258, 32, "3 m") + t(144, 86, "4 m", "end");
   g += `<text x="165" y="244" font-size="14" text-anchor="middle" fill="#55607a">not to scale</text>`;
-  return `<svg viewBox="-20 0 350 250" width="340" height="243" role="img" aria-label="A garden bed shaped like a letter U, with every corner a right angle. The bottom side is 12 m and the left side is 7 m. Along the top, the left part is 5 m and the right part is 3 m. Between them a rectangular gap is cut down into the bed; the left side of the gap is marked 4 m deep. The width of the gap is not marked. The diagram is not drawn to scale.">${g}</svg>`;
+  return `<svg viewBox="-20 0 368 250" width="350" height="238" role="img" aria-label="A garden bed shaped like a letter U, with every corner a right angle. The bottom side is 12 m and the left and right sides are each 7 m. Along the top, the left part is 5 m and the right part is 3 m. Between them a rectangular gap is cut down into the bed; the left side of the gap is marked 4 m deep. The width of the gap is not marked. The diagram is not drawn to scale.">${g}</svg>`;
 })();
 
 /* ---- Maths Q3: a magic square ---- */
