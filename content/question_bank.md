@@ -16,40 +16,6 @@ Never paste in questions from the official sample papers or other copyrighted bo
 
 These three are one family ("which statements are correct" about shapes). Use them in different tests, at least 3 tests apart, oldest (David's) first.
 
-### Which shape statements are correct (quadrilaterals)
-- **Section**: maths (2D shapes: classifying quadrilaterals, in a "which statements are correct" format; the samples have a quadrilateral classification question around Q16)
-- **Added**: 2026-10-31
-- **Question**: Which of these statements is/are correct?
-  - 1 All rhombuses are parallelograms.
-  - 2 All rectangles are kites.
-  - 3 All quadrilaterals are squares.
-  - No options or answer were given.
-- **Answer** (checked): **1 only**.
-  - 1 is correct: a rhombus has both pairs of opposite sides parallel, so it is a parallelogram.
-  - 2 is wrong: a kite has two pairs of equal sides next to each other. A long, thin rectangle doesn't (only a square is both a rectangle and a kite).
-  - 3 is wrong: a quadrilateral is any four-sided shape, and most are not squares (it is the rule turned round: all squares are quadrilaterals).
-- **Notes**:
-  - Written by David (his questions can be reworded).
-  - Options (A–E): 1 only; 2 only; 1 and 2; 1 and 3; none of them. Main traps: "1 and 2" (a square is a rectangle and a kite, so a child thinks all rectangles are), "1 and 3" (reads 3 the wrong way round) and "none of them" (thinks a rhombus is a tilted square, not a parallelogram).
-  - The explanation should show a small picture of each shape, with a rectangle that is clearly not a kite.
-
-### Squares, rhombuses and rectangles (inspired by David's shape statements)
-- **Section**: maths (2D shapes: which statements are correct; a Q2)
-- **Added**: 2026-10-31
-- **Question** (our own, written in the style of David's question above): Which of these statements is/are correct?
-  - 1 Every square is also a rectangle.
-  - 2 Every rhombus is also a square.
-  - 3 Every rectangle is also a parallelogram.
-  - Options: A 1 only, B 3 only, C 1 and 3, D 2 and 3, E 1, 2 and 3.
-- **Answer** (checked): **C, 1 and 3**.
-  - 1 is correct: a square has four right angles, which is all a rectangle needs.
-  - 2 is wrong: a rhombus has four equal sides, but its angles need not be right angles (a "pushed-over" square).
-  - 3 is correct: a rectangle's opposite sides are parallel.
-- **Notes**:
-  - Written by Claude, inspired by David's question (David asked for some like it).
-  - Traps: B (thinks a square can't be a rectangle because its sides are all equal), D (mixes up which shape is the special case) and E (thinks a rhombus is just a tilted square).
-  - Draw a square, a rhombus that is not a square, and a rectangle in the explanation.
-
 ### Which 3D shape statements are correct (inspired by David's shape statements)
 - **Section**: maths (3D shapes: faces, edges and vertices, in a "which statements are correct" format; a Q2)
 - **Added**: 2026-10-31
@@ -67,22 +33,6 @@ These three are one family ("which statements are correct" about shapes). Use th
   - Traps: B (thinks a cube can't be a rectangular prism), D (counts 6 faces, mixing up faces and vertices) and E (both slips).
   - Test 64 Maths Q2 was 3D shapes (edges and vertices of a pentagonal prism), so use this a few tests after Test 64.
   - A picture of each shape helps in the explanation, not in the question.
-
-### Staying behind for the homework (whose reasoning: reversed rule)
-- **Section**: thinking (critical thinking: whose reasoning is correct, the "reversed rule" pattern; a Q1)
-- **Added**: 2026-10-31
-- **Question**: The deadline to complete the Geography homework was last Friday. Anyone who didn't complete it on time will have to stay behind after school tomorrow to finish it off.
-  - Kalinda: "I know Abby didn't hand in the homework on time, so she'll definitely be staying behind tomorrow."
-  - Keira: "Lottie has to stay behind tomorrow, so she must have failed to complete the homework on time too!"
-  - If the information in the box is true, whose reasoning is correct?
-  - No options or answer were given.
-- **Answer** (checked): **Kalinda only**.
-  - Kalinda uses the rule the right way round: not finished on time → stays behind.
-  - Keira turns the rule round. The box says who must stay behind, not that only they will; Lottie could be staying behind for another reason (detention, a different subject).
-- **Notes**:
-  - Written by David (his questions can be reworded).
-  - One wording gap: the rule is about *completing* the homework, but Kalinda says Abby didn't *hand it in*. A sharp child could argue Abby finished it but forgot to hand it in, which would make Kalinda wrong too. Change Kalinda's line to "Abby didn't complete the homework on time" (or make the rule about handing it in), so the only trap is Keira's reversed rule.
-  - Options (A–D): Kalinda only; Keira only; both Kalinda and Keira; neither Kalinda nor Keira. Traps: "both" (Keira's line sounds just as sure) and "Keira only".
 
 ### Art prize entries (inspired by David's homework question)
 - **Section**: thinking (critical thinking: whose reasoning is correct, the "needed versus guaranteed" pattern; a Q1)
@@ -134,23 +84,6 @@ These three are one family ("which statements are correct" about shapes). Use th
   - Ways to bring it up to sample level, if David agrees:
     - Give the clues out of order, and make some of them "not" clues or gaps. For example, "Raj was not last", "Zoe finished two places behind Mia", and ask who came second.
     - Add a fifth runner and a clue that leaves two possible orders, and ask which statement must be true.
-
-### Maths and chess (fraction of a fraction)
-- **Section**: maths (fractions of a quantity, two steps; quick-fire Q1)
-- **Added**: 2026-11-01
-- **Question**: In a class of **24 students**, exactly **half** like maths. Of those who like maths, **one third** also play chess. How many students like maths **and** play chess?
-  - No options or answer were given.
-- **Answer** (checked): **4**. Half of 24 is 12 who like maths. One third of those 12 is 4.
-- **Notes**:
-  - Written by David (his questions can be reworded).
-  - Level: two quick steps, so it suits a quick-fire Maths Q1, not a Q2 or Q3. Test 62 Maths Q2 was a harder version of the same skill (a third, then three eighths of what is left), so space it a few tests after Test 62.
-  - Possible wrong options from real mistakes:
-    - 8: one third of the whole class (24 ÷ 3), skipping the "of those" step.
-    - 12: stops after the first step (the maths lovers).
-    - 3: 12 ÷ 4, using a quarter instead of a third.
-    - 16: 24 − 8, the students who don't play chess.
-    - 6: halves twice (24 ÷ 2 ÷ 2).
-  - Choose 4 of these, so with the answer there are 5 options.
 
 ### Rectangle area from its perimeter
 - **Section**: maths (perimeter and area; a quick-fire Q1 or a gentle Q2)
@@ -253,6 +186,74 @@ These three are one family ("which statements are correct" about shapes). Use th
   - Draw the larger triangle so its diagonal clearly runs corner to corner of the 2 × 2 block, not to scale for measuring. Area left after cut-outs was in Test 43 and Test 53, so it can be used any time.
 
 ## Used
+
+### Which shape statements are correct (quadrilaterals) → Test 65 Maths Q2
+- **Section**: maths (2D shapes: classifying quadrilaterals, in a "which statements are correct" format; the samples have a quadrilateral classification question around Q16)
+- **Added**: 2026-10-31
+- **Question**: Which of these statements is/are correct?
+  - 1 All rhombuses are parallelograms.
+  - 2 All rectangles are kites.
+  - 3 All quadrilaterals are squares.
+  - No options or answer were given.
+- **Answer** (checked): **1 only**.
+  - 1 is correct: a rhombus has both pairs of opposite sides parallel, so it is a parallelogram.
+  - 2 is wrong: a kite has two pairs of equal sides next to each other. A long, thin rectangle doesn't (only a square is both a rectangle and a kite).
+  - 3 is wrong: a quadrilateral is any four-sided shape, and most are not squares (it is the rule turned round: all squares are quadrilaterals).
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Options (A–E): 1 only; 2 only; 1 and 2; 1 and 3; none of them. Main traps: "1 and 2" (a square is a rectangle and a kite, so a child thinks all rectangles are), "1 and 3" (reads 3 the wrong way round) and "none of them" (thinks a rhombus is a tilted square, not a parallelogram).
+  - The explanation should show a small picture of each shape, with a rectangle that is clearly not a kite.
+
+### Squares, rhombuses and rectangles (inspired by David's shape statements) → Test 68 Maths Q2
+- **Section**: maths (2D shapes: which statements are correct; a Q2)
+- **Added**: 2026-10-31
+- **Question** (our own, written in the style of David's question above): Which of these statements is/are correct?
+  - 1 Every square is also a rectangle.
+  - 2 Every rhombus is also a square.
+  - 3 Every rectangle is also a parallelogram.
+  - Options: A 1 only, B 3 only, C 1 and 3, D 2 and 3, E 1, 2 and 3.
+- **Answer** (checked): **C, 1 and 3**.
+  - 1 is correct: a square has four right angles, which is all a rectangle needs.
+  - 2 is wrong: a rhombus has four equal sides, but its angles need not be right angles (a "pushed-over" square).
+  - 3 is correct: a rectangle's opposite sides are parallel.
+- **Notes**:
+  - Written by Claude, inspired by David's question (David asked for some like it).
+  - Traps: B (thinks a square can't be a rectangle because its sides are all equal), D (mixes up which shape is the special case) and E (thinks a rhombus is just a tilted square).
+  - Draw a square, a rhombus that is not a square, and a rectangle in the explanation.
+
+### Staying behind for the homework (whose reasoning: reversed rule) → Test 66 Thinking Q1
+- **Used**: Kalinda's line changed to "Abby didn't complete the homework on time" (as the note below suggests); option order moved for answer-letter spread.
+- **Section**: thinking (critical thinking: whose reasoning is correct, the "reversed rule" pattern; a Q1)
+- **Added**: 2026-10-31
+- **Question**: The deadline to complete the Geography homework was last Friday. Anyone who didn't complete it on time will have to stay behind after school tomorrow to finish it off.
+  - Kalinda: "I know Abby didn't hand in the homework on time, so she'll definitely be staying behind tomorrow."
+  - Keira: "Lottie has to stay behind tomorrow, so she must have failed to complete the homework on time too!"
+  - If the information in the box is true, whose reasoning is correct?
+  - No options or answer were given.
+- **Answer** (checked): **Kalinda only**.
+  - Kalinda uses the rule the right way round: not finished on time → stays behind.
+  - Keira turns the rule round. The box says who must stay behind, not that only they will; Lottie could be staying behind for another reason (detention, a different subject).
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - One wording gap: the rule is about *completing* the homework, but Kalinda says Abby didn't *hand it in*. A sharp child could argue Abby finished it but forgot to hand it in, which would make Kalinda wrong too. Change Kalinda's line to "Abby didn't complete the homework on time" (or make the rule about handing it in), so the only trap is Keira's reversed rule.
+  - Options (A–D): Kalinda only; Keira only; both Kalinda and Keira; neither Kalinda nor Keira. Traps: "both" (Keira's line sounds just as sure) and "Keira only".
+
+### Maths and chess (fraction of a fraction) → Test 67 Maths Q1
+- **Section**: maths (fractions of a quantity, two steps; quick-fire Q1)
+- **Added**: 2026-11-01
+- **Question**: In a class of **24 students**, exactly **half** like maths. Of those who like maths, **one third** also play chess. How many students like maths **and** play chess?
+  - No options or answer were given.
+- **Answer** (checked): **4**. Half of 24 is 12 who like maths. One third of those 12 is 4.
+- **Notes**:
+  - Written by David (his questions can be reworded).
+  - Level: two quick steps, so it suits a quick-fire Maths Q1, not a Q2 or Q3. Test 62 Maths Q2 was a harder version of the same skill (a third, then three eighths of what is left), so space it a few tests after Test 62.
+  - Possible wrong options from real mistakes:
+    - 8: one third of the whole class (24 ÷ 3), skipping the "of those" step.
+    - 12: stops after the first step (the maths lovers).
+    - 3: 12 ÷ 4, using a quarter instead of a third.
+    - 16: 24 − 8, the students who don't play chess.
+    - 6: halves twice (24 ÷ 2 ÷ 2).
+  - Choose 4 of these, so with the answer there are 5 options.
 
 ### Follow-up 2: a "turned back" trip with no diagram (stretch, step 3 of 3) → Test 61 Maths Q3 (stretch)
 - **Section**: maths Q3 (stretch)
