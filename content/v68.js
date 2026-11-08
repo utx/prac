@@ -156,11 +156,9 @@ const SECTIONS = [
       },
       {
         stem: `Which of these statements is/are correct?
-               <ol style="margin:8px 0 0">
-                 <li>Every square is also a rectangle.</li>
-                 <li>Every rhombus is also a square.</li>
-                 <li>Every rectangle is also a parallelogram.</li>
-               </ol>`,
+               <p style="margin:6px 0 0">1 &nbsp;Every square is also a rectangle.<br>
+                  2 &nbsp;Every rhombus is also a square.<br>
+                  3 &nbsp;Every rectangle is also a parallelogram.</p>`,
         options: ["1 only", "3 only", "1 and 3", "2 and 3", "1, 2 and 3"],
         answer: 2,
         skill: "2D shapes: which statements about squares, rhombuses and rectangles are correct (question bank, supplied by David)",
