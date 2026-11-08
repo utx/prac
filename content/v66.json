@@ -1,0 +1,62 @@
+{
+  "version": 66,
+  "date": "2026-11-08",
+  "reading": "Cloze: A Thousand Cranes",
+  "reading_format": "cloze",
+  "reading_topic": "learning to fold origami paper cranes: an aunt who folds one in 52 seconds, crumpled first attempts, valley and mountain folds, the old Japanese belief that folding a thousand cranes grants a wish, and finding that the slow daily folding has become the best part of the day (first-person piece)",
+  "thinking": [
+    "Whose reasoning is correct (reversed rule: staying behind for the homework; Kalinda only) (supplied by David)",
+    "Number problem: two ages from a difference now and a total in 4 years' time",
+    "Views: which picture shows objects on a table from the left to the right of a person at one side (stretch)"
+  ],
+  "maths": [
+    "Quick-fire missing number: box divided by 3 plus 8 equals 4 × 5 (undoing two operations)",
+    "Capacity: litres and millilitres, how much more water fills a jug after three cups",
+    "Combinations with a condition: outfits of T-shirt, shorts and cap with no two items the same colour (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1 Q12 and PT3 Q13 (near-synonyms and look-alike words where only one fits the meaning)",
+      "PT3 Q10 (word decided by the grammar and the preposition that follows), PT1 Q8 (fixed expressions)",
+      "PT2 Q11 (word chosen from the meaning of the whole passage), PT1-PT3 Q1-6 (attitude shown rather than stated) — stretch"
+    ],
+    "thinking": [
+      "PT2 Q8 (whose reasoning: reversed rule), PT3 Q15 (rule used in both directions), PT1 Q26 (rule forwards vs backwards); supplied by David",
+      "PT1 Q1 (travel time from a ratio: number), PT3 Q1 (days counting: number), PT1 Q7 (counting over days)",
+      "PT3 Q16 (view from a seat at a table), PT2 Q22 (plan view and side view), PT1 Q28 (floor plan from a view) — stretch"
+    ],
+    "maths": [
+      "PT1 Q1 (missing number with equals sign), PT2 Q18 (missing factor), PT3 Q24 (inverse operations)",
+      "PT1 Q9 (reading a jug scale, pouring), PT2 Q13 (grams to half a kilogram: converting units), PT3 Q11 (water in a container)",
+      "PT2 Q10 (combinations: shapes × colours), PT2 Q28 (round-robin matches), PT1 Q35 (combinations) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms"
+    ],
+    "thinking": [
+      "Whose reasoning",
+      "Number problems",
+      "Spatial"
+    ],
+    "maths": [
+      "Number & place value",
+      "Measurement & scales",
+      "Chance & counting"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

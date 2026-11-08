@@ -1,0 +1,62 @@
+{
+  "version": 65,
+  "date": "2026-11-08",
+  "reading": "Story extract: The Tree House",
+  "reading_format": "story",
+  "reading_topic": "a girl and her grandfather build a tree house; she wants it perfect and cuts a floorboard too short, he saw the mistake coming and let her find it herself, then shows her the wobbly stool he made as a boy; the short board becomes the step she is proudest of (feelings shown, not stated)",
+  "thinking": [
+    "Spot the mistake (ignoring another possible cause: morning stretching versus easier spelling words)",
+    "Totals table: books read in a reading challenge, one gap in each row or column, find the grand total (step 1)",
+    "Straight cuts: which pair of pieces one straight cut across a square cannot make (stretch)"
+  ],
+  "maths": [
+    "Quick-fire time: finishing time of a play with two acts and a break",
+    "Which shape statements are correct: rhombuses, rectangles, kites and quadrilaterals (supplied by David)",
+    "Chance statements: a spinner with a half, a quarter and two eighths, which statements are correct (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1 Q1-6 and PT3 Q1-6 (feelings and thoughts shown rather than stated)",
+      "PT1 Q1-6 and PT2 Q1-6 (why the writer includes a detail / what a detail shows)",
+      "PT1-PT3 Q6 (whole-text question: what the story is mostly about, what the ending shows) — stretch"
+    ],
+    "thinking": [
+      "PT3 Q8 (mistake: ignoring another possible cause), PT3 Q24 (mistake: one cause assumed to exclude another)",
+      "PT1 Q19 (marks table), PT3 Q7 (packs table), PT2 Q7 (bar chart totals)",
+      "PT1 Q34 and PT3 Q34 maths (straight cuts: pieces and their sides), PT3 Q10 (counting shapes) — stretch"
+    ],
+    "maths": [
+      "PT1 Q3 (elapsed time), PT2 Q20 (clock + 555 minutes), PT2 Q2 (minutes in a timetable)",
+      "PT3 Q16 (quadrilateral classification), PT2 Q17 (rectangle and rhombus properties); supplied by David",
+      "PT3 Q10 and PT2 Q14 (chance statements: which are correct), PT1 Q33 (chance with counters) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Feelings & inference",
+      "Purpose of a detail",
+      "Main idea"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Time & timetables",
+      "Area, perimeter & 3D",
+      "Chance & counting"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
