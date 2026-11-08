@@ -97,11 +97,11 @@ const SECTIONS = [
       },
       {
         stem: "Which word best fits <b>gap 3</b>?",
-        options: ["ordeal", "chore", "obstacle", "reward"],
+        options: ["wish", "chore", "obstacle", "reward"],
         answer: 3,
         skill: "choosing a word from the meaning of the whole text: an attitude shown, not stated",
         explain: `<p>Follow how the writer’s feelings change. At first the writer was aiming for the wish at the end: a thousand cranes. Now the writer has “stopped counting”, folds slowly, and the ten minutes of folding have become “the best part of my day”. So the folding is no longer just a way to get the wish; it is the good thing in itself. The folding itself is the real <b>reward</b>.</p>
-                  <p class="why-not">Each wrong word fits an <em>earlier</em> part of the text, or the wrong way of seeing it. “Chore” (a dull job you have to do) is the trap: the writer does fold one crane every evening, like a regular job. But nobody calls a chore “the best part of my day”. “Ordeal” (a painful, difficult experience) fits the first forty-minute crane, not the quiet evenings now. “Obstacle” (something in the way) treats the folding as what stands between her and the wish, which is how a reader might expect the writer to feel, but the writer has stopped counting and no longer sees the folding that way.</p>`
+                  <p class="why-not">Each wrong word fits an <em>earlier</em> part of the text, or the wrong way of seeing it. “Chore” (a dull job you have to do) is the trap: the writer does fold one crane every evening, like a regular job. But nobody calls a chore “the best part of my day”. “Wish” picks up a word from earlier in the text, but the wish is what Aunt Mei’s story promises at the <em>end</em>, after a thousand cranes; the writer is saying the folding itself has become the good part, not that the folding is a wish. “Obstacle” (something in the way) treats the folding as what stands between her and the wish, which is how a reader might expect the writer to feel, but the writer has stopped counting and no longer sees the folding that way.</p>`
       }
     ]
   },

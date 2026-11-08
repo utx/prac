@@ -32,9 +32,9 @@ const booksTable = (filled) => {
   <tr><th rowspan="2"></th><th colspan="3" style="text-align:center">Books read</th><th rowspan="2" style="text-align:center">Total</th></tr>
   <tr><th style="text-align:center">Week 1</th><th style="text-align:center">Week 2</th><th style="text-align:center">Week 3</th></tr>
   <tr><th>Isla</th>${BC(4)}${f(5, "①")}${BC(3)}${BC(12)}</tr>
-  <tr><th>Noah</th>${BC(2)}${BC(6)}${f(5, "③")}${f(13, "④")}</tr>
+  <tr><th>Noah</th>${BC(2)}${BC(6)}${BC(5)}${f(13, "③")}</tr>
   <tr><th>Zain</th>${f(2, "②")}${BC(3)}${BC(5)}${BC(10)}</tr>
-  <tr><th>Total</th>${BC(8)}${f(14, "⑤")}${BC(13)}${filled ? BC(`<b>35</b> <span style="color:#c0392b">⑥</span>`, ";background:#e3f2e1") : GAP}</tr>
+  <tr><th>Total</th>${BC(8)}${BC(14)}${f(13, "④")}${filled ? BC(`<b>35</b> <span style="color:#c0392b">⑤</span>`, ";background:#e3f2e1") : GAP}</tr>
 </table></div>`;
 };
 
@@ -124,10 +124,10 @@ const SECTIONS = [
         options: ["To show that Grandpa was not very good at woodwork when he was a boy.",
                   "To explain where Grandpa sits while he watches Mia building the floor.",
                   "To show that Grandpa has kept everything his father ever made for him.",
-                  "To show Mia that a mistake can teach you a lesson you never forget."],
+                  "To explain why Grandpa kept quiet when he saw Mia’s mistake coming."],
         answer: 3,
         skill: "understanding why a writer includes a detail",
-        explain: `<p>The stool arrives just after Mia’s angry outburst. Grandpa made it as a boy and cut one leg too short, just as Mia has cut her board too short. He says, “I’ve never measured from the wrong end since.” The stool is proof that his own mistake taught him a lesson for life, and it explains why he kept quiet: he wanted Mia to learn the same way. Straight afterwards Mia checks “which end said zero”, so she has learnt it too.</p>
+        explain: `<p>The stool arrives just after Mia’s angry outburst. Grandpa made it as a boy and cut one leg too short, just as Mia has cut her board too short. He says, “I’ve never measured from the wrong end since.” His father watched him make the mistake and “never said a word”, and the mistake taught him a lesson for life. So the stool explains why Grandpa kept quiet when he saw Mia’s mistake coming: he was doing what his father did, so that she would learn the same way. Straight afterwards Mia checks “which end said zero”, so she has learnt it too.</p>
                   <p class="why-not">A is the trap: the short leg does show that young Grandpa made a mistake, but the point of the stool is what the mistake taught him, not that he was bad at woodwork. B mixes up the details: Grandpa sits on an upturned bucket while he watches; he only sits on the stool to show it to Mia. C gets the story the wrong way round: Grandpa made the stool himself while his father watched, and nothing tells us what else he has kept.</p>`
       },
       {
@@ -165,22 +165,21 @@ const SECTIONS = [
         stem: `Three children kept a record of the books they read in a three-week reading challenge. Some numbers in the table are missing.
                <div class="figure">${booksTable(false)}</div>
                <p style="margin:10px 0 0">How many books did the three children read <b>altogether</b> in the three weeks?</p>`,
-        options: ["35", "30", "22", "13"],
+        options: ["35", "70", "22", "13"],
         answer: 0,
         skill: "finding missing numbers in a table from row and column totals (totals table, step 1: one gap in each row or column)",
         explain: `<p><b>The method:</b> Find a row or column with only <b>one</b> number missing. Total − the numbers you know = the missing number. Fill it in, then look again: a new row or column may now have only one gap. (If the missing number is a total, add up that row or column instead.)</p>
                   <p>① <b>Isla’s row</b> has one gap: 12 − 4 − 3 = <b>5</b> (Week 2).<br>
                      ② <b>Zain’s row</b> has one gap: 10 − 3 − 5 = <b>2</b> (Week 1).<br>
-                     ③ <b>Noah’s row</b> has two gaps (Week 3 and his total), so use the <b>Week 3 column</b> instead: 13 − 3 − 5 = <b>5</b>.<br>
-                     ④ Now Noah’s row is complete: 2 + 6 + 5 = <b>13</b>.<br>
-                     ⑤ And the Week 2 column is complete: 5 + 6 + 3 = <b>14</b>.<br>
-                     ⑥ The grand total, in the bottom-right corner.</p>
+                     ③ <b>Noah’s row</b>: only his total is missing, so add it up: 2 + 6 + 5 = <b>13</b>.<br>
+                     ④ <b>The Week 3 column</b>: only its total is missing: 3 + 5 + 5 = <b>13</b>.<br>
+                     ⑤ The grand total, in the bottom-right corner.</p>
                   <div class="figure">${booksTable(true)}</div>
                   <p><b>The grand total can be found two ways, and both must agree:</b><br>
                      adding the <b>children’s totals</b> (the Total column): 12 + 13 + 10 = <b>35</b><br>
                      adding the <b>weeks’ totals</b> (the Total row): 8 + 14 + 13 = <b>35</b> ✓<br>
                      Both add up every book in the table once, just grouped in a different way.</p>
-                  <p class="why-not">30 (B) is the trap: it adds up the table as if every “?” were 0, so Noah’s total looks like 2 + 6 = 8 and 12 + 8 + 10 = 30 (the weeks give 8 + 9 + 13 = 30 the same way). The gaps have to be filled first. 22 (C) adds only the two children’s totals that are shown, 12 + 10, and leaves Noah out. 13 (D) stops one step early: it is Noah’s total, a number found on the way, not the total for all three children.</p>`
+                  <p class="why-not">22 (C) is the trap: it adds up only the totals that are shown, 12 + 10 (or 8 + 14), as if the “?” were 0, and leaves Noah (or Week 3) out. The gaps have to be filled first. 70 (B) adds the children’s totals <em>and</em> the weeks’ totals together (35 + 35), so every book is counted twice: the Total row and the Total column are two ways of adding the same books, not two different lots. 13 (D) stops one step early: it is Noah’s total (and the Week 3 total), a number found on the way, not the total for all three children.</p>`
       },
       {
         stem: `Lena has a square piece of paper. She makes <b>one straight cut</b> right across it, from one edge to another, so that it falls into two pieces.
@@ -238,7 +237,7 @@ const SECTIONS = [
         stem: `The pointer on this spinner is equally likely to stop anywhere on it.
                <div class="figure">${SPINNER_SVG}</div>
                <p style="margin:10px 0 0">Which of these statements is/are correct?</p>
-               <p style="margin:6px 0 0">1 &nbsp;Spinning a 1 is as likely as spinning a 2, 3 or 4.<br>
+               <p style="margin:6px 0 0">1 &nbsp;Spinning a 1 is as likely as <b>not</b> spinning a 1.<br>
                   2 &nbsp;Spinning a 2 is twice as likely as spinning a 3.<br>
                   3 &nbsp;Spinning an even number is as likely as spinning an odd number.</p>`,
         options: ["1 only", "2 only", "3 only", "1 and 3", "1 and 2"],
@@ -246,7 +245,7 @@ const SECTIONS = [
         skill: "chance: which statements are correct when the parts of a spinner are different sizes",
         explain: `<p>The chance of each number depends on <b>how much of the spinner</b> it covers, not on how many parts there are. Write each part as a fraction of the whole spinner:</p>
                   <p>1 → <b>half</b> = 4 eighths &nbsp; 2 → <b>a quarter</b> = 2 eighths &nbsp; 3 → <b>1 eighth</b> &nbsp; 4 → <b>1 eighth</b></p>
-                  <p><b>1 is correct.</b> 2, 3 and 4 together cover 2 + 1 + 1 = 4 eighths, the other half. So a 1 is just as likely as a 2, 3 or 4.</p>
+                  <p><b>1 is correct.</b> Not spinning a 1 means spinning a 2, 3 or 4, and those together cover 2 + 1 + 1 = 4 eighths, the other half. So a 1 is just as likely as not a 1.</p>
                   <p><b>2 is correct.</b> 2 covers 2 eighths and 3 covers 1 eighth, so a 2 is twice as likely.</p>
                   <p><b>3 is wrong.</b> Even numbers (2 and 4) cover 2 + 1 = 3 eighths. Odd numbers (1 and 3) cover 4 + 1 = 5 eighths. An odd number is more likely.</p>
                   <p>So the answer is <b>1 and 2</b> (E).</p>
