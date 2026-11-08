@@ -1,9 +1,9 @@
 {
   "version": 68,
   "date": "2026-11-08",
-  "reading": "Four extracts: Caves",
-  "reading_format": "four extracts",
-  "reading_topic": "caves: a memoir of a family visit to a show cave where the guide switches off the lights to show glow-worms (the young of a small fly, glowing to lure insects into sticky threads) and a nervous little brother is won over, an opinion piece against touching cave formations (skin oils stop crystal growing, dirt stains them, guides call growing formations 'live'), a short story of two children at a cave entrance when the torch fails and the older sister follows the creek out, a factual piece on how rain made acidic by carbon dioxide dissolves limestone into caves and how drops build straws, stalactites, stalagmites and columns (about a centimetre in a hundred years; c for ceiling, g for ground)",
+  "reading": "Cloze: The Letterbox",
+  "reading_format": "cloze",
+  "reading_topic": "caves: a first-person account of an adventure-caving trip, crawling flat through a narrow squeeze the guide calls the Letterbox, a chamber hung with glassy straws and a column taller than a house, the guide's warning that skin oil stops straws growing, headlamps off in total silence, and the writer, who had dreaded the squeeze, finding to their surprise that they are almost loath to leave (replaced the original four-extract set on caves at David's request, 8 Nov 2026; cloze now has 6 gaps worth ½ mark each)",
   "thinking": [
     "Spot the mistake (judging from your own small group: asking only the chess club which subject they like best)",
     "Venn diagram: instrument players and sports team, finding how many do both from the totals and the number who do neither",
@@ -16,9 +16,12 @@
   ],
   "sample_map": {
     "reading": [
-      "PT1-PT3 Q26-33 (which extract: main idea expressed in different words), PT1 Q1-6 (feelings shown rather than stated)",
-      "PT1-PT3 Q26-33 ('uses figurative language'), PT1-PT3 Q15-19 (which thing is given human qualities)",
-      "PT1-PT3 Q26-33 (an idea expressed in completely different words), PT1-PT3 Q1-6 (why the writer includes a detail) — stretch"
+      "PT1-PT3 Q7-14 (cloze: look-alike words where only one fits the meaning and grammar, e.g. 'leafed' versus 'paged')",
+      "PT1-PT3 Q7-14 (cloze: shade of meaning, e.g. 'teeming with' versus near-synonyms)",
+      "PT1-PT3 Q7-14 (cloze: near-synonyms where only one fits the context, e.g. 'decline' versus 'decay')",
+      "PT1-PT3 Q7-14 (cloze: grammar and preposition fit: only one verb takes the words that follow)",
+      "PT1-PT3 Q7-14 (cloze: look-alike words and collocations, e.g. 'culmination', 'remiss')",
+      "PT1-PT3 Q7-14 (cloze: word chosen from the meaning of the whole passage), PT1-PT3 Q1-6 (feelings shown rather than stated) — stretch"
     ],
     "thinking": [
       "PT3 Q5 (mistake: judging from own small group), PT2 Q6 (mistake: own experience)",
@@ -33,9 +36,12 @@
   },
   "categories": {
     "reading": [
-      "Main idea",
-      "Comparisons & imagery",
-      "Purpose of a detail"
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Vocabulary & idioms",
+      "Feelings & inference"
     ],
     "thinking": [
       "Spot the mistake",
@@ -50,7 +56,7 @@
   },
   "stretch": {
     "reading": [
-      2
+      5
     ],
     "thinking": [
       2

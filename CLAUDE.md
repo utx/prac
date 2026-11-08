@@ -39,6 +39,7 @@ David's son found Test 63 Thinking Q2 (quiz scores table: rows and columns with 
 
 ## Format
 - Reading 3 questions (A–D), Thinking Skills 3 (A–D), Maths 3 (A–E). No timer.
+- **Cloze is the exception: 6 gaps worth ½ mark each** (David, Nov 2026), so every test is still out of 9. Give the reading section `points: 0.5` in `content/vNN.js` (the template then shows ½ marks and records `pts` for the stats), 6 `categories`/`sample_map` entries, and tag the last gap as the stretch (`"reading": [5]`). Test 68 was the first.
 - Never mention "OC" in the page itself.
 
 ## Calibration
@@ -51,6 +52,7 @@ David's son found Test 63 Thinking Q2 (quiz scores table: rows and columns with 
 Sample paper: story 6 Qs, cloze 8, poem 5, missing sentences 6, four extracts 8.
 - Rotate formats. Over any 9 versions aim for about: cloze ×2, four extracts ×2, story ×2, missing sentences ×2, poem ×1.
 - Passages stay approachable (about 250–350 words), but questions are genuinely OC-level: implication, why a detail is included, structure, comparisons, feelings shown rather than stated.
+- Cloze has 6 gaps (½ mark each; see Format). Spread the deciding clue across collocations, preposition/grammar fit, look-alike words and shades of meaning, with the last gap read from the whole passage (the stretch). Don't let the right answer be the only hard word in its set.
 - Cloze uses upper-primary to adult vocabulary like the samples (e.g. culmination, teeming, scouring, remiss): near-synonyms, look-alike words and preposition collocations where only one fits. Avoid easy everyday idioms. No homophone-spelling gaps (bated/baited and the like): the real cloze doesn't test them (David, Oct 2026).
 - Every few versions, use a real public-domain classic instead of an original text (author died more than 70 years ago, e.g. Grahame, Nesbit, Stevenson, Lawson). Copy the text exactly from a reliable source (Project Gutenberg via its GitHub mirrors) and credit author and year in the passage note.
 - Wrong options must be partly true or built on a real detail from the text, never obviously wrong.

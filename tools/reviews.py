@@ -9,7 +9,7 @@ Usage:
   python3 tools/reviews.py --all           every review row
   python3 tools/reviews.py done V SECTION Q "reply to David"
                                            mark a redo as handled (SECTION: reading, thinking or maths;
-                                           Q: question number 1-3 as shown on the page)
+                                           Q: question number 1-3 (1-6 for a cloze) as shown on the page)
 
 A question is waiting when its latest row is 'redo'. Approving it again, or a 'done' reply, closes it.
 Exit code 2 if the database can't be reached or isn't configured.
