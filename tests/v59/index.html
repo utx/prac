@@ -594,12 +594,16 @@ function persistAttempt() {
   if (attempt.finished) st.flags[attempt.v] = { completed: true, at: attempt.finished };
   saveStore(st);
 }
+/* Marks: each question is worth its section's "points" (default 1; cloze gaps are worth ½ each). */
+const qPts = i => SECTIONS[i].points || 1;
+const sectionMax = i => SECTIONS[i].questions.length * qPts(i);
+const fmtMark = x => { const w = Math.floor(x + 1e-9); return Math.abs(x - w) < 1e-9 ? String(w) : (w ? w : "") + "½"; };
 function recordSection(i) {
   if (!attempt) return;
   const s = SECTIONS[i];
   attempt.sections[i] = { id: s.id, ms: Date.now() - sectionStart,
     answers: s.questions.map((q, qi) => ({ cat: ((TEST_META.categories || {})[s.id] || [])[qi] || null,
-      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, changes: changes[i][qi],
+      chosen: responses[i][qi], answer: q.answer, correct: responses[i][qi] === q.answer, pts: qPts(i), changes: changes[i][qi],
       stretch: (((TEST_META.stretch || {})[s.id]) || []).includes(qi) })) };
   persistAttempt();
   syncPost("section", attempt.v, attempt.id, { started: attempt.started, index: i, section: attempt.sections[i] });
@@ -628,13 +632,13 @@ function showStart() {
       ${completedNote()}
       <p class="lead">Three short sections: reading, thinking skills and maths.</p>
       <div class="plan">
-        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions</span></div>`).join("")}
+        ${SECTIONS.map(s => `<div><strong>${s.name}</strong><span>${s.questions.length} questions${s.points && s.points !== 1 ? ` (${fmtMark(s.points)} mark each)` : ""}</span></div>`).join("")}
       </div>
       <ol>
         <li>Take as long as you need — there is no time limit.</li>
-        <li>Answer all three questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
+        <li>Answer all the questions in a section, then press <strong>Submit answers</strong> to see how you went.</li>
         <li>You don’t lose marks for wrong answers, so attempt every question.</li>
-        <li>Your overall mark out of 9 is shown at the end.</li>
+        <li>Your overall mark out of ${fmtMark(SECTIONS.reduce((n, _, i) => n + sectionMax(i), 0))} is shown at the end.</li>
       </ol>
       <button class="primary" id="start">Start the reading section</button>
     </div>`;
@@ -729,7 +733,7 @@ function updateStatus() {
 }
 
 function sectionScore(i) {
-  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? 1 : 0), 0);
+  return SECTIONS[i].questions.reduce((n, q, qi) => n + (responses[i][qi] === q.answer ? qPts(i) : 0), 0);
 }
 
 function showReview() {
@@ -740,7 +744,7 @@ function showReview() {
   hdrSection.textContent = `${s.name} · Review`;
   const body = `<div>
       <h2>${s.name} — review</h2>
-      <p class="section-score">You scored <b>${score}</b> out of ${s.questions.length}</p>
+      <p class="section-score">You scored <b>${fmtMark(score)}</b> out of ${fmtMark(sectionMax(current))}</p>
       ${s.preamble || ""}
       ${renderQuestions(s, "review")}
       <div class="submit-row">
@@ -830,7 +834,7 @@ function showFinal() {
   hdrSection.textContent = "Results";
   finishAttempt();
   const total = SECTIONS.reduce((n, _, i) => n + sectionScore(i), 0);
-  const max = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  const max = SECTIONS.reduce((n, _, i) => n + sectionMax(i), 0);
   let verdict;
   if (total === max) verdict = "Full marks. Every question right, across all three sections.";
   else if (total >= 7) verdict = "A strong result. Look back at the questions you missed — the explanations show exactly where the trap was.";
@@ -838,9 +842,9 @@ function showFinal() {
   else verdict = "A good start. Re-read the explanations for each section, then try the paper again.";
   app.innerHTML = `
     <div class="sheet">
-      <div class="final-score"><div class="big">${total}</div><div class="of">out of ${max}</div></div>
+      <div class="final-score"><div class="big">${fmtMark(total)}</div><div class="of">out of ${fmtMark(max)}</div></div>
       <div class="breakdown">
-        ${SECTIONS.map((s, i) => `<div><strong>${sectionScore(i)} / ${s.questions.length}</strong><span>${s.name}</span></div>`).join("")}
+        ${SECTIONS.map((s, i) => `<div><strong>${fmtMark(sectionScore(i))} / ${fmtMark(sectionMax(i))}</strong><span>${s.name}</span></div>`).join("")}
       </div>
       <p class="verdict center">${verdict}</p>
       <div class="center"><button class="primary" id="again">Try the paper again</button></div>

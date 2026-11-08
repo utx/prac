@@ -5,17 +5,31 @@
 let passMode = "answer";
 const INK = "#1b2a41";
 
-/* ---- Reading: four extracts on one theme ---- */
-const EXTRACTS = [
-  `My little brother Sam spent the whole drive to the caves asking whether there would be bats. By the time we reached the entrance, he was holding Mum’s hand so tightly that her fingers had turned white. Inside, the path wound down past dripping rock, and the air grew cool and damp. Then our guide stopped beside an underground creek and asked us to be completely silent. One by one, she switched off the lights. The darkness was so thick that I couldn’t see my own hand. For a few seconds, nobody breathed. Then, slowly, the ceiling above us began to glow with hundreds of tiny blue-green lights, as if someone had scattered a handful of stars across the rock. The guide whispered that they weren’t worms at all, but the young of a small fly, glowing to lure insects into sticky threads. I hardly heard her. I was watching Sam. He had let go of Mum’s hand, and he was pointing upwards with his mouth wide open. On the way out, he asked if we could come back tomorrow.`,
-  `In many show caves, visitors are asked not to touch the rock formations. Some people think this rule is fussy. After all, what harm can one finger do to solid stone? The answer is: more than you might think. Our skin is covered in natural oils. When a finger touches a stalactite that is still growing, it leaves behind a thin, greasy film, and the dripping water can no longer add new crystal in that spot. Dirt from our hands also stains the gleaming white stone a dull brown. Cave guides call formations that are still growing “live”, and that is a good way to think of them. A stalagmite as tall as a child may have been growing for many thousands of years. It can be spoiled forever in a second by someone who just wanted to know what it felt like. The least we can do is keep our hands to ourselves.`,
-  `“Just to the first bend,” Priya had promised, and the cave mouth had looked friendly enough in the afternoon sun. Now the bend was behind them, and the torch was flickering. Kai gave it a shake. The beam shrank to an orange thread, and then it was gone. The darkness rushed in from every side. Priya could feel the cave breathing cold air on the back of her neck, and somewhere deeper inside, water dripped, slow and patient, as if the cave were waiting to see what they would do. Kai’s hand found hers. “Priya?” His voice was very small. She made herself breathe slowly. They had come in with the trickling creek on their left, she remembered, so on the way out it must be on their right. “Hold on to my jumper,” she said, and she put her free hand on the wet rock wall. They followed the sound of the water until a grey smudge of light appeared ahead, and then the warm, ordinary afternoon. Kai didn’t let go of her jumper until they were back at the tent.`,
-  `Limestone caves are carved out of solid rock, and the tool that carves them is rain. As rainwater soaks down through the soil, it picks up a gas called carbon dioxide, which turns it into a weak acid. This water seeps into cracks in the limestone and slowly dissolves the rock, widening the cracks into tunnels and caverns over many thousands of years. Once a cave has formed, the water starts to build instead. Each drop that hangs from the ceiling carries a tiny amount of dissolved rock. When it meets the cave air, it leaves a thin ring of crystal behind. Ring by ring, a hollow tube called a “straw” grows downwards, and many straws thicken into stalactites. Where the drops land on the floor, stalagmites grow upwards to meet them, and when the two join, they make a column. Many formations grow only about a centimetre in a hundred years. To remember which is which, think of the c in stalactite for ceiling and the g in stalagmite for ground.`
-];
+/* ---- Reading: cloze (6 gaps, ½ mark each) ---- */
+const CLOZE_TEXT = `
+<p>Our guide, Lena, called it the Letterbox, and the moment I saw it I understood why. It was a slot in the rock barely taller than a school bag, and the only way through was to lie flat on my stomach, stretch my arms out in front of me and wriggle. For a moment I seriously thought about waiting outside with the backpacks.</p>
+<p>Then Lena slid in head first, and I followed the soles of her boots. The rock pressed cold against my back, and the passage was so {1} that I couldn’t even lift my head to look ahead. It was only three body-lengths long, though it felt more like thirty.</p>
+<p>On the other side, I stood up in a chamber so beautiful that I forgot to be scared. The ceiling was {2} with hundreds of thin, glassy straws, hanging like streamers at a party, and in the far corner a column taller than a house rose from the floor to the roof. Standing at its foot, we were completely {3}. Lena told us that each straw grows only a tiny amount every year, and that the oil from a single fingertip can stop it growing where it was touched. It took all my willpower to {4} the urge to reach up and touch one.</p>
+<p>Before we left the chamber, Lena asked us to switch off our headlamps. The darkness was instant and complete, and the silence was so {5} that I could hear the people beside me breathing. Somewhere far away, a single drop of water fell.</p>
+<p>Back outside in the dazzling afternoon, the others were chattering about lunch, but I kept glancing back at the dark mouth of the cave. On the drive there I had been dreading the Letterbox. Now, to my surprise, I was almost {6} to leave the cave behind.</p>`;
+
+function clozeHtml() {
+  const si = SECTIONS.findIndex(s => s.id === "reading");
+  let t = CLOZE_TEXT;
+  SECTIONS[si].questions.forEach((q, i) => {
+    const chosen = responses[si][i];
+    let fill;
+    if (passMode === "review") fill = `<span class="gap filled correct">(${i + 1}) ${q.options[q.answer]}</span>`;
+    else if (chosen !== null) fill = `<span class="gap filled">(${i + 1}) ${q.options[chosen]}</span>`;
+    else fill = `<span class="gap">(${i + 1}) ……</span>`;
+    t = t.replace(`{${i + 1}}`, fill);
+  });
+  return t;
+}
 const PASSAGE = {
-  title: "Caves",
-  note: "Read the four extracts below about caves.",
-  html: EXTRACTS.map((t, i) => `<div class="extract"><h4>Extract ${"ABCD"[i]}</h4><p>${t}</p></div>`).join("")
+  title: "The Letterbox",
+  note: "Read the text below and decide which answer best fits each gap. (A <i>straw</i> is a thin, hollow tube of mineral crystal that grows down from a cave ceiling, one drip at a time.)",
+  html: clozeHtml
 };
 
 /* ---- Thinking Skills Q2: Venn diagram (instrument / sports team) ---- */
@@ -60,34 +74,56 @@ const SECTIONS = [
     id: "reading",
     name: "Reading",
     passage: PASSAGE,
-    intro: "Read the four extracts about caves, then choose the best answer (A, B, C or D) for each question.",
+    points: 0.5,
+    intro: "Read the text, then decide which answer (A, B, C or D) best fits each gap. Each gap is worth half a mark.",
     questions: [
       {
-        stem: "Which extract’s main point is that an experience in the dark turned out to be wonderful rather than frightening?",
-        letterOptions: true,
-        options: ["Extract A", "Extract B", "Extract C", "Extract D"],
-        answer: 0,
-        skill: "identifying the main idea of a text when feelings are shown, not stated",
-        explain: `<p>Extract A never uses the words “frightened” or “wonderful”, but it shows both. At the start, Sam is nervous: he keeps asking about bats and holds Mum’s hand “so tightly that her fingers had turned white”. Then the lights go off, the darkness is total and “nobody breathed”. But instead of something scary, the ceiling fills with glow-worms “as if someone had scattered a handful of stars”. Sam lets go of Mum’s hand, points up with his mouth wide open, and asks to come back tomorrow. The whole extract builds to that change from fear to wonder.</p>
-                  <p class="why-not">Extract C is the trap: it is also about being in a cave in the dark, and Kai is clearly frightened (“His voice was very small”). But the darkness never becomes wonderful: the point of C is that Priya stays calm and finds the way out, and the ending is relief at being back in the “warm, ordinary afternoon”. Extract B is about not touching cave formations, and Extract D explains how caves and their formations are made; neither describes an experience in the dark.</p>`
-      },
-      {
-        stem: "In which extract is the cave described as if it were a living creature, to make it seem threatening?",
-        letterOptions: true,
-        options: ["Extract A", "Extract B", "Extract C", "Extract D"],
+        stem: "Which word best fits <b>gap 1</b>?",
+        options: ["crammed", "compact", "cramped", "crumpled"],
         answer: 2,
-        skill: "recognising personification and working out the feeling it creates",
-        explain: `<p>In Extract C, the cave is given the actions of an animal: Priya feels “the cave breathing cold air on the back of her neck”, and the dripping water sounds “as if the cave were waiting to see what they would do”. A cave can’t breathe or wait, so the writer is treating it like a creature watching the children. Breath on your neck in the dark, from something waiting to see what you do, makes the cave feel threatening, and it builds the tension before Priya calms herself.</p>
-                  <p class="why-not">Extract B is the trap: it really does describe the cave formations as alive (“Cave guides call formations that are still growing ‘live’”). But the writer does this to make readers want to protect them, not to make them seem threatening. Extract A has real living creatures in the cave (the glow-worms), and compares their light to stars, which makes the cave beautiful, not threatening. Extract D says formations “grow”, but that is a scientific fact about crystal building up, not a description of the cave as a creature.</p>`
+        skill: "choosing between look-alike words: which one fits the meaning and the grammar",
+        explain: `<p>The writer is lying flat in a slot “barely taller than a school bag”, with the rock pressing on their back and no room even to lift their head. A space that is uncomfortably small for the person in it is <b>cramped</b>.</p>
+                  <p class="why-not">“Crammed” is the trap: it looks and sounds almost the same, and it is also about a tight fit. But “crammed” means stuffed full <em>of things</em> (“a cupboard crammed with toys”), and it needs “with” to say what fills it. The passage isn’t full of anything; it is just too small. “Compact” means small and neatly fitted together, which is a good thing (“a compact car”), not a squeeze you can’t lift your head in. “Crumpled” means crushed into creases, like a used tissue; rock doesn’t crumple.</p>`
       },
       {
-        stem: "In which extract is a length of time mentioned mainly to make a careless action seem more serious?",
-        letterOptions: true,
-        options: ["Extract A", "Extract B", "Extract C", "Extract D"],
+        stem: "Which word best fits <b>gap 2</b>?",
+        options: ["festooned", "littered", "plastered", "cluttered"],
+        answer: 0,
+        skill: "choosing between words close in meaning: which one matches the picture and the feeling in the text",
+        explain: `<p>Two clues decide it. The straws are <em>hanging</em> “like streamers at a party”, and the chamber is “so beautiful that I forgot to be scared”. <b>Festooned</b> means decorated with things hanging in loops or strings, like streamers or bunting, so it matches both the picture and the delight.</p>
+                  <p class="why-not">“Littered” is the trap: it picks up the idea of a party, but “littered with” means messily scattered over a surface, like rubbish on the floor <em>after</em> a party. It is untidy, and the writer thinks the chamber is beautiful. “Cluttered” is also untidy (too many things in the way). “Plastered” means thickly covered and stuck flat, like posters on a wall, but the straws hang down from the ceiling.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 3</b>?",
+        options: ["shrunk", "belittled", "stunted", "dwarfed"],
+        answer: 3,
+        skill: "choosing between words close in meaning: being made to look small by something much bigger",
+        explain: `<p>The column is “taller than a house”, and the group is standing right at its foot. Next to something so huge, the people look tiny. To be <b>dwarfed</b> by something is to be made to look small because the thing beside you is so much bigger.</p>
+                  <p class="why-not">All four words are about being small. “Belittled” is the trap: it looks as if it means “made little”, but it means made to feel unimportant by unkind words (“She belittled my drawing”). “Shrunk” means actually became smaller, and the people did not change size. “Stunted” means stopped from growing properly, like a plant without enough light.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 4</b>?",
+        options: ["refrain", "resist", "desist", "abstain"],
         answer: 1,
-        skill: "understanding why a writer includes a detail (a long span of time set against a moment)",
-        explain: `<p>In Extract B, the writer says a stalagmite “may have been growing for many thousands of years” and then that it “can be spoiled forever in a second by someone who just wanted to know what it felt like”. Putting <b>thousands of years</b> next to <b>a second</b> shows how unequal the two are: one careless touch, done just out of curiosity, can undo something that took far longer than any human life to make. The length of time is there to make the reader feel how serious touching really is, which is the point of the whole opinion piece.</p>
-                  <p class="why-not">Extract D is the trap: it also gives a length of time (“only about a centimetre in a hundred years”). But D uses it to explain how slowly formations grow, and nobody does anything careless in D. Extract C has an action that goes wrong (Kai shakes the torch and it goes out), but no length of time is used to make that seem serious. Extract A mentions “a few seconds” when nobody breathed, but that builds suspense in the dark; nobody is careless.</p>`
+        skill: "choosing between words close in meaning, using the grammar of the words that follow (“the urge”)",
+        explain: `<p>The writer badly wants to touch a straw but knows that it would harm it, so the writer has to fight the wish. You <b>resist</b> an urge: “resist” takes the urge straight after it, with no little word in between (“resist the temptation”, “resist the urge”).</p>
+                  <p class="why-not">“Refrain” is the trap: it means just the right thing (to stop yourself doing something), but it needs “from”: “refrain <em>from</em> touching”. You can’t “refrain the urge”. “Desist” (stop doing something) and “abstain” (choose not to do or have something) also need “from”, so they don’t fit before “the urge” either.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 5</b>?",
+        options: ["profound", "profuse", "proficient", "prolific"],
+        answer: 0,
+        skill: "choosing between look-alike words: which one fits the meaning (“a profound silence”)",
+        explain: `<p>With every light off, the cave is so quiet that the writer can hear people breathing and a single far-off drop of water. A silence that deep and complete is a <b>profound</b> silence: profound means very deep or very great.</p>
+                  <p class="why-not">The other three words begin the same way, which is the trap. “Profuse” means pouring out in large amounts (“profuse apologies”, “profuse bleeding”), the opposite of silence. “Prolific” means producing a lot (“a prolific writer”). “Proficient” means skilled at something (“a proficient swimmer”). None of them describes how deep a silence is.</p>`
+      },
+      {
+        stem: "Which word best fits <b>gap 6</b>?",
+        options: ["relieved", "impatient", "loath", "jubilant"],
+        answer: 2,
+        skill: "choosing a word from the meaning of the whole text: a change of feeling shown, not stated",
+        explain: `<p>Track the writer’s feelings through the whole text. At the start the writer nearly stays outside, and on the drive there was “dreading the Letterbox”. But in the chamber the writer “forgot to be scared”, and at the end, while the others chatter about lunch, keeps “glancing back at the dark mouth of the cave”. People look back at a place they don’t want to leave. “To my surprise” and “almost” fit too: after all that dread, it is surprising to find you don’t want to go. <b>Loath</b> means unwilling (“loath to leave”), so the writer is almost unwilling to leave the cave behind. (Don’t mix it up with <i>loathe</i>, with an e, which means to hate.)</p>
+                  <p class="why-not">“Relieved” is the trap: it follows on from “dreading”, and “almost relieved” sounds natural. But being relieved to escape something you dreaded would be no surprise at all, and someone who is glad to get away doesn’t keep glancing back. “Impatient” (keen to leave quickly) fits the others, who are thinking about lunch, not the writer. “Jubilant” means overjoyed, so “almost jubilant to leave” is an even stronger version of relieved: the opposite of glancing back at the cave.</p>`
       }
     ]
   },

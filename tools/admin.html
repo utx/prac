@@ -174,6 +174,9 @@ function status(p, n) {
 }
 function fmtDate(iso) { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" }); }
 function mins(ms) { return ms ? (ms / 60000) : 0; }
+// Marks: older answers have no "pts" and count 1; cloze gaps count ½ each.
+function secMark(s) { return s.answers.reduce((n, x) => n + (x.correct ? (x.pts || 1) : 0), 0); }
+function fmtMark(x) { const w = Math.floor(x + 1e-9); return Math.abs(x - w) < 1e-9 ? String(w) : (w ? w : "") + "½"; }
 function fmtMins(m) { return m < 1 ? "<1 min" : Math.round(m) + " min"; }
 
 function analyse(st) {
@@ -271,14 +274,14 @@ function render() {
         return hbar(cat, "", e.c, e.n, `<div style="margin-top:2px">${status(pct(e.c, e.n), e.n)}</div>`);
       }).join("")).join("")}</div></div>`;
 
-  // scores by test (first attempt), stacked by section
+  // scores by test (first attempt), stacked by section (cloze gaps are worth ½ each: "pts")
   const SEG = { reading: "#4a7fc1", thinking: "#e0a43a", maths: "#2e9e6a" };
   const ordered = first.filter(a => a.finished).sort((a, b) => a.v - b.v);
   const scoreChart = `<div class="card"><h2>Score by test</h2><p class="sub">First attempt at each test, out of 9, split by section.</p>
     ${ordered.length ? `<div class="cols">${ordered.map(a => {
-      const parts = ["reading", "thinking", "maths"].map(id => { const s = a.sections.find(x => x && x.id === id); return [id, s ? s.answers.filter(x => x.correct).length : 0]; });
+      const parts = ["reading", "thinking", "maths"].map(id => { const s = a.sections.find(x => x && x.id === id); return [id, s ? secMark(s) : 0]; });
       const tot = parts.reduce((n, p) => n + p[1], 0);
-      return `<div class="col" title="Test ${a.v}: ${tot}/9 (Reading ${parts[0][1]}, Thinking ${parts[1][1]}, Maths ${parts[2][1]})"><span class="num">${tot}</span>
+      return `<div class="col" title="Test ${a.v}: ${fmtMark(tot)}/9 (Reading ${fmtMark(parts[0][1])}, Thinking ${fmtMark(parts[1][1])}, Maths ${fmtMark(parts[2][1])})"><span class="num">${fmtMark(tot)}</span>
         <div class="stack">${parts.filter(p => p[1]).map(p => `<div class="seg" style="height:${p[1] * 15}px;background:${SEG[p[0]]}"></div>`).join("")}</div></div>`;
     }).join("")}</div>
     <div class="col-labels">${ordered.map(a => `<span>T${a.v}</span>`).join("")}</div>
@@ -295,7 +298,7 @@ function render() {
       <li><span class="what"><b>Changed answers</b><small>${changed.length ? `${changed.length} question${changed.length > 1 ? "s" : ""} where an answer was changed before submitting; ${changed.filter(q => q.correct).length} ended up right.` : "No answers changed yet."}</small></span></li>
       <li><span class="what"><b>Left blank</b><small>${unanswered} question${unanswered === 1 ? "" : "s"} submitted without an answer (there is no penalty for guessing).</small></span></li>
       <li><span class="what"><b>Time per section</b><small>${allTimes.length ? `Average ${fmtMins(mins(allTimes.reduce((a, b) => a + b, 0) / allTimes.length))}, longest ${fmtMins(mins(Math.max(...allTimes)))}. In the real test it’s roughly 1 minute per question.` : "No timings yet."}</small></span></li>
-      <li><span class="what"><b>Retakes</b><small>${retakes.length ? retakes.filter(a => a.finished).map(a => `Test ${a.v}: ${a.total}/9 on ${fmtDate(a.finished)}`).join("; ") || "Started but not finished." : "None yet. Retakes are kept separate so they don’t inflate the stats above."}</small></span></li>
+      <li><span class="what"><b>Retakes</b><small>${retakes.length ? retakes.filter(a => a.finished).map(a => `Test ${a.v}: ${fmtMark(a.total)}/9 on ${fmtDate(a.finished)}`).join("; ") || "Started but not finished." : "None yet. Retakes are kept separate so they don’t inflate the stats above."}</small></span></li>
     </ul></div>`;
 
   // recent mistakes
@@ -322,11 +325,11 @@ function render() {
     ${[...MENU].reverse().map(t => {
       const a = (byV[t.version] || [])[0];
       const f = st.flags[t.version];
-      const sc = id => { const s = a && a.sections.find(x => x && x.id === id); return s ? s.answers.filter(x => x.correct).length : "–"; };
+      const sc = id => { const s = a && a.sections.find(x => x && x.id === id); return s ? fmtMark(secMark(s)) : "–"; };
       const time = a ? fmtMins(mins(a.sections.filter(Boolean).reduce((n, s) => n + (s.ms || 0), 0))) : "";
       return `<tr><td class="n"><b>Test ${t.version}</b></td><td>${esc(t.reading)}</td>
         <td>${f && f.completed ? `<span class="chip good">✓ Done ${esc(fmtDate(f.at))}</span>` : (a ? `<span class="chip warn">Started</span>` : `<span class="chip none">Not started</span>`)}</td>
-        <td class="n">${a && a.finished ? `<b>${a.total}/9</b>` : "–"}</td><td class="n">${a ? `${sc("reading")} / ${sc("thinking")} / ${sc("maths")}` : "–"}</td>
+        <td class="n">${a && a.finished ? `<b>${fmtMark(a.total)}/9</b>` : "–"}</td><td class="n">${a ? `${sc("reading")} / ${sc("thinking")} / ${sc("maths")}` : "–"}</td>
         <td class="n">${time}</td>
         ${reviewRows ? `<td>${testReviewCell(t)}</td>` : ""}
         <td><span class="actions"><a class="btn primary" href="../tests/v${t.version}/index.html?admin=1">Practice</a>

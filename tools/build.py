@@ -39,7 +39,7 @@ def check_stretch(n, meta):
     """From v40 every section must tag exactly one stretch question (see CLAUDE.md)."""
     stretch = meta.get("stretch", {})
     for sec, idx in stretch.items():
-        if sec not in CATEGORIES or not all(isinstance(i, int) and 0 <= i < 3 for i in idx):
+        if sec not in CATEGORIES or not all(isinstance(i, int) and 0 <= i < len(meta.get("categories", {}).get(sec, [0, 0, 0])) for i in idx):
             raise SystemExit(f"v{n}: bad 'stretch' entry {sec}: {idx!r}")
     if n >= 40:
         missing = [sec for sec in CATEGORIES if len(stretch.get(sec, [])) != 1]
@@ -194,7 +194,7 @@ INDEX = """<!DOCTYPE html>
 <header><div class="bar">Practice Tests</div></header>
 <main>
   <h1>Choose a test</h1>
-  <p class="lead">Each test has three reading, three thinking skills and three maths questions, with explanations at the end of each section. The newest test is first. <span id="progress"></span></p>
+  <p class="lead">Each test has a reading, a thinking skills and a maths section (three questions each, or six half-mark gaps in a cloze), with explanations at the end of each section. The newest test is first. <span id="progress"></span></p>
   <div class="grid">
 {{CARDS}}
   </div>
@@ -224,7 +224,7 @@ INDEX = """<!DOCTYPE html>
         done++;
         const d = new Date(f.at);
         tag.textContent = "✓ Completed" + (isNaN(d) ? "" : " " + d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }))
-          + (firstTotal !== null ? " · " + firstTotal + "/9" : "");
+          + (firstTotal !== null ? " · " + String(firstTotal).replace(".5", "½") + "/9" : "");
       }
       card.querySelector(".go").textContent = isDone ? "Open again →" : "Start →";
       const btn = card.querySelector(".flag");

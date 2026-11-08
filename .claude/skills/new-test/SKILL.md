@@ -28,8 +28,9 @@ Default batch size is **1–2 tests per run** (3 at most). Each test gets its ow
 
 ## 1. Write the content
 
-- `content/vNN.js`: copy the shape of the most recent test of the same Reading format (cloze: v39; missing sentences: v40; story: v38; four extracts: v36; poem/classic: v37; classic story: v33). Diagrams are inline SVG with a meaningful `aria-label`; anything wide must wrap on a 390px phone (split into separate small SVGs in a flex-wrap row).
+- `content/vNN.js`: copy the shape of the most recent test of the same Reading format (cloze: v68, with 6 half-mark gaps; missing sentences: v40; story: v38; four extracts: v36; poem/classic: v37; classic story: v33). Diagrams are inline SVG with a meaningful `aria-label`; anything wide must wrap on a 390px phone (split into separate small SVGs in a flex-wrap row).
 - Each question: `stem`, `options`, `answer` (zero-based), `skill`, `explain` (method, then a `why-not` paragraph naming why each trap is wrong — name the main trap first).
+- **Cloze reading has 6 gaps worth ½ mark each** (`points: 0.5` on the reading section; see `CLAUDE.md` Format); its stretch is the last gap (index 5).
 - Every section's **Q3 is the stretch question** (hardest third of the samples; must need inference, not word-matching).
 - Public-domain classics: download from the Project Gutenberg GitHub mirror (`https://raw.githubusercontent.com/GITenberg/<Title>_<id>/master/<id>.txt`; gutenberg.org itself is blocked here), extract the passage **programmatically** so it is exact, and credit author and year in the passage note.
 - `content/vNN.json`: version, date, reading, reading_format, reading_topic, thinking[3], maths[3], sample_map (each question → the sample question numbers it relates to, "— stretch" on Q3s), categories (labels from `CATEGORIES` in `tools/build.py`), stretch `{"reading":[2],"thinking":[2],"maths":[2]}`.
