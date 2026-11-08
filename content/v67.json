@@ -1,0 +1,62 @@
+{
+  "version": 67,
+  "date": "2026-11-08",
+  "reading": "Missing sentences: Eight Arms, Three Hearts",
+  "reading_format": "missing sentences",
+  "reading_topic": "octopuses: eight arms, three hearts and blue blood, no bones apart from a hard beak so the body follows wherever the beak fits, aquarium escapes (one in New Zealand said to have gone down a drainpipe to the sea), about 500 million nerve cells with roughly two thirds in the arms so each arm can act on its own and taste with its suckers, changing colour and skin texture in under a second, short lives of a year or two, the mother guarding her eggs without eating and dying soon after they hatch so the young have nobody to learn from (giant Pacific octopus three to five years)",
+  "thinking": [
+    "Supports the claim (a walking bus so more students walk to school instead of being driven)",
+    "Totals table: bags of fruit sold at a market stall, two-step chain (step 2)",
+    "Nets of an open box: which five-square shape can't be folded into a cube with no lid (stretch)"
+  ],
+  "maths": [
+    "Quick-fire fractions: one third of the half of a class who like maths (supplied by David)",
+    "Area of a U-shaped garden bed: finding the unmarked gap width, then a rectangle minus a cut-out",
+    "Number puzzle: magic square, finding the total from the one complete diagonal, then a three-step chain (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1-PT3 Q20-25 (missing sentences: reference word 'this' pointing back, and a sentence that gives the consequence of the one before)",
+      "PT1-PT3 Q20-25 (missing sentences: general statement followed by an example; 'Because of this' linking back)",
+      "PT1-PT3 Q20-25 (missing sentences: a sentence that explains why a detail matters and sets up the next one), PT1-PT3 Q1-6 (why the writer includes a detail) — stretch"
+    ],
+    "thinking": [
+      "PT1 Q2, PT2 Q3, PT3 Q21 (supports the claim), PT2 Q26 (supports the claim)",
+      "PT3 Q7 (packs table + a swap), PT1 Q19 (marks table), PT3 Q2 (juice availability table); practice focus: totals table step 2",
+      "PT1 Q10 (dice nets, opposite faces), PT2 Q28 (layers of a pyramid), PT3 Q4 (pieces pairing into layers) — stretch"
+    ],
+    "maths": [
+      "PT1 Q20 (fractions of pocket money spent), PT2 Q6 (fraction of a cake after sharing); supplied by David",
+      "PT3 Q14 (area of a shape from a smaller one), PT1 Q31 (perimeter change from an added rectangle), PT2 Q12 (order shapes by area)",
+      "PT1 Q7 (numbers on two lines summing equally), PT1 Q13 (addition pyramid), PT3 Q4 (number-sentence grid puzzle) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Sentence links",
+      "Sentence links",
+      "Purpose of a detail"
+    ],
+    "thinking": [
+      "Supports the claim",
+      "Tables & timetables",
+      "Spatial"
+    ],
+    "maths": [
+      "Fractions",
+      "Area, perimeter & 3D",
+      "Number & place value"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}

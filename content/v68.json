@@ -1,0 +1,62 @@
+{
+  "version": 68,
+  "date": "2026-11-08",
+  "reading": "Four extracts: Caves",
+  "reading_format": "four extracts",
+  "reading_topic": "caves: a memoir of a family visit to a show cave where the guide switches off the lights to show glow-worms (the young of a small fly, glowing to lure insects into sticky threads) and a nervous little brother is won over, an opinion piece against touching cave formations (skin oils stop crystal growing, dirt stains them, guides call growing formations 'live'), a short story of two children at a cave entrance when the torch fails and the older sister follows the creek out, a factual piece on how rain made acidic by carbon dioxide dissolves limestone into caves and how drops build straws, stalactites, stalagmites and columns (about a centimetre in a hundred years; c for ceiling, g for ground)",
+  "thinking": [
+    "Spot the mistake (judging from your own small group: asking only the chess club which subject they like best)",
+    "Venn diagram: instrument players and sports team, finding how many do both from the totals and the number who do neither",
+    "Whose reasoning is correct (needed versus guaranteed: two years in the band needed for a solo; both are right) (stretch)"
+  ],
+  "maths": [
+    "Quick-fire place value: smallest 5-digit number from digit cards including a zero",
+    "Which statements are correct: squares, rhombuses, rectangles and parallelograms (question bank, inspired by David's shape statements; supplied by David)",
+    "Chance: which of five bags with different totals gives the best chance of a red marble (stretch)"
+  ],
+  "sample_map": {
+    "reading": [
+      "PT1-PT3 Q26-33 (which extract: main idea expressed in different words), PT1 Q1-6 (feelings shown rather than stated)",
+      "PT1-PT3 Q26-33 ('uses figurative language'), PT1-PT3 Q15-19 (which thing is given human qualities)",
+      "PT1-PT3 Q26-33 (an idea expressed in completely different words), PT1-PT3 Q1-6 (why the writer includes a detail) — stretch"
+    ],
+    "thinking": [
+      "PT3 Q5 (mistake: judging from own small group), PT2 Q6 (mistake: own experience)",
+      "PT1 Q3 (which pets overlap), PT2 Q2 (movie preferences), PT1 Q30 (votes for two of three colours)",
+      "PT1 Q5 (whose reasoning: needed vs guaranteed), PT1 Q18 ('only if': both correct), PT2 Q8 (reversed rule) — stretch"
+    ],
+    "maths": [
+      "PT1 Q16 (largest − smallest from digits), PT2 Q31 (smallest + largest 3-digit with distinct digits)",
+      "PT3 Q16 (quadrilateral classification); from the question bank",
+      "PT2 Q23 (least likely event), PT1 Q33 (chance with counters 1–11), PT3 Q10 (chance statements) — stretch"
+    ]
+  },
+  "categories": {
+    "reading": [
+      "Main idea",
+      "Comparisons & imagery",
+      "Purpose of a detail"
+    ],
+    "thinking": [
+      "Spot the mistake",
+      "Rules & codes",
+      "Whose reasoning"
+    ],
+    "maths": [
+      "Number & place value",
+      "Area, perimeter & 3D",
+      "Chance & counting"
+    ]
+  },
+  "stretch": {
+    "reading": [
+      2
+    ],
+    "thinking": [
+      2
+    ],
+    "maths": [
+      2
+    ]
+  }
+}
