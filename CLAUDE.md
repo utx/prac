@@ -74,6 +74,7 @@ Sample frequency across 90 questions: spatial 18%, spot the mistake 14%, tables/
 ## Maths
 - **Q1:** a quick-fire question (under a minute), rotating: place value, time, money, measurement, reading a scale, reading a graph, simple word problem, missing number.
 - **Q2 and Q3:** multi-step reasoning on sample-paper topics: fractions, patterns, area and perimeter, 3D shapes, chance statements, combinations, rates, best value, timetables, "which statements are correct" graph questions.
+- Combinations questions stay simple (David, Nov 2026: "keep these much simpler, like 3 shorts, 3 tops, 2 hats = 3 × 3 × 2"): multiply the choices for each item, with no extra conditions such as "no two the same colour". Traps: adding instead of multiplying, forgetting one item, multiplying two and adding the third. Don't use one as the stretch question.
 - At most one competition-style (Kangaroo-like) question per version.
 - Repeating patterns must show the repeat clearly (a visible repeating block); no rule-generated sequences whose cycle only shows up after brute-force working (David, Oct 2026).
 - Cover the whole question base here too: every few versions, use Q2 or Q3 for a sample topic not seen recently or a nearby one (for example symmetry, angles, position and direction, mass, volume, number puzzles), checking the `maths` labels in recent `content/vNN.json` files.

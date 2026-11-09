@@ -9,7 +9,7 @@ const INK = "#1b2a41";
 const CLOZE_TEXT = `
 <p>Our guide, Lena, called it the Letterbox, and the moment I saw it I understood why. It was a slot in the rock barely taller than a school bag, and the only way through was to lie flat on my stomach, stretch my arms out in front of me and wriggle. For a moment I seriously thought about waiting outside with the backpacks.</p>
 <p>Then Lena slid in head first, and I followed the soles of her boots. The rock pressed cold against my back, and the passage was so {1} that I couldn’t even lift my head to look ahead. It was only three body-lengths long, though it felt more like thirty.</p>
-<p>On the other side, I stood up in a chamber so beautiful that I forgot to be scared. The ceiling was {2} with hundreds of thin, glassy straws, hanging like streamers at a party, and in the far corner a column taller than a house rose from the floor to the roof. Standing at its foot, we were completely {3}. Lena told us that each straw grows only a tiny amount every year, and that the oil from a single fingertip can stop it growing where it was touched. It took all my willpower to {4} the urge to reach up and touch one.</p>
+<p>On the other side, I stood up in a chamber so beautiful that I forgot to be scared. Hundreds of thin, glassy straws hung from the ceiling, {2} in the beam of my headlamp like tiny icicles, and in the far corner a column taller than a house rose from the floor to the roof. Standing at its foot, we were completely {3}. Lena told us that each straw grows only a tiny amount every year, and that the oil from a single fingertip can stop it growing where it was touched. It took all my willpower to {4} the urge to reach up and touch one.</p>
 <p>Before we left the chamber, Lena asked us to switch off our headlamps. The darkness was instant and complete, and the silence was so {5} that I could hear the people beside me breathing. Somewhere far away, a single drop of water fell.</p>
 <p>Back outside in the dazzling afternoon, the others were chattering about lunch, but I kept glancing back at the dark mouth of the cave. On the drive there I had been dreading the Letterbox. Now, to my surprise, I was almost {6} to leave the cave behind.</p>`;
 
@@ -87,11 +87,11 @@ const SECTIONS = [
       },
       {
         stem: "Which word best fits <b>gap 2</b>?",
-        options: ["festooned", "littered", "plastered", "cluttered"],
+        options: ["glinting", "glaring", "blazing", "smouldering"],
         answer: 0,
-        skill: "choosing between words close in meaning: which one matches the picture and the feeling in the text",
-        explain: `<p>Two clues decide it. The straws are <em>hanging</em> “like streamers at a party”, and the chamber is “so beautiful that I forgot to be scared”. <b>Festooned</b> means decorated with things hanging in loops or strings, like streamers or bunting, so it matches both the picture and the delight.</p>
-                  <p class="why-not">“Littered” is the trap: it picks up the idea of a party, but “littered with” means messily scattered over a surface, like rubbish on the floor <em>after</em> a party. It is untidy, and the writer thinks the chamber is beautiful. “Cluttered” is also untidy (too many things in the way). “Plastered” means thickly covered and stuck flat, like posters on a wall, but the straws hang down from the ceiling.</p>`
+        skill: "choosing between words close in meaning: which kind of light fits the picture in the text",
+        explain: `<p>The straws are thin and glassy, and they shine only “in the beam of my headlamp”: they give off no light of their own, they just catch the light shone on them, the way “tiny icicles” do. Small, quick flashes of reflected light are <b>glinting</b> (“the ring glinted in the sun”).</p>
+                  <p class="why-not">All four words are about light. “Glaring” is the trap: it starts the same way and is about bright light, but a glare is a harsh, dazzling light that hurts your eyes, coming from something very bright like the sun or car headlights. Tiny straws catching a headlamp beam can’t dazzle anyone. “Blazing” means burning or shining fiercely, like a bonfire or the midday sun: far too strong, and the straws have no light of their own. “Smouldering” means burning slowly with smoke but no flame, like the end of a campfire; nothing in the cave is burning.</p>`
       },
       {
         stem: "Which word best fits <b>gap 3</b>?",

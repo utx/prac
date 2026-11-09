@@ -11,8 +11,8 @@
   ],
   "maths": [
     "Quick-fire missing number: box divided by 3 plus 8 equals 4 × 5 (undoing two operations)",
-    "Capacity: litres and millilitres, how much more water fills a jug after three cups",
-    "Combinations with a condition: outfits of T-shirt, shorts and cap with no two items the same colour (stretch)"
+    "Capacity: litres and millilitres, how much more water fills a jug after three cups (stretch)",
+    "Combinations: lunch deals of sandwich, drink and fruit, multiplying the choices (4 × 3 × 2; made simpler at David's request)"
   ],
   "sample_map": {
     "reading": [
@@ -27,8 +27,8 @@
     ],
     "maths": [
       "PT1 Q1 (missing number with equals sign), PT2 Q18 (missing factor), PT3 Q24 (inverse operations)",
-      "PT1 Q9 (reading a jug scale, pouring), PT2 Q13 (grams to half a kilogram: converting units), PT3 Q11 (water in a container)",
-      "PT2 Q10 (combinations: shapes × colours), PT2 Q28 (round-robin matches), PT1 Q35 (combinations) — stretch"
+      "PT1 Q9 (reading a jug scale, pouring), PT2 Q13 (grams to half a kilogram: converting units), PT3 Q11 (water in a container) — stretch",
+      "PT2 Q10 (combinations: shapes × colours), PT1 Q35 (combinations)"
     ]
   },
   "categories": {
@@ -56,7 +56,7 @@
       2
     ],
     "maths": [
-      2
+      1
     ]
   }
 }
