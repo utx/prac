@@ -176,24 +176,21 @@ const SECTIONS = [
                   <p class="why-not">1400 mL (E) is the trap: it is how much water is in the jug, not how much <em>more</em> is needed. 1350 mL (D) forgets the 3 cups Mia poured in (2000 − 650). 1250 mL (C) forgets the 650 mL that was already in the jug (2000 − 750). 1100 mL (B) counts only one cup of 250 mL instead of three.</p>`
       },
       {
-        stem: `Sam has:
+        stem: `At the school canteen, a lunch deal is <b>one</b> sandwich, <b>one</b> drink and <b>one</b> piece of fruit.
                <ul style="margin:6px 0 0">
-                 <li>3 T-shirts: <b>red</b>, <b>blue</b> and <b>green</b></li>
-                 <li>3 pairs of shorts: <b>red</b>, <b>blue</b> and <b>black</b></li>
-                 <li>2 caps: <b>red</b> and <b>blue</b></li>
+                 <li>Sandwiches: <b>cheese</b>, <b>ham</b>, <b>egg</b> or <b>chicken</b></li>
+                 <li>Drinks: <b>milk</b>, <b>juice</b> or <b>water</b></li>
+                 <li>Fruit: <b>apple</b> or <b>banana</b></li>
                </ul>
-               <p style="margin:10px 0 0">An outfit is one T-shirt, one pair of shorts and one cap. Sam never wears two things of the same colour at once.</p>
-               <p style="margin:10px 0 0">How many different outfits can Sam wear?</p>`,
-        options: ["18", "14", "7", "6", "2"],
-        answer: 3,
-        skill: "combinations with a condition: counting outfits with no two items the same colour",
-        explain: `<p>Start with the cap, because it is the item with the fewest choices, then list what can go with it.</p>
-                  <p><b>Red cap:</b> the T-shirt can’t be red, so blue or green. The shorts can’t be red, so blue or black. And the T-shirt and shorts can’t both be blue:<br>
-                     blue T-shirt + black shorts, green T-shirt + blue shorts, green T-shirt + black shorts → <b>3</b> outfits.</p>
-                  <p><b>Blue cap:</b> the T-shirt can be red or green; the shorts can be red or black; and they can’t both be red:<br>
-                     red T-shirt + black shorts, green T-shirt + red shorts, green T-shirt + black shorts → <b>3</b> outfits.</p>
-                  <p>3 + 3 = <b>6</b> outfits.</p>
-                  <p class="why-not">14 (B) is the trap: it checks that the T-shirt and shorts are different colours (7 pairs) and then doubles for the 2 caps, forgetting that the cap mustn’t match either of them. 18 (A) ignores the colour rule altogether (3 × 3 × 2). 7 (C) counts the T-shirt and shorts pairs and forgets the caps. 2 (E) takes away every clash from the 18 separately (16 clashes), but an all-red or all-blue outfit has three clashes and has been taken away three times.</p>`
+               <p style="margin:10px 0 0">How many different lunch deals can Ava choose?</p>`,
+        options: ["6", "9", "12", "14", "24"],
+        answer: 4,
+        skill: "combinations: multiplying the number of choices for each item",
+        explain: `<p>Each sandwich can go with each drink, and each of those can go with each piece of fruit, so <b>multiply</b> the number of choices.</p>
+                  <p><b>Sandwich and drink:</b> 4 sandwiches × 3 drinks = <b>12</b> pairs (cheese + milk, cheese + juice, cheese + water, ham + milk, …).</p>
+                  <p><b>Add the fruit:</b> every one of those 12 pairs can have an apple or a banana: 12 × 2 = <b>24</b> lunch deals.</p>
+                  <p>So 4 × 3 × 2 = <b>24</b>.</p>
+                  <p class="why-not">9 (B) is the trap: it adds the choices (4 + 3 + 2) instead of multiplying them. 12 (C) stops one step early: it counts the sandwich-and-drink pairs and forgets the fruit. 14 (D) multiplies the first two and then adds the fruit (4 × 3 + 2). 6 (A) leaves out the sandwiches (3 × 2).</p>`
       }
     ]
   }
