@@ -52,7 +52,7 @@ const html = fs.readFileSync(PAGE, "utf8");
 if (/\bOC\b/.test(html)) bad('the page mentions "OC"');
 if (!/not endorsed by Epic/.test(html)) bad("the Epic fan-content notice is missing");
 for (const m of html.matchAll(/(?:img: "|\[")([a-z]+)"(?=, "[A-Z][^"]*", "#)/g)) if (!fs.existsSync(path.join(ROOT, "prac2", "art", m[1] + ".webp"))) bad(`missing picture prac2/art/${m[1]}.webp`);
-for (const n of ["crown3d", "world-forest", "world-peaks", "world-reef"]) if (!fs.existsSync(path.join(ROOT, "prac2", "art", n + ".webp"))) bad(`missing picture prac2/art/${n}.webp`);
+for (const n of ["crown3d", "world-forest", "world-peaks", "world-reef", "chest0", "chest1", "chest2", "chest3", "chest4", "arena-forest", "arena-peaks", "arena-reef"]) if (!fs.existsSync(path.join(ROOT, "prac2", "art", n + ".webp"))) bad(`missing picture prac2/art/${n}.webp`);
 for (const w of WORLDS) if (!fs.existsSync(path.join(ROOT, "prac2", "art", w.boss.img + ".webp"))) bad(`missing boss picture for ${w.id}`);
 console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
 
@@ -115,6 +115,7 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
       }
     }
     if ((await locked()).length) bad(`${label}: levels still locked at the end`);
+    if (!/chest4/.test(await page.$eval(".timecard .chest", e => e.getAttribute("src")))) bad(`${label}: a full hour should show the overflowing chest`);
     if (await secs() !== 3600) bad(`${label}: everything right first time should earn exactly one hour, not ${await secs()} s`);
     const st = await page.evaluate(() => JSON.parse(localStorage.getItem("prac2.v1")));
     if (!st.badges.all || !st.badges.boss_maths || !st.badges.three) bad(`${label}: badges were not awarded (${Object.keys(st.badges)})`);

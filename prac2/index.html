@@ -217,6 +217,20 @@
   @keyframes bob { 50% { transform: translateY(-7px); } }
   @media (max-width: 520px) { .whead .isle { width: 96px; height: 110px; margin-top: -40px; } .top h1 img { width: 48px; height: 46px; vertical-align: -12px; } }
 
+  /* ---- the treasure chest that fills up, and the boss arenas ---- */
+  .chest { width: 150px; height: 150px; object-fit: contain; flex: none; margin: -8px 0; filter: drop-shadow(0 6px 4px rgba(0,0,0,.5)); }
+  .result .big img.chest { width: 190px; height: 190px; margin: 0; animation: bob 2.6s ease-in-out infinite; }
+  .bossbox.arena { position: relative; display: block; padding: 0; height: 250px; overflow: hidden; border-radius: 16px;
+    background: #0d1330 center bottom / cover no-repeat; }
+  .bossbox.arena .info { position: absolute; left: 0; right: 0; top: 0; padding: 10px 16px 22px;
+    background: linear-gradient(180deg, rgba(13,19,48,.92), rgba(13,19,48,.6) 70%, transparent); }
+  .bossbox.arena .info b { font-family: "Arial Black", Impact, sans-serif; font-style: italic; text-transform: uppercase; font-size: 19px; }
+  .bossbox.arena .stagepos { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; justify-content: center; }
+  .bossbox.arena .face { line-height: 0; }
+  .bossbox.arena .face img { width: 150px; height: 150px; filter: drop-shadow(0 0 14px rgba(255,255,255,.55)) drop-shadow(0 6px 0 rgba(0,0,0,.45)); }
+  .bossbox.arena .face:not(.hit):not(.laugh) { animation: bob 3s ease-in-out infinite; }
+  @media (max-width: 520px) { .chest { width: 104px; height: 104px; } .bossbox.arena { height: 210px; } .bossbox.arena .face img { width: 120px; height: 120px; } .bossbox.arena .stagepos { bottom: 22px; } }
+
   /* ---- Fortnite time: the reward pie ---- */
   .timecard { background: #0d1330; color: #fff; border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   .pie { --p: 0; width: 132px; height: 132px; border-radius: 50%; flex: none; position: relative;
@@ -845,6 +859,8 @@ const RANKS = [[0, "Rookie"], [100, "Scout"], [250, "Explorer"], [450, "Pathfind
 const SKINS = [["recruit", "Recruit", "#8a94a6"], ["britebomber", "Brite Bomber", "#2f8fff"], ["fishstick", "Fishstick", "#2f8fff"], ["peely", "Peely", "#a34dff"],
   ["cuddle", "Cuddle Team Leader", "#ffb21a"], ["drift", "Drift", "#ffb21a"], ["midas", "Midas", "#ffb21a"]];
 const ISLE = { reading: "world-forest", thinking: "world-peaks", maths: "world-reef" };
+const ARENA = { reading: "arena-forest", thinking: "arena-peaks", maths: "arena-reef" };
+const chestStage = () => { const p = piePct(); return p <= 0 ? 0 : p >= 100 ? 4 : 1 + Math.min(2, Math.floor(p / 34)); };
 const art = (name, alt, cls = "") => `<img class="${cls}" src="art/${name}.webp" alt="${alt}">`;
 const BADGES = [
   ["first", "🥾", "First steps", "Finish your first level"],
@@ -989,6 +1005,7 @@ function showMap() {
       <button class="pill" id="snd" aria-label="Sound on or off">${S.sound ? "🔊 Sound on" : "🔇 Sound off"}</button></div>
     ${PRACTICE ? `<div class="cave" id="practice-note"><div class="txt"><b>Practice mode</b><br>Every level is open and nothing you do here is saved. The real game progress is not touched.</div><a class="btn gold" href="../pracadmin/index.html" style="text-decoration:none">← Admin page</a></div>` : ""}
     <div class="timecard"><div class="pie" id="timepie" data-secs="${Math.round(earned())}" style="--p:${piePct()}" role="img" aria-label="Pie chart: ${fmt(earned())} of 60 minutes earned"></div>
+      ${art("chest" + chestStage(), "Your treasure chest: it fills with gold as your Fortnite time grows", "chest")}
       <div class="txt"><div class="lab">🎮 Fortnite time earned</div><div class="bigt">${fmt(earned())}</div>
         <div class="of">of 60 minutes. Every right answer grows the pie, and harder levels are worth more. Right after a hint earns half.${S.used ? `<br><b>${fmt(Math.max(0, earned() - S.used))} left to play</b> (${fmt(S.used)} already used)` : ""}</div></div>${art(SKINS[r][0], "Your skin: " + SKINS[r][1], "hero")}</div>
     <div class="rank">Rank: <b>${RANKS[r][1]}</b> · ${S.xp} XP ${nextAt ? `<span style="opacity:.8">· ${nextAt - S.xp} XP to ${RANKS[r + 1][1]}</span>` : "· top rank!"}
@@ -1049,7 +1066,7 @@ function showQuestion() {
   app.innerHTML = `
     <div class="playbar"><button class="pill" id="quit">← Map</button><span class="title">${esc(p.w.name)} · ${esc(boss ? p.w.boss.name : p.lv.name)}</span><span class="spacer" style="flex:1"></span>
       <span class="dots">${p.items.map((_, i) => `<i class="${i < p.idx ? "p" + p.res[i] : i === p.idx ? "cur" : ""}"></i>`).join("")}</span><span class="pill" id="tpill"><i class="pie mini" id="minipie" style="--p:${piePct()}"></i><span id="ttxt">${fmt(earned())}</span></span><span class="pill" id="gems">💎 ${p.pts}</span></div>
-    ${boss ? `<div class="bossbox"><div class="face" id="face">${art(p.w.boss.img, p.w.boss.name)}</div><div class="info"><b>${esc(p.w.boss.name)}</b>
+    ${boss ? `<div class="bossbox arena" style="background-image:url(art/${ARENA[p.w.id]}.webp)"><div class="stagepos"><div class="face" id="face">${art(p.w.boss.img, p.w.boss.name)}</div></div><div class="info"><b>${esc(p.w.boss.name)}</b>
       <div class="hp"><i id="hp" style="width:${100 * (max - p.pts) / max}%"></i></div><div class="say" id="say">${esc(p.idx === 0 ? p.w.boss.taunt : "Is that all you've got?")}</div></div></div>` : ""}
     <div class="stage${passage ? " has-passage" : ""}" style="--world:${p.w.color}">${passage}
       <div class="card"><div class="qhead"><span>Question ${p.idx + 1} of ${p.items.length}</span><span>${esc(q.cat)}</span></div>
@@ -1123,7 +1140,7 @@ function finish() {
       if (stars) { big = art(p.w.boss.img, "") + art("crown3d", "A golden crown", "crown3d"); title = `You defeated ${p.w.boss.name}!`; lines.push(esc(p.w.boss.defeat)); if (!beforeStars) lines.push(`You won the <b>${esc(p.w.crown)}</b>. +100 XP`); SFX.boss(); confetti(260); }
       else { big = art(p.w.boss.img, ""); title = `${p.w.boss.name} got away…`; lines.push(`You did ${p.pts} damage out of ${max}. You need ${max - 3} to win. Read the explanations, then come back stronger!`); SFX.wrong(); }
     } else {
-      big = stars === 3 ? "🎉" : stars ? "🙂" : "🌱"; title = stars === 3 ? "Perfect level!" : stars === 2 ? "Level cleared!" : stars === 1 ? "Nearly there!" : "Keep training!";
+      big = (stars === 3 ? "🎉" : stars ? "" : "🌱") + art("chest" + chestStage(), "Your treasure chest", "chest"); title = stars === 3 ? "Perfect level!" : stars === 2 ? "Level cleared!" : stars === 1 ? "Nearly there!" : "Keep training!";
       lines.push(`You scored ${p.pts} of ${max} 💎.`);
       if (stars < 2) lines.push("You need 2 ⭐ to unlock the next level. Have another go: you've seen how each one works now.");
       else if (stars === 2 && rec.stars < 3) lines.push("Play again and get every question first time for 3 ⭐.");
