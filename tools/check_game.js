@@ -34,12 +34,12 @@ for (const w of WORLDS) {
     for (const q of lv.questions) {
       nq++;
       if (ids.has(q.id)) bad(`duplicate question id ${q.id}`); ids.add(q.id);
-      if (q.options.length !== want) bad(`${q.id}: needs ${want} options`);
+      if (q.options.length !== (lv.bank ? 5 : want)) bad(`${q.id}: needs ${lv.bank ? 5 : want} options`);
       if (!(q.answer >= 0 && q.answer < q.options.length)) bad(`${q.id}: bad answer index`);
       if (!text(q.hint) || !text(q.explain) || !text(q.stem)) bad(`${q.id}: needs a stem, a hint and an explanation`);
       if (!CATS[w.id].includes(q.cat)) bad(`${q.id}: unknown question type "${q.cat}"`);
       if (!/why-not/.test(q.explain)) bad(`${q.id}: the explanation must say why the traps are wrong`);
-      if (!q.visual && !/ only$/.test(q.options[0])) {   // "X only / Y only / Both / Neither" is a fixed set
+      if (!q.visual && !lv.bank && !/ only$/.test(q.options[0])) {   // a sentence bank is the same five options for every gap;   // "X only / Y only / Both / Neither" is a fixed set
         const len = q.options.map(o => text(o).length), top = Math.max(...len);
         if (len[q.answer] === top && len.filter(l => l === top).length === 1 && top > 12) bad(`${q.id}: the correct option is the single longest`);
       }
@@ -72,7 +72,7 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
     const locked = () => page.$$eval(".node.locked", n => n.map(x => x.dataset.l));
     await overflow("map");
     const l = await locked();
-    if (l.length !== 12 || l.includes("r1") || l.includes("m1") || l.includes("t1")) bad(`${label}: a new player should have only level 1 of each world open (locked: ${l})`);
+    if (l.length !== WORLDS.reduce((a, w) => a + w.levels.length - 1, 0) || l.includes("r1") || l.includes("m1") || l.includes("t1")) bad(`${label}: a new player should have only level 1 of each world open (locked: ${l})`);
     if (shots) await page.screenshot({ path: path.join(shots, `game-map-${label}.png`), fullPage: true });
 
     /* play one level; mode "right" answers correctly, "hint" gets each one wrong once first */
@@ -105,8 +105,9 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
     if (!(await locked()).includes(first.levels[1].id)) bad(`${label}: level 2 opened with only 1 star`);
     if (!(await page.$("#cave"))) bad(`${label}: missed questions did not open the Comeback Cave`);
     const secs = () => page.$eval("#timepie", e => Number(e.dataset.secs));
-    const share = 3600 / (3 * 80);   // one level-1 question: levels weigh 1, 2, 3, 4 and a boss question 8
-    if (await secs() !== Math.round(4 * share / 2)) bad(`${label}: four level-1 answers after a hint should earn ${4 * share / 2} s, not ${await secs()}`);
+    /* one level-1 question's share of the hour: level n questions weigh n, a boss question twice the number of levels */
+    const share = 3600 / WORLDS.reduce((a, w) => a + w.levels.reduce((b, lv, i) => b + lv.questions.length * (lv.boss ? (w.levels.length - 1) * 2 : i + 1), 0), 0);
+    if (Math.abs(await secs() - 4 * share / 2) > 1) bad(`${label}: four level-1 answers after a hint should earn ${4 * share / 2} s, not ${await secs()}`);
     for (const w of WORLDS) {
       for (const lv of w.levels) {
         if ((await locked()).includes(lv.id)) bad(`${label}: ${lv.id} is still locked after 3 stars on the levels before it`);

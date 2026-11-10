@@ -47,6 +47,76 @@
     return `<div class="figure"><svg viewBox="0 0 190 160" width="190" height="160" role="img" aria-label="A large cube made of 27 small cubes, 3 small cubes long, 3 wide and 3 high.">${g}</svg></div>`;
   })();
 
+  const tbl = (head, rows) => `<div class="figure"><table class="grid"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map((c, i) => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table></div>`;
+
+  /* M1: picture graph */
+  const book = (x, y, half) => `<rect x="${x}" y="${y}" width="${half ? 13 : 26}" height="30" rx="2" fill="#4dabf7" stroke="${INK}" stroke-width="1.5"/>` + (half ? "" : `<line x1="${x + 6}" x2="${x + 6}" y1="${y}" y2="${y + 30}" stroke="${INK}" stroke-width="1.5"/>`);
+  const PICT = (() => {
+    const rows = [["Monday", 3], ["Tuesday", 4.5], ["Wednesday", 2], ["Thursday", 3.5]];
+    let g = "";
+    rows.forEach(([d, n], i) => {
+      const y = 12 + i * 42;
+      g += T(92, y + 21, d, 'text-anchor="end"') + `<line x1="100" x2="100" y1="${y - 6}" y2="${y + 36}" stroke="${INK}" stroke-width="2"/>`;
+      for (let k = 0; k < Math.floor(n); k++) g += book(110 + k * 32, y);
+      if (n % 1) g += book(110 + Math.floor(n) * 32, y, true);
+    });
+    g += book(110, 186) + T(144, 207, "= 4 books");
+    return `<div class="figure"><svg viewBox="0 0 290 224" width="290" role="img" aria-label="A picture graph of books borrowed. Monday: 3 book symbols. Tuesday: 4 and a half symbols. Wednesday: 2 symbols. Thursday: 3 and a half symbols. Key: one symbol = 4 books.">${g}</svg></div>`;
+  })();
+
+  /* M2: dot plot */
+  const DOTS = (() => {
+    const counts = [1, 3, 5, 4, 4, 2, 1];
+    let g = `<line x1="20" x2="300" y1="130" y2="130" stroke="${INK}" stroke-width="2"/>`;
+    counts.forEach((c, v) => {
+      const x = 40 + v * 40;
+      g += `<line x1="${x}" x2="${x}" y1="130" y2="136" stroke="${INK}" stroke-width="2"/>` + T(x, 152, v, 'text-anchor="middle"');
+      for (let k = 0; k < c; k++) g += `<circle cx="${x}" cy="${118 - k * 22}" r="8" fill="#ff8a65" stroke="${INK}" stroke-width="1.5"/>`;
+    });
+    g += T(160, 172, "Goals scored", 'text-anchor="middle"');
+    return `<div class="figure"><svg viewBox="0 0 320 180" width="320" role="img" aria-label="A dot plot. Each dot is one child. 0 goals: 1 dot. 1 goal: 3 dots. 2 goals: 5 dots. 3 goals: 4 dots. 4 goals: 4 dots. 5 goals: 2 dots. 6 goals: 1 dot.">${g}</svg></div>`;
+  })();
+
+  /* L2 Q3: the rectangle, not to scale */
+  const RECT = `<div class="figure"><svg viewBox="0 0 260 130" width="260" role="img" aria-label="A rectangle. The long side is labelled 8 cm. The short side is labelled with a question mark. The diagram is not to scale."><rect x="40" y="20" width="170" height="70" fill="#dff0d8" stroke="${INK}" stroke-width="2.4"/>${T(125, 14, "8 cm", 'text-anchor="middle" font-weight="700"')}${T(218, 60, "?", 'font-weight="700"')}<text x="125" y="112" font-size="13" text-anchor="middle" fill="#55607a">not to scale</text></svg></div>`;
+
+  /* a column graph: series = [{name, color, values}], gridlines every `step` up to `max` */
+  function colGraph({ labels, series, max, step, ylabel, numbers = true, aria }) {
+    const W = 70 + labels.length * (series.length * 26 + 30), H = 250, y = v => 205 - v * (170 / max);
+    let g = "";
+    for (let v = 0; v <= max; v += step) g += `<line x1="50" x2="${W - 10}" y1="${y(v)}" y2="${y(v)}" stroke="#c5ccd8" stroke-width="1"/>` + (numbers ? T(42, y(v) + 5, v, 'text-anchor="end"') : "");
+    labels.forEach((n, i) => {
+      const x0 = 66 + i * (series.length * 26 + 30);
+      series.forEach((s, k) => { g += `<rect x="${x0 + k * 26}" y="${y(s.values[i])}" width="24" height="${205 - y(s.values[i])}" fill="${s.color}" stroke="${INK}" stroke-width="1.5"/>`; });
+      g += T(x0 + series.length * 13, 224, n, 'text-anchor="middle"');
+    });
+    g += `<line x1="50" x2="50" y1="${y(max)}" y2="205" stroke="${INK}" stroke-width="2"/><line x1="50" x2="${W - 10}" y1="205" y2="205" stroke="${INK}" stroke-width="2"/>`;
+    g += `<text x="14" y="120" font-size="13" fill="${INK}" text-anchor="middle" transform="rotate(-90 14 120)">${ylabel}</text>`;
+    if (series.length > 1) series.forEach((s, k) => { g += `<rect x="${60 + k * 110}" y="236" width="14" height="12" fill="${s.color}" stroke="${INK}"/>` + T(80 + k * 110, 247, s.name); });
+    return `<div class="figure"><svg viewBox="0 0 ${W} ${H + (series.length > 1 ? 6 : -12)}" width="${W}" role="img" aria-label="${aria}">${g}</svg></div>`;
+  }
+
+  /* L4 (Chart Cove) Q1: cupcakes sold */
+  const CUPCAKES = colGraph({ labels: ["Mon", "Tue", "Wed"], max: 30, step: 10, ylabel: "Cupcakes sold",
+    series: [{ name: "", color: "#f783ac", values: [15, 25, 10] }],
+    aria: "A column graph of cupcakes sold. The scale goes 0, 10, 20, 30. Monday's column is halfway between 10 and 20. Tuesday's column is halfway between 20 and 30. Wednesday's column reaches 10." });
+  /* L4 Q2: shells, scale missing */
+  const SHELLS = colGraph({ labels: ["Aki", "Bo"], max: 10, step: 1, ylabel: "Shells collected", numbers: false,
+    series: [{ name: "", color: "#63e6be", values: [6, 9] }],
+    aria: "A column graph with no numbers on its scale. There are evenly spaced lines across the graph. Aki's column reaches the 6th line above the bottom. Bo's column reaches the 9th line." });
+  /* L4 Q3: two rain gauges with different scales */
+  function gauge(x, title, labels, gaps, level, top) {
+    const y = v => 190 - v * (150 / top), unit = (labels[1] - labels[0]) / gaps;
+    let g = `<path d="M${x} 30 L${x} 192 Q${x} 198 ${x + 6} 198 L${x + 54} 198 Q${x + 60} 198 ${x + 60} 192 L${x + 60} 30" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
+    g += `<rect x="${x + 2}" y="${y(level)}" width="56" height="${196 - y(level)}" fill="#74c0fc" opacity=".8"/>`;
+    for (let v = 0; v <= top + 0.01; v += unit) {
+      const big = labels.includes(Math.round(v));
+      g += `<line x1="${x}" x2="${x + (big ? 22 : 12)}" y1="${y(v)}" y2="${y(v)}" stroke="${INK}" stroke-width="1.8"/>` + (big ? T(x + 66, y(v) + 5, Math.round(v) + " mm") : "");
+    }
+    return g + T(x + 30, 218, title, 'text-anchor="middle" font-weight="700"');
+  }
+  const GAUGES = `<div class="figure"><svg viewBox="0 0 330 226" width="330" role="img" aria-label="Two rain gauges. Monday's gauge is labelled 0, 10, 20 and 30 millimetres, with four small marks between each pair of labels. Its water reaches the third small mark above 10. Tuesday's gauge is labelled 0, 20 and 40 millimetres, with three small marks between each pair of labels. Its water reaches the third small mark above 20.">${gauge(20, "Monday", [0, 10, 20, 30], 5, 16, 30)}${gauge(190, "Tuesday", [0, 20, 40], 4, 35, 40)}</svg></div>`;
+
   const BEADS = seq => `<div class="figure" style="font-size:24px;letter-spacing:2px">${seq} …</div>`;
 
   WORLDS.push({
@@ -57,11 +127,11 @@
       {
         id: "m1", name: "Shallow Waters",
         questions: [
-          { id: "m1a", cat: "Number & place value",
-            stem: `<p>Which number is <b>300 more</b> than 4,850?</p>`,
-            options: ["4,853", "4,880", "5,050", "5,150", "7,850"], answer: 3,
-            hint: `300 is 3 <b>hundreds</b>. Count on in hundreds from 4,850: 4,950, then … (watch what happens when you pass 5,000).`,
-            explain: `<p>Add 3 hundreds: 4,850 → 4,950 → 5,050 → <b>5,150</b>.</p><p class="why-not">4,880 adds 3 tens and 4,853 adds 3 ones. 7,850 adds 3 thousands. 5,050 stops one hundred too soon.</p>` },
+          { id: "m1e", cat: "Graphs & data",
+          stem: `<p>The picture graph shows how many books a class borrowed each day.</p>${PICT}<p>How many <b>more</b> books were borrowed on <b>Tuesday</b> than on <b>Wednesday</b>?</p>`,
+          options: ["2", "3", "8", "10", "18"], answer: 3,
+          hint: `Check the key first: one picture is not one book. What is <b>half</b> a picture worth?`,
+          explain: `<p>Each picture is 4 books, so half a picture is 2. Tuesday: 4 × 4 + 2 = 18. Wednesday: 2 × 4 = 8. Difference: 18 − 8 = <b>10</b>.</p><p class="why-not">2 and 3 count pictures instead of books. 8 ignores the half picture. 18 is Tuesday’s total, not the difference.</p>` },
           { id: "m1b", cat: "Time & timetables",
             stem: `<p>A film starts at <b>10:45 am</b> and runs for <b>1 hour 30 minutes</b>. What time does it finish?</p>`,
             options: ["11:15 am", "11:45 am", "12:15 pm", "12:45 pm", "1:15 pm"], answer: 2,
@@ -93,7 +163,7 @@
             hint: `How many of the 8 slices make one quarter of the pizza? It isn't one slice.`,
             explain: `<p>One quarter of 8 slices is 2 slices. So 2 + 2 = 4 slices are eaten and 4 are left. 4 out of 8 is <b>one half</b>.</p><p class="why-not"><sup>5</sup>⁄<sub>8</sub> treats “one quarter” as one slice. <sup>1</sup>⁄<sub>4</sub> is how much each child ate, not what is left.</p>` },
           { id: "m2c", cat: "Area, perimeter & 3D",
-            stem: `<p>A rectangle has a <b>perimeter of 26 cm</b>. Its long sides are each <b>8 cm</b>. What is its <b>area</b>?</p>`,
+            stem: `<p>This rectangle has a <b>perimeter of 26 cm</b>. Its long sides are each <b>8 cm</b>.</p>${RECT}<p>What is its <b>area</b>?</p>`,
             options: ["18 cm²", "26 cm²", "40 cm²", "80 cm²", "208 cm²"], answer: 2,
             hint: `First find a short side. The two long sides use up 16 cm of the perimeter, and what is left is shared by <b>two</b> short sides.`,
             explain: `<p>The two long sides: 8 + 8 = 16 cm. That leaves 26 − 16 = 10 cm for two short sides, so each is 5 cm. Area = 8 × 5 = <b>40 cm²</b>.</p><p class="why-not">80 cm² forgets to halve the 10 cm (8 × 10). 18 is 26 − 8, and 208 is 26 × 8: both mix up perimeter and side lengths.</p>` },
@@ -117,16 +187,41 @@
             options: ["1 only", "2 only", "1 and 2 only", "2 and 3 only", "1, 2 and 3"], answer: 3,
             hint: `For statement 1, count the marbles that are <b>not</b> red: blue and green together.`,
             explain: `<p>Statement 1: there are 5 red and 3 + 2 = 5 not red, so they are <b>equally</b> likely. Not correct. Statement 2: green has the fewest marbles (2), so it is least likely. Correct. Statement 3: there are no yellow marbles, so it is impossible. Correct. So <b>2 and 3 only</b>.</p><p class="why-not">Statement 1 is the trap: red is the most likely <em>colour</em>, but it is not more likely than all the other marbles put together.</p>` },
-          { id: "m3c", cat: "Rates",
-            stem: `<p>A machine prints <b>45 posters in 3 minutes</b>. Printing at the same speed, how many posters does it print in <b>8 minutes</b>?</p>`,
-            options: ["53", "90", "120", "135", "360"], answer: 2,
-            hint: `Find how many posters it prints in <b>one</b> minute first.`,
-            explain: `<p>In one minute: 45 ÷ 3 = 15 posters. In 8 minutes: 15 × 8 = <b>120</b>.</p><p class="why-not">360 is 45 × 8, which treats 45 as the number for one minute. 135 is 45 × 3. 53 just adds 45 and 8.</p>` },
+          { id: "m3e", cat: "Graphs & data",
+          stem: `<p>Twenty children each took 6 shots at goal. The dot plot shows how many goals each child scored.</p>${DOTS}<p>How many children scored <b>more than 3</b> goals?</p>`,
+          options: ["4", "7", "9", "11", "13"], answer: 1,
+          hint: `“More than 3” does <b>not</b> include 3. Which columns of dots count?`,
+          explain: `<p>More than 3 means 4, 5 or 6 goals. Count those dots: 4 + 2 + 1 = <b>7</b>.</p><p class="why-not">11 includes the children who scored exactly 3. 4 counts only one column. 9 is the number who scored fewer than 3, and 13 is the number who scored 3 or fewer.</p>` },
           { id: "m3d", cat: "Time & timetables",
             stem: `<p>Today is <b>Wednesday</b>. What day of the week will it be in <b>40 days</b>?</p>`,
             options: ["Thursday", "Friday", "Saturday", "Sunday", "Monday"], answer: 4,
             hint: `Every 7 days you land on Wednesday again. How many whole weeks are in 40 days, and how many days are left over?`,
             explain: `<p>40 = 5 weeks (35 days) + 5 days. After 35 days it is Wednesday again. Five more days: Thursday, Friday, Saturday, Sunday, <b>Monday</b>.</p><p class="why-not">Sunday counts Wednesday itself as the first of the 5 days. Friday comes from 40 ÷ 7 ≈ 5 with the wrong leftover (2 instead of 5).</p>` },
+        ],
+      },
+      {
+        id: "m5", name: "Chart Cove",
+        questions: [
+          { id: "m5a", cat: "Graphs & data",
+            stem: `<p>A school stall wants to sell <b>80 cupcakes</b> in four days. The graph shows the first three days.</p>${CUPCAKES}<p>How many cupcakes must the stall sell on <b>Thursday</b> to reach its target?</p>`,
+            options: ["20", "30", "35", "40", "50"], answer: 1,
+            hint: `Two of the columns stop <b>halfway</b> between two lines. The lines go up in 10s, so what is halfway worth?`,
+            explain: `<p>Monday 15, Tuesday 25, Wednesday 10: that is 50 sold so far. To reach 80 they need 80 − 50 = <b>30</b>.</p><p class="why-not">50 is the number already sold. 40 reads the halfway columns down to 10 and 20. 20 reads them up to 20 and 30. 35 misreads just one of them.</p>` },
+          { id: "m5b", cat: "Graphs & data",
+            stem: `<p>Aki and Bo collected shells. The numbers have been left off the graph’s scale, but the lines are evenly spaced and start at 0.</p>${SHELLS}<p>Together they collected <b>60 shells</b>. How many did <b>Bo</b> collect?</p>`,
+            options: ["9", "24", "30", "36", "45"], answer: 3,
+            hint: `Count how many lines each column reaches. How many lines is that altogether, and how many shells must one line be worth?`,
+            explain: `<p>Aki’s column reaches 6 lines and Bo’s reaches 9: 15 lines for 60 shells, so each line is 60 ÷ 15 = 4 shells. Bo collected 9 × 4 = <b>36</b>.</p><p class="why-not">9 treats each line as 1 shell. 24 is Aki’s number. 30 just halves the total, but the columns are not the same height. 45 guesses that each line is worth 5.</p>` },
+          { id: "m5c", cat: "Measurement & scales",
+            stem: `<p>The two gauges show how much rain fell on Monday and on Tuesday. <b>Their scales are different.</b></p>${GAUGES}<p>How much <b>more</b> rain fell on Tuesday than on Monday?</p>`,
+            options: ["10 mm", "17 mm", "19 mm", "22 mm", "51 mm"], answer: 2,
+            hint: `Work out what one small mark is worth on <b>each</b> gauge separately. They are not the same.`,
+            explain: `<p>Monday’s gauge has 5 gaps for every 10 mm, so each small mark is 2 mm: the water is at 10 + 3 × 2 = 16 mm. Tuesday’s has 4 gaps for every 20 mm, so each mark is 5 mm: 20 + 3 × 5 = 35 mm. Difference: 35 − 16 = <b>19 mm</b>.</p><p class="why-not">10 mm comes from using the same value for the marks on both gauges. 51 mm adds instead of subtracting. 22 mm reads Monday’s marks as 1 mm each.</p>` },
+          { id: "m5d", cat: "Graphs & data",
+            stem: `<p>The table shows a netball competition so far. A win earns <b>3 points</b>, a draw earns <b>1 point</b> and a loss earns none.</p>${tbl(["Team", "Played", "Won", "Drawn", "Lost"], [["Reds", 8, 5, 1, 2], ["Blues", 8, 4, 4, 0], ["Greens", 7, 4, 1, 2], ["Golds", 8, 2, 3, 3]])}<div class="box">1. The Reds have more points than the Blues.<br>2. The Blues have not lost a game.<br>3. If the Greens win their next game, they will have as many points as the Reds have now.</div><p>Which statements are correct?</p>`,
+            options: ["1 only", "2 only", "1 and 2 only", "2 and 3 only", "1, 2 and 3"], answer: 3,
+            hint: `Work out each team’s points first: wins × 3, plus draws. More wins doesn’t always mean more points.`,
+            explain: `<p>Points: Reds 5 × 3 + 1 = 16. Blues 4 × 3 + 4 = 16. Greens 4 × 3 + 1 = 13. Statement 1: 16 and 16 are equal, so not correct. Statement 2: the Blues’ “Lost” column is 0, correct. Statement 3: 13 + 3 = 16, the same as the Reds, correct. So <b>2 and 3 only</b>.</p><p class="why-not">Statement 1 looks right because the Reds have more wins, but the Blues’ four draws make up the difference.</p>` },
         ],
       },
       {
@@ -137,11 +232,11 @@
             options: ["1", "7", "13", "26", "52"], answer: 2,
             hint: `Work backwards from 5, undoing each step in reverse order. The opposite of “divide by 4” is “multiply by 4”.`,
             explain: `<p>Work backwards: 5 × 4 = 20. Undo “subtract 6”: 20 + 6 = 26. Undo “double”: 26 ÷ 2 = <b>13</b>. Check: 13 → 26 → 20 → 5. ✓</p><p class="why-not">26 stops one step early (it forgets to undo the doubling). 7 subtracts 6 again instead of adding it back. 1 does the steps forwards starting from 5.</p>` },
-          { id: "m4b", cat: "Number & place value",
-            stem: `<p>Two numbers <b>add up to 50</b>. One is <b>14 more</b> than the other. What is the <b>larger</b> number?</p>`,
-            options: ["18", "25", "28", "32", "36"], answer: 3,
-            hint: `Take the extra 14 away from 50 first. What is left is shared equally between the two numbers.`,
-            explain: `<p>50 − 14 = 36, and 36 ÷ 2 = 18. So the smaller number is 18 and the larger is 18 + 14 = <b>32</b>. Check: 18 + 32 = 50. ✓</p><p class="why-not">18 is the smaller number, not the one asked for. 36 is 50 − 14 without halving. 25 is half of 50, which ignores the difference.</p>` },
+          { id: "m4e", cat: "Time & timetables",
+          stem: `<p>Three buses run from the Station to the Beach.</p>${tbl(["", "Bus 1", "Bus 2", "Bus 3"], [["Station", "9:10", "9:40", "10:20"], ["Market", "9:28", "9:58", "10:38"], ["Beach", "9:55", "10:25", "11:05"]])}<p>Zara takes Bus 1 and gets off at the Market. Her shopping takes <b>40 minutes</b>. Then she catches the next bus she can. What time does she reach the Beach?</p>`,
+          options: ["10:08 am", "10:25 am", "10:35 am", "10:38 am", "11:05 am"], answer: 4,
+          hint: `Work out when her shopping finishes. Has Bus 2 already left the Market by then?`,
+          explain: `<p>She reaches the Market at 9:28 and finishes shopping at 9:28 + 40 minutes = 10:08. Bus 2 left the Market at 9:58, so she has missed it. Bus 3 leaves at 10:38 and reaches the Beach at <b>11:05 am</b>.</p><p class="why-not">10:25 is when Bus 2 arrives, but she was still shopping when it left. 10:38 is when Bus 3 <em>leaves</em> the Market. 10:08 is when her shopping ends. 10:35 adds 40 minutes to Bus 1’s arrival at the Beach.</p>` },
           { id: "m4c", cat: "Area, perimeter & 3D",
             stem: `<p>A <b>square</b> paddock has sides <b>12 m</b> long. A farmer puts a fence post at <b>every corner</b>, and then more posts so that the posts are <b>3 m apart</b> all the way round. How many posts does she use?</p>`,
             options: ["16", "17", "20", "24", "48"], answer: 0,
