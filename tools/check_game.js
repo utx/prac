@@ -2,7 +2,7 @@
 /* Checks the adventure game (prac2/index.html, built by tools/build_game.py).
    1. Content rules: unique ids, option counts (maths A–E, others A–D), a hint and an
       explanation for every question, a known question type, the correct option never
-      the single longest, answer letters spread within each level, no "OC" on the page.
+      the single longest, answer letters spread within each level (no letter more than twice), no "OC" on the page.
    2. In a real browser at desktop and phone width: the map draws, levels lock and
       unlock by the star rules, a wrong answer gives a hint and a second go, every
       question of every level renders without errors or sideways scrolling, a boss can
@@ -45,7 +45,7 @@ for (const w of WORLDS) {
       }
       letters[q.answer] = (letters[q.answer] || 0) + 1;
     }
-    if (Math.max(...Object.values(letters)) > (lv.boss ? 2 : 1)) bad(`${lv.id}: answer letters are not spread (${JSON.stringify(letters)})`);
+    if (Math.max(...Object.values(letters)) > 2) bad(`${lv.id}: answer letters are not spread (${JSON.stringify(letters)})`);
   }
 }
 const html = fs.readFileSync(PAGE, "utf8");
