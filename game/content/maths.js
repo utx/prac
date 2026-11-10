@@ -51,8 +51,8 @@
 
   WORLDS.push({
     id: "maths", name: "Number Reef", icon: "🌊", color: "#0b6fa4", crown: "Coral Crown",
-    blurb: "Dive deeper with every level. Captain Kraken guards the Coral Crown at the bottom of the reef.",
-    boss: { name: "Captain Kraken", emoji: "🐙", taunt: "Eight arms, and not one of them does sums as fast as me!", defeat: "Captain Kraken sinks back into the deep, blowing bubbles of respect." },
+    blurb: "Dive deeper with every level. Leviathan guards the Coral Crown at the bottom of the reef.",
+    boss: { name: "Leviathan", emoji: "🐟", img: "leviathan", taunt: "Call me fishman. Nobody in this reef does sums as fast as me!", defeat: "Leviathan sinks back into the deep, blowing bubbles of respect." },
     levels: [
       {
         id: "m1", name: "Shallow Waters",
@@ -155,7 +155,7 @@
         ],
       },
       {
-        id: "mb", name: "Captain Kraken", boss: true,
+        id: "mb", name: "Leviathan", boss: true,
         questions: [
           { id: "mba", cat: "Fractions",
             stem: `<p>Mia spent <b>one third</b> of her money on a book. Then she spent <b>half of what was left</b> on a game. She now has <b>$12</b>. How much money did she start with?</p>`,

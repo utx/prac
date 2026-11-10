@@ -189,6 +189,22 @@
   .opt .let { border-radius: 8px; transform: skewX(-6deg); }
   .result h2 { font-size: 32px; }
 
+  /* ---- Fortnite art (Epic's outfit renders, see the notice at the foot of the page) ---- */
+  .hero { width: 150px; height: 150px; object-fit: contain; flex: none; filter: drop-shadow(0 6px 0 rgba(0,0,0,.45)); margin: -10px 0; }
+  .node .num img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: block; }
+  .node.boss .num { width: 64px; height: 64px; overflow: hidden; padding: 0; }
+  .bossbox .face img { width: 84px; height: 84px; object-fit: contain; display: block; filter: drop-shadow(0 4px 0 rgba(0,0,0,.5)); }
+  .result .big img { width: 150px; height: 150px; object-fit: contain; }
+  .locker { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+  .skin { border: 3px solid #0d1330; border-bottom-width: 7px; border-radius: 10px; text-align: center; padding: 6px 4px 8px; font-size: 13px; line-height: 1.25;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--rar) 55%, #fff), color-mix(in srgb, var(--rar) 90%, #000)); color: #fff; }
+  .skin img { width: 92px; height: 92px; object-fit: contain; display: block; margin: 0 auto; }
+  .skin b { display: block; font-family: "Arial Black", Impact, sans-serif; font-style: italic; text-transform: uppercase; font-size: 13.5px; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
+  .skin.off { --rar: #5d6578 !important; }
+  .skin.off img { filter: brightness(0) opacity(.55); }
+  .skin.cur { box-shadow: 0 0 0 4px #ffe81a; }
+  .legal { color: rgba(255,255,255,.75); font-size: 12.5px; line-height: 1.45; margin: 16px 4px 0; text-align: center; }
+
   /* ---- Fortnite time: the reward pie ---- */
   .timecard { background: #0d1330; color: #fff; border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   .pie { --p: 0; width: 132px; height: 132px; border-radius: 50%; flex: none; position: relative;
@@ -222,6 +238,10 @@ const WORLDS = [];
 const KEY = "prac2.v1";
 const LETTERS = "ABCDE";
 const RANKS = [[0, "Rookie"], [100, "Scout"], [250, "Explorer"], [450, "Pathfinder"], [700, "Champion"], [1000, "Hero"], [1300, "Legend"]];
+/* One outfit per rank: [image, name, rarity colour] */
+const SKINS = [["recruit", "Recruit", "#8a94a6"], ["britebomber", "Brite Bomber", "#2f8fff"], ["fishstick", "Fishstick", "#2f8fff"], ["peely", "Peely", "#a34dff"],
+  ["cuddle", "Cuddle Team Leader", "#ffb21a"], ["drift", "Drift", "#ffb21a"], ["midas", "Midas", "#ffb21a"]];
+const art = (name, alt, cls = "") => `<img class="${cls}" src="art/${name}.webp" alt="${alt}">`;
 const BADGES = [
   ["first", "🥾", "First steps", "Finish your first level"],
   ["three", "🌟", "Three stars", "Get 3 stars on a level"],
@@ -344,8 +364,8 @@ function showMap() {
       const why = lockReason(w, i), b = best(lv);
       const isNext = !why && b === 0 && !nextMarked && (nextMarked = true);
       return `<button class="node r${Math.min(i + 1, 4)}${why ? " locked" : ""}${lv.boss ? " boss" : ""}${lv.boss && b ? " beaten" : ""}${isNext ? " next" : ""}" data-w="${w.id}" data-l="${lv.id}" ${why ? `data-why="${esc(why)}"` : ""}>
-        <span class="num">${why ? "🔒" : lv.boss ? (b ? "👑" : w.boss.emoji) : i + 1}</span>
-        <span class="nm">${esc(lv.boss ? w.boss.name : lv.name)}</span>
+        <span class="num">${lv.boss ? art(w.boss.img, "") : why ? "🔒" : i + 1}</span>
+        <span class="nm">${lv.boss && b ? "👑 " : lv.boss && why ? "🔒 " : ""}${esc(lv.boss ? w.boss.name : lv.name)}</span>
         <span class="rar">${lv.boss ? "Legendary" : ["Common", "Uncommon", "Rare", "Epic"][Math.min(i, 3)]} · ${fmt(TIME[lv.questions[0].id])} each</span>
         ${why ? `<span class="req">${esc(lv.boss ? `Needs ${BOSS_GATE} ⭐` : "Locked")}</span>` : `<span class="st">${starRow(b)}</span>`}
       </button>`;
@@ -365,15 +385,18 @@ function showMap() {
     ${PRACTICE ? `<div class="cave" id="practice-note"><div class="txt"><b>Practice mode</b><br>Every level is open and nothing you do here is saved. The real game progress is not touched.</div><a class="btn gold" href="../pracadmin/index.html" style="text-decoration:none">← Admin page</a></div>` : ""}
     <div class="timecard"><div class="pie" id="timepie" data-secs="${Math.round(earned())}" style="--p:${piePct()}" role="img" aria-label="Pie chart: ${fmt(earned())} of 60 minutes earned"></div>
       <div class="txt"><div class="lab">🎮 Fortnite time earned</div><div class="bigt">${fmt(earned())}</div>
-        <div class="of">of 60 minutes. Every right answer grows the pie, and harder levels are worth more. Right after a hint earns half.${S.used ? `<br><b>${fmt(Math.max(0, earned() - S.used))} left to play</b> (${fmt(S.used)} already used)` : ""}</div></div></div>
+        <div class="of">of 60 minutes. Every right answer grows the pie, and harder levels are worth more. Right after a hint earns half.${S.used ? `<br><b>${fmt(Math.max(0, earned() - S.used))} left to play</b> (${fmt(S.used)} already used)` : ""}</div></div>${art(SKINS[r][0], "Your skin: " + SKINS[r][1], "hero")}</div>
     <div class="rank">Rank: <b>${RANKS[r][1]}</b> · ${S.xp} XP ${nextAt ? `<span style="opacity:.8">· ${nextAt - S.xp} XP to ${RANKS[r + 1][1]}</span>` : "· top rank!"}
       <div class="xpbar"><i style="width:${pct}%"></i></div></div>
     ${cave.length ? `<div class="cave"><div class="txt"><b>💪 Comeback Cave</b><br>${cave.length} question${cave.length > 1 ? "s" : ""} got away from you. Come back and beat ${cave.length > 1 ? "them" : "it"} for bonus XP!</div>
       <button class="btn gold" id="cave">Enter the cave</button></div>` : ""}
     ${worlds}
+    <div class="shelf"><h3>Locker (${r + 1} / ${SKINS.length} skins)</h3>
+      <div class="locker">${SKINS.map((k, i) => `<div class="skin${i > r ? " off" : ""}${i === r ? " cur" : ""}" style="--rar:${k[2]}">${art(k[0], i > r ? "A locked skin" : k[1])}<b>${i > r ? "???" : esc(k[1])}</b>${i > r ? `Rank ${RANKS[i][1]}: ${RANKS[i][0]} XP` : "Rank " + RANKS[i][1]}</div>`).join("")}</div></div>
     <div class="shelf"><h3>Badges (${Object.keys(S.badges).length} / ${BADGES.length})</h3>
       <div class="badges">${BADGES.map(b => `<span class="badge${S.badges[b[0]] ? "" : " off"}" title="${esc(b[3])}"><i>${b[1]}</i><span><b>${esc(b[2])}</b><br><small>${esc(b[3])}</small></span></span>`).join("")}</div></div>
-    ${parents()}`;
+    ${parents()}
+    <p class="legal">A private, non-commercial fan project. Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.</p>`;
   $("#snd").onclick = () => { S.sound = !S.sound; save(); showMap(); if (S.sound) SFX.right(); };
   if ($("#cave")) $("#cave").onclick = startCave;
   app.querySelectorAll(".node").forEach(n => n.onclick = () => {
@@ -421,7 +444,7 @@ function showQuestion() {
   app.innerHTML = `
     <div class="playbar"><button class="pill" id="quit">← Map</button><span class="title">${esc(p.w.name)} · ${esc(boss ? p.w.boss.name : p.lv.name)}</span><span class="spacer" style="flex:1"></span>
       <span class="dots">${p.items.map((_, i) => `<i class="${i < p.idx ? "p" + p.res[i] : i === p.idx ? "cur" : ""}"></i>`).join("")}</span><span class="pill" id="tpill"><i class="pie mini" id="minipie" style="--p:${piePct()}"></i><span id="ttxt">${fmt(earned())}</span></span><span class="pill" id="gems">💎 ${p.pts}</span></div>
-    ${boss ? `<div class="bossbox"><div class="face" id="face">${p.w.boss.emoji}</div><div class="info"><b>${esc(p.w.boss.name)}</b>
+    ${boss ? `<div class="bossbox"><div class="face" id="face">${art(p.w.boss.img, p.w.boss.name)}</div><div class="info"><b>${esc(p.w.boss.name)}</b>
       <div class="hp"><i id="hp" style="width:${100 * (max - p.pts) / max}%"></i></div><div class="say" id="say">${esc(p.idx === 0 ? p.w.boss.taunt : "Is that all you've got?")}</div></div></div>` : ""}
     <div class="stage${passage ? " has-passage" : ""}" style="--world:${p.w.color}">${passage}
       <div class="card"><div class="qhead"><span>Question ${p.idx + 1} of ${p.items.length}</span><span>${esc(q.cat)}</span></div>
@@ -492,8 +515,8 @@ function finish() {
     save();
     const opened = unlockedIds().filter(id => !unlockedBefore.includes(id));
     if (lv.boss) {
-      if (stars) { big = "👑"; title = `You defeated ${p.w.boss.name}!`; lines.push(esc(p.w.boss.defeat)); if (!beforeStars) lines.push(`You won the <b>${esc(p.w.crown)}</b>. +100 XP`); SFX.boss(); confetti(260); }
-      else { big = p.w.boss.emoji; title = `${p.w.boss.name} got away…`; lines.push(`You did ${p.pts} damage out of ${max}. You need ${max - 3} to win. Read the explanations, then come back stronger!`); SFX.wrong(); }
+      if (stars) { big = art(p.w.boss.img, "") + "👑"; title = `You defeated ${p.w.boss.name}!`; lines.push(esc(p.w.boss.defeat)); if (!beforeStars) lines.push(`You won the <b>${esc(p.w.crown)}</b>. +100 XP`); SFX.boss(); confetti(260); }
+      else { big = art(p.w.boss.img, ""); title = `${p.w.boss.name} got away…`; lines.push(`You did ${p.pts} damage out of ${max}. You need ${max - 3} to win. Read the explanations, then come back stronger!`); SFX.wrong(); }
     } else {
       big = stars === 3 ? "🎉" : stars ? "🙂" : "🌱"; title = stars === 3 ? "Perfect level!" : stars === 2 ? "Level cleared!" : stars === 1 ? "Nearly there!" : "Keep training!";
       lines.push(`You scored ${p.pts} of ${max} 💎.`);
@@ -510,7 +533,7 @@ function finish() {
   if (!p.cave && missed) lines.push(`${missed} question${missed > 1 ? "s are" : " is"} waiting in the 💪 Comeback Cave.`);
   newBadges.forEach(b => lines.push(`${b[1]} New badge: <b>${esc(b[2])}</b>`));
   const r = rankOf(S.xp);
-  if (p.rank0 !== undefined && r > p.rank0) lines.push(`⬆️ New rank: <b>${RANKS[r][1]}</b>!`);
+  if (p.rank0 !== undefined && r > p.rank0) { lines.push(`⬆️ New rank: <b>${RANKS[r][1]}</b>! New skin unlocked: <b>${esc(SKINS[r][1])}</b>`); big = art(SKINS[r][0], SKINS[r][1]) + (p.lv.boss && stars ? "👑" : ""); }
   save();
   app.innerHTML = `<div class="card result"><div class="big">${big}</div><h2>${esc(title)}</h2>
     ${p.cave ? "" : `<div class="stars">${[0, 1, 2].map(i => `<span class="${i < stars ? "on" : ""}">⭐</span>`).join("")}</div>`}

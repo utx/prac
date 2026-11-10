@@ -50,6 +50,9 @@ for (const w of WORLDS) {
 }
 const html = fs.readFileSync(PAGE, "utf8");
 if (/\bOC\b/.test(html)) bad('the page mentions "OC"');
+if (!/not endorsed by Epic/.test(html)) bad("the Epic fan-content notice is missing");
+for (const m of html.matchAll(/(?:img: "|\[")([a-z]+)"(?=, "[A-Z][^"]*", "#)/g)) if (!fs.existsSync(path.join(ROOT, "prac2", "art", m[1] + ".webp"))) bad(`missing picture prac2/art/${m[1]}.webp`);
+for (const w of WORLDS) if (!fs.existsSync(path.join(ROOT, "prac2", "art", w.boss.img + ".webp"))) bad(`missing boss picture for ${w.id}`);
 console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
 
 /* ---- 2. browser ---- */
@@ -117,6 +120,9 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
     await page.reload();
     if ((await page.$$(".node.boss.beaten")).length !== 3) bad(`${label}: progress was not kept after a reload`);
     await overflow("finished map");
+    const broken = await page.$$eval("img", im => im.filter(i => !(i.complete && i.naturalWidth > 0)).map(i => i.getAttribute("src")));
+    if (broken.length) bad(`${label}: pictures did not load: ${broken}`);
+    if ((await page.$$(".skin:not(.off)")).length !== 7) bad(`${label}: the top rank should unlock all 7 skins`);
     if (shots) await page.screenshot({ path: path.join(shots, `game-done-${label}.png`), fullPage: true });
     errors.forEach(e => bad(`${label}: page error: ${e}`));
     await ctx.close();
