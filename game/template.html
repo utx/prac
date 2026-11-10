@@ -156,6 +156,56 @@
   canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
   @media (max-width: 520px) { .wrap { padding: 12px 12px 70px; } .top h1 { font-size: 22px; } .card { padding: 14px; } .opts.visual { gap: 6px; } .opt { padding: 9px 10px; gap: 9px; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* ---- battle-royale look: all original, drawn with CSS (no third-party artwork) ---- */
+  html { background: #2a1266; }
+  body { background:
+      repeating-linear-gradient(115deg, rgba(255,255,255,.035) 0 26px, transparent 26px 70px),
+      radial-gradient(900px 500px at 85% -10%, rgba(255,90,220,.45), transparent 70%),
+      linear-gradient(180deg, #1668e3 0%, #5a2fd8 52%, #2a1266 100%) fixed; }
+  .top h1, .world h2, .shelf h3, .btn, .pill, .node .nm, .fb h4, .playbar .title, .result h2, .cave b, .timecard .lab, .rank b {
+    font-family: "Arial Black", "Segoe UI Black", Impact, "Segoe UI", sans-serif; font-style: italic; text-transform: uppercase; letter-spacing: .4px; }
+  .top h1 { font-size: 30px; text-shadow: 0 3px 0 #0d1330; transform: skewX(-4deg); }
+  .top h1 span { color: #ffe81a; }
+  .world, .card, .shelf, .cave, .timecard { border: 3px solid #0d1330; box-shadow: 0 6px 0 #0d1330; }
+  .world { border-top: 8px solid var(--world); }
+  .btn { background: #ffe81a !important; color: #111 !important; border: 3px solid #0d1330; box-shadow: 0 4px 0 #0d1330; border-radius: 8px; transform: skewX(-4deg); }
+  .btn:hover { filter: none; transform: skewX(-4deg) translateY(-2px); box-shadow: 0 6px 0 #0d1330; }
+  .btn:active { transform: skewX(-4deg) translateY(3px); box-shadow: 0 1px 0 #0d1330; }
+  .btn.ghost { background: #fff !important; color: var(--ink-soft) !important; }
+  .pill { background: rgba(13,19,48,.55); border: 2px solid rgba(255,255,255,.35); }
+  .node { border-width: 3px; border-color: #0d1330; border-bottom-width: 7px; border-radius: 10px; background: #fff; }
+  .node .num { border-radius: 10px; transform: skewX(-6deg); border: 2px solid #0d1330; background: var(--rar); }
+  .node { --rar: #8a94a6; } .node.r2 { --rar: #43a629; } .node.r3 { --rar: #2f8fff; } .node.r4 { --rar: #a34dff; } .node.boss { --rar: #ffb21a; }
+  .node:not(.locked) { border-bottom-color: var(--rar); background: linear-gradient(180deg, #fff 55%, color-mix(in srgb, var(--rar) 22%, #fff)); }
+  .node .rar { font-size: 11.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--rar); filter: brightness(.8); }
+  .node.boss .num, .node.boss.beaten .num { background: var(--rar); }
+  .node.locked .num { background: #9aa3b5; }
+  .node.next { border-color: #0d1330; border-bottom-color: #ffe81a; box-shadow: 0 0 0 4px #ffe81a; }
+  .rank { background: rgba(13,19,48,.55); border: 2px solid rgba(255,255,255,.25); }
+  .xpbar i { background: linear-gradient(90deg, #ffe81a, #ff9d1a); }
+  .bossbox { background: rgba(13,19,48,.7); border: 3px solid #0d1330; }
+  .opt { border-width: 3px; border-radius: 10px; }
+  .opt .let { border-radius: 8px; transform: skewX(-6deg); }
+  .result h2 { font-size: 32px; }
+
+  /* ---- Fortnite time: the reward pie ---- */
+  .timecard { background: #0d1330; color: #fff; border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .pie { --p: 0; width: 132px; height: 132px; border-radius: 50%; flex: none; position: relative;
+    background: conic-gradient(#ffe81a calc(var(--p) * 1%), #2b3566 0); border: 5px solid #fff; box-shadow: 0 0 0 4px #0d1330, 0 0 24px rgba(255,232,26,.55); }
+  .pie::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-conic-gradient(rgba(13,19,48,.55) 0 1deg, transparent 1deg 30deg); }
+  .pie.mini { width: 22px; height: 22px; border-width: 2px; box-shadow: none; display: inline-block; vertical-align: -5px; margin-right: 6px; }
+  .pie.mini::after { display: none; }
+  .pie.grow { animation: piegrow .7s; }
+  @keyframes piegrow { 40% { transform: scale(1.45); filter: brightness(1.4); } }
+  .timecard .txt { flex: 1 1 220px; }
+  .timecard .lab { color: #ffe81a; font-size: 17px; }
+  .timecard .bigt { font-size: 38px; font-weight: 900; line-height: 1.1; font-family: "Arial Black", Impact, sans-serif; }
+  .timecard .of { opacity: .85; font-size: 15px; }
+  .tgain { background: #0d1330; color: #ffe81a; font-weight: 800; border-radius: 8px; padding: 6px 12px; display: inline-block; margin: 0 0 8px !important; }
+  .usedrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0 14px; }
+  .usedrow .btn { padding: 5px 12px; font-size: 14px; }
 </style>
 </head>
 <body>
@@ -191,11 +241,11 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;",
 /* ---------- saved progress ---------- */
 /* Practice mode: opened from the admin page (?admin=1 after the PIN). Everything is unlocked and nothing is saved. */
 const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
-const FRESH = () => ({ levels: {}, q: {}, xp: 0, badges: {}, days: [], sound: true });
+const FRESH = () => ({ levels: {}, q: {}, xp: 0, badges: {}, days: [], sound: true, used: 0 });
 function load() {
   if (PRACTICE) return FRESH();
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.levels) return Object.assign({ levels: {}, q: {}, xp: 0, badges: {}, days: [], sound: true }, s); } catch (e) {}
-  return { levels: {}, q: {}, xp: 0, badges: {}, days: [], sound: true };
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.levels) return Object.assign(FRESH(), s); } catch (e) {}
+  return FRESH();
 }
 let S = load();
 const save = () => { if (PRACTICE) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
@@ -226,6 +276,25 @@ function lockReason(w, i) {
 }
 const rankOf = xp => { let r = 0; RANKS.forEach((x, i) => { if (xp >= x[0]) r = i; }); return r; };
 const allQuestions = () => WORLDS.flatMap(w => w.levels.flatMap(l => l.questions.map(q => ({ q, lv: l, w }))));
+/* Fortnite time. Every question is worth a share of one hour, by how hard its level is
+   (level 1 = 1 share, level 2 = 2 … and a boss question = twice the last level). Right first
+   time earns the whole share; right after a hint earns half. A later first-time answer tops
+   it up to the whole share, so the pie can always reach the full hour. */
+const HOUR = 3600;
+const TIME = (() => {
+  const w = {}; let total = 0;
+  WORLDS.forEach(wd => { const n = regular(wd).length; wd.levels.forEach((lv, i) => lv.questions.forEach(q => { w[q.id] = lv.boss ? n * 2 : i + 1; total += w[q.id]; })); });
+  Object.keys(w).forEach(k => w[k] = HOUR * w[k] / total);
+  return w;
+})();
+const earned = () => Object.keys(TIME).reduce((a, id) => a + TIME[id] * (((S.q[id] || {}).best || 0) / 2), 0);
+const fmt = s => {
+  s = Math.round(s * 2) / 2;
+  const m = Math.floor(s / 60), r = s - m * 60, half = r % 1 ? "½" : "", whole = Math.floor(r);
+  const secs = (whole || !half ? whole : "") + half + " s";
+  return m ? m + " min" + (r ? " " + secs : "") : secs;
+};
+const piePct = () => Math.min(100, 100 * earned() / HOUR);
 const caveList = () => allQuestions().filter(x => S.q[x.q.id] && S.q[x.q.id].seen && (S.q[x.q.id].best || 0) < 2);
 
 /* ---------- sound and sparkle ---------- */
@@ -274,9 +343,10 @@ function showMap() {
     const nodes = w.levels.map((lv, i) => {
       const why = lockReason(w, i), b = best(lv);
       const isNext = !why && b === 0 && !nextMarked && (nextMarked = true);
-      return `<button class="node${why ? " locked" : ""}${lv.boss ? " boss" : ""}${lv.boss && b ? " beaten" : ""}${isNext ? " next" : ""}" data-w="${w.id}" data-l="${lv.id}" ${why ? `data-why="${esc(why)}"` : ""}>
+      return `<button class="node r${Math.min(i + 1, 4)}${why ? " locked" : ""}${lv.boss ? " boss" : ""}${lv.boss && b ? " beaten" : ""}${isNext ? " next" : ""}" data-w="${w.id}" data-l="${lv.id}" ${why ? `data-why="${esc(why)}"` : ""}>
         <span class="num">${why ? "🔒" : lv.boss ? (b ? "👑" : w.boss.emoji) : i + 1}</span>
         <span class="nm">${esc(lv.boss ? w.boss.name : lv.name)}</span>
+        <span class="rar">${lv.boss ? "Legendary" : ["Common", "Uncommon", "Rare", "Epic"][Math.min(i, 3)]} · ${fmt(TIME[lv.questions[0].id])} each</span>
         ${why ? `<span class="req">${esc(lv.boss ? `Needs ${BOSS_GATE} ⭐` : "Locked")}</span>` : `<span class="st">${starRow(b)}</span>`}
       </button>`;
     }).join("");
@@ -293,6 +363,9 @@ function showMap() {
       <span class="pill">👑 ${crowns} / ${WORLDS.length}</span>
       <button class="pill" id="snd" aria-label="Sound on or off">${S.sound ? "🔊 Sound on" : "🔇 Sound off"}</button></div>
     ${PRACTICE ? `<div class="cave" id="practice-note"><div class="txt"><b>Practice mode</b><br>Every level is open and nothing you do here is saved. The real game progress is not touched.</div><a class="btn gold" href="../pracadmin/index.html" style="text-decoration:none">← Admin page</a></div>` : ""}
+    <div class="timecard"><div class="pie" id="timepie" data-secs="${Math.round(earned())}" style="--p:${piePct()}" role="img" aria-label="Pie chart: ${fmt(earned())} of 60 minutes earned"></div>
+      <div class="txt"><div class="lab">🎮 Fortnite time earned</div><div class="bigt">${fmt(earned())}</div>
+        <div class="of">of 60 minutes. Every right answer grows the pie, and harder levels are worth more. Right after a hint earns half.${S.used ? `<br><b>${fmt(Math.max(0, earned() - S.used))} left to play</b> (${fmt(S.used)} already used)` : ""}</div></div></div>
     <div class="rank">Rank: <b>${RANKS[r][1]}</b> · ${S.xp} XP ${nextAt ? `<span style="opacity:.8">· ${nextAt - S.xp} XP to ${RANKS[r + 1][1]}</span>` : "· top rank!"}
       <div class="xpbar"><i style="width:${pct}%"></i></div></div>
     ${cave.length ? `<div class="cave"><div class="txt"><b>💪 Comeback Cave</b><br>${cave.length} question${cave.length > 1 ? "s" : ""} got away from you. Come back and beat ${cave.length > 1 ? "them" : "it"} for bonus XP!</div>
@@ -307,6 +380,7 @@ function showMap() {
     if (n.dataset.why) { flash("toast", "🔒 " + n.dataset.why, 2600); SFX.wrong(); return; }
     const w = WORLDS.find(w => w.id === n.dataset.w); startLevel(w, w.levels.find(l => l.id === n.dataset.l));
   });
+  app.querySelectorAll("[data-used]").forEach(b => b.onclick = () => { const d = Number(b.dataset.used); S.used = d ? Math.max(0, Math.min(earned(), (S.used || 0) + d)) : 0; save(); showMap(); const det = $("details.parents"); if (det) { det.open = true; det.scrollIntoView(); } });
   const reset = $("#reset");
   if (reset) reset.onclick = () => { if (confirm("Wipe ALL progress in this game on this device? This can't be undone.")) { localStorage.removeItem(KEY); S = load(); showMap(); } };
   window.scrollTo(0, 0);
@@ -318,6 +392,8 @@ function parents() {
     r.n++; if (s && s.seen) { r.seen++; if (s.first === 2) r.first++; else if (s.first === 1) r.second++; }
   });
   return `<details class="parents"><summary>For grown-ups: progress by question type</summary>
+    <p><b>Fortnite time:</b> ${fmt(earned())} earned of 60 minutes, ${fmt(S.used || 0)} marked as used, <b>${fmt(Math.max(0, earned() - (S.used || 0)))} left</b>. When he has had some of his time, record it here:</p>
+    <div class="usedrow"><button class="btn ghost" data-used="300">+5 min used</button><button class="btn ghost" data-used="900">+15 min used</button><button class="btn ghost" data-used="1800">+30 min used</button><button class="btn ghost" data-used="0">Clear used time</button></div>
     <p>“Right first time” counts the very first attempt at each question. Progress is saved in this browser on this device only.</p>
     <table><tr><th>Question type</th><th class="n">Tried</th><th class="n">Right first time</th><th class="n">Right after a hint</th></tr>
     ${Object.entries(rows).map(([k, r]) => `<tr><td>${esc(k)}</td><td class="n">${r.seen} of ${r.n}</td><td class="n">${r.first}</td><td class="n">${r.second}</td></tr>`).join("")}</table>
@@ -332,7 +408,7 @@ function startCave() {
   play = { w: { name: "Comeback Cave", color: "#b97f00" }, lv: { id: "cave", name: "Comeback Cave" }, items, idx: 0, pts: 0, res: [], cave: true }; begin();
 }
 function begin() {
-  newBadges = []; play.rank0 = rankOf(S.xp);
+  newBadges = []; play.rank0 = rankOf(S.xp); play.t0 = earned();
   const t = today(); if (!S.days.includes(t)) { S.days.push(t); S.days = S.days.slice(-60); save(); }
   showQuestion();
 }
@@ -344,7 +420,7 @@ function showQuestion() {
   const passage = lv.passage ? `<div class="card passage"><h3>${lv.passage.title}</h3>${lv.passage.note ? `<p class="note">${lv.passage.note}</p>` : ""}${lv.passage.html}</div>` : "";
   app.innerHTML = `
     <div class="playbar"><button class="pill" id="quit">← Map</button><span class="title">${esc(p.w.name)} · ${esc(boss ? p.w.boss.name : p.lv.name)}</span><span class="spacer" style="flex:1"></span>
-      <span class="dots">${p.items.map((_, i) => `<i class="${i < p.idx ? "p" + p.res[i] : i === p.idx ? "cur" : ""}"></i>`).join("")}</span><span class="pill" id="gems">💎 ${p.pts}</span></div>
+      <span class="dots">${p.items.map((_, i) => `<i class="${i < p.idx ? "p" + p.res[i] : i === p.idx ? "cur" : ""}"></i>`).join("")}</span><span class="pill" id="tpill"><i class="pie mini" id="minipie" style="--p:${piePct()}"></i><span id="ttxt">${fmt(earned())}</span></span><span class="pill" id="gems">💎 ${p.pts}</span></div>
     ${boss ? `<div class="bossbox"><div class="face" id="face">${p.w.boss.emoji}</div><div class="info"><b>${esc(p.w.boss.name)}</b>
       <div class="hp"><i id="hp" style="width:${100 * (max - p.pts) / max}%"></i></div><div class="say" id="say">${esc(p.idx === 0 ? p.w.boss.taunt : "Is that all you've got?")}</div></div></div>` : ""}
     <div class="stage${passage ? " has-passage" : ""}" style="--world:${p.w.color}">${passage}
@@ -375,8 +451,10 @@ function choose(i, btn) {
   /* remember how this question went */
   const s = S.q[q.id] = S.q[q.id] || { seen: 0, best: 0 };
   const before = s.best || 0, wasMissed = s.seen > 0 && before < 2;
+  const e0 = earned();
   if (!s.seen) s.first = pts;
   s.seen++; s.best = Math.max(before, pts);
+  const dt = earned() - e0;
   let gain = Math.max(0, pts - before) * 10 + (pts ? 1 : 0);
   if (pts === 2 && wasMissed) { gain += 10; award("comeback"); }
   S.xp += gain;
@@ -386,7 +464,9 @@ function choose(i, btn) {
   if (pts === 2) { SFX.right(); if (streak >= 3) flash("combo", `🔥 ${streak} in a row!`); } else if (pts === 1) SFX.retry(); else SFX.wrong();
   const head = pts === 2 ? (wasMissed ? "💪 You beat it this time! +2 💎" : "✅ Right first time! +2 💎") : pts === 1 ? "👍 Got it on the second go. +1 💎" : "This one got away. Here's how it works";
   const last = p.idx === p.items.length - 1;
-  fb.innerHTML = `<div class="fb ${pts ? "good" : "miss"}"><h4>${head}</h4>${q.explain}${pts < 2 ? `<p><b>${p.cave ? "It stays in the Comeback Cave until you get it first time." : "You'll meet this one again in the Comeback Cave."}</b></p>` : ""}</div>
+  if (dt > 0) { const mp = $("#minipie"); mp.style.setProperty("--p", piePct()); mp.classList.add("grow"); $("#ttxt").textContent = fmt(earned()); }
+  const tline = dt > 0 ? `<p class="tgain">🎮 +${fmt(dt)} of Fortnite time!${pts === 1 ? " (half: get it first time in the Comeback Cave for the rest)" : ""}</p>` : "";
+  fb.innerHTML = `<div class="fb ${pts ? "good" : "miss"}"><h4>${head}</h4>${tline}${q.explain}${pts < 2 ? `<p><b>${p.cave ? "It stays in the Comeback Cave until you get it first time." : "You'll meet this one again in the Comeback Cave."}</b></p>` : ""}</div>
     <div class="next"><button class="btn" id="next" style="background:${p.w.color}">${last ? "Finish →" : "Next question →"}</button></div>`;
   $("#next").onclick = () => { if (last) finish(); else { p.idx++; showQuestion(); } };
   $("#next").scrollIntoView({ block: "nearest", behavior: "smooth" });
@@ -424,6 +504,8 @@ function finish() {
     opened.forEach(id => { const x = findLevel(id); lines.push(`🔓 Unlocked: <b>${esc(x.lv.boss ? x.w.boss.name + " (boss!)" : x.lv.name)}</b>`); });
     if (!lv.boss && !opened.length && stars >= 2) { const s = worldStars(p.w); if (s < BOSS_GATE && lockReason(p.w, p.w.levels.length - 1) && regular(p.w).every(l => best(l) >= 2)) lines.push(`You have ${s} ⭐ here. Get ${BOSS_GATE} ⭐ to wake the boss: replay a level for 3 ⭐.`); }
   }
+  const dt = earned() - p.t0;
+  lines.unshift(dt > 0 ? `🎮 <b>+${fmt(dt)}</b> of Fortnite time this round. You now have <b>${fmt(earned())}</b> of 60 minutes.` : `🎮 No new Fortnite time this round. You have ${fmt(earned())} of 60 minutes.`);
   const missed = p.res.filter(r => r < 2).length;
   if (!p.cave && missed) lines.push(`${missed} question${missed > 1 ? "s are" : " is"} waiting in the 💪 Comeback Cave.`);
   newBadges.forEach(b => lines.push(`${b[1]} New badge: <b>${esc(b[2])}</b>`));

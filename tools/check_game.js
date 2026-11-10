@@ -100,6 +100,9 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
     if (s !== 1) bad(`${label}: every question right on the second go should give 1 star, not ${s}`);
     if (!(await locked()).includes(first.levels[1].id)) bad(`${label}: level 2 opened with only 1 star`);
     if (!(await page.$("#cave"))) bad(`${label}: missed questions did not open the Comeback Cave`);
+    const secs = () => page.$eval("#timepie", e => Number(e.dataset.secs));
+    const share = 3600 / (3 * 80);   // one level-1 question: levels weigh 1, 2, 3, 4 and a boss question 8
+    if (await secs() !== Math.round(4 * share / 2)) bad(`${label}: four level-1 answers after a hint should earn ${4 * share / 2} s, not ${await secs()}`);
     for (const w of WORLDS) {
       for (const lv of w.levels) {
         if ((await locked()).includes(lv.id)) bad(`${label}: ${lv.id} is still locked after 3 stars on the levels before it`);
@@ -108,6 +111,7 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
       }
     }
     if ((await locked()).length) bad(`${label}: levels still locked at the end`);
+    if (await secs() !== 3600) bad(`${label}: everything right first time should earn exactly one hour, not ${await secs()} s`);
     const st = await page.evaluate(() => JSON.parse(localStorage.getItem("prac2.v1")));
     if (!st.badges.all || !st.badges.boss_maths || !st.badges.three) bad(`${label}: badges were not awarded (${Object.keys(st.badges)})`);
     await page.reload();
