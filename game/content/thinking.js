@@ -43,8 +43,8 @@
 
   WORLDS.push({
     id: "thinking", name: "Puzzle Peaks", icon: "⛰️", color: "#7a4bb5", crown: "Summit Crown",
-    blurb: "Climb through tables, codes, shapes and tricky arguments. The Riddle Owl waits at the summit.",
-    boss: { name: "The Riddle Owl", emoji: "🦉", taunt: "Whooo dares to out-think me? My riddles have no easy answers.", defeat: "The Riddle Owl bows its head. “Wise… very wise,” it hoots, and flies away." },
+    blurb: "Climb through tables, codes, shapes and tricky arguments. Raven waits at the summit.",
+    boss: { name: "Raven", emoji: "🦅", img: "raven", taunt: "Who dares to out-think me? My riddles have no easy answers.", defeat: "Raven folds his dark wings. “Wise… very wise,” he says, and vanishes into the storm." },
     levels: [
       {
         id: "t1", name: "Foothills",
@@ -156,7 +156,7 @@
         ],
       },
       {
-        id: "tb", name: "The Riddle Owl", boss: true,
+        id: "tb", name: "Raven", boss: true,
         questions: [
           { id: "tba", cat: "Whose reasoning",
             stem: `<p class="box"><b>Most</b> of the children in Class 4K walk to school.</p><p><b>Uma:</b> “Leo is in Class 4K, so he must walk to school.”<br><b>Vik:</b> “Zara walks to school, so she is probably in Class 4K.”</p><p>Whose reasoning is correct?</p>`,

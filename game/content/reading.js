@@ -69,8 +69,8 @@ the snail is fast asleep.</p>`,
 
   WORLDS.push({
     id: "reading", name: "Story Forest", icon: "🌲", color: "#2e7d4f", crown: "Leaf Crown",
-    blurb: "Words, poems and stories hide their secrets here. Inkwing the dragon guards the Leaf Crown.",
-    boss: { name: "Inkwing the Dragon", emoji: "🐉", taunt: "Anyone can read the words. Can you read what hides between them?", defeat: "Inkwing curls up around a book, purring smoke. The forest is yours." },
+    blurb: "Words, poems and stories hide their secrets here. Hybrid, the dragon ninja, guards the Leaf Crown.",
+    boss: { name: "Hybrid", emoji: "🐉", img: "hybrid", taunt: "Anyone can read the words. Can you read what hides between them?", defeat: "Hybrid bows, dragon scales and all. The forest is yours." },
     levels: [
       {
         id: "r1", name: "Word Glade",
@@ -173,7 +173,7 @@ the snail is fast asleep.</p>`,
         ],
       },
       {
-        id: "rb", name: "Inkwing the Dragon", boss: true, passage: PROMPTER,
+        id: "rb", name: "Hybrid", boss: true, passage: PROMPTER,
         questions: [
           { id: "rba", cat: "Comparisons & imagery",
             stem: `<p>Joel is “gripping his sceptre <b>the way you grip the railing of a boat</b>”. What does this comparison tell us?</p>`,

@@ -50,6 +50,9 @@ for (const w of WORLDS) {
 }
 const html = fs.readFileSync(PAGE, "utf8");
 if (/\bOC\b/.test(html)) bad('the page mentions "OC"');
+if (!/not endorsed by Epic/.test(html)) bad("the Epic fan-content notice is missing");
+for (const m of html.matchAll(/(?:img: "|\[")([a-z]+)"(?=, "[A-Z][^"]*", "#)/g)) if (!fs.existsSync(path.join(ROOT, "prac2", "art", m[1] + ".webp"))) bad(`missing picture prac2/art/${m[1]}.webp`);
+for (const w of WORLDS) if (!fs.existsSync(path.join(ROOT, "prac2", "art", w.boss.img + ".webp"))) bad(`missing boss picture for ${w.id}`);
 console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
 
 /* ---- 2. browser ---- */
@@ -100,6 +103,9 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
     if (s !== 1) bad(`${label}: every question right on the second go should give 1 star, not ${s}`);
     if (!(await locked()).includes(first.levels[1].id)) bad(`${label}: level 2 opened with only 1 star`);
     if (!(await page.$("#cave"))) bad(`${label}: missed questions did not open the Comeback Cave`);
+    const secs = () => page.$eval("#timepie", e => Number(e.dataset.secs));
+    const share = 3600 / (3 * 80);   // one level-1 question: levels weigh 1, 2, 3, 4 and a boss question 8
+    if (await secs() !== Math.round(4 * share / 2)) bad(`${label}: four level-1 answers after a hint should earn ${4 * share / 2} s, not ${await secs()}`);
     for (const w of WORLDS) {
       for (const lv of w.levels) {
         if ((await locked()).includes(lv.id)) bad(`${label}: ${lv.id} is still locked after 3 stars on the levels before it`);
@@ -108,11 +114,15 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
       }
     }
     if ((await locked()).length) bad(`${label}: levels still locked at the end`);
+    if (await secs() !== 3600) bad(`${label}: everything right first time should earn exactly one hour, not ${await secs()} s`);
     const st = await page.evaluate(() => JSON.parse(localStorage.getItem("prac2.v1")));
     if (!st.badges.all || !st.badges.boss_maths || !st.badges.three) bad(`${label}: badges were not awarded (${Object.keys(st.badges)})`);
     await page.reload();
     if ((await page.$$(".node.boss.beaten")).length !== 3) bad(`${label}: progress was not kept after a reload`);
     await overflow("finished map");
+    const broken = await page.$$eval("img", im => im.filter(i => !(i.complete && i.naturalWidth > 0)).map(i => i.getAttribute("src")));
+    if (broken.length) bad(`${label}: pictures did not load: ${broken}`);
+    if ((await page.$$(".skin:not(.off)")).length !== 7) bad(`${label}: the top rank should unlock all 7 skins`);
     if (shots) await page.screenshot({ path: path.join(shots, `game-done-${label}.png`), fullPage: true });
     errors.forEach(e => bad(`${label}: page error: ${e}`));
     await ctx.close();
