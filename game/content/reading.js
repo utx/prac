@@ -3,7 +3,27 @@
    All passages are original and written for this game.
    --------------------------------------------------------------- */
 (() => {
-  const gap = s => `<p class="gapline">${s.replace("___", '<span class="gapw">&nbsp;</span>')}</p><p>Which word fits the gap best?</p>`;
+  const gap = n => `<b class="gapn">(${n}) ______</b>`;
+  const FOSSIL = {
+    title: "Fossil Beach",
+    note: "Choose the word that fits each gap best.",
+    html: `<p>I had always assumed that fossils belonged in museums, safely behind glass. So when my aunt, who is a geologist, ${gap(1)} that we spend Saturday searching for them on a windswept beach, I was doubtful.</p>
+  <p>For the first hour my doubts seemed entirely ${gap(2)}: every promising stone turned out to be just a stone. Then my aunt handed me a grey pebble that hardly ${gap(3)} from the thousands around it, except for a faint spiral on one side. “Ammonite,” she said. “About 180 million years old.”</p>
+  <p>I turned it over and over in my hand. After that I refused to leave the foot of the cliff until it was almost dark. By the time we caught the last bus home, I was a complete ${gap(4)}.</p>`,
+  };
+  const WOMBAT = {
+    title: "The Animal That Makes Cubes",
+    note: "Four sentences have been removed from the text. Choose the sentence that fits each gap. One sentence is not needed.",
+    html: `<p>Most animals are not fussy about the shape of their droppings. Wombats are the exception: they are the only animals in the world known to produce cubes. <b class="gapn">(1) …………</b> A single wombat can leave between eighty and a hundred of them in one night.</p>
+  <p>Wombats are short-sighted, and they find their way mostly by smell. They use their droppings as signposts, placing them on top of rocks, logs and small rises where other wombats cannot miss them. <b class="gapn">(2) …………</b> A round pellet would simply roll off.</p>
+  <p>For a long time, nobody could explain how a soft, round tube like an intestine could make something with flat sides and corners. Some people guessed that the wombat squeezed the cubes into shape as they left its body. <b class="gapn">(3) …………</b> When scientists finally looked inside, they found that the cubes are formed much earlier, in the last part of the intestine.</p>
+  <p>The secret is in the intestine’s walls. Some sections are stiff and others are stretchy. <b class="gapn">(4) …………</b> Over several days, this uneven squeezing slowly shapes the drying material into blocks with flat faces.</p>`,
+  };
+  const SENTS = ["That turned out to be wrong.",
+    "Each one is about two centimetres across, roughly the size of a dice.",
+    "Wombats also dig long burrows, which they defend against intruders.",
+    "This is where the unusual shape proves its worth.",
+    "As the waste passes through, the stiff parts and the stretchy parts press on it with different strength."];
   const EXTRACTS = ["Extract A", "Extract B", "Extract C", "Extract D"];
 
   const OVERDUE = {
@@ -73,28 +93,24 @@ the snail is fast asleep.</p>`,
     boss: { name: "Hybrid", emoji: "🐉", img: "hybrid", taunt: "Anyone can read the words. Can you read what hides between them?", defeat: "Hybrid bows, dragon scales and all. The forest is yours." },
     levels: [
       {
-        id: "r1", name: "Word Glade",
+        id: "r1", name: "Word Glade", passage: FOSSIL,
         questions: [
-          { id: "r1a", cat: "Vocabulary & idioms",
-            stem: gap("After a week of heavy rain, the river finally ___ its banks and flooded the paddocks."),
-            options: ["tore", "burst", "split", "cracked"], answer: 1,
-            hint: `Think about water pushing harder and harder until it suddenly escapes, like a balloon filled too full.`,
-            explain: `<p>A river that overflows is said to <b>burst its banks</b>. The words go together as a pair: the water presses until it suddenly breaks out.</p><p class="why-not">Tore, split and cracked all mean something breaking, but they describe solid things such as cloth, wood or glass. We don't use them with a river's banks.</p>` },
-          { id: "r1b", cat: "Vocabulary & idioms",
-            stem: gap("Over thousands of years, camels have ___ to life in the desert."),
-            options: ["adopted", "admitted", "adapted", "attracted"], answer: 2,
-            hint: `Two of these words look almost the same. One means “taken in as your own”; the other means “changed to suit a place”.`,
-            explain: `<p>To <b>adapt</b> to something is to change so that you suit it. Camels have adapted to the desert: they can go a long time without water.</p><p class="why-not"><em>Adopted</em> looks very similar, but it means to take something as your own (you adopt a pet). <em>Admitted</em> means owned up or let in, and <em>attracted</em> means drew towards.</p>` },
-          { id: "r1c", cat: "Vocabulary & idioms",
-            stem: gap("The mayor ___ a short speech before she cut the ribbon."),
-            options: ["told", "spoke", "said", "delivered"], answer: 3,
-            hint: `Three of these are about talking but don't sit next to “a speech”. Try each one aloud: “she ___ a speech”.`,
-            explain: `<p>You <b>deliver</b> a speech (or give or make one). It is a fixed pair of words.</p><p class="why-not">You tell a story, speak <em>to</em> someone and say a word, but you don't “tell”, “speak” or “say” a speech.</p>` },
-          { id: "r1d", cat: "Vocabulary & idioms",
-            stem: gap("With its engine dead, the little boat was at the ___ of the waves."),
-            options: ["mercy", "power", "force", "anger"], answer: 0,
-            hint: `The boat is helpless: the waves can do what they like with it. Which word completes the saying “at the ___ of”?`,
-            explain: `<p>To be <b>at the mercy of</b> something means to be helpless against it. Without its engine, the boat can't fight the waves.</p><p class="why-not">Power, force and anger all suit stormy waves, but “at the power of” and “at the force of” are not expressions in English.</p>` },
+          { id: "r1e", cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap 1</b>?</p>`,
+            options: ["offered", "proposed", "invited", "persuaded"], answer: 1,
+            hint: `Look at the words straight after the gap: “<b>that we spend</b> Saturday …”. Only one of these verbs can be followed by “that we …”.`,
+            explain: `<p>You <b>propose that</b> someone does something. “My aunt proposed that we spend Saturday …” is the only one that fits the grammar.</p><p class="why-not">You offer <em>to do</em> something, you invite someone <em>to</em> something, and you persuade <em>someone</em> to do something. None of them can be followed by “that we spend”.</p>` },
+          { id: "r1f", cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap 2</b>?</p>`,
+            options: ["qualified", "satisfied", "justified", "classified"], answer: 2,
+            hint: `Was the writer right to be doubtful at this point? Read what comes after the colon.`,
+            explain: `<p>Doubts that turn out to have a good reason behind them are <b>justified</b>. Every stone was just a stone, so the doubts seemed right.</p><p class="why-not">The other words look alike but mean different things: <em>qualified</em> (trained or limited), <em>satisfied</em> (pleased, or fulfilled) and <em>classified</em> (sorted into groups).</p>` },
+          { id: "r1g", cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap 3</b>?</p>`,
+            options: ["differed", "separated", "contrasted", "disagreed"], answer: 0,
+            hint: `The next word is “<b>from</b>”, and the pebble is being compared with other pebbles. Which verb means “was unlike” and takes “from”?`,
+            explain: `<p>One thing <b>differs from</b> another. The pebble “hardly differed from” the rest: it looked almost the same.</p><p class="why-not">Things contrast <em>with</em> each other and people disagree <em>with</em> each other. “Separated from” would mean it had been moved apart, which makes no sense with “hardly”.</p>` },
+          { id: "r1h", cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap 4</b>?</p>`,
+            options: ["expert", "stranger", "critic", "convert"], answer: 3,
+            hint: `Compare how the writer felt at the start (“I was doubtful”) with how they behave at the end. What do you call someone who has completely changed their mind?`,
+            explain: `<p>A <b>convert</b> is someone who has been won over to a new belief or interest. The writer began doubtful and ended up refusing to leave the cliff: a complete change of heart. You need the whole passage to see it.</p><p class="why-not"><em>Expert</em> is tempting, but one afternoon and one fossil don’t make an expert. A <em>critic</em> is the opposite of how the writer now feels.</p>` },
         ],
       },
       {
@@ -170,6 +186,23 @@ the snail is fast asleep.</p>`,
             options: EXTRACTS, answer: 2,
             hint: `“Over time” means the extract must tell us about a <b>before</b> and an <b>after</b>.`,
             explain: `<p><b>Extract C</b> starts with mapmakers who “had to guess” and ends with maps “accurate enough to trust with your life”, once surveyors began measuring the land. That is something becoming more reliable.</p><p class="why-not">Extract D says maps can be relied on (no batteries, no signal), but it doesn't describe them changing over time.</p>` },
+        ],
+      },
+      {
+        id: "r5", name: "The Missing Lines", passage: WOMBAT, bank: true,
+        questions: [
+          { id: "r5a", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 1</b>?</p>`, options: SENTS, answer: 1,
+            hint: `The sentence after the gap says “a hundred of <b>them</b>”. The missing sentence must also be about the cubes themselves.`,
+            explain: `<p><b>B</b>. “Each one” points back to the cubes just mentioned and tells us their size; the next sentence carries on with how many “of them” there are.</p><p class="why-not">A (“That turned out to be wrong”) would cancel the fact just given, but the text carries on as if it is true. C changes the subject to burrows.</p>` },
+          { id: "r5b", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 2</b>?</p>`, options: SENTS, answer: 3,
+            hint: `Read the sentence after the gap: “A round pellet would simply roll off.” What idea is that an example of?`,
+            explain: `<p><b>D</b>. The droppings are placed on top of rocks and logs. “This is where the unusual shape proves its worth” makes the general point, and “A round pellet would simply roll off” is the proof: cubes stay put.</p><p class="why-not">B is also about the droppings, but their size doesn’t explain why a round one would roll off. E is about the intestine, which hasn’t been mentioned yet.</p>` },
+          { id: "r5c", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 3</b>?</p>`, options: SENTS, answer: 0,
+            hint: `Before the gap: what “some people guessed”. After it: what scientists “finally” found. What usually comes between a guess and the real answer?`,
+            explain: `<p><b>A</b>. “That” points back to the guess (cubes squeezed into shape on the way out). The next sentence gives the real answer: they are formed “much earlier”. A short correction joins the two.</p><p class="why-not">E explains how the cubes are really made, which belongs after we are told about the stiff and stretchy sections. D is about the shape being useful, not about how it is made.</p>` },
+          { id: "r5d", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 4</b>?</p>`, options: SENTS, answer: 4,
+            hint: `The sentence after the gap mentions “<b>this uneven squeezing</b>”. Which sentence describes squeezing that is uneven?`,
+            explain: `<p><b>E</b>. The stiff parts and stretchy parts “press on it with different strength”: that is the “uneven squeezing” the last sentence refers to.</p><p class="why-not">C is the sentence that is never used: it is about wombats, but nothing around any gap is about burrows. D’s “unusual shape” has already been dealt with in the second paragraph.</p>` },
         ],
       },
       {

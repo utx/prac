@@ -1,7 +1,9 @@
 /* ---------------------------------------------------------------
    CROWN QUEST: draft alternates from the Nov 2026 audit against the sample papers.
-   NOT in the game yet (tools/build_game.py only reads game/content/). David is reviewing
-   them; before any go in, verify by computation and run the independent cold solve.
+   tools/build_game.py only reads game/content/, so nothing here is in the game by itself.
+   David approved and we moved into the game: r1 (cloze), r5, t1a, t2d, m1a, m2c, m3c, m4b.
+   Still only drafts here: the maths level "Chart Cove" (m5, no decision yet) and the
+   replacement for mbc (David kept the painted cube). Verify and cold-solve before using.
    Same question shape as game/content/*.js.
    --------------------------------------------------------------- */
 const ALT = (() => {
@@ -108,7 +110,7 @@ const ALT = (() => {
   const WOMBAT = {
     title: "The Animal That Makes Cubes",
     note: "Four sentences have been removed from the text. Choose the sentence (A–E) that fits each gap. One sentence is not needed.",
-    html: `<p>Most animals are not fussy about the shape of their droppings. The bare-nosed wombat is the exception: it is the only animal in the world known to produce cubes. <b class="gapn">(1) …………</b> A single wombat can leave between eighty and a hundred of them in one night.</p>
+    html: `<p>Most animals are not fussy about the shape of their droppings. Wombats are the exception: they are the only animals in the world known to produce cubes. <b class="gapn">(1) …………</b> A single wombat can leave between eighty and a hundred of them in one night.</p>
 <p>Wombats are short-sighted, and they find their way mostly by smell. They use their droppings as signposts, placing them on top of rocks, logs and small rises where other wombats cannot miss them. <b class="gapn">(2) …………</b> A round pellet would simply roll off.</p>
 <p>For a long time, nobody could explain how a soft, round tube like an intestine could make something with flat sides and corners. Some people guessed that the wombat squeezed the cubes into shape as they left its body. <b class="gapn">(3) …………</b> When scientists finally looked inside, they found that the cubes are formed much earlier, in the last part of the intestine.</p>
 <p>The secret is in the intestine’s walls. Some sections are stiff and others are stretchy. <b class="gapn">(4) …………</b> Over several days, this uneven squeezing slowly shapes the drying material into blocks with flat faces.</p>

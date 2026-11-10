@@ -4,6 +4,29 @@
 (() => {
   const tbl = (head, rows) => `<div class="figure"><table class="grid"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map((c, i) => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table></div>`;
 
+  const T = (x, y, s, o = "") => `<text x="${x}" y="${y}" font-size="14" fill="${INK}" ${o}>${s}</text>`;
+
+  /* a column graph: series = [{name, color, values}], gridlines every `step` up to `max` */
+  function colGraph({ labels, series, max, step, ylabel, numbers = true, aria }) {
+    const W = 70 + labels.length * (series.length * 26 + 30), H = 250, y = v => 205 - v * (170 / max);
+    let g = "";
+    for (let v = 0; v <= max; v += step) g += `<line x1="50" x2="${W - 10}" y1="${y(v)}" y2="${y(v)}" stroke="#c5ccd8" stroke-width="1"/>` + (numbers ? T(42, y(v) + 5, v, 'text-anchor="end"') : "");
+    labels.forEach((n, i) => {
+      const x0 = 66 + i * (series.length * 26 + 30);
+      series.forEach((s, k) => { g += `<rect x="${x0 + k * 26}" y="${y(s.values[i])}" width="24" height="${205 - y(s.values[i])}" fill="${s.color}" stroke="${INK}" stroke-width="1.5"/>`; });
+      g += T(x0 + series.length * 13, 224, n, 'text-anchor="middle"');
+    });
+    g += `<line x1="50" x2="50" y1="${y(max)}" y2="205" stroke="${INK}" stroke-width="2"/><line x1="50" x2="${W - 10}" y1="205" y2="205" stroke="${INK}" stroke-width="2"/>`;
+    g += `<text x="14" y="120" font-size="13" fill="${INK}" text-anchor="middle" transform="rotate(-90 14 120)">${ylabel}</text>`;
+    if (series.length > 1) series.forEach((s, k) => { g += `<rect x="${60 + k * 110}" y="236" width="14" height="12" fill="${s.color}" stroke="${INK}"/>` + T(80 + k * 110, 247, s.name); });
+    return `<div class="figure"><svg viewBox="0 0 ${W} ${H + (series.length > 1 ? 6 : -12)}" width="${W}" role="img" aria-label="${aria}">${g}</svg></div>`;
+  }
+
+  /* L1 Q1: two classes' votes */
+  const VOTES = colGraph({ labels: ["Swimming", "Soccer", "Chess", "Art"], max: 10, step: 2, ylabel: "Votes",
+    series: [{ name: "Class 4K", color: "#4dabf7", values: [9, 6, 4, 7] }, { name: "Class 4M", color: "#ffa94d", values: [5, 8, 4, 10] }],
+    aria: "A column graph with two columns for each activity, one for Class 4K and one for Class 4M. The scale goes 0, 2, 4, 6, 8, 10. Swimming: 4K halfway between 8 and 10, 4M halfway between 4 and 6. Soccer: 4K 6, 4M 8. Chess: 4K 4, 4M 4. Art: 4K halfway between 6 and 8, 4M 10." });
+
   /* L1 Q4: an L-shaped tile turned a quarter turn. Cells are [row, col] in a 3 × 3 grid. */
   const L = [[0, 0], [1, 0], [2, 0], [2, 1]];
   const norm = cells => { const r0 = Math.min(...cells.map(c => c[0])), c0 = Math.min(...cells.map(c => c[1])); return cells.map(([r, c]) => [r - r0, c - c0]); };
@@ -49,11 +72,11 @@
       {
         id: "t1", name: "Foothills",
         questions: [
-          { id: "t1a", cat: "Tables & timetables",
-            stem: `<p>The table shows the days when four children have swimming training (✓).</p>${tbl(["", "Mon", "Tue", "Wed", "Thu"], [["Ana", "✓", "", "✓", ""], ["Ben", "", "✓", "✓", "✓"], ["Cal", "✓", "", "✓", "✓"], ["Dia", "✓", "", "", ""]])}<p>On which day do <b>exactly two</b> of the children have training?</p>`,
-            options: ["Monday", "Tuesday", "Wednesday", "Thursday"], answer: 3,
-            hint: `Go <b>down</b> each day's column and count the ticks. You are looking for a column with exactly 2.`,
-            explain: `<p>Count the ticks in each column: Monday 3 (Ana, Cal, Dia), Tuesday 1 (Ben), Wednesday 3, <b>Thursday 2</b> (Ben and Cal).</p><p class="why-not">Tuesday has only one tick. Monday and Wednesday each have three. Counting along the rows instead of down the columns tells you about each child, not each day.</p>` },
+          { id: "t1e", cat: "Tables & timetables",
+          stem: `<p>Two classes voted for their favourite lunchtime activity. Every child had one vote.</p>${VOTES}<p>For which activity is the <b>difference</b> between the two classes’ votes the <b>greatest</b>?</p>`,
+          options: ["Swimming", "Soccer", "Chess", "Art"], answer: 0,
+          hint: `Don’t look for the tallest column. For each activity, find the <b>gap</b> between its two columns. A column that stops halfway between two lines is an odd number.`,
+          explain: `<p>Read each pair and subtract. Swimming: 9 and 5, difference <b>4</b>. Soccer: 6 and 8, difference 2. Chess: 4 and 4, difference 0. Art: 7 and 10, difference 3. The greatest difference is for <b>Swimming</b>.</p><p class="why-not">Art has the tallest column and the most votes altogether, but the question asks about the difference. Chess is where the classes are the same.</p>` },
           { id: "t1b", cat: "Order & arrangement",
             stem: `<p>Four children ran a race.</p><div class="box">Kai finished before Lena.<br>Mo finished after Lena.<br>Nia finished before Kai.</div><p>Who came <b>third</b>?</p>`,
             options: ["Kai", "Lena", "Mo", "Nia"], answer: 1,
@@ -95,11 +118,14 @@
             options: ["Ari", "Bea", "Col", "Dan"], answer: 3,
             hint: `For each child, keep only the bigger of the two jumps and ignore the other. Then put those four numbers in order.`,
             explain: `<p>Best jumps: Ari 3.3, Bea 3.5, Col 3.7, Dan 3.6. In order: Col 3.7, <b>Dan 3.6</b>, Bea 3.5, Ari 3.3. Dan came second.</p><p class="why-not">Bea is second if you look only at Jump 1, or only at Jump 2. Col is second if you add each child's two jumps together, but only the best jump counts.</p>` },
-          { id: "t2d", cat: "Number problems",
-            stem: `<p>There are <b>12</b> children in the art club. Every child paints, or draws, or does both. <b>8</b> children paint and <b>7</b> children draw.</p><p>How many children do <b>both</b>?</p>`,
-            options: ["1", "3", "4", "5"], answer: 1,
-            hint: `8 + 7 is more than 12. Why? Because some children were counted <b>twice</b>.`,
-            explain: `<p>8 + 7 = 15, but there are only 12 children. The extra 15 − 12 = <b>3</b> are the children who were counted twice, once as painters and once as drawers. They do both.</p><p class="why-not">1 is just 8 − 7. 4 is the number who don't paint (12 − 8) and 5 is the number who don't draw (12 − 7).</p>` },
+          { id: "t2e", cat: "Supports the claim",
+          stem: `<p class="box">Ms Tran, the librarian: “We should move the reading corner away from the library door. Then children will be able to concentrate on their books for longer.”</p><p>Which statement, if true, best supports Ms Tran’s claim?</p>`,
+          options: ["Children who read for longer usually finish more books each term.",
+                    "The spot beside the door gets the best sunlight in the afternoon.",
+                    "Children in the reading corner look up every time the door opens.",
+                    "Most children say the reading corner is their favourite part of the library."], answer: 2,
+          hint: `The claim is: <b>away from the door → concentrate for longer</b>. Which statement shows the door is what breaks their concentration?`,
+          explain: `<p>Moving the corner only helps if the <b>door</b> is the problem. If children look up every time it opens, then being further from it should mean fewer interruptions and longer concentration.</p><p class="why-not">Reading for longer being good for you explains why the goal matters, not why moving would achieve it. Good sunlight is a reason to <em>stay</em> by the door. Being the favourite spot says nothing about concentrating.</p>` },
         ],
       },
       {
@@ -171,11 +197,11 @@
                       "Some of the Hawks' players may have missed a game or two because of injuries."], answer: 0,
             hint: `Is comparing 12 wins with 9 wins fair? What else would you need to know about each team's season?`,
             explain: `<p>Wins can only be compared fairly if both teams played the same number of games. If the Hawks won 12 out of 20 and the Eagles won 9 out of 10, the Eagles did far better. Tom's comparison may be unfair because <b>the Hawks may have played more games</b>.</p><p class="why-not">Goals scored in losses don't change who won. Training days don't matter. Injured Hawks players would make their 12 wins more impressive, not less.</p>` },
-          { id: "tbc", cat: "Order & arrangement",
-            stem: `<p>Ava, Bo, Cy and Di ran a race. There were no ties.</p><div class="box">Ava finished before Bo.<br>Di finished before Cy.<br>Bo did not finish last.</div><p>These clues are not enough to work out the full order. Which <b>one extra clue</b> makes it possible?</p>`,
-            options: ["Cy finished last.", "Ava finished before Di.", "Di finished before Ava.", "Bo finished before Cy."], answer: 2,
-            hint: `First list every order the three clues allow (there are three). A useful extra clue must leave <b>only one</b> of them.`,
-            explain: `<p>The three clues allow exactly three orders: Ava–Bo–Di–Cy, Ava–Di–Bo–Cy and Di–Ava–Bo–Cy. “<b>Di finished before Ava</b>” fits only the last one, so it fixes the order: Di, Ava, Bo, Cy.</p><p class="why-not">“Cy finished last” and “Bo finished before Cy” are already true in all three orders, so they tell us nothing new. “Ava finished before Di” still leaves two orders.</p>` },
+          { id: "tbf", cat: "Order & arrangement",
+            stem: `<p>Five friends stand one behind another in a queue.</p><div class="box">Ivy is at the front.<br>Gus is directly in front of Hana.<br>Hana is directly in front of Fay.<br>Eli is somewhere behind Fay.</div><p>Who is in the <b>middle</b> of the queue?</p>`,
+            options: ["Eli", "Fay", "Gus", "Hana"], answer: 3,
+            hint: `Two of the clues say “<b>directly</b> in front of”. Join them up: they make a block of three friends who must stand together. Where can that block go?`,
+            explain: `<p>Gus is directly in front of Hana, and Hana is directly in front of Fay, so Gus, Hana, Fay stand together in that order. Ivy is at the front, so the block takes places 2–4 or places 3–5. Eli has to be behind Fay, so there must be a place left after her: the block is in places 2–4 and Eli is last. The queue is Ivy, Gus, <b>Hana</b>, Fay, Eli, and Hana is in the middle.</p><p class="why-not">Gus is in the middle only if you count from Gus instead of from Ivy at the front. Fay is in the middle if the block is pushed to the back, but then Eli would have nowhere to stand behind her.</p>` },
           { id: "tbd", cat: "Tables & timetables",
             stem: `<p>Three friends collected stickers on Monday, Tuesday and Wednesday. Some of the numbers are missing from the table.</p>${STICK([["Zed", 6, 9, "?", 22], ["Yan", 8, "?", 5, "?"], ["Xia", 4, 7, 9, 20], ["Total", 18, 26, 21, "?"]])}<p>How many stickers did <b>Yan</b> collect <b>altogether</b>?</p>`,
             options: ["10", "23", "26", "65"], answer: 1,

@@ -107,6 +107,7 @@
   .stem p { margin: 0 0 10px; }
   .stem .box { background: var(--field); border-left: 4px solid var(--world); border-radius: 6px; padding: 10px 14px; margin: 0 0 10px; }
   .stem .gapline { font-size: 19px; background: var(--field); border-radius: 8px; padding: 12px 14px; margin: 0 0 10px; }
+  .gapn { white-space: nowrap; background: var(--hint-bg); border-radius: 4px; padding: 0 4px; }
   .stem .gapw { display: inline-block; min-width: 70px; border-bottom: 3px solid var(--ink); }
   .figure { margin: 10px 0; text-align: center; overflow-x: auto; }
   .figure svg, .opt svg { max-width: 100%; height: auto; }
@@ -261,7 +262,27 @@ const WORLDS = [];
    All passages are original and written for this game.
    --------------------------------------------------------------- */
 (() => {
-  const gap = s => `<p class="gapline">${s.replace("___", '<span class="gapw">&nbsp;</span>')}</p><p>Which word fits the gap best?</p>`;
+  const gap = n => `<b class="gapn">(${n}) ______</b>`;
+  const FOSSIL = {
+    title: "Fossil Beach",
+    note: "Choose the word that fits each gap best.",
+    html: `<p>I had always assumed that fossils belonged in museums, safely behind glass. So when my aunt, who is a geologist, ${gap(1)} that we spend Saturday searching for them on a windswept beach, I was doubtful.</p>
+  <p>For the first hour my doubts seemed entirely ${gap(2)}: every promising stone turned out to be just a stone. Then my aunt handed me a grey pebble that hardly ${gap(3)} from the thousands around it, except for a faint spiral on one side. “Ammonite,” she said. “About 180 million years old.”</p>
+  <p>I turned it over and over in my hand. After that I refused to leave the foot of the cliff until it was almost dark. By the time we caught the last bus home, I was a complete ${gap(4)}.</p>`,
+  };
+  const WOMBAT = {
+    title: "The Animal That Makes Cubes",
+    note: "Four sentences have been removed from the text. Choose the sentence that fits each gap. One sentence is not needed.",
+    html: `<p>Most animals are not fussy about the shape of their droppings. Wombats are the exception: they are the only animals in the world known to produce cubes. <b class="gapn">(1) …………</b> A single wombat can leave between eighty and a hundred of them in one night.</p>
+  <p>Wombats are short-sighted, and they find their way mostly by smell. They use their droppings as signposts, placing them on top of rocks, logs and small rises where other wombats cannot miss them. <b class="gapn">(2) …………</b> A round pellet would simply roll off.</p>
+  <p>For a long time, nobody could explain how a soft, round tube like an intestine could make something with flat sides and corners. Some people guessed that the wombat squeezed the cubes into shape as they left its body. <b class="gapn">(3) …………</b> When scientists finally looked inside, they found that the cubes are formed much earlier, in the last part of the intestine.</p>
+  <p>The secret is in the intestine’s walls. Some sections are stiff and others are stretchy. <b class="gapn">(4) …………</b> Over several days, this uneven squeezing slowly shapes the drying material into blocks with flat faces.</p>`,
+  };
+  const SENTS = ["That turned out to be wrong.",
+    "Each one is about two centimetres across, roughly the size of a dice.",
+    "Wombats also dig long burrows, which they defend against intruders.",
+    "This is where the unusual shape proves its worth.",
+    "As the waste passes through, the stiff parts and the stretchy parts press on it with different strength."];
   const EXTRACTS = ["Extract A", "Extract B", "Extract C", "Extract D"];
 
   const OVERDUE = {
@@ -331,28 +352,24 @@ the snail is fast asleep.</p>`,
     boss: { name: "Hybrid", emoji: "🐉", img: "hybrid", taunt: "Anyone can read the words. Can you read what hides between them?", defeat: "Hybrid bows, dragon scales and all. The forest is yours." },
     levels: [
       {
-        id: "r1", name: "Word Glade",
+        id: "r1", name: "Word Glade", passage: FOSSIL,
         questions: [
-          { id: "r1a", cat: "Vocabulary & idioms",
-            stem: gap("After a week of heavy rain, the river finally ___ its banks and flooded the paddocks."),
-            options: ["tore", "burst", "split", "cracked"], answer: 1,
-            hint: `Think about water pushing harder and harder until it suddenly escapes, like a balloon filled too full.`,
-            explain: `<p>A river that overflows is said to <b>burst its banks</b>. The words go together as a pair: the water presses until it suddenly breaks out.</p><p class="why-not">Tore, split and cracked all mean something breaking, but they describe solid things such as cloth, wood or glass. We don't use them with a river's banks.</p>` },
-          { id: "r1b", cat: "Vocabulary & idioms",
-            stem: gap("Over thousands of years, camels have ___ to life in the desert."),
-            options: ["adopted", "admitted", "adapted", "attracted"], answer: 2,
-            hint: `Two of these words look almost the same. One means “taken in as your own”; the other means “changed to suit a place”.`,
-            explain: `<p>To <b>adapt</b> to something is to change so that you suit it. Camels have adapted to the desert: they can go a long time without water.</p><p class="why-not"><em>Adopted</em> looks very similar, but it means to take something as your own (you adopt a pet). <em>Admitted</em> means owned up or let in, and <em>attracted</em> means drew towards.</p>` },
-          { id: "r1c", cat: "Vocabulary & idioms",
-            stem: gap("The mayor ___ a short speech before she cut the ribbon."),
-            options: ["told", "spoke", "said", "delivered"], answer: 3,
-            hint: `Three of these are about talking but don't sit next to “a speech”. Try each one aloud: “she ___ a speech”.`,
-            explain: `<p>You <b>deliver</b> a speech (or give or make one). It is a fixed pair of words.</p><p class="why-not">You tell a story, speak <em>to</em> someone and say a word, but you don't “tell”, “speak” or “say” a speech.</p>` },
-          { id: "r1d", cat: "Vocabulary & idioms",
-            stem: gap("With its engine dead, the little boat was at the ___ of the waves."),
-            options: ["mercy", "power", "force", "anger"], answer: 0,
-            hint: `The boat is helpless: the waves can do what they like with it. Which word completes the saying “at the ___ of”?`,
-            explain: `<p>To be <b>at the mercy of</b> something means to be helpless against it. Without its engine, the boat can't fight the waves.</p><p class="why-not">Power, force and anger all suit stormy waves, but “at the power of” and “at the force of” are not expressions in English.</p>` },
+          { id: "r1e", cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap 1</b>?</p>`,
+            options: ["offered", "proposed", "invited", "persuaded"], answer: 1,
+            hint: `Look at the words straight after the gap: “<b>that we spend</b> Saturday …”. Only one of these verbs can be followed by “that we …”.`,
+            explain: `<p>You <b>propose that</b> someone does something. “My aunt proposed that we spend Saturday …” is the only one that fits the grammar.</p><p class="why-not">You offer <em>to do</em> something, you invite someone <em>to</em> something, and you persuade <em>someone</em> to do something. None of them can be followed by “that we spend”.</p>` },
+          { id: "r1f", cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap 2</b>?</p>`,
+            options: ["qualified", "satisfied", "justified", "classified"], answer: 2,
+            hint: `Was the writer right to be doubtful at this point? Read what comes after the colon.`,
+            explain: `<p>Doubts that turn out to have a good reason behind them are <b>justified</b>. Every stone was just a stone, so the doubts seemed right.</p><p class="why-not">The other words look alike but mean different things: <em>qualified</em> (trained or limited), <em>satisfied</em> (pleased, or fulfilled) and <em>classified</em> (sorted into groups).</p>` },
+          { id: "r1g", cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap 3</b>?</p>`,
+            options: ["differed", "separated", "contrasted", "disagreed"], answer: 0,
+            hint: `The next word is “<b>from</b>”, and the pebble is being compared with other pebbles. Which verb means “was unlike” and takes “from”?`,
+            explain: `<p>One thing <b>differs from</b> another. The pebble “hardly differed from” the rest: it looked almost the same.</p><p class="why-not">Things contrast <em>with</em> each other and people disagree <em>with</em> each other. “Separated from” would mean it had been moved apart, which makes no sense with “hardly”.</p>` },
+          { id: "r1h", cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap 4</b>?</p>`,
+            options: ["expert", "stranger", "critic", "convert"], answer: 3,
+            hint: `Compare how the writer felt at the start (“I was doubtful”) with how they behave at the end. What do you call someone who has completely changed their mind?`,
+            explain: `<p>A <b>convert</b> is someone who has been won over to a new belief or interest. The writer began doubtful and ended up refusing to leave the cliff: a complete change of heart. You need the whole passage to see it.</p><p class="why-not"><em>Expert</em> is tempting, but one afternoon and one fossil don’t make an expert. A <em>critic</em> is the opposite of how the writer now feels.</p>` },
         ],
       },
       {
@@ -431,6 +448,23 @@ the snail is fast asleep.</p>`,
         ],
       },
       {
+        id: "r5", name: "The Missing Lines", passage: WOMBAT, bank: true,
+        questions: [
+          { id: "r5a", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 1</b>?</p>`, options: SENTS, answer: 1,
+            hint: `The sentence after the gap says “a hundred of <b>them</b>”. The missing sentence must also be about the cubes themselves.`,
+            explain: `<p><b>B</b>. “Each one” points back to the cubes just mentioned and tells us their size; the next sentence carries on with how many “of them” there are.</p><p class="why-not">A (“That turned out to be wrong”) would cancel the fact just given, but the text carries on as if it is true. C changes the subject to burrows.</p>` },
+          { id: "r5b", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 2</b>?</p>`, options: SENTS, answer: 3,
+            hint: `Read the sentence after the gap: “A round pellet would simply roll off.” What idea is that an example of?`,
+            explain: `<p><b>D</b>. The droppings are placed on top of rocks and logs. “This is where the unusual shape proves its worth” makes the general point, and “A round pellet would simply roll off” is the proof: cubes stay put.</p><p class="why-not">B is also about the droppings, but their size doesn’t explain why a round one would roll off. E is about the intestine, which hasn’t been mentioned yet.</p>` },
+          { id: "r5c", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 3</b>?</p>`, options: SENTS, answer: 0,
+            hint: `Before the gap: what “some people guessed”. After it: what scientists “finally” found. What usually comes between a guess and the real answer?`,
+            explain: `<p><b>A</b>. “That” points back to the guess (cubes squeezed into shape on the way out). The next sentence gives the real answer: they are formed “much earlier”. A short correction joins the two.</p><p class="why-not">E explains how the cubes are really made, which belongs after we are told about the stiff and stretchy sections. D is about the shape being useful, not about how it is made.</p>` },
+          { id: "r5d", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 4</b>?</p>`, options: SENTS, answer: 4,
+            hint: `The sentence after the gap mentions “<b>this uneven squeezing</b>”. Which sentence describes squeezing that is uneven?`,
+            explain: `<p><b>E</b>. The stiff parts and stretchy parts “press on it with different strength”: that is the “uneven squeezing” the last sentence refers to.</p><p class="why-not">C is the sentence that is never used: it is about wombats, but nothing around any gap is about burrows. D’s “unusual shape” has already been dealt with in the second paragraph.</p>` },
+        ],
+      },
+      {
         id: "rb", name: "Hybrid", boss: true, passage: PROMPTER,
         questions: [
           { id: "rba", cat: "Comparisons & imagery",
@@ -469,6 +503,29 @@ the snail is fast asleep.</p>`,
    --------------------------------------------------------------- */
 (() => {
   const tbl = (head, rows) => `<div class="figure"><table class="grid"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map((c, i) => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table></div>`;
+
+  const T = (x, y, s, o = "") => `<text x="${x}" y="${y}" font-size="14" fill="${INK}" ${o}>${s}</text>`;
+
+  /* a column graph: series = [{name, color, values}], gridlines every `step` up to `max` */
+  function colGraph({ labels, series, max, step, ylabel, numbers = true, aria }) {
+    const W = 70 + labels.length * (series.length * 26 + 30), H = 250, y = v => 205 - v * (170 / max);
+    let g = "";
+    for (let v = 0; v <= max; v += step) g += `<line x1="50" x2="${W - 10}" y1="${y(v)}" y2="${y(v)}" stroke="#c5ccd8" stroke-width="1"/>` + (numbers ? T(42, y(v) + 5, v, 'text-anchor="end"') : "");
+    labels.forEach((n, i) => {
+      const x0 = 66 + i * (series.length * 26 + 30);
+      series.forEach((s, k) => { g += `<rect x="${x0 + k * 26}" y="${y(s.values[i])}" width="24" height="${205 - y(s.values[i])}" fill="${s.color}" stroke="${INK}" stroke-width="1.5"/>`; });
+      g += T(x0 + series.length * 13, 224, n, 'text-anchor="middle"');
+    });
+    g += `<line x1="50" x2="50" y1="${y(max)}" y2="205" stroke="${INK}" stroke-width="2"/><line x1="50" x2="${W - 10}" y1="205" y2="205" stroke="${INK}" stroke-width="2"/>`;
+    g += `<text x="14" y="120" font-size="13" fill="${INK}" text-anchor="middle" transform="rotate(-90 14 120)">${ylabel}</text>`;
+    if (series.length > 1) series.forEach((s, k) => { g += `<rect x="${60 + k * 110}" y="236" width="14" height="12" fill="${s.color}" stroke="${INK}"/>` + T(80 + k * 110, 247, s.name); });
+    return `<div class="figure"><svg viewBox="0 0 ${W} ${H + (series.length > 1 ? 6 : -12)}" width="${W}" role="img" aria-label="${aria}">${g}</svg></div>`;
+  }
+
+  /* L1 Q1: two classes' votes */
+  const VOTES = colGraph({ labels: ["Swimming", "Soccer", "Chess", "Art"], max: 10, step: 2, ylabel: "Votes",
+    series: [{ name: "Class 4K", color: "#4dabf7", values: [9, 6, 4, 7] }, { name: "Class 4M", color: "#ffa94d", values: [5, 8, 4, 10] }],
+    aria: "A column graph with two columns for each activity, one for Class 4K and one for Class 4M. The scale goes 0, 2, 4, 6, 8, 10. Swimming: 4K halfway between 8 and 10, 4M halfway between 4 and 6. Soccer: 4K 6, 4M 8. Chess: 4K 4, 4M 4. Art: 4K halfway between 6 and 8, 4M 10." });
 
   /* L1 Q4: an L-shaped tile turned a quarter turn. Cells are [row, col] in a 3 × 3 grid. */
   const L = [[0, 0], [1, 0], [2, 0], [2, 1]];
@@ -515,11 +572,11 @@ the snail is fast asleep.</p>`,
       {
         id: "t1", name: "Foothills",
         questions: [
-          { id: "t1a", cat: "Tables & timetables",
-            stem: `<p>The table shows the days when four children have swimming training (✓).</p>${tbl(["", "Mon", "Tue", "Wed", "Thu"], [["Ana", "✓", "", "✓", ""], ["Ben", "", "✓", "✓", "✓"], ["Cal", "✓", "", "✓", "✓"], ["Dia", "✓", "", "", ""]])}<p>On which day do <b>exactly two</b> of the children have training?</p>`,
-            options: ["Monday", "Tuesday", "Wednesday", "Thursday"], answer: 3,
-            hint: `Go <b>down</b> each day's column and count the ticks. You are looking for a column with exactly 2.`,
-            explain: `<p>Count the ticks in each column: Monday 3 (Ana, Cal, Dia), Tuesday 1 (Ben), Wednesday 3, <b>Thursday 2</b> (Ben and Cal).</p><p class="why-not">Tuesday has only one tick. Monday and Wednesday each have three. Counting along the rows instead of down the columns tells you about each child, not each day.</p>` },
+          { id: "t1e", cat: "Tables & timetables",
+          stem: `<p>Two classes voted for their favourite lunchtime activity. Every child had one vote.</p>${VOTES}<p>For which activity is the <b>difference</b> between the two classes’ votes the <b>greatest</b>?</p>`,
+          options: ["Swimming", "Soccer", "Chess", "Art"], answer: 0,
+          hint: `Don’t look for the tallest column. For each activity, find the <b>gap</b> between its two columns. A column that stops halfway between two lines is an odd number.`,
+          explain: `<p>Read each pair and subtract. Swimming: 9 and 5, difference <b>4</b>. Soccer: 6 and 8, difference 2. Chess: 4 and 4, difference 0. Art: 7 and 10, difference 3. The greatest difference is for <b>Swimming</b>.</p><p class="why-not">Art has the tallest column and the most votes altogether, but the question asks about the difference. Chess is where the classes are the same.</p>` },
           { id: "t1b", cat: "Order & arrangement",
             stem: `<p>Four children ran a race.</p><div class="box">Kai finished before Lena.<br>Mo finished after Lena.<br>Nia finished before Kai.</div><p>Who came <b>third</b>?</p>`,
             options: ["Kai", "Lena", "Mo", "Nia"], answer: 1,
@@ -561,11 +618,14 @@ the snail is fast asleep.</p>`,
             options: ["Ari", "Bea", "Col", "Dan"], answer: 3,
             hint: `For each child, keep only the bigger of the two jumps and ignore the other. Then put those four numbers in order.`,
             explain: `<p>Best jumps: Ari 3.3, Bea 3.5, Col 3.7, Dan 3.6. In order: Col 3.7, <b>Dan 3.6</b>, Bea 3.5, Ari 3.3. Dan came second.</p><p class="why-not">Bea is second if you look only at Jump 1, or only at Jump 2. Col is second if you add each child's two jumps together, but only the best jump counts.</p>` },
-          { id: "t2d", cat: "Number problems",
-            stem: `<p>There are <b>12</b> children in the art club. Every child paints, or draws, or does both. <b>8</b> children paint and <b>7</b> children draw.</p><p>How many children do <b>both</b>?</p>`,
-            options: ["1", "3", "4", "5"], answer: 1,
-            hint: `8 + 7 is more than 12. Why? Because some children were counted <b>twice</b>.`,
-            explain: `<p>8 + 7 = 15, but there are only 12 children. The extra 15 − 12 = <b>3</b> are the children who were counted twice, once as painters and once as drawers. They do both.</p><p class="why-not">1 is just 8 − 7. 4 is the number who don't paint (12 − 8) and 5 is the number who don't draw (12 − 7).</p>` },
+          { id: "t2e", cat: "Supports the claim",
+          stem: `<p class="box">Ms Tran, the librarian: “We should move the reading corner away from the library door. Then children will be able to concentrate on their books for longer.”</p><p>Which statement, if true, best supports Ms Tran’s claim?</p>`,
+          options: ["Children who read for longer usually finish more books each term.",
+                    "The spot beside the door gets the best sunlight in the afternoon.",
+                    "Children in the reading corner look up every time the door opens.",
+                    "Most children say the reading corner is their favourite part of the library."], answer: 2,
+          hint: `The claim is: <b>away from the door → concentrate for longer</b>. Which statement shows the door is what breaks their concentration?`,
+          explain: `<p>Moving the corner only helps if the <b>door</b> is the problem. If children look up every time it opens, then being further from it should mean fewer interruptions and longer concentration.</p><p class="why-not">Reading for longer being good for you explains why the goal matters, not why moving would achieve it. Good sunlight is a reason to <em>stay</em> by the door. Being the favourite spot says nothing about concentrating.</p>` },
         ],
       },
       {
@@ -637,11 +697,11 @@ the snail is fast asleep.</p>`,
                       "Some of the Hawks' players may have missed a game or two because of injuries."], answer: 0,
             hint: `Is comparing 12 wins with 9 wins fair? What else would you need to know about each team's season?`,
             explain: `<p>Wins can only be compared fairly if both teams played the same number of games. If the Hawks won 12 out of 20 and the Eagles won 9 out of 10, the Eagles did far better. Tom's comparison may be unfair because <b>the Hawks may have played more games</b>.</p><p class="why-not">Goals scored in losses don't change who won. Training days don't matter. Injured Hawks players would make their 12 wins more impressive, not less.</p>` },
-          { id: "tbc", cat: "Order & arrangement",
-            stem: `<p>Ava, Bo, Cy and Di ran a race. There were no ties.</p><div class="box">Ava finished before Bo.<br>Di finished before Cy.<br>Bo did not finish last.</div><p>These clues are not enough to work out the full order. Which <b>one extra clue</b> makes it possible?</p>`,
-            options: ["Cy finished last.", "Ava finished before Di.", "Di finished before Ava.", "Bo finished before Cy."], answer: 2,
-            hint: `First list every order the three clues allow (there are three). A useful extra clue must leave <b>only one</b> of them.`,
-            explain: `<p>The three clues allow exactly three orders: Ava–Bo–Di–Cy, Ava–Di–Bo–Cy and Di–Ava–Bo–Cy. “<b>Di finished before Ava</b>” fits only the last one, so it fixes the order: Di, Ava, Bo, Cy.</p><p class="why-not">“Cy finished last” and “Bo finished before Cy” are already true in all three orders, so they tell us nothing new. “Ava finished before Di” still leaves two orders.</p>` },
+          { id: "tbf", cat: "Order & arrangement",
+            stem: `<p>Five friends stand one behind another in a queue.</p><div class="box">Ivy is at the front.<br>Gus is directly in front of Hana.<br>Hana is directly in front of Fay.<br>Eli is somewhere behind Fay.</div><p>Who is in the <b>middle</b> of the queue?</p>`,
+            options: ["Eli", "Fay", "Gus", "Hana"], answer: 3,
+            hint: `Two of the clues say “<b>directly</b> in front of”. Join them up: they make a block of three friends who must stand together. Where can that block go?`,
+            explain: `<p>Gus is directly in front of Hana, and Hana is directly in front of Fay, so Gus, Hana, Fay stand together in that order. Ivy is at the front, so the block takes places 2–4 or places 3–5. Eli has to be behind Fay, so there must be a place left after her: the block is in places 2–4 and Eli is last. The queue is Ivy, Gus, <b>Hana</b>, Fay, Eli, and Hana is in the middle.</p><p class="why-not">Gus is in the middle only if you count from Gus instead of from Ivy at the front. Fay is in the middle if the block is pushed to the back, but then Eli would have nowhere to stand behind her.</p>` },
           { id: "tbd", cat: "Tables & timetables",
             stem: `<p>Three friends collected stickers on Monday, Tuesday and Wednesday. Some of the numbers are missing from the table.</p>${STICK([["Zed", 6, 9, "?", 22], ["Yan", 8, "?", 5, "?"], ["Xia", 4, 7, 9, 20], ["Total", 18, 26, 21, "?"]])}<p>How many stickers did <b>Yan</b> collect <b>altogether</b>?</p>`,
             options: ["10", "23", "26", "65"], answer: 1,
@@ -707,6 +767,39 @@ the snail is fast asleep.</p>`,
     return `<div class="figure"><svg viewBox="0 0 190 160" width="190" height="160" role="img" aria-label="A large cube made of 27 small cubes, 3 small cubes long, 3 wide and 3 high.">${g}</svg></div>`;
   })();
 
+  const tbl = (head, rows) => `<div class="figure"><table class="grid"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map((c, i) => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table></div>`;
+
+  /* M1: picture graph */
+  const book = (x, y, half) => `<rect x="${x}" y="${y}" width="${half ? 13 : 26}" height="30" rx="2" fill="#4dabf7" stroke="${INK}" stroke-width="1.5"/>` + (half ? "" : `<line x1="${x + 6}" x2="${x + 6}" y1="${y}" y2="${y + 30}" stroke="${INK}" stroke-width="1.5"/>`);
+  const PICT = (() => {
+    const rows = [["Monday", 3], ["Tuesday", 4.5], ["Wednesday", 2], ["Thursday", 3.5]];
+    let g = "";
+    rows.forEach(([d, n], i) => {
+      const y = 12 + i * 42;
+      g += T(92, y + 21, d, 'text-anchor="end"') + `<line x1="100" x2="100" y1="${y - 6}" y2="${y + 36}" stroke="${INK}" stroke-width="2"/>`;
+      for (let k = 0; k < Math.floor(n); k++) g += book(110 + k * 32, y);
+      if (n % 1) g += book(110 + Math.floor(n) * 32, y, true);
+    });
+    g += book(110, 186) + T(144, 207, "= 4 books");
+    return `<div class="figure"><svg viewBox="0 0 290 224" width="290" role="img" aria-label="A picture graph of books borrowed. Monday: 3 book symbols. Tuesday: 4 and a half symbols. Wednesday: 2 symbols. Thursday: 3 and a half symbols. Key: one symbol = 4 books.">${g}</svg></div>`;
+  })();
+
+  /* M2: dot plot */
+  const DOTS = (() => {
+    const counts = [1, 3, 5, 4, 4, 2, 1];
+    let g = `<line x1="20" x2="300" y1="130" y2="130" stroke="${INK}" stroke-width="2"/>`;
+    counts.forEach((c, v) => {
+      const x = 40 + v * 40;
+      g += `<line x1="${x}" x2="${x}" y1="130" y2="136" stroke="${INK}" stroke-width="2"/>` + T(x, 152, v, 'text-anchor="middle"');
+      for (let k = 0; k < c; k++) g += `<circle cx="${x}" cy="${118 - k * 22}" r="8" fill="#ff8a65" stroke="${INK}" stroke-width="1.5"/>`;
+    });
+    g += T(160, 172, "Goals scored", 'text-anchor="middle"');
+    return `<div class="figure"><svg viewBox="0 0 320 180" width="320" role="img" aria-label="A dot plot. Each dot is one child. 0 goals: 1 dot. 1 goal: 3 dots. 2 goals: 5 dots. 3 goals: 4 dots. 4 goals: 4 dots. 5 goals: 2 dots. 6 goals: 1 dot.">${g}</svg></div>`;
+  })();
+
+  /* L2 Q3: the rectangle, not to scale */
+  const RECT = `<div class="figure"><svg viewBox="0 0 260 130" width="260" role="img" aria-label="A rectangle. The long side is labelled 8 cm. The short side is labelled with a question mark. The diagram is not to scale."><rect x="40" y="20" width="170" height="70" fill="#dff0d8" stroke="${INK}" stroke-width="2.4"/>${T(125, 14, "8 cm", 'text-anchor="middle" font-weight="700"')}${T(218, 60, "?", 'font-weight="700"')}<text x="125" y="112" font-size="13" text-anchor="middle" fill="#55607a">not to scale</text></svg></div>`;
+
   const BEADS = seq => `<div class="figure" style="font-size:24px;letter-spacing:2px">${seq} …</div>`;
 
   WORLDS.push({
@@ -717,11 +810,11 @@ the snail is fast asleep.</p>`,
       {
         id: "m1", name: "Shallow Waters",
         questions: [
-          { id: "m1a", cat: "Number & place value",
-            stem: `<p>Which number is <b>300 more</b> than 4,850?</p>`,
-            options: ["4,853", "4,880", "5,050", "5,150", "7,850"], answer: 3,
-            hint: `300 is 3 <b>hundreds</b>. Count on in hundreds from 4,850: 4,950, then … (watch what happens when you pass 5,000).`,
-            explain: `<p>Add 3 hundreds: 4,850 → 4,950 → 5,050 → <b>5,150</b>.</p><p class="why-not">4,880 adds 3 tens and 4,853 adds 3 ones. 7,850 adds 3 thousands. 5,050 stops one hundred too soon.</p>` },
+          { id: "m1e", cat: "Graphs & data",
+          stem: `<p>The picture graph shows how many books a class borrowed each day.</p>${PICT}<p>How many <b>more</b> books were borrowed on <b>Tuesday</b> than on <b>Wednesday</b>?</p>`,
+          options: ["2", "3", "8", "10", "18"], answer: 3,
+          hint: `Check the key first: one picture is not one book. What is <b>half</b> a picture worth?`,
+          explain: `<p>Each picture is 4 books, so half a picture is 2. Tuesday: 4 × 4 + 2 = 18. Wednesday: 2 × 4 = 8. Difference: 18 − 8 = <b>10</b>.</p><p class="why-not">2 and 3 count pictures instead of books. 8 ignores the half picture. 18 is Tuesday’s total, not the difference.</p>` },
           { id: "m1b", cat: "Time & timetables",
             stem: `<p>A film starts at <b>10:45 am</b> and runs for <b>1 hour 30 minutes</b>. What time does it finish?</p>`,
             options: ["11:15 am", "11:45 am", "12:15 pm", "12:45 pm", "1:15 pm"], answer: 2,
@@ -753,7 +846,7 @@ the snail is fast asleep.</p>`,
             hint: `How many of the 8 slices make one quarter of the pizza? It isn't one slice.`,
             explain: `<p>One quarter of 8 slices is 2 slices. So 2 + 2 = 4 slices are eaten and 4 are left. 4 out of 8 is <b>one half</b>.</p><p class="why-not"><sup>5</sup>⁄<sub>8</sub> treats “one quarter” as one slice. <sup>1</sup>⁄<sub>4</sub> is how much each child ate, not what is left.</p>` },
           { id: "m2c", cat: "Area, perimeter & 3D",
-            stem: `<p>A rectangle has a <b>perimeter of 26 cm</b>. Its long sides are each <b>8 cm</b>. What is its <b>area</b>?</p>`,
+            stem: `<p>This rectangle has a <b>perimeter of 26 cm</b>. Its long sides are each <b>8 cm</b>.</p>${RECT}<p>What is its <b>area</b>?</p>`,
             options: ["18 cm²", "26 cm²", "40 cm²", "80 cm²", "208 cm²"], answer: 2,
             hint: `First find a short side. The two long sides use up 16 cm of the perimeter, and what is left is shared by <b>two</b> short sides.`,
             explain: `<p>The two long sides: 8 + 8 = 16 cm. That leaves 26 − 16 = 10 cm for two short sides, so each is 5 cm. Area = 8 × 5 = <b>40 cm²</b>.</p><p class="why-not">80 cm² forgets to halve the 10 cm (8 × 10). 18 is 26 − 8, and 208 is 26 × 8: both mix up perimeter and side lengths.</p>` },
@@ -777,11 +870,11 @@ the snail is fast asleep.</p>`,
             options: ["1 only", "2 only", "1 and 2 only", "2 and 3 only", "1, 2 and 3"], answer: 3,
             hint: `For statement 1, count the marbles that are <b>not</b> red: blue and green together.`,
             explain: `<p>Statement 1: there are 5 red and 3 + 2 = 5 not red, so they are <b>equally</b> likely. Not correct. Statement 2: green has the fewest marbles (2), so it is least likely. Correct. Statement 3: there are no yellow marbles, so it is impossible. Correct. So <b>2 and 3 only</b>.</p><p class="why-not">Statement 1 is the trap: red is the most likely <em>colour</em>, but it is not more likely than all the other marbles put together.</p>` },
-          { id: "m3c", cat: "Rates",
-            stem: `<p>A machine prints <b>45 posters in 3 minutes</b>. Printing at the same speed, how many posters does it print in <b>8 minutes</b>?</p>`,
-            options: ["53", "90", "120", "135", "360"], answer: 2,
-            hint: `Find how many posters it prints in <b>one</b> minute first.`,
-            explain: `<p>In one minute: 45 ÷ 3 = 15 posters. In 8 minutes: 15 × 8 = <b>120</b>.</p><p class="why-not">360 is 45 × 8, which treats 45 as the number for one minute. 135 is 45 × 3. 53 just adds 45 and 8.</p>` },
+          { id: "m3e", cat: "Graphs & data",
+          stem: `<p>Twenty children each took 6 shots at goal. The dot plot shows how many goals each child scored.</p>${DOTS}<p>How many children scored <b>more than 3</b> goals?</p>`,
+          options: ["4", "7", "9", "11", "13"], answer: 1,
+          hint: `“More than 3” does <b>not</b> include 3. Which columns of dots count?`,
+          explain: `<p>More than 3 means 4, 5 or 6 goals. Count those dots: 4 + 2 + 1 = <b>7</b>.</p><p class="why-not">11 includes the children who scored exactly 3. 4 counts only one column. 9 is the number who scored fewer than 3, and 13 is the number who scored 3 or fewer.</p>` },
           { id: "m3d", cat: "Time & timetables",
             stem: `<p>Today is <b>Wednesday</b>. What day of the week will it be in <b>40 days</b>?</p>`,
             options: ["Thursday", "Friday", "Saturday", "Sunday", "Monday"], answer: 4,
@@ -797,11 +890,11 @@ the snail is fast asleep.</p>`,
             options: ["1", "7", "13", "26", "52"], answer: 2,
             hint: `Work backwards from 5, undoing each step in reverse order. The opposite of “divide by 4” is “multiply by 4”.`,
             explain: `<p>Work backwards: 5 × 4 = 20. Undo “subtract 6”: 20 + 6 = 26. Undo “double”: 26 ÷ 2 = <b>13</b>. Check: 13 → 26 → 20 → 5. ✓</p><p class="why-not">26 stops one step early (it forgets to undo the doubling). 7 subtracts 6 again instead of adding it back. 1 does the steps forwards starting from 5.</p>` },
-          { id: "m4b", cat: "Number & place value",
-            stem: `<p>Two numbers <b>add up to 50</b>. One is <b>14 more</b> than the other. What is the <b>larger</b> number?</p>`,
-            options: ["18", "25", "28", "32", "36"], answer: 3,
-            hint: `Take the extra 14 away from 50 first. What is left is shared equally between the two numbers.`,
-            explain: `<p>50 − 14 = 36, and 36 ÷ 2 = 18. So the smaller number is 18 and the larger is 18 + 14 = <b>32</b>. Check: 18 + 32 = 50. ✓</p><p class="why-not">18 is the smaller number, not the one asked for. 36 is 50 − 14 without halving. 25 is half of 50, which ignores the difference.</p>` },
+          { id: "m4e", cat: "Time & timetables",
+          stem: `<p>Three buses run from the Station to the Beach.</p>${tbl(["", "Bus 1", "Bus 2", "Bus 3"], [["Station", "9:10", "9:40", "10:20"], ["Market", "9:28", "9:58", "10:38"], ["Beach", "9:55", "10:25", "11:05"]])}<p>Zara takes Bus 1 and gets off at the Market. Her shopping takes <b>40 minutes</b>. Then she catches the next bus she can. What time does she reach the Beach?</p>`,
+          options: ["10:08 am", "10:25 am", "10:35 am", "10:38 am", "11:05 am"], answer: 4,
+          hint: `Work out when her shopping finishes. Has Bus 2 already left the Market by then?`,
+          explain: `<p>She reaches the Market at 9:28 and finishes shopping at 9:28 + 40 minutes = 10:08. Bus 2 left the Market at 9:58, so she has missed it. Bus 3 leaves at 10:38 and reaches the Beach at <b>11:05 am</b>.</p><p class="why-not">10:25 is when Bus 2 arrives, but she was still shopping when it left. 10:38 is when Bus 3 <em>leaves</em> the Market. 10:08 is when her shopping ends. 10:35 adds 40 minutes to Bus 1’s arrival at the Beach.</p>` },
           { id: "m4c", cat: "Area, perimeter & 3D",
             stem: `<p>A <b>square</b> paddock has sides <b>12 m</b> long. A farmer puts a fence post at <b>every corner</b>, and then more posts so that the posts are <b>3 m apart</b> all the way round. How many posts does she use?</p>`,
             options: ["16", "17", "20", "24", "48"], answer: 0,
@@ -860,7 +953,7 @@ const SKINS = [["recruit", "Recruit", "#8a94a6"], ["britebomber", "Brite Bomber"
   ["cuddle", "Cuddle Team Leader", "#ffb21a"], ["drift", "Drift", "#ffb21a"], ["midas", "Midas", "#ffb21a"]];
 const ISLE = { reading: "world-forest", thinking: "world-peaks", maths: "world-reef" };
 const ARENA = { reading: "arena-forest", thinking: "arena-peaks", maths: "arena-reef" };
-const chestStage = () => { const p = piePct(); return p <= 0 ? 0 : p >= 100 ? 4 : 1 + Math.min(2, Math.floor(p / 34)); };
+const chestStage = () => { const p = piePct(); return p <= 0 ? 0 : p >= 99.99 ? 4 : 1 + Math.min(2, Math.floor(p / 34)); };
 const art = (name, alt, cls = "") => `<img class="${cls}" src="art/${name}.webp" alt="${alt}">`;
 const BADGES = [
   ["first", "🥾", "First steps", "Finish your first level"],
@@ -901,7 +994,7 @@ function dayStreak() {
 const best = lv => (S.levels[lv.id] || {}).stars || 0;
 const regular = w => w.levels.filter(l => !l.boss);
 const worldStars = w => regular(w).reduce((a, l) => a + best(l), 0);
-const BOSS_GATE = 9;
+const bossGate = w => regular(w).length * 3 - 3;   // 9 of 12 stars with four levels, 12 of 15 with five
 function starsFor(lv, pts) {
   const max = lv.questions.length * 2;
   if (lv.boss) return pts >= max ? 3 : pts >= max - 2 ? 2 : pts >= max - 3 ? 1 : 0;
@@ -910,7 +1003,7 @@ function starsFor(lv, pts) {
 function lockReason(w, i) {
   if (PRACTICE) return "";
   const lv = w.levels[i];
-  if (lv.boss) { const s = worldStars(w); return s >= BOSS_GATE ? "" : `Collect ${BOSS_GATE} ⭐ in ${w.name} to wake the boss (you have ${s})`; }
+  if (lv.boss) { const s = worldStars(w); return s >= bossGate(w) ? "" : `Collect ${bossGate(w)} ⭐ in ${w.name} to wake the boss (you have ${s})`; }
   if (i === 0 || best(w.levels[i - 1]) >= 2) return "";
   return `Get 2 ⭐ on “${w.levels[i - 1].name}” to unlock`;
 }
@@ -987,7 +1080,7 @@ function showMap() {
         <span class="num">${lv.boss ? art(w.boss.img, "") : why ? "🔒" : i + 1}</span>
         <span class="nm">${lv.boss && b ? "👑 " : lv.boss && why ? "🔒 " : ""}${esc(lv.boss ? w.boss.name : lv.name)}</span>
         <span class="rar">${lv.boss ? "Legendary" : ["Common", "Uncommon", "Rare", "Epic"][Math.min(i, 3)]} · ${fmt(TIME[lv.questions[0].id])} each</span>
-        ${why ? `<span class="req">${esc(lv.boss ? `Needs ${BOSS_GATE} ⭐` : "Locked")}</span>` : `<span class="st">${starRow(b)}</span>`}
+        ${why ? `<span class="req">${esc(lv.boss ? `Needs ${bossGate(w)} ⭐` : "Locked")}</span>` : `<span class="st">${starRow(b)}</span>`}
       </button>`;
     }).join("");
     return `<section class="world" style="--world:${w.color}">
@@ -1147,7 +1240,7 @@ function finish() {
       if (stars >= 2) { SFX.win(); if (stars === 3) confetti(); }
     }
     opened.forEach(id => { const x = findLevel(id); lines.push(`🔓 Unlocked: <b>${esc(x.lv.boss ? x.w.boss.name + " (boss!)" : x.lv.name)}</b>`); });
-    if (!lv.boss && !opened.length && stars >= 2) { const s = worldStars(p.w); if (s < BOSS_GATE && lockReason(p.w, p.w.levels.length - 1) && regular(p.w).every(l => best(l) >= 2)) lines.push(`You have ${s} ⭐ here. Get ${BOSS_GATE} ⭐ to wake the boss: replay a level for 3 ⭐.`); }
+    if (!lv.boss && !opened.length && stars >= 2) { const s = worldStars(p.w); if (s < bossGate(p.w) && lockReason(p.w, p.w.levels.length - 1) && regular(p.w).every(l => best(l) >= 2)) lines.push(`You have ${s} ⭐ here. Get ${bossGate(p.w)} ⭐ to wake the boss: replay a level for 3 ⭐.`); }
   }
   const dt = earned() - p.t0;
   lines.unshift(dt > 0 ? `🎮 <b>+${fmt(dt)}</b> of Fortnite time this round. You now have <b>${fmt(earned())}</b> of 60 minutes.` : `🎮 No new Fortnite time this round. You have ${fmt(earned())} of 60 minutes.`);

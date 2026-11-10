@@ -107,6 +107,7 @@
   .stem p { margin: 0 0 10px; }
   .stem .box { background: var(--field); border-left: 4px solid var(--world); border-radius: 6px; padding: 10px 14px; margin: 0 0 10px; }
   .stem .gapline { font-size: 19px; background: var(--field); border-radius: 8px; padding: 12px 14px; margin: 0 0 10px; }
+  .gapn { white-space: nowrap; background: var(--hint-bg); border-radius: 4px; padding: 0 4px; }
   .stem .gapw { display: inline-block; min-width: 70px; border-bottom: 3px solid var(--ink); }
   .figure { margin: 10px 0; text-align: center; overflow-x: auto; }
   .figure svg, .opt svg { max-width: 100%; height: auto; }
@@ -269,7 +270,7 @@ const SKINS = [["recruit", "Recruit", "#8a94a6"], ["britebomber", "Brite Bomber"
   ["cuddle", "Cuddle Team Leader", "#ffb21a"], ["drift", "Drift", "#ffb21a"], ["midas", "Midas", "#ffb21a"]];
 const ISLE = { reading: "world-forest", thinking: "world-peaks", maths: "world-reef" };
 const ARENA = { reading: "arena-forest", thinking: "arena-peaks", maths: "arena-reef" };
-const chestStage = () => { const p = piePct(); return p <= 0 ? 0 : p >= 100 ? 4 : 1 + Math.min(2, Math.floor(p / 34)); };
+const chestStage = () => { const p = piePct(); return p <= 0 ? 0 : p >= 99.99 ? 4 : 1 + Math.min(2, Math.floor(p / 34)); };
 const art = (name, alt, cls = "") => `<img class="${cls}" src="art/${name}.webp" alt="${alt}">`;
 const BADGES = [
   ["first", "🥾", "First steps", "Finish your first level"],
@@ -310,7 +311,7 @@ function dayStreak() {
 const best = lv => (S.levels[lv.id] || {}).stars || 0;
 const regular = w => w.levels.filter(l => !l.boss);
 const worldStars = w => regular(w).reduce((a, l) => a + best(l), 0);
-const BOSS_GATE = 9;
+const bossGate = w => regular(w).length * 3 - 3;   // 9 of 12 stars with four levels, 12 of 15 with five
 function starsFor(lv, pts) {
   const max = lv.questions.length * 2;
   if (lv.boss) return pts >= max ? 3 : pts >= max - 2 ? 2 : pts >= max - 3 ? 1 : 0;
@@ -319,7 +320,7 @@ function starsFor(lv, pts) {
 function lockReason(w, i) {
   if (PRACTICE) return "";
   const lv = w.levels[i];
-  if (lv.boss) { const s = worldStars(w); return s >= BOSS_GATE ? "" : `Collect ${BOSS_GATE} ⭐ in ${w.name} to wake the boss (you have ${s})`; }
+  if (lv.boss) { const s = worldStars(w); return s >= bossGate(w) ? "" : `Collect ${bossGate(w)} ⭐ in ${w.name} to wake the boss (you have ${s})`; }
   if (i === 0 || best(w.levels[i - 1]) >= 2) return "";
   return `Get 2 ⭐ on “${w.levels[i - 1].name}” to unlock`;
 }
@@ -396,7 +397,7 @@ function showMap() {
         <span class="num">${lv.boss ? art(w.boss.img, "") : why ? "🔒" : i + 1}</span>
         <span class="nm">${lv.boss && b ? "👑 " : lv.boss && why ? "🔒 " : ""}${esc(lv.boss ? w.boss.name : lv.name)}</span>
         <span class="rar">${lv.boss ? "Legendary" : ["Common", "Uncommon", "Rare", "Epic"][Math.min(i, 3)]} · ${fmt(TIME[lv.questions[0].id])} each</span>
-        ${why ? `<span class="req">${esc(lv.boss ? `Needs ${BOSS_GATE} ⭐` : "Locked")}</span>` : `<span class="st">${starRow(b)}</span>`}
+        ${why ? `<span class="req">${esc(lv.boss ? `Needs ${bossGate(w)} ⭐` : "Locked")}</span>` : `<span class="st">${starRow(b)}</span>`}
       </button>`;
     }).join("");
     return `<section class="world" style="--world:${w.color}">
@@ -556,7 +557,7 @@ function finish() {
       if (stars >= 2) { SFX.win(); if (stars === 3) confetti(); }
     }
     opened.forEach(id => { const x = findLevel(id); lines.push(`🔓 Unlocked: <b>${esc(x.lv.boss ? x.w.boss.name + " (boss!)" : x.lv.name)}</b>`); });
-    if (!lv.boss && !opened.length && stars >= 2) { const s = worldStars(p.w); if (s < BOSS_GATE && lockReason(p.w, p.w.levels.length - 1) && regular(p.w).every(l => best(l) >= 2)) lines.push(`You have ${s} ⭐ here. Get ${BOSS_GATE} ⭐ to wake the boss: replay a level for 3 ⭐.`); }
+    if (!lv.boss && !opened.length && stars >= 2) { const s = worldStars(p.w); if (s < bossGate(p.w) && lockReason(p.w, p.w.levels.length - 1) && regular(p.w).every(l => best(l) >= 2)) lines.push(`You have ${s} ⭐ here. Get ${bossGate(p.w)} ⭐ to wake the boss: replay a level for 3 ⭐.`); }
   }
   const dt = earned() - p.t0;
   lines.unshift(dt > 0 ? `🎮 <b>+${fmt(dt)}</b> of Fortnite time this round. You now have <b>${fmt(earned())}</b> of 60 minutes.` : `🎮 No new Fortnite time this round. You have ${fmt(earned())} of 60 minutes.`);
