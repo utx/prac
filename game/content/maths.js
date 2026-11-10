@@ -80,6 +80,43 @@
   /* L2 Q3: the rectangle, not to scale */
   const RECT = `<div class="figure"><svg viewBox="0 0 260 130" width="260" role="img" aria-label="A rectangle. The long side is labelled 8 cm. The short side is labelled with a question mark. The diagram is not to scale."><rect x="40" y="20" width="170" height="70" fill="#dff0d8" stroke="${INK}" stroke-width="2.4"/>${T(125, 14, "8 cm", 'text-anchor="middle" font-weight="700"')}${T(218, 60, "?", 'font-weight="700"')}<text x="125" y="112" font-size="13" text-anchor="middle" fill="#55607a">not to scale</text></svg></div>`;
 
+  /* a column graph: series = [{name, color, values}], gridlines every `step` up to `max` */
+  function colGraph({ labels, series, max, step, ylabel, numbers = true, aria }) {
+    const W = 70 + labels.length * (series.length * 26 + 30), H = 250, y = v => 205 - v * (170 / max);
+    let g = "";
+    for (let v = 0; v <= max; v += step) g += `<line x1="50" x2="${W - 10}" y1="${y(v)}" y2="${y(v)}" stroke="#c5ccd8" stroke-width="1"/>` + (numbers ? T(42, y(v) + 5, v, 'text-anchor="end"') : "");
+    labels.forEach((n, i) => {
+      const x0 = 66 + i * (series.length * 26 + 30);
+      series.forEach((s, k) => { g += `<rect x="${x0 + k * 26}" y="${y(s.values[i])}" width="24" height="${205 - y(s.values[i])}" fill="${s.color}" stroke="${INK}" stroke-width="1.5"/>`; });
+      g += T(x0 + series.length * 13, 224, n, 'text-anchor="middle"');
+    });
+    g += `<line x1="50" x2="50" y1="${y(max)}" y2="205" stroke="${INK}" stroke-width="2"/><line x1="50" x2="${W - 10}" y1="205" y2="205" stroke="${INK}" stroke-width="2"/>`;
+    g += `<text x="14" y="120" font-size="13" fill="${INK}" text-anchor="middle" transform="rotate(-90 14 120)">${ylabel}</text>`;
+    if (series.length > 1) series.forEach((s, k) => { g += `<rect x="${60 + k * 110}" y="236" width="14" height="12" fill="${s.color}" stroke="${INK}"/>` + T(80 + k * 110, 247, s.name); });
+    return `<div class="figure"><svg viewBox="0 0 ${W} ${H + (series.length > 1 ? 6 : -12)}" width="${W}" role="img" aria-label="${aria}">${g}</svg></div>`;
+  }
+
+  /* L4 (Chart Cove) Q1: cupcakes sold */
+  const CUPCAKES = colGraph({ labels: ["Mon", "Tue", "Wed"], max: 30, step: 10, ylabel: "Cupcakes sold",
+    series: [{ name: "", color: "#f783ac", values: [15, 25, 10] }],
+    aria: "A column graph of cupcakes sold. The scale goes 0, 10, 20, 30. Monday's column is halfway between 10 and 20. Tuesday's column is halfway between 20 and 30. Wednesday's column reaches 10." });
+  /* L4 Q2: shells, scale missing */
+  const SHELLS = colGraph({ labels: ["Aki", "Bo"], max: 10, step: 1, ylabel: "Shells collected", numbers: false,
+    series: [{ name: "", color: "#63e6be", values: [6, 9] }],
+    aria: "A column graph with no numbers on its scale. There are evenly spaced lines across the graph. Aki's column reaches the 6th line above the bottom. Bo's column reaches the 9th line." });
+  /* L4 Q3: two rain gauges with different scales */
+  function gauge(x, title, labels, gaps, level, top) {
+    const y = v => 190 - v * (150 / top), unit = (labels[1] - labels[0]) / gaps;
+    let g = `<path d="M${x} 30 L${x} 192 Q${x} 198 ${x + 6} 198 L${x + 54} 198 Q${x + 60} 198 ${x + 60} 192 L${x + 60} 30" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
+    g += `<rect x="${x + 2}" y="${y(level)}" width="56" height="${196 - y(level)}" fill="#74c0fc" opacity=".8"/>`;
+    for (let v = 0; v <= top + 0.01; v += unit) {
+      const big = labels.includes(Math.round(v));
+      g += `<line x1="${x}" x2="${x + (big ? 22 : 12)}" y1="${y(v)}" y2="${y(v)}" stroke="${INK}" stroke-width="1.8"/>` + (big ? T(x + 66, y(v) + 5, Math.round(v) + " mm") : "");
+    }
+    return g + T(x + 30, 218, title, 'text-anchor="middle" font-weight="700"');
+  }
+  const GAUGES = `<div class="figure"><svg viewBox="0 0 330 226" width="330" role="img" aria-label="Two rain gauges. Monday's gauge is labelled 0, 10, 20 and 30 millimetres, with four small marks between each pair of labels. Its water reaches the third small mark above 10. Tuesday's gauge is labelled 0, 20 and 40 millimetres, with three small marks between each pair of labels. Its water reaches the third small mark above 20.">${gauge(20, "Monday", [0, 10, 20, 30], 5, 16, 30)}${gauge(190, "Tuesday", [0, 20, 40], 4, 35, 40)}</svg></div>`;
+
   const BEADS = seq => `<div class="figure" style="font-size:24px;letter-spacing:2px">${seq} …</div>`;
 
   WORLDS.push({
@@ -160,6 +197,31 @@
             options: ["Thursday", "Friday", "Saturday", "Sunday", "Monday"], answer: 4,
             hint: `Every 7 days you land on Wednesday again. How many whole weeks are in 40 days, and how many days are left over?`,
             explain: `<p>40 = 5 weeks (35 days) + 5 days. After 35 days it is Wednesday again. Five more days: Thursday, Friday, Saturday, Sunday, <b>Monday</b>.</p><p class="why-not">Sunday counts Wednesday itself as the first of the 5 days. Friday comes from 40 ÷ 7 ≈ 5 with the wrong leftover (2 instead of 5).</p>` },
+        ],
+      },
+      {
+        id: "m5", name: "Chart Cove",
+        questions: [
+          { id: "m5a", cat: "Graphs & data",
+            stem: `<p>A school stall wants to sell <b>80 cupcakes</b> in four days. The graph shows the first three days.</p>${CUPCAKES}<p>How many cupcakes must the stall sell on <b>Thursday</b> to reach its target?</p>`,
+            options: ["20", "30", "35", "40", "50"], answer: 1,
+            hint: `Two of the columns stop <b>halfway</b> between two lines. The lines go up in 10s, so what is halfway worth?`,
+            explain: `<p>Monday 15, Tuesday 25, Wednesday 10: that is 50 sold so far. To reach 80 they need 80 − 50 = <b>30</b>.</p><p class="why-not">50 is the number already sold. 40 reads the halfway columns down to 10 and 20. 20 reads them up to 20 and 30. 35 misreads just one of them.</p>` },
+          { id: "m5b", cat: "Graphs & data",
+            stem: `<p>Aki and Bo collected shells. The numbers have been left off the graph’s scale, but the lines are evenly spaced and start at 0.</p>${SHELLS}<p>Together they collected <b>60 shells</b>. How many did <b>Bo</b> collect?</p>`,
+            options: ["9", "24", "30", "36", "45"], answer: 3,
+            hint: `Count how many lines each column reaches. How many lines is that altogether, and how many shells must one line be worth?`,
+            explain: `<p>Aki’s column reaches 6 lines and Bo’s reaches 9: 15 lines for 60 shells, so each line is 60 ÷ 15 = 4 shells. Bo collected 9 × 4 = <b>36</b>.</p><p class="why-not">9 treats each line as 1 shell. 24 is Aki’s number. 30 just halves the total, but the columns are not the same height. 45 guesses that each line is worth 5.</p>` },
+          { id: "m5c", cat: "Measurement & scales",
+            stem: `<p>The two gauges show how much rain fell on Monday and on Tuesday. <b>Their scales are different.</b></p>${GAUGES}<p>How much <b>more</b> rain fell on Tuesday than on Monday?</p>`,
+            options: ["10 mm", "17 mm", "19 mm", "22 mm", "51 mm"], answer: 2,
+            hint: `Work out what one small mark is worth on <b>each</b> gauge separately. They are not the same.`,
+            explain: `<p>Monday’s gauge has 5 gaps for every 10 mm, so each small mark is 2 mm: the water is at 10 + 3 × 2 = 16 mm. Tuesday’s has 4 gaps for every 20 mm, so each mark is 5 mm: 20 + 3 × 5 = 35 mm. Difference: 35 − 16 = <b>19 mm</b>.</p><p class="why-not">10 mm comes from using the same value for the marks on both gauges. 51 mm adds instead of subtracting. 22 mm reads Monday’s marks as 1 mm each.</p>` },
+          { id: "m5d", cat: "Graphs & data",
+            stem: `<p>The table shows a netball competition so far. A win earns <b>3 points</b>, a draw earns <b>1 point</b> and a loss earns none.</p>${tbl(["Team", "Played", "Won", "Drawn", "Lost"], [["Reds", 8, 5, 1, 2], ["Blues", 8, 4, 4, 0], ["Greens", 7, 4, 1, 2], ["Golds", 8, 2, 3, 3]])}<div class="box">1. The Reds have more points than the Blues.<br>2. The Blues have not lost a game.<br>3. If the Greens win their next game, they will have as many points as the Reds have now.</div><p>Which statements are correct?</p>`,
+            options: ["1 only", "2 only", "1 and 2 only", "2 and 3 only", "1, 2 and 3"], answer: 3,
+            hint: `Work out each team’s points first: wins × 3, plus draws. More wins doesn’t always mean more points.`,
+            explain: `<p>Points: Reds 5 × 3 + 1 = 16. Blues 4 × 3 + 4 = 16. Greens 4 × 3 + 1 = 13. Statement 1: 16 and 16 are equal, so not correct. Statement 2: the Blues’ “Lost” column is 0, correct. Statement 3: 13 + 3 = 16, the same as the Reds, correct. So <b>2 and 3 only</b>.</p><p class="why-not">Statement 1 looks right because the Reds have more wins, but the Blues’ four draws make up the difference.</p>` },
         ],
       },
       {

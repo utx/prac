@@ -1,9 +1,9 @@
 /* ---------------------------------------------------------------
    CROWN QUEST: draft alternates from the Nov 2026 audit against the sample papers.
    tools/build_game.py only reads game/content/, so nothing here is in the game by itself.
-   David approved and we moved into the game: r1 (cloze), r5, t1a, t2d, m1a, m2c, m3c, m4b.
-   Still only drafts here: the maths level "Chart Cove" (m5, no decision yet) and the
-   replacement for mbc (David kept the painted cube). Verify and cold-solve before using.
+   David approved and we moved into the game: r1 (cloze), r5, t1a, t2d, m1a, m2c, m3c, m4b
+   and the maths level "Chart Cove" (m5). Not used: the replacement for mbc (David kept
+   the painted cube). The game's own files are now the source of truth for the rest.
    Same question shape as game/content/*.js.
    --------------------------------------------------------------- */
 const ALT = (() => {
