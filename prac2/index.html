@@ -205,6 +205,18 @@
   .skin.cur { box-shadow: 0 0 0 4px #ffe81a; }
   .legal { color: rgba(255,255,255,.75); font-size: 12.5px; line-height: 1.45; margin: 16px 4px 0; text-align: center; }
 
+  /* ---- our own 3D art, rendered in Blender (game/art/render.py) ---- */
+  .top h1 img { width: 62px; height: 60px; object-fit: contain; vertical-align: -16px; margin-right: 4px; filter: drop-shadow(0 4px 0 rgba(13,19,48,.8)); animation: bob 3.2s ease-in-out infinite; }
+  .whead { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .whead .isle { width: 132px; height: 150px; object-fit: contain; flex: none; margin: -46px 0 -8px -6px; filter: drop-shadow(0 8px 6px rgba(13,19,48,.45)); animation: bob 4s ease-in-out infinite; }
+  .world:nth-of-type(2n) .isle { animation-delay: -1.3s; } .world:nth-of-type(3n) .isle { animation-delay: -2.6s; }
+  .whead .wtxt { flex: 1; min-width: 0; }
+  .whead p.sub { margin: 2px 0 0; }
+  .world { margin-top: 34px; }
+  .result .big img.crown3d { width: 170px; height: 166px; animation: bob 2.6s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-7px); } }
+  @media (max-width: 520px) { .whead .isle { width: 96px; height: 110px; margin-top: -40px; } .top h1 img { width: 48px; height: 46px; vertical-align: -12px; } }
+
   /* ---- Fortnite time: the reward pie ---- */
   .timecard { background: #0d1330; color: #fff; border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   .pie { --p: 0; width: 132px; height: 132px; border-radius: 50%; flex: none; position: relative;
@@ -832,6 +844,7 @@ const RANKS = [[0, "Rookie"], [100, "Scout"], [250, "Explorer"], [450, "Pathfind
 /* One outfit per rank: [image, name, rarity colour] */
 const SKINS = [["recruit", "Recruit", "#8a94a6"], ["britebomber", "Brite Bomber", "#2f8fff"], ["fishstick", "Fishstick", "#2f8fff"], ["peely", "Peely", "#a34dff"],
   ["cuddle", "Cuddle Team Leader", "#ffb21a"], ["drift", "Drift", "#ffb21a"], ["midas", "Midas", "#ffb21a"]];
+const ISLE = { reading: "world-forest", thinking: "world-peaks", maths: "world-reef" };
 const art = (name, alt, cls = "") => `<img class="${cls}" src="art/${name}.webp" alt="${alt}">`;
 const BADGES = [
   ["first", "🥾", "First steps", "Finish your first level"],
@@ -962,14 +975,15 @@ function showMap() {
       </button>`;
     }).join("");
     return `<section class="world" style="--world:${w.color}">
-      <h2>${w.icon} ${esc(w.name)} ${beaten ? "👑" : ""}<small>${worldStars(w)} / ${regular(w).length * 3} ⭐</small></h2>
-      <p class="sub">${esc(w.blurb)}</p>
+      <div class="whead">${ISLE[w.id] ? art(ISLE[w.id], "", "isle") : ""}<div class="wtxt">
+        <h2>${ISLE[w.id] ? "" : w.icon + " "}${esc(w.name)} ${beaten ? "👑" : ""}<small>${worldStars(w)} / ${regular(w).length * 3} ⭐</small></h2>
+        <p class="sub">${esc(w.blurb)}</p></div></div>
       <div class="path">${nodes}</div>
     </section>`;
   }).join("");
   const crowns = WORLDS.filter(w => best(w.levels[w.levels.length - 1]) > 0).length;
   app.innerHTML = `
-    <div class="top"><h1>👑 Crown <span>Quest</span></h1><span class="spacer"></span>
+    <div class="top"><h1>${art("crown3d", "")}Crown <span>Quest</span></h1><span class="spacer"></span>
       ${ds > 0 ? `<span class="pill">🔥 ${ds}-day streak</span>` : ""}
       <span class="pill">👑 ${crowns} / ${WORLDS.length}</span>
       <button class="pill" id="snd" aria-label="Sound on or off">${S.sound ? "🔊 Sound on" : "🔇 Sound off"}</button></div>
@@ -1106,7 +1120,7 @@ function finish() {
     save();
     const opened = unlockedIds().filter(id => !unlockedBefore.includes(id));
     if (lv.boss) {
-      if (stars) { big = art(p.w.boss.img, "") + "👑"; title = `You defeated ${p.w.boss.name}!`; lines.push(esc(p.w.boss.defeat)); if (!beforeStars) lines.push(`You won the <b>${esc(p.w.crown)}</b>. +100 XP`); SFX.boss(); confetti(260); }
+      if (stars) { big = art(p.w.boss.img, "") + art("crown3d", "A golden crown", "crown3d"); title = `You defeated ${p.w.boss.name}!`; lines.push(esc(p.w.boss.defeat)); if (!beforeStars) lines.push(`You won the <b>${esc(p.w.crown)}</b>. +100 XP`); SFX.boss(); confetti(260); }
       else { big = art(p.w.boss.img, ""); title = `${p.w.boss.name} got away…`; lines.push(`You did ${p.pts} damage out of ${max}. You need ${max - 3} to win. Read the explanations, then come back stronger!`); SFX.wrong(); }
     } else {
       big = stars === 3 ? "🎉" : stars ? "🙂" : "🌱"; title = stars === 3 ? "Perfect level!" : stars === 2 ? "Level cleared!" : stars === 1 ? "Nearly there!" : "Keep training!";
@@ -1124,7 +1138,7 @@ function finish() {
   if (!p.cave && missed) lines.push(`${missed} question${missed > 1 ? "s are" : " is"} waiting in the 💪 Comeback Cave.`);
   newBadges.forEach(b => lines.push(`${b[1]} New badge: <b>${esc(b[2])}</b>`));
   const r = rankOf(S.xp);
-  if (p.rank0 !== undefined && r > p.rank0) { lines.push(`⬆️ New rank: <b>${RANKS[r][1]}</b>! New skin unlocked: <b>${esc(SKINS[r][1])}</b>`); big = art(SKINS[r][0], SKINS[r][1]) + (p.lv.boss && stars ? "👑" : ""); }
+  if (p.rank0 !== undefined && r > p.rank0) { lines.push(`⬆️ New rank: <b>${RANKS[r][1]}</b>! New skin unlocked: <b>${esc(SKINS[r][1])}</b>`); big = art(SKINS[r][0], SKINS[r][1]) + (p.lv.boss && stars ? art("crown3d", "A golden crown", "crown3d") : ""); }
   save();
   app.innerHTML = `<div class="card result"><div class="big">${big}</div><h2>${esc(title)}</h2>
     ${p.cave ? "" : `<div class="stars">${[0, 1, 2].map(i => `<span class="${i < stars ? "on" : ""}">⭐</span>`).join("")}</div>`}

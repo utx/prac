@@ -52,6 +52,7 @@ const html = fs.readFileSync(PAGE, "utf8");
 if (/\bOC\b/.test(html)) bad('the page mentions "OC"');
 if (!/not endorsed by Epic/.test(html)) bad("the Epic fan-content notice is missing");
 for (const m of html.matchAll(/(?:img: "|\[")([a-z]+)"(?=, "[A-Z][^"]*", "#)/g)) if (!fs.existsSync(path.join(ROOT, "prac2", "art", m[1] + ".webp"))) bad(`missing picture prac2/art/${m[1]}.webp`);
+for (const n of ["crown3d", "world-forest", "world-peaks", "world-reef"]) if (!fs.existsSync(path.join(ROOT, "prac2", "art", n + ".webp"))) bad(`missing picture prac2/art/${n}.webp`);
 for (const w of WORLDS) if (!fs.existsSync(path.join(ROOT, "prac2", "art", w.boss.img + ".webp"))) bad(`missing boss picture for ${w.id}`);
 console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
 
