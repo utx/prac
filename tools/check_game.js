@@ -117,6 +117,29 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
     errors.forEach(e => bad(`${label}: page error: ${e}`));
     await ctx.close();
   }
+  /* practice mode (from the admin page): everything open, nothing saved, real progress untouched */
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto("file://" + PAGE);
+    await page.evaluate(() => { localStorage.setItem("prac2.v1", JSON.stringify({ levels: {}, q: {}, xp: 7, badges: {}, days: [], sound: true })); sessionStorage.setItem("prac.admin", "1"); });
+    await page.goto("file://" + PAGE + "?admin=1");
+    if (!(await page.$("#practice-note"))) bad("practice mode: no practice note");
+    if ((await page.$$(".node.locked")).length) bad("practice mode: levels are locked");
+    const boss = WORLDS[2].levels[4];
+    await page.click(`.node[data-l="${boss.id}"]`);
+    for (const q of boss.questions) { await page.click(`.opt[data-i="${q.answer}"]`); await page.click("#next"); }
+    await page.waitForSelector(".result");
+    const kept = JSON.parse(await page.evaluate(() => localStorage.getItem("prac2.v1")));
+    if (kept.xp !== 7 || Object.keys(kept.levels).length) bad("practice mode changed the saved progress");
+    await page.goto("file://" + PAGE + "?admin=1");
+    if (await page.$(".node.boss.beaten")) bad("practice mode kept progress after a reload");
+    await page.evaluate(() => sessionStorage.removeItem("prac.admin"));
+    await page.goto("file://" + PAGE + "?admin=1");
+    if (await page.$("#practice-note")) bad("practice mode opened without the admin PIN");
+    if (!fs.readFileSync(path.join(ROOT, "pracadmin", "index.html"), "utf8").includes("prac2/index.html?admin=1")) bad("the admin page has no practice link to the game");
+    await ctx.close();
+  }
   await browser.close();
   console.log(fail ? `GAME CHECK FAILED (${fail})` : "GAME CHECK PASS");
   process.exit(fail ? 1 : 0);
