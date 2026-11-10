@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crown Quest</title>
+<style>
+  :root {
+    --ink: #1b2a41; --ink-soft: #55627a; --line: #d8dde6; --paper: #ffffff; --field: #f3f5f8;
+    --sky1: #1a1f4b; --sky2: #3b2a7a; --gold: #f5b82e; --gold-deep: #b97f00;
+    --good: #1e8a55; --good-bg: #e2f5ea; --bad: #c0392b; --bad-bg: #fde8e5; --hint-bg: #fff6dc;
+    --world: #2e7d4f;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--sky2); }
+  html, body { margin: 0; min-height: 100%; color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+  body { background: linear-gradient(160deg, var(--sky1), var(--sky2)) fixed; }
+  button { font: inherit; cursor: pointer; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px 16px 80px; }
+
+  /* ---- top bar ---- */
+  .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; color: #fff; margin-bottom: 14px; }
+  .top h1 { font-size: 26px; margin: 0; letter-spacing: .5px; }
+  .top h1 span { color: var(--gold); }
+  .top .spacer { flex: 1; }
+  .pill { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); color: #fff; border-radius: 999px;
+    padding: 5px 12px; font-size: 15px; font-weight: 600; white-space: nowrap; }
+  button.pill:hover { background: rgba(255,255,255,.25); }
+  .rank { background: rgba(255,255,255,.1); border-radius: 12px; padding: 10px 14px; color: #fff; margin-bottom: 16px; }
+  .rank b { color: var(--gold); }
+  .xpbar { height: 10px; background: rgba(255,255,255,.2); border-radius: 999px; overflow: hidden; margin-top: 6px; }
+  .xpbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), #ffe08a); border-radius: 999px; transition: width .6s; }
+
+  /* ---- map ---- */
+  .world { background: var(--paper); border-radius: 16px; padding: 16px 18px 18px; margin-bottom: 16px; border-top: 6px solid var(--world); }
+  .world h2 { margin: 0; font-size: 22px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .world h2 small { font-size: 15px; font-weight: 600; color: var(--ink-soft); margin-left: auto; }
+  .world p.sub { margin: 2px 0 12px; color: var(--ink-soft); font-size: 15px; }
+  .path { display: flex; gap: 6px; align-items: stretch; flex-wrap: wrap; }
+  .node { flex: 1 1 120px; min-width: 104px; background: var(--field); border: 2px solid var(--line); border-radius: 14px;
+    padding: 10px 8px; text-align: center; color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 2px;
+    transition: transform .12s, border-color .12s; }
+  .node:hover { transform: translateY(-2px); border-color: var(--world); }
+  .node .num { width: 44px; height: 44px; border-radius: 50%; background: var(--world); color: #fff; font-weight: 800; font-size: 20px;
+    display: flex; align-items: center; justify-content: center; }
+  .node .nm { font-weight: 700; font-size: 15px; line-height: 1.25; }
+  .node .st { font-size: 17px; letter-spacing: 1px; }
+  .node .st .off { opacity: .22; filter: grayscale(1); }
+  .node .req { font-size: 12.5px; color: var(--ink-soft); line-height: 1.3; }
+  .node.locked { opacity: .72; }
+  .node.locked .num { background: #9aa3b5; }
+  .node.next { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(245,184,46,.35); animation: pulse 1.8s infinite; }
+  .node.boss .num { background: #7a1f3d; font-size: 24px; }
+  .node.boss.beaten .num { background: var(--gold); }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(245,184,46,.12); } }
+  .cave { background: #fff8e6; border: 2px dashed var(--gold-deep); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .cave .txt { flex: 1 1 240px; }
+  .cave b { font-size: 19px; }
+  .btn { background: var(--world); color: #fff; border: 0; border-radius: 10px; padding: 10px 20px; font-weight: 700; font-size: 17px; }
+  .btn:hover { filter: brightness(1.1); }
+  .btn.gold { background: var(--gold); color: #3a2a00; }
+  .btn.ghost { background: none; color: var(--ink-soft); border: 1px solid var(--line); }
+  .shelf { background: var(--paper); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; }
+  .shelf h3 { margin: 0 0 8px; font-size: 18px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge { border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; font-size: 14px; display: flex; gap: 6px; align-items: center; background: var(--field); }
+  .badge.off { opacity: .45; filter: grayscale(1); }
+  .badge i { font-style: normal; font-size: 20px; }
+  details.parents { background: rgba(255,255,255,.92); border-radius: 12px; padding: 10px 16px; font-size: 15px; }
+  details.parents summary { cursor: pointer; font-weight: 600; color: var(--ink-soft); }
+  details.parents table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  details.parents td, details.parents th { border-bottom: 1px solid var(--line); padding: 5px 8px; text-align: left; }
+  details.parents td.n, details.parents th.n { text-align: right; }
+
+  /* ---- play ---- */
+  .playbar { display: flex; align-items: center; gap: 10px; color: #fff; margin-bottom: 12px; flex-wrap: wrap; }
+  .playbar .title { font-weight: 700; font-size: 19px; }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,.25); display: block; }
+  .dots i.cur { background: #fff; }
+  .dots i.p2 { background: var(--gold); } .dots i.p1 { background: #9bd3b4; } .dots i.p0 { background: #e58a7f; }
+  .bossbox { background: rgba(0,0,0,.28); border-radius: 16px; padding: 10px 16px; color: #fff; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .bossbox .face { font-size: 54px; line-height: 1; transition: transform .2s; }
+  .bossbox .face.hit { animation: hit .5s; }
+  .bossbox .face.laugh { animation: laugh .6s; }
+  @keyframes hit { 20% { transform: translateX(-10px) rotate(-12deg) scale(.9); filter: brightness(2); } 60% { transform: translateX(8px) rotate(8deg); } }
+  @keyframes laugh { 30% { transform: scale(1.25) rotate(6deg); } 60% { transform: scale(1.15) rotate(-6deg); } }
+  .bossbox .info { flex: 1; }
+  .bossbox .say { font-size: 15px; opacity: .9; min-height: 22px; }
+  .hp { height: 16px; background: rgba(255,255,255,.2); border-radius: 999px; overflow: hidden; margin: 4px 0; }
+  .hp i { display: block; height: 100%; background: linear-gradient(90deg, #e5484d, #ff8a65); transition: width .6s; }
+  .stage { display: grid; gap: 14px; }
+  .stage.has-passage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  @media (max-width: 820px) { .stage.has-passage { grid-template-columns: minmax(0, 1fr); } }
+  .card { background: var(--paper); border-radius: 16px; padding: 18px 20px; min-width: 0; }
+  .passage h3 { margin: 0 0 4px; font-size: 20px; }
+  .passage .note { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 10px; }
+  .passage p { margin: 0 0 10px; }
+  .passage .poem { white-space: pre-line; font-size: 17px; line-height: 1.6; margin: 0 0 4px; }
+  .passage .extract { border-left: 4px solid var(--world); padding: 2px 0 2px 12px; margin: 0 0 14px; }
+  .passage .extract b.tag { display: block; color: var(--world); }
+  @media (min-width: 821px) { .passage { position: sticky; top: 10px; max-height: calc(100vh - 20px); overflow: auto; } }
+  .qhead { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--ink-soft); font-weight: 600; margin-bottom: 6px; }
+  .stem { font-size: 18px; }
+  .stem p { margin: 0 0 10px; }
+  .stem .box { background: var(--field); border-left: 4px solid var(--world); border-radius: 6px; padding: 10px 14px; margin: 0 0 10px; }
+  .stem .gapline { font-size: 19px; background: var(--field); border-radius: 8px; padding: 12px 14px; margin: 0 0 10px; }
+  .stem .gapw { display: inline-block; min-width: 70px; border-bottom: 3px solid var(--ink); }
+  .figure { margin: 10px 0; text-align: center; overflow-x: auto; }
+  .figure svg, .opt svg { max-width: 100%; height: auto; }
+  table.grid { border-collapse: collapse; margin: 8px auto; font-size: 17px; }
+  table.grid th, table.grid td { border: 1.5px solid var(--ink-soft); padding: 6px 12px; text-align: center; }
+  table.grid th { background: var(--field); }
+  .opts { display: grid; gap: 9px; margin-top: 14px; }
+  .opts.visual { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .opt { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--paper); border: 2px solid var(--line);
+    border-radius: 12px; padding: 10px 14px; color: var(--ink); font-size: 17px; width: 100%; transition: border-color .1s, background .1s; }
+  .opt:hover:not(:disabled) { border-color: var(--world); background: var(--field); }
+  .opt:disabled { cursor: default; }
+  .opt .let { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--field); border: 1.5px solid var(--line);
+    font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .opt.right { border-color: var(--good); background: var(--good-bg); }
+  .opt.right .let { background: var(--good); color: #fff; border-color: var(--good); }
+  .opt.wrong { border-color: var(--bad); background: var(--bad-bg); opacity: .8; animation: shake .35s; }
+  .opt.wrong .let { background: var(--bad); color: #fff; border-color: var(--bad); }
+  .opt.dim { opacity: .55; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .fb { margin-top: 14px; border-radius: 12px; padding: 12px 16px; }
+  .fb.hint { background: var(--hint-bg); border: 1.5px solid var(--gold); }
+  .fb.good { background: var(--good-bg); border: 1.5px solid var(--good); }
+  .fb.miss { background: var(--field); border: 1.5px solid var(--line); }
+  .fb h4 { margin: 0 0 4px; font-size: 18px; }
+  .fb p { margin: 0 0 8px; } .fb p:last-child { margin: 0; }
+  .fb .why-not { color: var(--ink-soft); }
+  .next { margin-top: 14px; display: flex; justify-content: flex-end; }
+  .combo { position: fixed; left: 50%; bottom: 76px; transform: translateX(-50%); background: #ff7a1a; color: #fff; font-weight: 800;
+    font-size: 24px; padding: 10px 22px; border-radius: 999px; z-index: 30; pointer-events: none; animation: pop 1.6s forwards; white-space: nowrap; }
+  @keyframes pop { 0% { opacity: 0; transform: translate(-50%, 20px) scale(.6); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -30px); } }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #111a; background: rgba(15,20,40,.94); color: #fff;
+    padding: 10px 18px; border-radius: 12px; z-index: 30; max-width: 90vw; text-align: center; }
+
+  /* ---- result ---- */
+  .result { text-align: center; padding: 28px 20px; }
+  .result .big { font-size: 64px; line-height: 1.1; }
+  .result h2 { font-size: 28px; margin: 6px 0; }
+  .result .stars { font-size: 46px; letter-spacing: 6px; }
+  .result .stars span { display: inline-block; opacity: .2; filter: grayscale(1); }
+  .result .stars span.on { opacity: 1; filter: none; animation: starin .5s backwards; }
+  .result .stars span.on:nth-child(2) { animation-delay: .25s; } .result .stars span.on:nth-child(3) { animation-delay: .5s; }
+  @keyframes starin { 0% { transform: scale(0) rotate(-90deg); } 70% { transform: scale(1.3); } }
+  .result .lines { margin: 12px auto; max-width: 460px; text-align: left; }
+  .result .lines div { padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .result .acts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+  @media (max-width: 520px) { .wrap { padding: 12px 12px 70px; } .top h1 { font-size: 22px; } .card { padding: 14px; } .opts.visual { gap: 6px; } .opt { padding: 9px 10px; gap: 9px; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<canvas id="confetti" hidden></canvas>
+<div class="wrap" id="app"></div>
+<script>
+const INK = "#1b2a41";
+const WORLDS = [];
+/*__CONTENT__*/
+</script>
+<script>
+(() => {
+"use strict";
+const KEY = "prac2.v1";
+const LETTERS = "ABCDE";
+const RANKS = [[0, "Rookie"], [100, "Scout"], [250, "Explorer"], [450, "Pathfinder"], [700, "Champion"], [1000, "Hero"], [1300, "Legend"]];
+const BADGES = [
+  ["first", "🥾", "First steps", "Finish your first level"],
+  ["three", "🌟", "Three stars", "Get 3 stars on a level"],
+  ["streak5", "🔥", "On fire", "5 right first time in a row"],
+  ["streak10", "☄️", "Unstoppable", "10 right first time in a row"],
+  ["comeback", "💪", "Comeback kid", "Beat a question that beat you before"],
+  ["days3", "📅", "Three days running", "Play 3 days in a row"],
+  ["days7", "🗓️", "A whole week", "Play 7 days in a row"],
+  ...WORLDS.map(w => ["boss_" + w.id, "👑", w.crown, "Defeat " + w.boss.name]),
+  ["perfect", "💎", "Flawless", "Defeat a boss without a single miss"],
+  ["all", "🏆", "Triple crown", "Win all three crowns"],
+];
+const app = document.getElementById("app");
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ---------- saved progress ---------- */
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.levels) return Object.assign({ levels: {}, q: {}, xp: 0, badges: {}, days: [], sound: true }, s); } catch (e) {}
+  return { levels: {}, q: {}, xp: 0, badges: {}, days: [], sound: true };
+}
+let S = load();
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+function dayStreak() {
+  const set = new Set(S.days); let n = 0; const d = new Date();
+  if (!set.has(today())) d.setDate(d.getDate() - 1);
+  for (;;) { const k = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); if (!set.has(k)) break; n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+
+/* ---------- rules ---------- */
+const best = lv => (S.levels[lv.id] || {}).stars || 0;
+const regular = w => w.levels.filter(l => !l.boss);
+const worldStars = w => regular(w).reduce((a, l) => a + best(l), 0);
+const BOSS_GATE = 9;
+function starsFor(lv, pts) {
+  const max = lv.questions.length * 2;
+  if (lv.boss) return pts >= max ? 3 : pts >= max - 2 ? 2 : pts >= max - 3 ? 1 : 0;
+  return pts >= max - 1 ? 3 : pts >= max - 3 ? 2 : pts >= max - 5 ? 1 : 0;
+}
+function lockReason(w, i) {
+  const lv = w.levels[i];
+  if (lv.boss) { const s = worldStars(w); return s >= BOSS_GATE ? "" : `Collect ${BOSS_GATE} ⭐ in ${w.name} to wake the boss (you have ${s})`; }
+  if (i === 0 || best(w.levels[i - 1]) >= 2) return "";
+  return `Get 2 ⭐ on “${w.levels[i - 1].name}” to unlock`;
+}
+const rankOf = xp => { let r = 0; RANKS.forEach((x, i) => { if (xp >= x[0]) r = i; }); return r; };
+const allQuestions = () => WORLDS.flatMap(w => w.levels.flatMap(l => l.questions.map(q => ({ q, lv: l, w }))));
+const caveList = () => allQuestions().filter(x => S.q[x.q.id] && S.q[x.q.id].seen && (S.q[x.q.id].best || 0) < 2);
+
+/* ---------- sound and sparkle ---------- */
+let actx = null;
+function tone(freqs, dur = 0.12, type = "triangle", gain = 0.12) {
+  if (!S.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * dur;
+      o.type = type; o.frequency.value = f; g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur * 1.6);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur * 1.7);
+    });
+  } catch (e) {}
+}
+const SFX = { right: () => tone([523, 784]), retry: () => tone([392, 587]), wrong: () => tone([196, 147], 0.16, "sawtooth", 0.07),
+  win: () => tone([523, 659, 784, 1047], 0.14), boss: () => tone([392, 523, 659, 784, 1047, 1319], 0.15), hit: () => tone([150, 90], 0.1, "square", 0.08) };
+function confetti(n = 140) {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.getElementById("confetti"), x = c.getContext("2d");
+  c.hidden = false; c.width = innerWidth; c.height = innerHeight;
+  const cols = ["#f5b82e", "#ff6b6b", "#4dabf7", "#51cf66", "#cc5de8", "#fff"];
+  const ps = Array.from({ length: n }, () => ({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5, vx: (Math.random() - .5) * 4, vy: 2 + Math.random() * 4, s: 5 + Math.random() * 7, c: cols[Math.floor(Math.random() * cols.length)], r: Math.random() * 6 }));
+  let t = 0;
+  (function step() {
+    x.clearRect(0, 0, c.width, c.height);
+    ps.forEach(p => { p.x += p.vx; p.y += p.vy; p.r += .15; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * .6); x.restore(); });
+    if (++t < 170) requestAnimationFrame(step); else c.hidden = true;
+  })();
+}
+function flash(cls, text, ms = 1700) { const d = document.createElement("div"); d.className = cls; d.textContent = text; document.body.appendChild(d); setTimeout(() => d.remove(), ms); }
+function award(id) { if (S.badges[id]) return false; S.badges[id] = today(); const b = BADGES.find(b => b[0] === id); if (b) newBadges.push(b); return true; }
+let newBadges = [];
+let streak = 0;
+
+/* ---------- the map ---------- */
+const starRow = (n, of = 3) => Array.from({ length: of }, (_, i) => `<span class="${i < n ? "" : "off"}">⭐</span>`).join("");
+function showMap() {
+  play = null;
+  const r = rankOf(S.xp), nextAt = RANKS[r + 1] ? RANKS[r + 1][0] : null, base = RANKS[r][0];
+  const pct = nextAt ? Math.round(100 * (S.xp - base) / (nextAt - base)) : 100;
+  const ds = dayStreak(), cave = caveList();
+  let nextMarked = false;
+  const worlds = WORLDS.map(w => {
+    const beaten = best(w.levels[w.levels.length - 1]) > 0;
+    const nodes = w.levels.map((lv, i) => {
+      const why = lockReason(w, i), b = best(lv);
+      const isNext = !why && b === 0 && !nextMarked && (nextMarked = true);
+      return `<button class="node${why ? " locked" : ""}${lv.boss ? " boss" : ""}${lv.boss && b ? " beaten" : ""}${isNext ? " next" : ""}" data-w="${w.id}" data-l="${lv.id}" ${why ? `data-why="${esc(why)}"` : ""}>
+        <span class="num">${why ? "🔒" : lv.boss ? (b ? "👑" : w.boss.emoji) : i + 1}</span>
+        <span class="nm">${esc(lv.boss ? w.boss.name : lv.name)}</span>
+        ${why ? `<span class="req">${esc(lv.boss ? `Needs ${BOSS_GATE} ⭐` : "Locked")}</span>` : `<span class="st">${starRow(b)}</span>`}
+      </button>`;
+    }).join("");
+    return `<section class="world" style="--world:${w.color}">
+      <h2>${w.icon} ${esc(w.name)} ${beaten ? "👑" : ""}<small>${worldStars(w)} / ${regular(w).length * 3} ⭐</small></h2>
+      <p class="sub">${esc(w.blurb)}</p>
+      <div class="path">${nodes}</div>
+    </section>`;
+  }).join("");
+  const crowns = WORLDS.filter(w => best(w.levels[w.levels.length - 1]) > 0).length;
+  app.innerHTML = `
+    <div class="top"><h1>👑 Crown <span>Quest</span></h1><span class="spacer"></span>
+      ${ds > 0 ? `<span class="pill">🔥 ${ds}-day streak</span>` : ""}
+      <span class="pill">👑 ${crowns} / ${WORLDS.length}</span>
+      <button class="pill" id="snd" aria-label="Sound on or off">${S.sound ? "🔊 Sound on" : "🔇 Sound off"}</button></div>
+    <div class="rank">Rank: <b>${RANKS[r][1]}</b> · ${S.xp} XP ${nextAt ? `<span style="opacity:.8">· ${nextAt - S.xp} XP to ${RANKS[r + 1][1]}</span>` : "· top rank!"}
+      <div class="xpbar"><i style="width:${pct}%"></i></div></div>
+    ${cave.length ? `<div class="cave"><div class="txt"><b>💪 Comeback Cave</b><br>${cave.length} question${cave.length > 1 ? "s" : ""} got away from you. Come back and beat ${cave.length > 1 ? "them" : "it"} for bonus XP!</div>
+      <button class="btn gold" id="cave">Enter the cave</button></div>` : ""}
+    ${worlds}
+    <div class="shelf"><h3>Badges (${Object.keys(S.badges).length} / ${BADGES.length})</h3>
+      <div class="badges">${BADGES.map(b => `<span class="badge${S.badges[b[0]] ? "" : " off"}" title="${esc(b[3])}"><i>${b[1]}</i><span><b>${esc(b[2])}</b><br><small>${esc(b[3])}</small></span></span>`).join("")}</div></div>
+    ${parents()}`;
+  $("#snd").onclick = () => { S.sound = !S.sound; save(); showMap(); if (S.sound) SFX.right(); };
+  if ($("#cave")) $("#cave").onclick = startCave;
+  app.querySelectorAll(".node").forEach(n => n.onclick = () => {
+    if (n.dataset.why) { flash("toast", "🔒 " + n.dataset.why, 2600); SFX.wrong(); return; }
+    const w = WORLDS.find(w => w.id === n.dataset.w); startLevel(w, w.levels.find(l => l.id === n.dataset.l));
+  });
+  const reset = $("#reset");
+  if (reset) reset.onclick = () => { if (confirm("Wipe ALL progress in this game on this device? This can't be undone.")) { localStorage.removeItem(KEY); S = load(); showMap(); } };
+  window.scrollTo(0, 0);
+}
+function parents() {
+  const rows = {};
+  allQuestions().forEach(({ q, w }) => {
+    const k = w.name + " · " + q.cat, r = rows[k] = rows[k] || { n: 0, seen: 0, first: 0, second: 0 }, s = S.q[q.id];
+    r.n++; if (s && s.seen) { r.seen++; if (s.first === 2) r.first++; else if (s.first === 1) r.second++; }
+  });
+  return `<details class="parents"><summary>For grown-ups: progress by question type</summary>
+    <p>“Right first time” counts the very first attempt at each question. Progress is saved in this browser on this device only.</p>
+    <table><tr><th>Question type</th><th class="n">Tried</th><th class="n">Right first time</th><th class="n">Right after a hint</th></tr>
+    ${Object.entries(rows).map(([k, r]) => `<tr><td>${esc(k)}</td><td class="n">${r.seen} of ${r.n}</td><td class="n">${r.first}</td><td class="n">${r.second}</td></tr>`).join("")}</table>
+    <button class="btn ghost" id="reset">Reset all progress…</button></details>`;
+}
+
+/* ---------- playing a level ---------- */
+let play = null;
+function startLevel(w, lv) { play = { w, lv, items: lv.questions.map(q => ({ q, lv })), idx: 0, pts: 0, res: [], cave: false }; begin(); }
+function startCave() {
+  const items = caveList().slice(0, 5).map(x => ({ q: x.q, lv: x.lv, w: x.w }));
+  play = { w: { name: "Comeback Cave", color: "#b97f00" }, lv: { id: "cave", name: "Comeback Cave" }, items, idx: 0, pts: 0, res: [], cave: true }; begin();
+}
+function begin() {
+  newBadges = []; play.rank0 = rankOf(S.xp);
+  const t = today(); if (!S.days.includes(t)) { S.days.push(t); S.days = S.days.slice(-60); save(); }
+  showQuestion();
+}
+function showQuestion() {
+  const p = play, it = p.items[p.idx], q = it.q, lv = it.lv, boss = p.lv.boss;
+  p.tries = 0; p.done = false;
+  document.querySelectorAll(".combo").forEach(c => c.remove());
+  const max = p.items.length * 2;
+  const passage = lv.passage ? `<div class="card passage"><h3>${lv.passage.title}</h3>${lv.passage.note ? `<p class="note">${lv.passage.note}</p>` : ""}${lv.passage.html}</div>` : "";
+  app.innerHTML = `
+    <div class="playbar"><button class="pill" id="quit">← Map</button><span class="title">${esc(p.w.name)} · ${esc(boss ? p.w.boss.name : p.lv.name)}</span><span class="spacer" style="flex:1"></span>
+      <span class="dots">${p.items.map((_, i) => `<i class="${i < p.idx ? "p" + p.res[i] : i === p.idx ? "cur" : ""}"></i>`).join("")}</span><span class="pill" id="gems">💎 ${p.pts}</span></div>
+    ${boss ? `<div class="bossbox"><div class="face" id="face">${p.w.boss.emoji}</div><div class="info"><b>${esc(p.w.boss.name)}</b>
+      <div class="hp"><i id="hp" style="width:${100 * (max - p.pts) / max}%"></i></div><div class="say" id="say">${esc(p.idx === 0 ? p.w.boss.taunt : "Is that all you've got?")}</div></div></div>` : ""}
+    <div class="stage${passage ? " has-passage" : ""}" style="--world:${p.w.color}">${passage}
+      <div class="card"><div class="qhead"><span>Question ${p.idx + 1} of ${p.items.length}</span><span>${esc(q.cat)}</span></div>
+        <div class="stem">${q.stem}</div>
+        <div class="opts${q.visual ? " visual" : ""}" id="opts">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><span class="let">${LETTERS[i]}</span><span>${o}</span></button>`).join("")}</div>
+        <div id="fb" aria-live="polite"></div></div></div>`;
+  $("#quit").onclick = () => { if (p.idx === 0 && p.tries === 0 || confirm("Leave this level? Your stars for this try won't be saved.")) showMap(); };
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => choose(Number(b.dataset.i), b));
+  window.scrollTo(0, 0);
+}
+function choose(i, btn) {
+  const p = play, it = p.items[p.idx], q = it.q;
+  if (p.done || btn.disabled) return;
+  p.tries++;
+  const right = i === q.answer, fb = $("#fb"), boss = p.lv.boss;
+  if (!right && p.tries === 1) {
+    btn.classList.add("wrong"); btn.disabled = true; SFX.wrong(); streak = 0;
+    if (boss) { const f = $("#face"); f.classList.remove("laugh"); void f.offsetWidth; f.classList.add("laugh"); $("#say").textContent = "Ha! Not quite…"; }
+    fb.innerHTML = `<div class="fb hint"><h4>💡 Not yet. Here's a hint</h4><p>${q.hint}</p><p><b>Have another go.</b></p></div>`;
+    return;
+  }
+  p.done = true;
+  const pts = right ? (p.tries === 1 ? 2 : 1) : 0;
+  p.pts += pts; p.res[p.idx] = pts;
+  app.querySelectorAll(".opt").forEach(b => { b.disabled = true; const j = Number(b.dataset.i); if (j === q.answer) b.classList.add("right"); else if (j === i) b.classList.add("wrong"); else b.classList.add("dim"); });
+  $("#gems").textContent = "💎 " + p.pts;
+  /* remember how this question went */
+  const s = S.q[q.id] = S.q[q.id] || { seen: 0, best: 0 };
+  const before = s.best || 0, wasMissed = s.seen > 0 && before < 2;
+  if (!s.seen) s.first = pts;
+  s.seen++; s.best = Math.max(before, pts);
+  let gain = Math.max(0, pts - before) * 10 + (pts ? 1 : 0);
+  if (pts === 2 && wasMissed) { gain += 10; award("comeback"); }
+  S.xp += gain;
+  if (pts === 2) { streak++; if (streak === 5) award("streak5"); if (streak === 10) award("streak10"); } else streak = 0;
+  save();
+  if (boss && pts) { const f = $("#face"); f.classList.remove("hit"); void f.offsetWidth; f.classList.add("hit"); $("#hp").style.width = (100 * (p.items.length * 2 - p.pts) / (p.items.length * 2)) + "%"; $("#say").textContent = pts === 2 ? "Ouch! A direct hit!" : "Oof… that one grazed me."; SFX.hit(); }
+  if (pts === 2) { SFX.right(); if (streak >= 3) flash("combo", `🔥 ${streak} in a row!`); } else if (pts === 1) SFX.retry(); else SFX.wrong();
+  const head = pts === 2 ? (wasMissed ? "💪 You beat it this time! +2 💎" : "✅ Right first time! +2 💎") : pts === 1 ? "👍 Got it on the second go. +1 💎" : "This one got away. Here's how it works";
+  const last = p.idx === p.items.length - 1;
+  fb.innerHTML = `<div class="fb ${pts ? "good" : "miss"}"><h4>${head}</h4>${q.explain}${pts < 2 ? `<p><b>${p.cave ? "It stays in the Comeback Cave until you get it first time." : "You'll meet this one again in the Comeback Cave."}</b></p>` : ""}</div>
+    <div class="next"><button class="btn" id="next" style="background:${p.w.color}">${last ? "Finish →" : "Next question →"}</button></div>`;
+  $("#next").onclick = () => { if (last) finish(); else { p.idx++; showQuestion(); } };
+  $("#next").scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+function finish() {
+  const p = play, lv = p.lv, n = p.items.length, max = n * 2;
+  const lines = [];
+  let stars = 0, title, big;
+  if (p.cave) {
+    const beat = p.res.filter(r => r === 2).length, left = caveList().length;
+    big = beat === n ? "💪" : "🕯️"; title = beat ? `You beat ${beat} of ${n}!` : "They got away again";
+    lines.push(left ? `${left} question${left > 1 ? "s" : ""} still hiding in the cave.` : "The cave is empty. Every question you have met is beaten!");
+    if (beat) { SFX.win(); if (beat === n) confetti(90); }
+  } else {
+    stars = starsFor(lv, p.pts);
+    const rec = S.levels[lv.id] = S.levels[lv.id] || { stars: 0, pts: 0, plays: 0 };
+    const beforeStars = rec.stars, unlockedBefore = unlockedIds();
+    rec.plays++; rec.pts = Math.max(rec.pts, p.pts);
+    if (stars > beforeStars) { S.xp += (stars - beforeStars) * 10 + (lv.boss && !beforeStars ? 100 : 0); rec.stars = stars; }
+    award("first"); if (stars === 3 && !lv.boss) award("three");
+    if (lv.boss && stars) { award("boss_" + p.w.id); if (p.pts === max) award("perfect"); if (WORLDS.every(w => best(w.levels[w.levels.length - 1]) > 0)) award("all"); }
+    const ds = dayStreak(); if (ds >= 3) award("days3"); if (ds >= 7) award("days7");
+    save();
+    const opened = unlockedIds().filter(id => !unlockedBefore.includes(id));
+    if (lv.boss) {
+      if (stars) { big = "👑"; title = `You defeated ${p.w.boss.name}!`; lines.push(esc(p.w.boss.defeat)); if (!beforeStars) lines.push(`You won the <b>${esc(p.w.crown)}</b>. +100 XP`); SFX.boss(); confetti(260); }
+      else { big = p.w.boss.emoji; title = `${p.w.boss.name} got away…`; lines.push(`You did ${p.pts} damage out of ${max}. You need ${max - 3} to win. Read the explanations, then come back stronger!`); SFX.wrong(); }
+    } else {
+      big = stars === 3 ? "🎉" : stars ? "🙂" : "🌱"; title = stars === 3 ? "Perfect level!" : stars === 2 ? "Level cleared!" : stars === 1 ? "Nearly there!" : "Keep training!";
+      lines.push(`You scored ${p.pts} of ${max} 💎.`);
+      if (stars < 2) lines.push("You need 2 ⭐ to unlock the next level. Have another go: you've seen how each one works now.");
+      else if (stars === 2 && rec.stars < 3) lines.push("Play again and get every question first time for 3 ⭐.");
+      if (stars >= 2) { SFX.win(); if (stars === 3) confetti(); }
+    }
+    opened.forEach(id => { const x = findLevel(id); lines.push(`🔓 Unlocked: <b>${esc(x.lv.boss ? x.w.boss.name + " (boss!)" : x.lv.name)}</b>`); });
+    if (!lv.boss && !opened.length && stars >= 2) { const s = worldStars(p.w); if (s < BOSS_GATE && lockReason(p.w, p.w.levels.length - 1) && regular(p.w).every(l => best(l) >= 2)) lines.push(`You have ${s} ⭐ here. Get ${BOSS_GATE} ⭐ to wake the boss: replay a level for 3 ⭐.`); }
+  }
+  const missed = p.res.filter(r => r < 2).length;
+  if (!p.cave && missed) lines.push(`${missed} question${missed > 1 ? "s are" : " is"} waiting in the 💪 Comeback Cave.`);
+  newBadges.forEach(b => lines.push(`${b[1]} New badge: <b>${esc(b[2])}</b>`));
+  const r = rankOf(S.xp);
+  if (p.rank0 !== undefined && r > p.rank0) lines.push(`⬆️ New rank: <b>${RANKS[r][1]}</b>!`);
+  save();
+  app.innerHTML = `<div class="card result"><div class="big">${big}</div><h2>${esc(title)}</h2>
+    ${p.cave ? "" : `<div class="stars">${[0, 1, 2].map(i => `<span class="${i < stars ? "on" : ""}">⭐</span>`).join("")}</div>`}
+    <div class="lines">${lines.map(l => `<div>${l}</div>`).join("")}</div>
+    <div class="acts"><button class="btn ghost" id="again">Play again</button><button class="btn" id="map" style="background:${p.w.color}">Back to the map →</button></div></div>`;
+  $("#map").onclick = showMap;
+  $("#again").onclick = () => { if (p.cave) { if (caveList().length) startCave(); else showMap(); } else startLevel(p.w, lv); };
+  window.scrollTo(0, 0);
+}
+const unlockedIds = () => WORLDS.flatMap(w => w.levels.filter((l, i) => !lockReason(w, i)).map(l => l.id));
+const findLevel = id => { for (const w of WORLDS) { const lv = w.levels.find(l => l.id === id); if (lv) return { w, lv }; } };
+showMap();
+})();
+</script>
+</body>
+</html>

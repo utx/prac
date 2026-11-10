@@ -27,6 +27,9 @@ Short practice papers, each with 3 reading, 3 thinking skills and 3 maths questi
 | `tools/question_sheet.js` | Makes an answer-free text copy of a test for independent checking. |
 | `.claude/skills/new-test/` | Step-by-step procedure Claude follows to build a new test. |
 | `tools/check_render.js` | Answers every question at desktop and phone widths, checks 9/9, sideways scrolling and page errors. |
+| `prac2/index.html` | **Crown Quest**, the adventure game (levels, stars, bosses). **Generated**; separate from the tests. |
+| `game/template.html`, `game/content/*.js` | The game's engine and its questions (one file per world). |
+| `tools/build_game.py`, `tools/check_game.js` | Build the game (also run by `tools/build.py`) and check it end to end. |
 
 ## Adding a new test
 

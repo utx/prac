@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crown Quest</title>
+<style>
+  :root {
+    --ink: #1b2a41; --ink-soft: #55627a; --line: #d8dde6; --paper: #ffffff; --field: #f3f5f8;
+    --sky1: #1a1f4b; --sky2: #3b2a7a; --gold: #f5b82e; --gold-deep: #b97f00;
+    --good: #1e8a55; --good-bg: #e2f5ea; --bad: #c0392b; --bad-bg: #fde8e5; --hint-bg: #fff6dc;
+    --world: #2e7d4f;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--sky2); }
+  html, body { margin: 0; min-height: 100%; color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+  body { background: linear-gradient(160deg, var(--sky1), var(--sky2)) fixed; }
+  button { font: inherit; cursor: pointer; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px 16px 80px; }
+
+  /* ---- top bar ---- */
+  .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; color: #fff; margin-bottom: 14px; }
+  .top h1 { font-size: 26px; margin: 0; letter-spacing: .5px; }
+  .top h1 span { color: var(--gold); }
+  .top .spacer { flex: 1; }
+  .pill { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); color: #fff; border-radius: 999px;
+    padding: 5px 12px; font-size: 15px; font-weight: 600; white-space: nowrap; }
+  button.pill:hover { background: rgba(255,255,255,.25); }
+  .rank { background: rgba(255,255,255,.1); border-radius: 12px; padding: 10px 14px; color: #fff; margin-bottom: 16px; }
+  .rank b { color: var(--gold); }
+  .xpbar { height: 10px; background: rgba(255,255,255,.2); border-radius: 999px; overflow: hidden; margin-top: 6px; }
+  .xpbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), #ffe08a); border-radius: 999px; transition: width .6s; }
+
+  /* ---- map ---- */
+  .world { background: var(--paper); border-radius: 16px; padding: 16px 18px 18px; margin-bottom: 16px; border-top: 6px solid var(--world); }
+  .world h2 { margin: 0; font-size: 22px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .world h2 small { font-size: 15px; font-weight: 600; color: var(--ink-soft); margin-left: auto; }
+  .world p.sub { margin: 2px 0 12px; color: var(--ink-soft); font-size: 15px; }
+  .path { display: flex; gap: 6px; align-items: stretch; flex-wrap: wrap; }
+  .node { flex: 1 1 120px; min-width: 104px; background: var(--field); border: 2px solid var(--line); border-radius: 14px;
+    padding: 10px 8px; text-align: center; color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 2px;
+    transition: transform .12s, border-color .12s; }
+  .node:hover { transform: translateY(-2px); border-color: var(--world); }
+  .node .num { width: 44px; height: 44px; border-radius: 50%; background: var(--world); color: #fff; font-weight: 800; font-size: 20px;
+    display: flex; align-items: center; justify-content: center; }
+  .node .nm { font-weight: 700; font-size: 15px; line-height: 1.25; }
+  .node .st { font-size: 17px; letter-spacing: 1px; }
+  .node .st .off { opacity: .22; filter: grayscale(1); }
+  .node .req { font-size: 12.5px; color: var(--ink-soft); line-height: 1.3; }
+  .node.locked { opacity: .72; }
+  .node.locked .num { background: #9aa3b5; }
+  .node.next { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(245,184,46,.35); animation: pulse 1.8s infinite; }
+  .node.boss .num { background: #7a1f3d; font-size: 24px; }
+  .node.boss.beaten .num { background: var(--gold); }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(245,184,46,.12); } }
+  .cave { background: #fff8e6; border: 2px dashed var(--gold-deep); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .cave .txt { flex: 1 1 240px; }
+  .cave b { font-size: 19px; }
+  .btn { background: var(--world); color: #fff; border: 0; border-radius: 10px; padding: 10px 20px; font-weight: 700; font-size: 17px; }
+  .btn:hover { filter: brightness(1.1); }
+  .btn.gold { background: var(--gold); color: #3a2a00; }
+  .btn.ghost { background: none; color: var(--ink-soft); border: 1px solid var(--line); }
+  .shelf { background: var(--paper); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; }
+  .shelf h3 { margin: 0 0 8px; font-size: 18px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge { border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; font-size: 14px; display: flex; gap: 6px; align-items: center; background: var(--field); }
+  .badge.off { opacity: .45; filter: grayscale(1); }
+  .badge i { font-style: normal; font-size: 20px; }
+  details.parents { background: rgba(255,255,255,.92); border-radius: 12px; padding: 10px 16px; font-size: 15px; }
+  details.parents summary { cursor: pointer; font-weight: 600; color: var(--ink-soft); }
+  details.parents table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  details.parents td, details.parents th { border-bottom: 1px solid var(--line); padding: 5px 8px; text-align: left; }
+  details.parents td.n, details.parents th.n { text-align: right; }
+
+  /* ---- play ---- */
+  .playbar { display: flex; align-items: center; gap: 10px; color: #fff; margin-bottom: 12px; flex-wrap: wrap; }
+  .playbar .title { font-weight: 700; font-size: 19px; }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,.25); display: block; }
+  .dots i.cur { background: #fff; }
+  .dots i.p2 { background: var(--gold); } .dots i.p1 { background: #9bd3b4; } .dots i.p0 { background: #e58a7f; }
+  .bossbox { background: rgba(0,0,0,.28); border-radius: 16px; padding: 10px 16px; color: #fff; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .bossbox .face { font-size: 54px; line-height: 1; transition: transform .2s; }
+  .bossbox .face.hit { animation: hit .5s; }
+  .bossbox .face.laugh { animation: laugh .6s; }
+  @keyframes hit { 20% { transform: translateX(-10px) rotate(-12deg) scale(.9); filter: brightness(2); } 60% { transform: translateX(8px) rotate(8deg); } }
+  @keyframes laugh { 30% { transform: scale(1.25) rotate(6deg); } 60% { transform: scale(1.15) rotate(-6deg); } }
+  .bossbox .info { flex: 1; }
+  .bossbox .say { font-size: 15px; opacity: .9; min-height: 22px; }
+  .hp { height: 16px; background: rgba(255,255,255,.2); border-radius: 999px; overflow: hidden; margin: 4px 0; }
+  .hp i { display: block; height: 100%; background: linear-gradient(90deg, #e5484d, #ff8a65); transition: width .6s; }
+  .stage { display: grid; gap: 14px; }
+  .stage.has-passage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  @media (max-width: 820px) { .stage.has-passage { grid-template-columns: minmax(0, 1fr); } }
+  .card { background: var(--paper); border-radius: 16px; padding: 18px 20px; min-width: 0; }
+  .passage h3 { margin: 0 0 4px; font-size: 20px; }
+  .passage .note { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 10px; }
+  .passage p { margin: 0 0 10px; }
+  .passage .poem { white-space: pre-line; font-size: 17px; line-height: 1.6; margin: 0 0 4px; }
+  .passage .extract { border-left: 4px solid var(--world); padding: 2px 0 2px 12px; margin: 0 0 14px; }
+  .passage .extract b.tag { display: block; color: var(--world); }
+  @media (min-width: 821px) { .passage { position: sticky; top: 10px; max-height: calc(100vh - 20px); overflow: auto; } }
+  .qhead { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--ink-soft); font-weight: 600; margin-bottom: 6px; }
+  .stem { font-size: 18px; }
+  .stem p { margin: 0 0 10px; }
+  .stem .box { background: var(--field); border-left: 4px solid var(--world); border-radius: 6px; padding: 10px 14px; margin: 0 0 10px; }
+  .stem .gapline { font-size: 19px; background: var(--field); border-radius: 8px; padding: 12px 14px; margin: 0 0 10px; }
+  .stem .gapw { display: inline-block; min-width: 70px; border-bottom: 3px solid var(--ink); }
+  .figure { margin: 10px 0; text-align: center; overflow-x: auto; }
+  .figure svg, .opt svg { max-width: 100%; height: auto; }
+  table.grid { border-collapse: collapse; margin: 8px auto; font-size: 17px; }
+  table.grid th, table.grid td { border: 1.5px solid var(--ink-soft); padding: 6px 12px; text-align: center; }
+  table.grid th { background: var(--field); }
+  .opts { display: grid; gap: 9px; margin-top: 14px; }
+  .opts.visual { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .opt { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--paper); border: 2px solid var(--line);
+    border-radius: 12px; padding: 10px 14px; color: var(--ink); font-size: 17px; width: 100%; transition: border-color .1s, background .1s; }
+  .opt:hover:not(:disabled) { border-color: var(--world); background: var(--field); }
+  .opt:disabled { cursor: default; }
+  .opt .let { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--field); border: 1.5px solid var(--line);
+    font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .opt.right { border-color: var(--good); background: var(--good-bg); }
+  .opt.right .let { background: var(--good); color: #fff; border-color: var(--good); }
+  .opt.wrong { border-color: var(--bad); background: var(--bad-bg); opacity: .8; animation: shake .35s; }
+  .opt.wrong .let { background: var(--bad); color: #fff; border-color: var(--bad); }
+  .opt.dim { opacity: .55; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .fb { margin-top: 14px; border-radius: 12px; padding: 12px 16px; }
+  .fb.hint { background: var(--hint-bg); border: 1.5px solid var(--gold); }
+  .fb.good { background: var(--good-bg); border: 1.5px solid var(--good); }
+  .fb.miss { background: var(--field); border: 1.5px solid var(--line); }
+  .fb h4 { margin: 0 0 4px; font-size: 18px; }
+  .fb p { margin: 0 0 8px; } .fb p:last-child { margin: 0; }
+  .fb .why-not { color: var(--ink-soft); }
+  .next { margin-top: 14px; display: flex; justify-content: flex-end; }
+  .combo { position: fixed; left: 50%; bottom: 76px; transform: translateX(-50%); background: #ff7a1a; color: #fff; font-weight: 800;
+    font-size: 24px; padding: 10px 22px; border-radius: 999px; z-index: 30; pointer-events: none; animation: pop 1.6s forwards; white-space: nowrap; }
+  @keyframes pop { 0% { opacity: 0; transform: translate(-50%, 20px) scale(.6); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -30px); } }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #111a; background: rgba(15,20,40,.94); color: #fff;
+    padding: 10px 18px; border-radius: 12px; z-index: 30; max-width: 90vw; text-align: center; }
+
+  /* ---- result ---- */
+  .result { text-align: center; padding: 28px 20px; }
+  .result .big { font-size: 64px; line-height: 1.1; }
+  .result h2 { font-size: 28px; margin: 6px 0; }
+  .result .stars { font-size: 46px; letter-spacing: 6px; }
+  .result .stars span { display: inline-block; opacity: .2; filter: grayscale(1); }
+  .result .stars span.on { opacity: 1; filter: none; animation: starin .5s backwards; }
+  .result .stars span.on:nth-child(2) { animation-delay: .25s; } .result .stars span.on:nth-child(3) { animation-delay: .5s; }
+  @keyframes starin { 0% { transform: scale(0) rotate(-90deg); } 70% { transform: scale(1.3); } }
+  .result .lines { margin: 12px auto; max-width: 460px; text-align: left; }
+  .result .lines div { padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .result .acts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+  @media (max-width: 520px) { .wrap { padding: 12px 12px 70px; } .top h1 { font-size: 22px; } .card { padding: 14px; } .opts.visual { gap: 6px; } .opt { padding: 9px 10px; gap: 9px; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<canvas id="confetti" hidden></canvas>
+<div class="wrap" id="app"></div>
+<script>
+const INK = "#1b2a41";
+const WORLDS = [];
+/* ---------------------------------------------------------------
+   CROWN QUEST: Story Forest (reading). Four options (A–D).
+   All passages are original and written for this game.
+   --------------------------------------------------------------- */
+(() => {
+  const gap = s => `<p class="gapline">${s.replace("___", '<span class="gapw">&nbsp;</span>')}</p><p>Which word fits the gap best?</p>`;
+  const EXTRACTS = ["Extract A", "Extract B", "Extract C", "Extract D"];
+
+  const OVERDUE = {
+    title: "Overdue",
+    html: `<p>Priya found it on Saturday, wedged behind the couch cushions with a sock and two biscuit crumbs for company: <em>The Atlas of Deep-Sea Creatures</em>. The library stamp inside said it was due back on 3 March. Three years ago.</p>
+<p>She did the sum twice. Twenty cents a day, for more than a thousand days. Her money box rattled thinly when she shook it.</p>
+<p>On Monday she walked to the library the long way, past the bakery and twice around the fountain. At the desk she slid the book across with one finger, as though it might bite, and placed her money box beside it.</p>
+<p>Mr Abbas turned the book over. He opened it to the stamp and his eyebrows rose. Then he opened it somewhere in the middle, where a page had been read so often that its corner had gone as soft as cloth.</p>
+<p>“The anglerfish page,” he said. “It was my favourite too.”</p>
+<p>He pushed the money box back towards her. “We stopped charging fines last year,” he said. “But our new book about volcanoes is looking for a good home for three weeks. Interested?”</p>`,
+  };
+
+  const POEM = {
+    title: "Crossing",
+    html: `<p class="poem">After the rain the path is a river of light,
+and here comes the snail,
+carrying his house like a sailor
+who will not leave his ship.
+
+He does not hurry.
+He writes his name behind him
+in one long silver line
+that only the morning can read.
+
+A blackbird tilts its head.
+A bicycle hisses past.
+The snail pulls in his horns, waits,
+and puts them out again:
+
+two small questions
+asked of the enormous air.
+
+By noon the path is dry,
+the silver letters gone,
+and under the ivy, safe at home
+(he was never anywhere else),
+the snail is fast asleep.</p>`,
+  };
+
+  const MAPS = {
+    title: "Finding the Way",
+    note: "Read the four extracts. For each question, choose the extract it describes.",
+    html: `<div class="extract"><b class="tag">Extract A</b>Dad refused to use the phone. He spread the map over the bonnet of the car like a tablecloth, pinned its corners with his keys and my drink bottle, and ran a finger along a thin red line. “Forty minutes,” he said. Two hours later we were eating our sandwiches beside a paddock gate that was, according to the map, a town. I have never been so happily lost.</div>
+<div class="extract"><b class="tag">Extract B</b>The map had been drawn in brown ink on the back of a seed packet. Wren turned it one way, then the other. A cross, a wobbly line, three trees. “It's Grandad's garden,” said Oli. “It could be anywhere,” said Wren, but she was already pulling on her boots.</div>
+<div class="extract"><b class="tag">Extract C</b>For most of history, mapmakers had to guess at what they had not seen. Coastlines were sketched from sailors' reports, and the blank spaces were often filled with pictures of imagined beasts rather than left empty. Only when surveyors began carefully measuring the land itself, in the 1700s, did maps become accurate enough to trust with your life.</div>
+<div class="extract"><b class="tag">Extract D</b>Children should still learn to read a paper map. A screen shows you only the next turn. A map shows you the whole country around it, so that you understand where you are and not merely where to go. Batteries run flat. Signals vanish in the hills. A map asks for nothing but a little patience.</div>`,
+  };
+
+  const PROMPTER = {
+    title: "The Prompter",
+    html: `<p>For six weeks Tamsin had sat on a stool in the wings with the script on her knees, and for six weeks nobody had needed her. That was the job of a prompter: to know every line of the play and never say one.</p>
+<p>On the night, the hall was full. Through a gap in the curtain she could see Joel, as the old king, striding about in his cardboard crown. He was magnificent. He was also, she noticed, gripping his sceptre the way you grip the railing of a boat.</p>
+<p>“And so,” boomed Joel, “I say to you all …”</p>
+<p>The silence that followed was only three seconds long. Tamsin counted them. In the front row a programme rustled.</p>
+<p>She did not look at the script. “A kingdom is not a thing you own,” she breathed, just loudly enough.</p>
+<p>“A kingdom,” Joel thundered, as if he had merely paused to let the thought ripen, “is not a thing you own!”</p>
+<p>Afterwards the cast took four bows. Parents stamped. Joel was lifted onto somebody's shoulders, crown and all. Tamsin stacked the stools.</p>
+<p>She was switching off the lamp when the crown appeared round the edge of the curtain, with Joel under it. He held out a paper cup of lemonade, a little spilt.</p>
+<p>“Three seconds,” he said. “It felt like the whole of Year 4.”</p>
+<p>“It was a good pause,” said Tamsin. “Very royal.”</p>
+<p>He laughed, set the cup on her stool, and went. Tamsin drank it slowly. It was warm and far too sweet, and she could not remember tasting anything better.</p>`,
+  };
+
+  WORLDS.push({
+    id: "reading", name: "Story Forest", icon: "🌲", color: "#2e7d4f", crown: "Leaf Crown",
+    blurb: "Words, poems and stories hide their secrets here. Inkwing the dragon guards the Leaf Crown.",
+    boss: { name: "Inkwing the Dragon", emoji: "🐉", taunt: "Anyone can read the words. Can you read what hides between them?", defeat: "Inkwing curls up around a book, purring smoke. The forest is yours." },
+    levels: [
+      {
+        id: "r1", name: "Word Glade",
+        questions: [
+          { id: "r1a", cat: "Vocabulary & idioms",
+            stem: gap("After a week of heavy rain, the river finally ___ its banks and flooded the paddocks."),
+            options: ["tore", "burst", "split", "cracked"], answer: 1,
+            hint: `Think about water pushing harder and harder until it suddenly escapes, like a balloon filled too full.`,
+            explain: `<p>A river that overflows is said to <b>burst its banks</b>. The words go together as a pair: the water presses until it suddenly breaks out.</p><p class="why-not">Tore, split and cracked all mean something breaking, but they describe solid things such as cloth, wood or glass. We don't use them with a river's banks.</p>` },
+          { id: "r1b", cat: "Vocabulary & idioms",
+            stem: gap("Over thousands of years, camels have ___ to life in the desert."),
+            options: ["adopted", "admitted", "adapted", "attracted"], answer: 2,
+            hint: `Two of these words look almost the same. One means “taken in as your own”; the other means “changed to suit a place”.`,
+            explain: `<p>To <b>adapt</b> to something is to change so that you suit it. Camels have adapted to the desert: they can go a long time without water.</p><p class="why-not"><em>Adopted</em> looks very similar, but it means to take something as your own (you adopt a pet). <em>Admitted</em> means owned up or let in, and <em>attracted</em> means drew towards.</p>` },
+          { id: "r1c", cat: "Vocabulary & idioms",
+            stem: gap("The mayor ___ a short speech before she cut the ribbon."),
+            options: ["told", "spoke", "said", "delivered"], answer: 3,
+            hint: `Three of these are about talking but don't sit next to “a speech”. Try each one aloud: “she ___ a speech”.`,
+            explain: `<p>You <b>deliver</b> a speech (or give or make one). It is a fixed pair of words.</p><p class="why-not">You tell a story, speak <em>to</em> someone and say a word, but you don't “tell”, “speak” or “say” a speech.</p>` },
+          { id: "r1d", cat: "Vocabulary & idioms",
+            stem: gap("With its engine dead, the little boat was at the ___ of the waves."),
+            options: ["mercy", "power", "force", "anger"], answer: 0,
+            hint: `The boat is helpless: the waves can do what they like with it. Which word completes the saying “at the ___ of”?`,
+            explain: `<p>To be <b>at the mercy of</b> something means to be helpless against it. Without its engine, the boat can't fight the waves.</p><p class="why-not">Power, force and anger all suit stormy waves, but “at the power of” and “at the force of” are not expressions in English.</p>` },
+        ],
+      },
+      {
+        id: "r2", name: "Whispering Path", passage: OVERDUE,
+        questions: [
+          { id: "r2a", cat: "Purpose of a detail",
+            stem: `<p>The writer says Priya's money box “<b>rattled thinly</b>”. What does this detail tell us?</p>`,
+            options: ["The money box was made of thin metal.", "Priya shook it too gently to hear it properly.", "It held far too little to pay the fine.", "Priya had already spent her money on books."], answer: 2,
+            hint: `Read the sentence just before it. Priya has worked out a very big sum. Now think what a nearly empty money box sounds like.`,
+            explain: `<p>Twenty cents a day for over a thousand days is more than two hundred dollars. A money box that rattles “thinly” has only a few coins in it. The writer puts the two side by side to show that <b>Priya can't possibly pay</b>.</p><p class="why-not">“Thinly” describes the sound of a few coins, not the metal. Nothing says she shook it gently or had spent her money on books.</p>` },
+          { id: "r2b", cat: "Feelings & inference",
+            stem: `<p>Priya walks to the library “<b>the long way, past the bakery and twice around the fountain</b>”. Why?</p>`,
+            options: ["She is putting off the moment when she must own up.", "She wants to buy something from the bakery first.", "She has forgotten the quickest way to the library.", "She enjoys looking at the fountain on her way to school."], answer: 0,
+            hint: `Nobody needs to walk around a fountain <b>twice</b> to get somewhere. How is she feeling about arriving?`,
+            explain: `<p>Going the long way, and circling the fountain twice, is what people do when they dread arriving. Priya is nervous about handing the book back, so <b>she is putting it off</b>. The writer shows her feelings through what she does.</p><p class="why-not">She passes the bakery but doesn't go in. She isn't lost: she chooses the long way. Nothing suggests she is on her way to school.</p>` },
+          { id: "r2c", cat: "Purpose of a detail",
+            stem: `<p>Why does the writer mention that one page's corner had gone “<b>as soft as cloth</b>”?</p>`,
+            options: ["To show that the book was old and badly made.", "To show that the book had been loved, not just lost.", "To explain why the library had bought a new book.", "To suggest that Priya had damaged the book on purpose."], answer: 1,
+            hint: `How does a paper corner become soft? Think about what Priya must have done with that page, again and again.`,
+            explain: `<p>A corner goes soft when a page is turned again and again. The detail shows that Priya didn't simply forget the book: she read it, especially that page, many times. <b>It had been loved.</b> That is what Mr Abbas notices.</p><p class="why-not">The softness comes from reading, not from poor quality or deliberate damage. The new book is about volcanoes; it doesn't replace this one.</p>` },
+          { id: "r2d", cat: "Character & structure",
+            stem: `<p>What do Mr Abbas's last words, about the volcano book, show about him?</p>`,
+            options: ["He has forgotten that Priya kept a book for three years.", "He wants Priya to pay for the new book instead of the fine.", "He thinks Priya ought to read about something other than fish.", "He trusts Priya and wants her to keep on borrowing."], answer: 3,
+            hint: `Priya expects to be in trouble. Instead he offers her another book, and says “for three weeks” with a smile in it. What is he telling her?`,
+            explain: `<p>Priya has just returned a book three years late, yet Mr Abbas offers her another one. He recognises a real reader (the anglerfish page was his favourite too). The gentle joke in “for three weeks” shows he hasn't forgotten, but <b>he trusts her and wants her to keep borrowing</b>.</p><p class="why-not">He hasn't forgotten: “three weeks” is a friendly reminder. He pushes her money back, so he isn't asking her to pay for anything.</p>` },
+        ],
+      },
+      {
+        id: "r3", name: "Poet's Hollow", passage: POEM,
+        questions: [
+          { id: "r3a", cat: "Comparisons & imagery",
+            stem: `<p>In the first verse, what is the snail compared to?</p>`,
+            options: ["a river that shines after the rain", "a house that has been left empty", "a ship that is sailing slowly away", "a sailor who stays with his ship"], answer: 3,
+            hint: `Find the word “like” in the first verse. What comes straight after it?`,
+            explain: `<p>The poet says the snail carries his house “like <b>a sailor who will not leave his ship</b>”. The snail is the sailor and the shell is the ship he never leaves.</p><p class="why-not">The “river of light” is the wet path, not the snail. The ship stands for the shell, and nothing in the poem is sailing away or left empty.</p>` },
+          { id: "r3b", cat: "Comparisons & imagery",
+            stem: `<p>“He writes his name behind him / in one long silver line”. What is the “silver line”?</p>`,
+            options: ["the shiny trail the snail leaves as it moves", "a streak of sunlight across the wet path", "a scratch that the shell makes on the ground", "a crack in the path where rain has collected"], answer: 0,
+            hint: `The line is <b>behind</b> him and he makes it himself. What do snails leave wherever they have been?`,
+            explain: `<p>A snail leaves a shiny trail of slime that glints silver in the light. The poet imagines it as <b>writing</b>: the snail signing his name on the path.</p><p class="why-not">Sunlight and puddles are on the path, but the snail doesn't make them. A shell doesn't drag along the ground and scratch it.</p>` },
+          { id: "r3c", cat: "Feelings & inference",
+            stem: `<p>The snail's horns are called “<b>two small questions / asked of the enormous air</b>”. What does this suggest?</p>`,
+            options: ["The snail is lost and is looking for the way home.", "The snail is carefully testing whether it is safe to go on.", "The blackbird and the bicycle are wondering about the snail.", "The poet is not sure what kind of animal this is."], answer: 1,
+            hint: `Look at what has just happened: a bird, a bicycle, horns pulled in, a wait. Why would the horns come out slowly again?`,
+            explain: `<p>After the blackbird and the bicycle, the snail pulls in his horns and waits. When he puts them out again, it is as if he is asking, “Is it safe now?” The words “small” and “enormous” show how tiny he is in a big, risky world. <b>He is testing whether it is safe.</b></p><p class="why-not">He isn't lost: he reaches the ivy. The “questions” belong to the snail's horns, not to the bird, the bicycle or the poet.</p>` },
+          { id: "r3d", cat: "Purpose of a detail",
+            stem: `<p>In the last verse the poet says the snail is “safe at home / <b>(he was never anywhere else)</b>”. Why does the poet add the words in brackets?</p>`,
+            options: ["Because the snail only dreamed of crossing the path.", "Because the snail sleeps under the same ivy every day.", "Because the snail carries his home with him.", "Because the poet did not see where the snail had been."], answer: 2,
+            hint: `Go back to the first verse. What was the snail carrying the whole way across the path?`,
+            explain: `<p>The first verse told us the snail carries his house on his back. So however far he travels, he is always “at home”. The brackets are a small joke that sends us back to the beginning: <b>his home goes wherever he goes</b>.</p><p class="why-not">The crossing was real: the path dried and the silver trail faded. The poem doesn't say he always sleeps under this ivy, and the poet watched the whole journey.</p>` },
+        ],
+      },
+      {
+        id: "r4", name: "Four Lanterns", passage: MAPS,
+        questions: [
+          { id: "r4a", cat: "Feelings & inference",
+            stem: `<p>Which extract shows a person whose <b>actions do not match her words</b>?</p>`,
+            options: EXTRACTS, answer: 1,
+            hint: `Look for someone who <b>says</b> one thing (a doubt) while <b>doing</b> another (getting ready).`,
+            explain: `<p>In <b>Extract B</b>, Wren says, “It could be anywhere,” which sounds as if she thinks the search is hopeless. But she is “already pulling on her boots”: she can't wait to start looking.</p><p class="why-not">In Extract A, Dad does exactly what he says (he refuses the phone and uses the map), even though it goes wrong.</p>` },
+          { id: "r4b", cat: "Main idea",
+            stem: `<p>Which extract argues that <b>knowing your route</b> is not the same as <b>understanding your surroundings</b>?</p>`,
+            options: EXTRACTS, answer: 3,
+            hint: `Find the extract that compares two ways of finding your way, and says what one of them leaves out.`,
+            explain: `<p><b>Extract D</b> says a screen “shows you only the next turn”, while a map lets you “understand where you are and not merely where to go”. That is the difference between following a route and understanding the land around you.</p><p class="why-not">Extract A also has a phone and a map, but it tells a funny story; it doesn't argue a point.</p>` },
+          { id: "r4c", cat: "Tone & attitude",
+            stem: `<p>Which extract describes <b>something going wrong that the writer ended up enjoying</b>?</p>`,
+            options: EXTRACTS, answer: 0,
+            hint: `Look for two words side by side that don't usually belong together: one for a feeling, one for a problem.`,
+            explain: `<p>In <b>Extract A</b>, a forty-minute drive turns into two hours and the “town” is a paddock gate. Yet the writer ends, “I have never been so <b>happily lost</b>.” The trip went wrong and became a favourite memory.</p><p class="why-not">Extract C describes mistakes on old maps, but nobody is enjoying them. In Extract B, nothing has gone wrong yet.</p>` },
+          { id: "r4d", cat: "Main idea",
+            stem: `<p>Which extract explains how something <b>became more reliable over time</b>?</p>`,
+            options: EXTRACTS, answer: 2,
+            hint: `“Over time” means the extract must tell us about a <b>before</b> and an <b>after</b>.`,
+            explain: `<p><b>Extract C</b> starts with mapmakers who “had to guess” and ends with maps “accurate enough to trust with your life”, once surveyors began measuring the land. That is something becoming more reliable.</p><p class="why-not">Extract D says maps can be relied on (no batteries, no signal), but it doesn't describe them changing over time.</p>` },
+        ],
+      },
+      {
+        id: "rb", name: "Inkwing the Dragon", boss: true, passage: PROMPTER,
+        questions: [
+          { id: "rba", cat: "Comparisons & imagery",
+            stem: `<p>Joel is “gripping his sceptre <b>the way you grip the railing of a boat</b>”. What does this comparison tell us?</p>`,
+            options: ["The sceptre was heavy and awkward to hold.", "Joel was pretending that the stage was a ship.", "Joel was far more nervous than he looked.", "Joel felt ill from walking about so much."], answer: 2,
+            hint: `When do people hold a boat's railing tightly? Now look at the sentence before: “He was magnificent. He was <b>also</b> …”`,
+            explain: `<p>You grip a boat's railing hard when you feel unsteady and are afraid of falling. From the hall Joel looks “magnificent”, but Tamsin, close by, sees his tight grip. Under the booming voice, <b>he is nervous</b>. It also prepares us for the moment he forgets his line.</p><p class="why-not">The comparison is about how tightly he holds on, not the sceptre's weight. There is no ship in the play, and nothing says he feels ill.</p>` },
+          { id: "rbb", cat: "Purpose of a detail",
+            stem: `<p>Why does the writer include the short sentence “<b>She did not look at the script.</b>”?</p>`,
+            options: ["To show how completely Tamsin knew the play.", "To show that it was too dark in the wings to read.", "To suggest that Tamsin had lost her place.", "To hint that she made the line up herself."], answer: 0,
+            hint: `Remember what the first paragraph says a prompter's job is: “to know every line …”`,
+            explain: `<p>The script is on her knees, but she doesn't need it. After six weeks of sitting unnoticed, <b>she knows every line by heart</b>, and the right words come at once. The sentence shows how well she has done a job nobody has seen.</p><p class="why-not">She has a lamp, so it isn't too dark. Joel repeats her line and the play carries on, so it was the real line, not one she invented or guessed at.</p>` },
+          { id: "rbc", cat: "Feelings & inference",
+            stem: `<p>Joel says his line “<b>as if he had merely paused to let the thought ripen</b>”. What does this suggest?</p>`,
+            options: ["He had planned the long pause before the show.", "He was cross with Tamsin for interrupting him.", "He was speaking slowly so that he would not forget again.", "He made the silence seem like part of his acting."], answer: 3,
+            hint: `Notice “as if”. It tells you what the pause <b>looked like</b> to the audience, not what really happened.`,
+            explain: `<p>Fruit ripens when it is given time. Joel carries on as though he had stopped on purpose to let his words sink in. “As if” tells us it wasn't true, but the audience would never know: <b>he turned the silence into part of his performance</b>.</p><p class="why-not">The pause wasn't planned: he had forgotten the line and felt it “like the whole of Year 4”. He “thundered” the line, which isn't slow or cross.</p>` },
+          { id: "rbd", cat: "Character & structure",
+            stem: `<p>At the end, Joel brings Tamsin a cup of lemonade and says, “Three seconds.” What is he really doing?</p>`,
+            options: ["Asking her to keep his mistake a secret.", "Thanking her, without saying so directly.", "Complaining that she took too long to help.", "Boasting about how well he covered it up."], answer: 1,
+            hint: `He leaves the cheering crowd to find the one person who was stacking stools. He never says “thank you”. Does he need to?`,
+            explain: `<p>Joel leaves his own celebration to find Tamsin, brings her a drink, and admits how frightening those three seconds were. He never uses the words, but everything he does says <b>thank you</b>: he knows who saved him.</p><p class="why-not">He doesn't ask her for anything, so he isn't asking for secrecy. He admits how long it felt, which is the opposite of boasting, and he laughs with her rather than complaining.</p>` },
+          { id: "rbe", cat: "Feelings & inference",
+            stem: `<p>The lemonade is “warm and far too sweet”, yet Tamsin “could not remember tasting anything better”. Why?</p>`,
+            options: ["She was thirsty after sitting in the hot wings all night.", "She was relieved that the play was finally over.", "She was hardly ever allowed sweet drinks at home.", "It meant that someone had noticed what she did."], answer: 3,
+            hint: `The drink itself isn't nice, so the reason can't be the taste. Think about the whole story: who has noticed Tamsin until now?`,
+            explain: `<p>All night, and for six weeks before, nobody needed or noticed Tamsin. While the cast took four bows, she stacked stools. The lemonade isn't good lemonade; it tastes wonderful because of what it stands for: <b>someone saw what she did and valued it</b>.</p><p class="why-not">The story never mentions thirst, heat or rules at home, and a warm, too-sweet drink wouldn't be the best thing for thirst. Relief that the play is over wouldn't make this one cup special.</p>` },
+        ],
+      },
+    ],
+  });
+})();
+
+/* ---------------------------------------------------------------
+   CROWN QUEST: Puzzle Peaks (thinking skills). Four options (A–D).
+   --------------------------------------------------------------- */
+(() => {
+  const tbl = (head, rows) => `<div class="figure"><table class="grid"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map((c, i) => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table></div>`;
+
+  /* L1 Q4: an L-shaped tile turned a quarter turn. Cells are [row, col] in a 3 × 3 grid. */
+  const L = [[0, 0], [1, 0], [2, 0], [2, 1]];
+  const norm = cells => { const r0 = Math.min(...cells.map(c => c[0])), c0 = Math.min(...cells.map(c => c[1])); return cells.map(([r, c]) => [r - r0, c - c0]); };
+  const cw = cells => norm(cells.map(([r, c]) => [c, 2 - r]));
+  const mirror = cells => norm(cells.map(([r, c]) => [r, 2 - c]));
+  const TILE_DESC = {
+    start: "three squares in a column with one more square to the right of the bottom square, like a capital L",
+    cw: "three squares in a row with one more square below the left-hand square",
+    ccw: "three squares in a row with one more square above the right-hand square",
+    half: "three squares in a column with one more square to the left of the top square",
+    flip: "three squares in a column with one more square to the left of the bottom square, like a capital J",
+  };
+  const tile = (cells, desc, u = 26) => {
+    const W = 3 * u + 6, g = cells.map(([r, c]) => `<rect x="${3 + c * u}" y="${3 + r * u}" width="${u}" height="${u}" fill="#b9e3c6" stroke="${INK}" stroke-width="2"/>`).join("");
+    return `<svg viewBox="0 0 ${W} ${W}" width="${W}" height="${W}" role="img" aria-label="A tile made of four squares: ${desc}.">${g}</svg>`;
+  };
+  const TILE = { start: norm(L), cw: cw(L), half: cw(cw(L)), ccw: cw(cw(cw(L))), flip: mirror(L) };
+
+  /* L3 Q4: the net of a dice (a cross) */
+  const NET = (() => {
+    const u = 40, cell = (r, c, n) => `<rect x="${4 + c * u}" y="${4 + r * u}" width="${u}" height="${u}" fill="#fff3c4" stroke="${INK}" stroke-width="2"/><text x="${4 + c * u + u / 2}" y="${4 + r * u + u / 2 + 7}" font-size="21" font-weight="700" text-anchor="middle" fill="${INK}">${n}</text>`;
+    const g = cell(0, 1, 1) + cell(1, 0, 2) + cell(1, 1, 3) + cell(1, 2, 4) + cell(1, 3, 5) + cell(2, 1, 6);
+    return `<div class="figure"><svg viewBox="0 0 168 128" width="168" height="128" role="img" aria-label="A net of six squares in the shape of a cross. The middle row has four squares numbered 2, 3, 4, 5 from left to right. Square 1 is above square 3 and square 6 is below square 3.">${g}</svg></div>`;
+  })();
+
+  /* L4 Q4: block towers seen from above, and four possible front views */
+  const PLAN = `<div class="figure"><table class="grid" style="font-weight:700"><tr><td>1</td><td>3</td><td>2</td></tr><tr><td>2</td><td>1</td><td>1</td></tr></table><div style="font-size:14px;font-weight:700;letter-spacing:2px">▲ FRONT ▲</div></div>`;
+  const view = h => {
+    const u = 22, H = 4 * u + 6;
+    const g = h.map((n, c) => Array.from({ length: n }, (_, k) => `<rect x="${3 + c * u}" y="${H - 3 - (k + 1) * u}" width="${u}" height="${u}" fill="#c9d6f2" stroke="${INK}" stroke-width="2"/>`).join("")).join("");
+    return `<svg viewBox="0 0 ${3 * u + 6} ${H}" width="${3 * u + 6}" height="${H}" role="img" aria-label="Three columns of squares side by side. From left to right they are ${h.join(", ")} squares tall.">${g}</svg>`;
+  };
+
+  /* Boss Q4: stickers table */
+  const STICK = rows => tbl(["", "Mon", "Tue", "Wed", "Total"], rows);
+  const F = s => `<b style="background:#fdf0dc;padding:0 4px">${s}</b>`;
+
+  WORLDS.push({
+    id: "thinking", name: "Puzzle Peaks", icon: "⛰️", color: "#7a4bb5", crown: "Summit Crown",
+    blurb: "Climb through tables, codes, shapes and tricky arguments. The Riddle Owl waits at the summit.",
+    boss: { name: "The Riddle Owl", emoji: "🦉", taunt: "Whooo dares to out-think me? My riddles have no easy answers.", defeat: "The Riddle Owl bows its head. “Wise… very wise,” it hoots, and flies away." },
+    levels: [
+      {
+        id: "t1", name: "Foothills",
+        questions: [
+          { id: "t1a", cat: "Tables & timetables",
+            stem: `<p>The table shows the days when four children have swimming training (✓).</p>${tbl(["", "Mon", "Tue", "Wed", "Thu"], [["Ana", "✓", "", "✓", ""], ["Ben", "", "✓", "✓", "✓"], ["Cal", "✓", "", "✓", "✓"], ["Dia", "✓", "", "", ""]])}<p>On which day do <b>exactly two</b> of the children have training?</p>`,
+            options: ["Monday", "Tuesday", "Wednesday", "Thursday"], answer: 3,
+            hint: `Go <b>down</b> each day's column and count the ticks. You are looking for a column with exactly 2.`,
+            explain: `<p>Count the ticks in each column: Monday 3 (Ana, Cal, Dia), Tuesday 1 (Ben), Wednesday 3, <b>Thursday 2</b> (Ben and Cal).</p><p class="why-not">Tuesday has only one tick. Monday and Wednesday each have three. Counting along the rows instead of down the columns tells you about each child, not each day.</p>` },
+          { id: "t1b", cat: "Order & arrangement",
+            stem: `<p>Four children ran a race.</p><div class="box">Kai finished before Lena.<br>Mo finished after Lena.<br>Nia finished before Kai.</div><p>Who came <b>third</b>?</p>`,
+            options: ["Kai", "Lena", "Mo", "Nia"], answer: 1,
+            hint: `Write the names in a line as you read each clue. Start with Kai and Lena, then fit Mo and Nia around them.`,
+            explain: `<p>Kai is before Lena. Mo is after Lena, so the order so far is Kai, Lena, Mo. Nia is before Kai, so the full order is Nia, Kai, <b>Lena</b>, Mo. Lena came third.</p><p class="why-not">Mo came last, not third. Kai is third only if you forget that Nia finished ahead of him.</p>` },
+          { id: "t1c", cat: "Rules & codes",
+            stem: `<p>In a secret code, each letter is swapped for the <b>next</b> letter of the alphabet. So <b>CAT</b> is written as <b>DBU</b>.</p><p>Which word is written in the code as <b>TVO</b>?</p>`,
+            options: ["UWP", "TUN", "SUN", "RUM"], answer: 2,
+            hint: `TVO is already in code. To get back to the real word, go one letter <b>backwards</b> each time.`,
+            explain: `<p>To decode, go back one letter: T → S, V → U, O → N. The word is <b>SUN</b>.</p><p class="why-not">UWP goes forwards again, which codes the word a second time instead of decoding it. TUN and RUM change only some letters by one step.</p>` },
+          { id: "t1d", cat: "Spatial", visual: true,
+            stem: `<p>This tile is given a <b>quarter turn clockwise</b> (the way a clock's hands move). It is <b>not</b> flipped over.</p><div class="figure">${tile(TILE.start, TILE_DESC.start, 30)}</div><p>What does it look like now?</p>`,
+            options: [tile(TILE.cw, TILE_DESC.cw), tile(TILE.half, TILE_DESC.half), tile(TILE.flip, TILE_DESC.flip), tile(TILE.ccw, TILE_DESC.ccw)], answer: 0,
+            hint: `Follow the tall part of the L. After a quarter turn clockwise, the part that pointed <b>up</b> points to the <b>right</b>, so the tile lies on its side.`,
+            explain: `<p>In a quarter turn clockwise, whatever was at the top moves to the right and whatever was on the right moves to the bottom. The tall column becomes a row lying on its side, and the little foot that stuck out to the right at the bottom now hangs <b>down from the left-hand end</b>.</p><p class="why-not">The row with a square sticking <b>up</b> at the right-hand end is a quarter turn the other way (anticlockwise). The upside-down L is a half turn. The J shape is the tile flipped over, which a turn can never do.</p>` },
+        ],
+      },
+      {
+        id: "t2", name: "Misty Trail",
+        questions: [
+          { id: "t2a", cat: "Spot the mistake",
+            stem: `<p class="box">Tia: “All four of my best friends say mango is their favourite ice-cream flavour. So mango must be the favourite flavour of the children at our school.”</p><p>Which one of these shows the mistake Tia has made?</p>`,
+            options: ["Mango ice-cream may cost more than the other flavours at the shop.",
+                      "Tia may like a different flavour of ice-cream from her four friends.",
+                      "Tia's four friends may not like the same things as the rest of the school.",
+                      "Tia's friends may also enjoy other flavours, such as chocolate, vanilla or strawberry."], answer: 2,
+            hint: `Tia asked four friends, but she is talking about the <b>whole school</b>. Is that a fair jump?`,
+            explain: `<p>Tia judges hundreds of children from a tiny group of four, and they are her own friends, who may well share her tastes. The rest of the school could be quite different. That is the mistake: <b>her four friends may not be like everyone else</b>.</p><p class="why-not">The cost of mango ice-cream and Tia's own favourite have nothing to do with what the school prefers. Her friends enjoying other flavours too doesn't change that mango is their favourite.</p>` },
+          { id: "t2b", cat: "Supports the claim",
+            stem: `<p class="box">Coach Rivera: “We should hold training in the morning instead of the afternoon. That way, the players won't get so worn out by the heat.”</p><p>Which statement, if true, best supports the coach's claim?</p>`,
+            options: ["It is much cooler at the ground in the morning than in the afternoon.",
+                      "Players who are worn out make more mistakes with the ball.",
+                      "Most of the players say that they really enjoy coming to training.",
+                      "The ground is free for the team to use in the morning and in the afternoon."], answer: 0,
+            hint: `The claim is: <b>morning training → less worn out by heat</b>. Look for the fact that links mornings to heat.`,
+            explain: `<p>The coach says moving to the morning will mean less heat. That only works if mornings really are cooler, and <b>the first statement says exactly that</b>.</p><p class="why-not">Tired players making mistakes explains why tiredness matters, but not why mornings would help. Enjoying training and the ground being free are true but say nothing about heat.</p>` },
+          { id: "t2c", cat: "Tables & timetables",
+            stem: `<p>In the long jump, each child has two jumps. Only each child's <b>best</b> jump counts.</p>${tbl(["", "Jump 1", "Jump 2"], [["Ari", "3.3 m", "3.2 m"], ["Bea", "3.5 m", "3.4 m"], ["Col", "3.7 m", "2.9 m"], ["Dan", "2.8 m", "3.6 m"]])}<p>Who came <b>second</b>?</p>`,
+            options: ["Ari", "Bea", "Col", "Dan"], answer: 3,
+            hint: `For each child, keep only the bigger of the two jumps and ignore the other. Then put those four numbers in order.`,
+            explain: `<p>Best jumps: Ari 3.3, Bea 3.5, Col 3.7, Dan 3.6. In order: Col 3.7, <b>Dan 3.6</b>, Bea 3.5, Ari 3.3. Dan came second.</p><p class="why-not">Bea is second if you look only at Jump 1, or only at Jump 2. Col is second if you add each child's two jumps together, but only the best jump counts.</p>` },
+          { id: "t2d", cat: "Number problems",
+            stem: `<p>There are <b>12</b> children in the art club. Every child paints, or draws, or does both. <b>8</b> children paint and <b>7</b> children draw.</p><p>How many children do <b>both</b>?</p>`,
+            options: ["1", "3", "4", "5"], answer: 1,
+            hint: `8 + 7 is more than 12. Why? Because some children were counted <b>twice</b>.`,
+            explain: `<p>8 + 7 = 15, but there are only 12 children. The extra 15 − 12 = <b>3</b> are the children who were counted twice, once as painters and once as drawers. They do both.</p><p class="why-not">1 is just 8 − 7. 4 is the number who don't paint (12 − 8) and 5 is the number who don't draw (12 − 7).</p>` },
+        ],
+      },
+      {
+        id: "t3", name: "Rocky Ridge",
+        questions: [
+          { id: "t3a", cat: "Whose reasoning",
+            stem: `<p class="box">Pool rule: <b>Only</b> children who can swim 50 metres are allowed in the deep pool. The rule is always followed.</p><p><b>Ana:</b> “Ben is in the deep pool, so he must be able to swim 50 metres.”<br><b>Cal:</b> “Dee can swim 50 metres, so she must be in the deep pool.”</p><p>Whose reasoning is correct?</p>`,
+            options: ["Ana only", "Cal only", "Both Ana and Cal", "Neither Ana nor Cal"], answer: 0,
+            hint: `Being able to swim 50 metres means you are <b>allowed</b> in. Does it mean you <b>have</b> to be in?`,
+            explain: `<p>The rule says who is allowed in. Ben is in the deep pool, so he must have passed the test: Ana is right. But Dee being <b>allowed</b> in doesn't mean she <b>is</b> in. She might be in the shallow pool, or at home. Cal has turned the rule around. So <b>Ana only</b>.</p><p class="why-not">Cal's mistake is treating something you <em>need</em> (swimming 50 metres) as something that <em>makes it happen</em>.</p>` },
+          { id: "t3b", cat: "Spot the mistake",
+            stem: `<p class="box">On Monday a school put up “Walk, don't run” posters in the playground. That week, fewer children fell over than the week before.<br><br>Mr Lee: “That proves the posters worked.”</p><p>Which one of these shows the mistake Mr Lee has made?</p>`,
+            options: ["The posters may have taken a long time to design and print.",
+                      "Running may be more fun than walking for most children.",
+                      "Something else may have changed that week, such as rain keeping children inside.",
+                      "Children may also fall over at home or at the park, where there are no posters at all."], answer: 2,
+            hint: `Two things happened in the same week. Does that prove one <b>caused</b> the other? What else could explain fewer falls?`,
+            explain: `<p>Fewer falls came after the posters, but that doesn't prove the posters were the reason. <b>Something else could have caused it</b>: a wet week with everyone indoors, a year group away on camp, and so on. Mr Lee has ignored other possible causes.</p><p class="why-not">How long the posters took to make and whether running is fun don't affect his argument. Falls at home or at the park aren't what the school counted.</p>` },
+          { id: "t3c", cat: "Order & arrangement",
+            stem: `<p>Four friends sit in a row of four seats, numbered 1 to 4 from left to right.</p><div class="box">Ravi sits in seat 4.<br>Quin sits in the seat just to the left of Pia.<br>Sol does not sit next to Ravi.</div><p>Who sits in <b>seat 2</b>?</p>`,
+            options: ["Pia", "Quin", "Ravi", "Sol"], answer: 1,
+            hint: `Ravi takes seat 4, so the others share seats 1, 2 and 3. Which of those seats is next to Ravi? Sol can't sit there.`,
+            explain: `<p>Ravi is in seat 4. Seat 3 is next to Ravi, so Sol can't be there. Quin and Pia must sit side by side, so they need two seats together: if Sol took seat 2, they would be split. So Sol is in seat 1, then <b>Quin in seat 2</b> and Pia in seat 3.</p><p class="why-not">Pia in seat 2 would put Quin in seat 1 and Sol in seat 3, next to Ravi, which the last clue rules out.</p>` },
+          { id: "t3d", cat: "Spatial",
+            stem: `<p>This net is folded to make a dice.</p>${NET}<p>Which number ends up on the face <b>opposite 3</b>?</p>`,
+            options: ["1", "2", "4", "5"], answer: 3,
+            hint: `Squares that touch each other on the net become <b>neighbours</b> on the dice, never opposites. In a straight row of squares, the opposite face is <b>two squares along</b>.`,
+            explain: `<p>Imagine wrapping the row 2, 3, 4, 5 around like a belt. Faces two squares apart in the belt end up opposite each other: 2 is opposite 4, and <b>3 is opposite 5</b>. Squares 1 and 6 fold in to become the top and bottom.</p><p class="why-not">1, 2 and 4 all touch square 3 on the net, so they share an edge with it on the dice and can't be opposite it.</p>` },
+        ],
+      },
+      {
+        id: "t4", name: "Storm Summit",
+        questions: [
+          { id: "t4a", cat: "Whose reasoning",
+            stem: `<p class="box">A drawer holds <b>5 red</b>, <b>4 blue</b> and <b>2 yellow</b> socks, all mixed up. It is dark, so nobody can see the colours.</p><p><b>Eva:</b> “If I take out 6 socks, I am certain to get at least one red sock.”<br><b>Finn:</b> “If I take out 4 socks, I am certain to get two socks of the same colour.”</p><p>Whose reasoning is correct?</p>`,
+            options: ["Eva only", "Finn only", "Both Eva and Finn", "Neither Eva nor Finn"], answer: 1,
+            hint: `“Certain” means it must work even with the <b>worst luck possible</b>. For Eva, how many socks are <b>not</b> red?`,
+            explain: `<p>Think of the worst luck. Eva: there are 4 + 2 = 6 socks that are not red, so her 6 socks could all be blue and yellow. She is not certain (she would need 7). Finn: there are only 3 colours, so the worst he can do with 3 socks is one of each colour, and the 4th sock must match one of them. He is certain. So <b>Finn only</b>.</p><p class="why-not">Eva's claim feels safe because red is the most common colour, but “likely” is not the same as “certain”.</p>` },
+          { id: "t4b", cat: "Must or cannot be true",
+            stem: `<p>One of three children broke a vase. Each of them says one thing.</p><div class="box"><b>Amy:</b> “Ben broke it.”<br><b>Ben:</b> “I didn't break it.”<br><b>Cat:</b> “I didn't break it.”</div><p><b>Exactly one</b> of these three statements is true. Who broke the vase?</p>`,
+            options: ["Amy", "Ben", "Cat", "It is impossible to tell"], answer: 2,
+            hint: `Test each child in turn. Pretend Amy broke it and count how many of the three statements would be true. Then try Ben, then Cat.`,
+            explain: `<p>Test each child. If <b>Amy</b> broke it: Amy's statement is false, Ben's is true, Cat's is true (two true). If <b>Ben</b> broke it: Amy's is true, Ben's is false, Cat's is true (two true). If <b>Cat</b> broke it: Amy's is false, Ben's is true, Cat's is false (exactly one true ✓). So <b>Cat</b> broke the vase.</p><p class="why-not">Ben is the tempting answer because Amy names him, but then both Amy and Cat would be telling the truth, and only one statement can be true.</p>` },
+          { id: "t4c", cat: "Number problems",
+            stem: `<p>One fruit cup needs <b>3 strawberries</b>, <b>2 kiwi slices</b> and <b>5 grapes</b>.</p><p>Sam has 20 strawberries, 15 kiwi slices and 28 grapes. What is the <b>largest</b> number of complete fruit cups he can make?</p>`,
+            options: ["5", "6", "7", "18"], answer: 0,
+            hint: `Work out how many cups each fruit could make by itself. The fruit that <b>runs out first</b> decides the answer.`,
+            explain: `<p>Strawberries: 20 ÷ 3 = 6 cups (2 left over). Kiwi slices: 15 ÷ 2 = 7 cups (1 left over). Grapes: 28 ÷ 5 = 5 cups (3 left over). The grapes run out first, so he can make only <b>5</b> complete cups.</p><p class="why-not">6 and 7 are how many cups the strawberries or kiwi slices could make, but there aren't enough grapes for those. 18 adds the three numbers together.</p>` },
+          { id: "t4d", cat: "Spatial", visual: true,
+            stem: `<p>Towers of cubes stand on a 3 by 2 grid. This plan shows the grid from <b>above</b>. Each number tells you how many cubes are stacked on that square.</p>${PLAN}<p>What do the towers look like from the <b>front</b>?</p>`,
+            options: [view([2, 1, 1]), view([1, 3, 2]), view([3, 4, 3]), view([2, 3, 2])], answer: 3,
+            hint: `From the front you look along each column, and you see the <b>tallest</b> tower in it. A tall tower at the back still shows above a short one in front.`,
+            explain: `<p>Take each column of the plan and find its tallest tower. Left column: 1 and 2 → 2. Middle column: 3 and 1 → 3. Right column: 2 and 1 → 2. The front view is <b>2, 3, 2</b>.</p><p class="why-not">2, 1, 1 shows only the front row and forgets that the taller towers behind can be seen over the top. 1, 3, 2 shows only the back row. 3, 4, 3 adds the two towers in each column.</p>` },
+        ],
+      },
+      {
+        id: "tb", name: "The Riddle Owl", boss: true,
+        questions: [
+          { id: "tba", cat: "Whose reasoning",
+            stem: `<p class="box"><b>Most</b> of the children in Class 4K walk to school.</p><p><b>Uma:</b> “Leo is in Class 4K, so he must walk to school.”<br><b>Vik:</b> “Zara walks to school, so she is probably in Class 4K.”</p><p>Whose reasoning is correct?</p>`,
+            options: ["Uma only", "Vik only", "Both Uma and Vik", "Neither Uma nor Vik"], answer: 3,
+            hint: `Look hard at two words: “most” and “must”. And for Vik: the fact is about children <b>in 4K</b>. Does it say anything about all the children who walk?`,
+            explain: `<p>“Most” is not “all”, so Leo <em>probably</em> walks, but Uma is wrong to say he <b>must</b>. Vik has turned the fact around: it tells us about children in 4K, not about children who walk. Hundreds of children from other classes may walk too, so Zara could be in any class. <b>Neither</b> is correct.</p><p class="why-not">Uma would be right if she had said “probably”. Vik sounds careful because he says “probably”, but his conclusion goes in the wrong direction.</p>` },
+          { id: "tbb", cat: "Spot the mistake",
+            stem: `<p class="box">This season the Hawks won 12 games and the Eagles won 9 games.<br><br>Tom: “The Hawks won more games, so they are clearly the better team.”</p><p>Which one of these shows the mistake Tom has made?</p>`,
+            options: ["The Hawks may have played more games than the Eagles.",
+                      "The Eagles may have scored plenty of goals in the games that they lost.",
+                      "The two teams may train on different days of the week.",
+                      "Some of the Hawks' players may have missed a game or two because of injuries."], answer: 0,
+            hint: `Is comparing 12 wins with 9 wins fair? What else would you need to know about each team's season?`,
+            explain: `<p>Wins can only be compared fairly if both teams played the same number of games. If the Hawks won 12 out of 20 and the Eagles won 9 out of 10, the Eagles did far better. Tom's comparison may be unfair because <b>the Hawks may have played more games</b>.</p><p class="why-not">Goals scored in losses don't change who won. Training days don't matter. Injured Hawks players would make their 12 wins more impressive, not less.</p>` },
+          { id: "tbc", cat: "Order & arrangement",
+            stem: `<p>Ava, Bo, Cy and Di ran a race. There were no ties.</p><div class="box">Ava finished before Bo.<br>Di finished before Cy.<br>Bo did not finish last.</div><p>These clues are not enough to work out the full order. Which <b>one extra clue</b> makes it possible?</p>`,
+            options: ["Cy finished last.", "Ava finished before Di.", "Di finished before Ava.", "Bo finished before Cy."], answer: 2,
+            hint: `First list every order the three clues allow (there are three). A useful extra clue must leave <b>only one</b> of them.`,
+            explain: `<p>The three clues allow exactly three orders: Ava–Bo–Di–Cy, Ava–Di–Bo–Cy and Di–Ava–Bo–Cy. “<b>Di finished before Ava</b>” fits only the last one, so it fixes the order: Di, Ava, Bo, Cy.</p><p class="why-not">“Cy finished last” and “Bo finished before Cy” are already true in all three orders, so they tell us nothing new. “Ava finished before Di” still leaves two orders.</p>` },
+          { id: "tbd", cat: "Tables & timetables",
+            stem: `<p>Three friends collected stickers on Monday, Tuesday and Wednesday. Some of the numbers are missing from the table.</p>${STICK([["Zed", 6, 9, "?", 22], ["Yan", 8, "?", 5, "?"], ["Xia", 4, 7, 9, 20], ["Total", 18, 26, 21, "?"]])}<p>How many stickers did <b>Yan</b> collect <b>altogether</b>?</p>`,
+            options: ["10", "23", "26", "65"], answer: 1,
+            hint: `Find a row or column with only <b>one</b> number missing. Yan's row has two gaps, so don't start there. Try the <b>Tuesday</b> column.`,
+            explain: `<p>Find a row or column with only <b>one</b> number missing. Total − the numbers you know = the missing number. Fill it in, then look again: a new row or column may now have only one gap.</p><p><b>① Tuesday column</b>: only Yan is missing. 26 − 9 − 7 = <b>10</b>.</p><p><b>② Yan's row</b>: now only the total is missing. 8 + 10 + 5 = <b>23</b>.</p>${STICK([["Zed", 6, 9, 7, 22], ["Yan", 8, F("① 10"), 5, F("② 23")], ["Xia", 4, 7, 9, 20], ["Total", 18, 26, 21, 65]])}<p class="why-not">10 is the first number you find (Yan's Tuesday), not the answer to the question. 26 is the Tuesday total. 65 is the grand total for all three friends.</p>` },
+          { id: "tbe", cat: "Spatial",
+            stem: `<p>Four towns lie on a flat plain.</p><div class="box">Bay is 3 km <b>north</b> of Ash.<br>Cove is 3 km <b>east</b> of Bay.<br>Dune is 6 km <b>south</b> of Cove.</div><p>In which direction is <b>Dune from Ash</b>?</p>`,
+            options: ["South-east", "South-west", "North-east", "North-west"], answer: 0,
+            hint: `Sketch it: put Ash in the middle of your page, with north at the top. Dune is 6 km south of Cove, which is further than the 3 km you went north.`,
+            explain: `<p>Start at Ash. Go 3 km north to Bay, then 3 km east to Cove. Now go 6 km south: the first 3 km bring you level with Ash, and the next 3 km take you below it. Dune is 3 km east and 3 km south of Ash, which is <b>south-east</b>.</p><p class="why-not">North-east is where Cove is from Ash: it forgets the last move. North-west is the direction of Ash from Dune, which is the question backwards.</p>` },
+        ],
+      },
+    ],
+  });
+})();
+
+/* ---------------------------------------------------------------
+   CROWN QUEST: Number Reef (maths). Five options (A–E) per question.
+   Levels climb from warm-up to the hardest third of the sample papers.
+   --------------------------------------------------------------- */
+(() => {
+  const T = (x, y, s, o = "") => `<text x="${x}" y="${y}" font-size="15" fill="${INK}" ${o}>${s}</text>`;
+
+  /* L2 Q1: a measuring jug, labelled every 100 mL with one unlabelled mark between */
+  const JUG = (() => {
+    const y = v => 230 - v * 0.4;                      // 0 mL at y=230, 500 mL at y=30
+    let g = `<path d="M70 20 L70 232 Q70 240 78 240 L182 240 Q190 240 190 232 L190 20" fill="none" stroke="${INK}" stroke-width="3"/>`;
+    g += `<rect x="72" y="${y(350)}" width="116" height="${238 - y(350)}" fill="#f6c453" opacity=".75"/>`;
+    for (let v = 0; v <= 500; v += 50) {
+      const big = v % 100 === 0;
+      g += `<line x1="70" x2="${big ? 98 : 86}" y1="${y(v)}" y2="${y(v)}" stroke="${INK}" stroke-width="2"/>`;
+      if (big && v) g += T(104, y(v) + 5, v + " mL");
+    }
+    return `<div class="figure"><svg viewBox="0 0 260 250" width="240" height="231" role="img" aria-label="A measuring jug. Marks are labelled 100 mL, 200 mL, 300 mL, 400 mL and 500 mL, with one small unlabelled mark halfway between each pair of labels. The juice reaches the small mark between 300 mL and 400 mL.">${g}</svg></div>`;
+  })();
+
+  /* Boss Q2: column graph of books read */
+  const GRAPH = (() => {
+    const data = [["Ava", 8], ["Ben", 5], ["Cy", 11], ["Dee", 6], ["Eli", 10]];
+    const y = v => 210 - v * 15;
+    let g = "";
+    for (let v = 0; v <= 12; v += 2) g += `<line x1="50" x2="330" y1="${y(v)}" y2="${y(v)}" stroke="#c5ccd8" stroke-width="1"/>` + T(42, y(v) + 5, v, 'text-anchor="end"');
+    data.forEach(([n, v], i) => {
+      const x = 68 + i * 54;
+      g += `<rect x="${x}" y="${y(v)}" width="34" height="${210 - y(v)}" fill="#4dabf7" stroke="${INK}" stroke-width="1.5"/>` + T(x + 17, 230, n, 'text-anchor="middle"');
+    });
+    g += `<line x1="50" x2="50" y1="${y(12)}" y2="210" stroke="${INK}" stroke-width="2"/><line x1="50" x2="330" y1="210" y2="210" stroke="${INK}" stroke-width="2"/>`;
+    g += `<text x="14" y="120" font-size="14" fill="${INK}" text-anchor="middle" transform="rotate(-90 14 120)">Books read</text>`;
+    return `<div class="figure"><svg viewBox="0 0 340 240" width="340" height="240" role="img" aria-label="A column graph of books read. The scale is marked 0, 2, 4, 6, 8, 10, 12. Ava's column reaches 8. Ben's column is halfway between 4 and 6. Cy's column is halfway between 10 and 12. Dee's column reaches 6. Eli's column reaches 10.">${g}</svg></div>`;
+  })();
+
+  /* Boss Q3: a 3 × 3 × 3 cube drawn from one corner */
+  const CUBE = (() => {
+    const u = 30, dx = 15, dy = 12, ox = 30, oy = 60;
+    let g = "";
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+      g += `<rect x="${ox + c * u}" y="${oy + r * u}" width="${u}" height="${u}" fill="#ff8a65" stroke="${INK}" stroke-width="1.5"/>`;                                            // front
+      const tx = ox + c * u + (2 - r) * dx, ty = oy - (2 - r) * dy;
+      g += `<polygon points="${tx},${ty} ${tx + u},${ty} ${tx + u + dx},${ty - dy} ${tx + dx},${ty - dy}" fill="#ffb39b" stroke="${INK}" stroke-width="1.5"/>`;                    // top
+      const sx = ox + 3 * u + c * dx, sy = oy + r * u - c * dy;
+      g += `<polygon points="${sx},${sy} ${sx + dx},${sy - dy} ${sx + dx},${sy - dy + u} ${sx},${sy + u}" fill="#e0664a" stroke="${INK}" stroke-width="1.5"/>`;                    // side
+    }
+    return `<div class="figure"><svg viewBox="0 0 190 160" width="190" height="160" role="img" aria-label="A large cube made of 27 small cubes, 3 small cubes long, 3 wide and 3 high.">${g}</svg></div>`;
+  })();
+
+  const BEADS = seq => `<div class="figure" style="font-size:24px;letter-spacing:2px">${seq} …</div>`;
+
+  WORLDS.push({
+    id: "maths", name: "Number Reef", icon: "🌊", color: "#0b6fa4", crown: "Coral Crown",
+    blurb: "Dive deeper with every level. Captain Kraken guards the Coral Crown at the bottom of the reef.",
+    boss: { name: "Captain Kraken", emoji: "🐙", taunt: "Eight arms, and not one of them does sums as fast as me!", defeat: "Captain Kraken sinks back into the deep, blowing bubbles of respect." },
+    levels: [
+      {
+        id: "m1", name: "Shallow Waters",
+        questions: [
+          { id: "m1a", cat: "Number & place value",
+            stem: `<p>Which number is <b>300 more</b> than 4,850?</p>`,
+            options: ["4,853", "4,880", "5,050", "5,150", "7,850"], answer: 3,
+            hint: `300 is 3 <b>hundreds</b>. Count on in hundreds from 4,850: 4,950, then … (watch what happens when you pass 5,000).`,
+            explain: `<p>Add 3 hundreds: 4,850 → 4,950 → 5,050 → <b>5,150</b>.</p><p class="why-not">4,880 adds 3 tens and 4,853 adds 3 ones. 7,850 adds 3 thousands. 5,050 stops one hundred too soon.</p>` },
+          { id: "m1b", cat: "Time & timetables",
+            stem: `<p>A film starts at <b>10:45 am</b> and runs for <b>1 hour 30 minutes</b>. What time does it finish?</p>`,
+            options: ["11:15 am", "11:45 am", "12:15 pm", "12:45 pm", "1:15 pm"], answer: 2,
+            hint: `Add the hour first, then the 30 minutes. 15 of those minutes take you up to the next o'clock.`,
+            explain: `<p>10:45 am + 1 hour = 11:45 am. Then 30 minutes more: 15 minutes reaches 12:00, and the other 15 gives <b>12:15 pm</b>.</p><p class="why-not">11:45 am adds only the hour, and 11:15 am adds only the 30 minutes. 12:45 pm adds 2 hours.</p>` },
+          { id: "m1c", cat: "Money & best value",
+            stem: `<p>Zoe buys a drink for <b>$2.60</b> and a sandwich for <b>$4.75</b>. She pays with a <b>$10</b> note. How much change does she get?</p>`,
+            options: ["$2.35", "$2.65", "$3.35", "$3.65", "$7.35"], answer: 1,
+            hint: `Two steps: first find the total cost, then take it away from $10.`,
+            explain: `<p>Total: $2.60 + $4.75 = $7.35. Change: $10.00 − $7.35 = <b>$2.65</b>.</p><p class="why-not">$7.35 is what she spent, not her change. $3.65 forgets that the cents add up to more than a dollar ($6.35 instead of $7.35).</p>` },
+          { id: "m1d", cat: "Number & place value",
+            stem: `<p>What number goes in the box?</p><p class="gapline" style="text-align:center">57 + ☐ = 100 − 15</p>`,
+            options: ["28", "38", "43", "72", "85"], answer: 0,
+            hint: `The equals sign means both sides are worth the same. Work out the right-hand side first.`,
+            explain: `<p>The right side is 100 − 15 = 85. So 57 + ☐ = 85, and ☐ = 85 − 57 = <b>28</b>.</p><p class="why-not">85 is the value of the right side, not the box. 43 is 100 − 57, which forgets to take away the 15. 72 is 57 + 15. 38 is a slip in the subtraction.</p>` },
+        ],
+      },
+      {
+        id: "m2", name: "Coral Maze",
+        questions: [
+          { id: "m2a", cat: "Measurement & scales",
+            stem: `<p>The jug shows how much juice Ali has.</p>${JUG}<p>He pours <b>100 mL</b> into a glass. How much juice is left in the jug?</p>`,
+            options: ["210 mL", "250 mL", "300 mL", "350 mL", "450 mL"], answer: 1,
+            hint: `The small mark has no label. It is exactly halfway between 300 mL and 400 mL, so what is it worth?`,
+            explain: `<p>The small mark is halfway between 300 and 400, so the jug holds 350 mL. After pouring out 100 mL: 350 − 100 = <b>250 mL</b>.</p><p class="why-not">350 mL is what was in the jug before pouring. 210 mL reads the small mark as 310. 450 mL adds instead of taking away.</p>` },
+          { id: "m2b", cat: "Fractions",
+            stem: `<p>A pizza is cut into <b>8 equal slices</b>. Tom eats 2 slices. Mia eats <b>one quarter</b> of the whole pizza. What fraction of the pizza is left?</p>`,
+            options: ["<sup>1</sup>⁄<sub>8</sub>", "<sup>1</sup>⁄<sub>4</sub>", "<sup>3</sup>⁄<sub>8</sub>", "<sup>1</sup>⁄<sub>2</sub>", "<sup>5</sup>⁄<sub>8</sub>"], answer: 3,
+            hint: `How many of the 8 slices make one quarter of the pizza? It isn't one slice.`,
+            explain: `<p>One quarter of 8 slices is 2 slices. So 2 + 2 = 4 slices are eaten and 4 are left. 4 out of 8 is <b>one half</b>.</p><p class="why-not"><sup>5</sup>⁄<sub>8</sub> treats “one quarter” as one slice. <sup>1</sup>⁄<sub>4</sub> is how much each child ate, not what is left.</p>` },
+          { id: "m2c", cat: "Area, perimeter & 3D",
+            stem: `<p>A rectangle has a <b>perimeter of 26 cm</b>. Its long sides are each <b>8 cm</b>. What is its <b>area</b>?</p>`,
+            options: ["18 cm²", "26 cm²", "40 cm²", "80 cm²", "208 cm²"], answer: 2,
+            hint: `First find a short side. The two long sides use up 16 cm of the perimeter, and what is left is shared by <b>two</b> short sides.`,
+            explain: `<p>The two long sides: 8 + 8 = 16 cm. That leaves 26 − 16 = 10 cm for two short sides, so each is 5 cm. Area = 8 × 5 = <b>40 cm²</b>.</p><p class="why-not">80 cm² forgets to halve the 10 cm (8 × 10). 18 is 26 − 8, and 208 is 26 × 8: both mix up perimeter and side lengths.</p>` },
+          { id: "m2d", cat: "Patterns & sequences",
+            stem: `<p>Beads on a string repeat in this pattern:</p>${BEADS("🔴🔴🔵🟢🔴🔴🔵🟢🔴🔴🔵🟢")}<p>How many of the <b>first 22 beads</b> are <b>red</b>?</p>`,
+            options: ["8", "9", "10", "11", "12"], answer: 4,
+            hint: `The pattern repeats every 4 beads, with 2 reds in each block. How many whole blocks fit into 22, and which beads are left over?`,
+            explain: `<p>Each block of 4 beads (red, red, blue, green) has 2 reds. 22 = 5 blocks (20 beads) + 2 more beads. The 5 blocks have 10 reds, and the next 2 beads are red, red. 10 + 2 = <b>12</b>.</p><p class="why-not">10 counts only the whole blocks and forgets the 2 beads left over. 11 counts just one of them.</p>` },
+        ],
+      },
+      {
+        id: "m3", name: "Kelp Canyon",
+        questions: [
+          { id: "m3a", cat: "Money & best value",
+            stem: `<p>A shop sells pencils three ways:</p><ul style="margin:0 0 10px"><li>one pencil for <b>80c</b></li><li>a pack of 4 for <b>$3.00</b></li><li>a pack of 10 for <b>$7.00</b></li></ul><p>What is the <b>least</b> Ravi can pay for <b>exactly 12</b> pencils?</p>`,
+            options: ["$8.60", "$9.00", "$9.20", "$9.60", "$10.00"], answer: 0,
+            hint: `Three packs of 4 looks neat, but is it the cheapest? Try each way of making 12 and compare.`,
+            explain: `<p>Ways to make 12: a pack of 10 + 2 singles = $7.00 + $1.60 = <b>$8.60</b>; three packs of 4 = $9.00; two packs of 4 + 4 singles = $9.20; 12 singles = $9.60. The cheapest is $8.60.</p><p class="why-not">$9.00 is the tidy answer (three packs of 4), but the pack of 10 is better value per pencil. $10.00 buys both packs, which is 14 pencils, not 12.</p>` },
+          { id: "m3b", cat: "Chance & counting",
+            stem: `<p>A bag holds <b>5 red</b>, <b>3 blue</b> and <b>2 green</b> marbles. Kim takes one without looking.</p><div class="box">1. A red marble is more likely than a marble that is not red.<br>2. Green is the least likely colour.<br>3. It is impossible to take a yellow marble.</div><p>Which statements are correct?</p>`,
+            options: ["1 only", "2 only", "1 and 2 only", "2 and 3 only", "1, 2 and 3"], answer: 3,
+            hint: `For statement 1, count the marbles that are <b>not</b> red: blue and green together.`,
+            explain: `<p>Statement 1: there are 5 red and 3 + 2 = 5 not red, so they are <b>equally</b> likely. Not correct. Statement 2: green has the fewest marbles (2), so it is least likely. Correct. Statement 3: there are no yellow marbles, so it is impossible. Correct. So <b>2 and 3 only</b>.</p><p class="why-not">Statement 1 is the trap: red is the most likely <em>colour</em>, but it is not more likely than all the other marbles put together.</p>` },
+          { id: "m3c", cat: "Rates",
+            stem: `<p>A machine prints <b>45 posters in 3 minutes</b>. Printing at the same speed, how many posters does it print in <b>8 minutes</b>?</p>`,
+            options: ["53", "90", "120", "135", "360"], answer: 2,
+            hint: `Find how many posters it prints in <b>one</b> minute first.`,
+            explain: `<p>In one minute: 45 ÷ 3 = 15 posters. In 8 minutes: 15 × 8 = <b>120</b>.</p><p class="why-not">360 is 45 × 8, which treats 45 as the number for one minute. 135 is 45 × 3. 53 just adds 45 and 8.</p>` },
+          { id: "m3d", cat: "Time & timetables",
+            stem: `<p>Today is <b>Wednesday</b>. What day of the week will it be in <b>40 days</b>?</p>`,
+            options: ["Thursday", "Friday", "Saturday", "Sunday", "Monday"], answer: 4,
+            hint: `Every 7 days you land on Wednesday again. How many whole weeks are in 40 days, and how many days are left over?`,
+            explain: `<p>40 = 5 weeks (35 days) + 5 days. After 35 days it is Wednesday again. Five more days: Thursday, Friday, Saturday, Sunday, <b>Monday</b>.</p><p class="why-not">Sunday counts Wednesday itself as the first of the 5 days. Friday comes from 40 ÷ 7 ≈ 5 with the wrong leftover (2 instead of 5).</p>` },
+        ],
+      },
+      {
+        id: "m4", name: "The Deep Trench",
+        questions: [
+          { id: "m4a", cat: "Number & place value",
+            stem: `<p>Lena thinks of a number. She <b>doubles</b> it, <b>subtracts 6</b>, then <b>divides by 4</b>. Her answer is <b>5</b>. What number did she start with?</p>`,
+            options: ["1", "7", "13", "26", "52"], answer: 2,
+            hint: `Work backwards from 5, undoing each step in reverse order. The opposite of “divide by 4” is “multiply by 4”.`,
+            explain: `<p>Work backwards: 5 × 4 = 20. Undo “subtract 6”: 20 + 6 = 26. Undo “double”: 26 ÷ 2 = <b>13</b>. Check: 13 → 26 → 20 → 5. ✓</p><p class="why-not">26 stops one step early (it forgets to undo the doubling). 7 subtracts 6 again instead of adding it back. 1 does the steps forwards starting from 5.</p>` },
+          { id: "m4b", cat: "Number & place value",
+            stem: `<p>Two numbers <b>add up to 50</b>. One is <b>14 more</b> than the other. What is the <b>larger</b> number?</p>`,
+            options: ["18", "25", "28", "32", "36"], answer: 3,
+            hint: `Take the extra 14 away from 50 first. What is left is shared equally between the two numbers.`,
+            explain: `<p>50 − 14 = 36, and 36 ÷ 2 = 18. So the smaller number is 18 and the larger is 18 + 14 = <b>32</b>. Check: 18 + 32 = 50. ✓</p><p class="why-not">18 is the smaller number, not the one asked for. 36 is 50 − 14 without halving. 25 is half of 50, which ignores the difference.</p>` },
+          { id: "m4c", cat: "Area, perimeter & 3D",
+            stem: `<p>A <b>square</b> paddock has sides <b>12 m</b> long. A farmer puts a fence post at <b>every corner</b>, and then more posts so that the posts are <b>3 m apart</b> all the way round. How many posts does she use?</p>`,
+            options: ["16", "17", "20", "24", "48"], answer: 0,
+            hint: `Each side has 5 posts, but be careful: a corner post belongs to <b>two</b> sides. Don't count it twice.`,
+            explain: `<p>The distance all the way round is 4 × 12 = 48 m. Going round a closed shape, there is one post for every 3 m gap: 48 ÷ 3 = <b>16</b>.</p><p class="why-not">20 counts 5 posts on each side (5 × 4), which counts every corner post twice. 17 adds an extra end post, which is right for a straight fence but not for a loop. 48 is the distance round.</p>` },
+          { id: "m4d", cat: "Rates",
+            stem: `<p>Sam folds <b>4 paper boats every 10 minutes</b>. Lee folds <b>3 paper boats every 5 minutes</b>. Working at the same time, how long do they take to fold <b>70 boats</b> altogether?</p>`,
+            options: ["50 minutes", "1 hour 10 minutes", "1 hour 40 minutes", "2 hours 30 minutes", "2 hours 55 minutes"], answer: 1,
+            hint: `Their times are different (10 minutes and 5 minutes). How many boats does <b>Lee</b> fold in 10 minutes?`,
+            explain: `<p>Use the same amount of time for both. In 10 minutes Sam folds 4 and Lee folds 3 + 3 = 6, so together they fold 10 boats every 10 minutes. 70 boats take <b>70 minutes = 1 hour 10 minutes</b>.</p><p class="why-not">1 hour 40 minutes adds 4 + 3 = 7 boats every 10 minutes, forgetting that Lee's 3 boats take only 5 minutes. 2 hours 55 minutes is Sam working alone.</p>` },
+        ],
+      },
+      {
+        id: "mb", name: "Captain Kraken", boss: true,
+        questions: [
+          { id: "mba", cat: "Fractions",
+            stem: `<p>Mia spent <b>one third</b> of her money on a book. Then she spent <b>half of what was left</b> on a game. She now has <b>$12</b>. How much money did she start with?</p>`,
+            options: ["$18", "$24", "$36", "$48", "$72"], answer: 2,
+            hint: `Work backwards. The game cost half of what she had after the book, so the $12 she has left is the <b>other</b> half.`,
+            explain: `<p>Work backwards. After the game she has $12, which is half of what she had after the book, so after the book she had $24. That $24 is the two thirds left after spending one third, so one third is $12 and the whole is <b>$36</b>. Check: $36 − $12 = $24, then half of $24 is $12. ✓</p><p class="why-not">$72 multiplies 12 × 2 × 3, treating $24 as one third instead of two thirds. $24 stops one step early.</p>` },
+          { id: "mbb", cat: "Graphs & data",
+            stem: `<p>The graph shows how many books five children read last term.</p>${GRAPH}<div class="box">1. Cy read exactly twice as many books as Ben.<br>2. Ava and Ben together read fewer books than Dee and Eli together.<br>3. Three of the children read more than 8 books.</div><p>Which statements are correct?</p>`,
+            options: ["2 only", "3 only", "1 and 2 only", "2 and 3 only", "1, 2 and 3"], answer: 0,
+            hint: `The lines go up in 2s, so a column that stops <b>halfway</b> between two lines is an odd number. Read Ben and Cy carefully.`,
+            explain: `<p>Read the columns: Ava 8, Ben 5, Cy 11, Dee 6, Eli 10. Statement 1: twice 5 is 10, but Cy read 11. Not correct. Statement 2: 8 + 5 = 13 and 6 + 10 = 16, and 13 is fewer than 16. Correct. Statement 3: only Cy (11) and Eli (10) read <b>more than</b> 8; Ava read exactly 8. Not correct. So <b>2 only</b>.</p><p class="why-not">Statement 1 looks right if you read Cy's column as 12 or Ben's as 6. Statement 3 looks right if you count Ava, but 8 is not more than 8.</p>` },
+          { id: "mbc", cat: "Area, perimeter & 3D",
+            stem: `<p>This large cube is made of <b>27 small cubes</b>. The whole outside of the large cube is painted red, and then it is pulled apart.</p>${CUBE}<p>How many small cubes have <b>exactly two</b> red faces?</p>`,
+            options: ["8", "12", "18", "24", "26"], answer: 1,
+            hint: `Corner cubes have three painted faces. Look for the cubes in the <b>middle of each edge</b> of the large cube. How many edges does a cube have?`,
+            explain: `<p>A small cube has exactly two red faces when it sits in the middle of an <b>edge</b> of the large cube (not at a corner). A cube has 12 edges, and each edge has one middle cube: <b>12</b>.</p><p class="why-not">8 is the number of corner cubes, which have three red faces. 26 is every cube with any paint at all (only the one in the very centre has none). 24 counts two cubes on every edge.</p>` },
+          { id: "mbd", cat: "Number & place value",
+            stem: `<p>Using each of the digits <b>2</b>, <b>6</b> and <b>9</b> exactly once, Noah makes the <b>largest</b> possible 3-digit number and the <b>smallest</b> possible 3-digit number. What is the <b>difference</b> between them?</p>`,
+            options: ["603", "683", "687", "693", "707"], answer: 3,
+            hint: `Largest: biggest digit first. Smallest: smallest digit first. Then subtract carefully, because the ones need a trade (2 − 9 can't be done).`,
+            explain: `<p>Largest: 962. Smallest: 269. 962 − 269: take away 262 to get 700, then 7 more: <b>693</b>.</p><p class="why-not">707 takes the smaller digit from the larger in every column (9 − 2, 6 − 6, 9 − 2) instead of trading. 683 and 603 are slips in the trading.</p>` },
+          { id: "mbe", cat: "Money & best value",
+            stem: `<p><b>3 pens and 2 rulers</b> cost <b>$9.50</b>.<br><b>1 pen and 2 rulers</b> cost <b>$5.50</b>.</p><p>How much do <b>1 pen and 1 ruler</b> cost together?</p>`,
+            options: ["$1.75", "$2.00", "$2.75", "$3.00", "$3.75"], answer: 4,
+            hint: `Compare the two lines. The rulers are the same in both, so the extra $4.00 pays for the 2 extra pens.`,
+            explain: `<p>The first lot has 2 more pens and costs $9.50 − $5.50 = $4.00 more, so one pen is $2.00. Then 1 pen + 2 rulers = $5.50 means 2 rulers cost $3.50, so one ruler is $1.75. Together: $2.00 + $1.75 = <b>$3.75</b>.</p><p class="why-not">$2.00 is the pen alone and $1.75 is the ruler alone: both stop before answering the question. $2.75 just halves $5.50.</p>` },
+        ],
+      },
+    ],
+  });
+})();
+
+</script>
+<script>
+(() => {
+"use strict";
+const KEY = "prac2.v1";
+const LETTERS = "ABCDE";
+const RANKS = [[0, "Rookie"], [100, "Scout"], [250, "Explorer"], [450, "Pathfinder"], [700, "Champion"], [1000, "Hero"], [1300, "Legend"]];
+const BADGES = [
+  ["first", "🥾", "First steps", "Finish your first level"],
+  ["three", "🌟", "Three stars", "Get 3 stars on a level"],
+  ["streak5", "🔥", "On fire", "5 right first time in a row"],
+  ["streak10", "☄️", "Unstoppable", "10 right first time in a row"],
+  ["comeback", "💪", "Comeback kid", "Beat a question that beat you before"],
+  ["days3", "📅", "Three days running", "Play 3 days in a row"],
+  ["days7", "🗓️", "A whole week", "Play 7 days in a row"],
+  ...WORLDS.map(w => ["boss_" + w.id, "👑", w.crown, "Defeat " + w.boss.name]),
+  ["perfect", "💎", "Flawless", "Defeat a boss without a single miss"],
+  ["all", "🏆", "Triple crown", "Win all three crowns"],
+];
+const app = document.getElementById("app");
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ---------- saved progress ---------- */
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.levels) return Object.assign({ levels: {}, q: {}, xp: 0, badges: {}, days: [], sound: true }, s); } catch (e) {}
+  return { levels: {}, q: {}, xp: 0, badges: {}, days: [], sound: true };
+}
+let S = load();
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+function dayStreak() {
+  const set = new Set(S.days); let n = 0; const d = new Date();
+  if (!set.has(today())) d.setDate(d.getDate() - 1);
+  for (;;) { const k = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); if (!set.has(k)) break; n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+
+/* ---------- rules ---------- */
+const best = lv => (S.levels[lv.id] || {}).stars || 0;
+const regular = w => w.levels.filter(l => !l.boss);
+const worldStars = w => regular(w).reduce((a, l) => a + best(l), 0);
+const BOSS_GATE = 9;
+function starsFor(lv, pts) {
+  const max = lv.questions.length * 2;
+  if (lv.boss) return pts >= max ? 3 : pts >= max - 2 ? 2 : pts >= max - 3 ? 1 : 0;
+  return pts >= max - 1 ? 3 : pts >= max - 3 ? 2 : pts >= max - 5 ? 1 : 0;
+}
+function lockReason(w, i) {
+  const lv = w.levels[i];
+  if (lv.boss) { const s = worldStars(w); return s >= BOSS_GATE ? "" : `Collect ${BOSS_GATE} ⭐ in ${w.name} to wake the boss (you have ${s})`; }
+  if (i === 0 || best(w.levels[i - 1]) >= 2) return "";
+  return `Get 2 ⭐ on “${w.levels[i - 1].name}” to unlock`;
+}
+const rankOf = xp => { let r = 0; RANKS.forEach((x, i) => { if (xp >= x[0]) r = i; }); return r; };
+const allQuestions = () => WORLDS.flatMap(w => w.levels.flatMap(l => l.questions.map(q => ({ q, lv: l, w }))));
+const caveList = () => allQuestions().filter(x => S.q[x.q.id] && S.q[x.q.id].seen && (S.q[x.q.id].best || 0) < 2);
+
+/* ---------- sound and sparkle ---------- */
+let actx = null;
+function tone(freqs, dur = 0.12, type = "triangle", gain = 0.12) {
+  if (!S.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * dur;
+      o.type = type; o.frequency.value = f; g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur * 1.6);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur * 1.7);
+    });
+  } catch (e) {}
+}
+const SFX = { right: () => tone([523, 784]), retry: () => tone([392, 587]), wrong: () => tone([196, 147], 0.16, "sawtooth", 0.07),
+  win: () => tone([523, 659, 784, 1047], 0.14), boss: () => tone([392, 523, 659, 784, 1047, 1319], 0.15), hit: () => tone([150, 90], 0.1, "square", 0.08) };
+function confetti(n = 140) {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.getElementById("confetti"), x = c.getContext("2d");
+  c.hidden = false; c.width = innerWidth; c.height = innerHeight;
+  const cols = ["#f5b82e", "#ff6b6b", "#4dabf7", "#51cf66", "#cc5de8", "#fff"];
+  const ps = Array.from({ length: n }, () => ({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5, vx: (Math.random() - .5) * 4, vy: 2 + Math.random() * 4, s: 5 + Math.random() * 7, c: cols[Math.floor(Math.random() * cols.length)], r: Math.random() * 6 }));
+  let t = 0;
+  (function step() {
+    x.clearRect(0, 0, c.width, c.height);
+    ps.forEach(p => { p.x += p.vx; p.y += p.vy; p.r += .15; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * .6); x.restore(); });
+    if (++t < 170) requestAnimationFrame(step); else c.hidden = true;
+  })();
+}
+function flash(cls, text, ms = 1700) { const d = document.createElement("div"); d.className = cls; d.textContent = text; document.body.appendChild(d); setTimeout(() => d.remove(), ms); }
+function award(id) { if (S.badges[id]) return false; S.badges[id] = today(); const b = BADGES.find(b => b[0] === id); if (b) newBadges.push(b); return true; }
+let newBadges = [];
+let streak = 0;
+
+/* ---------- the map ---------- */
+const starRow = (n, of = 3) => Array.from({ length: of }, (_, i) => `<span class="${i < n ? "" : "off"}">⭐</span>`).join("");
+function showMap() {
+  play = null;
+  const r = rankOf(S.xp), nextAt = RANKS[r + 1] ? RANKS[r + 1][0] : null, base = RANKS[r][0];
+  const pct = nextAt ? Math.round(100 * (S.xp - base) / (nextAt - base)) : 100;
+  const ds = dayStreak(), cave = caveList();
+  let nextMarked = false;
+  const worlds = WORLDS.map(w => {
+    const beaten = best(w.levels[w.levels.length - 1]) > 0;
+    const nodes = w.levels.map((lv, i) => {
+      const why = lockReason(w, i), b = best(lv);
+      const isNext = !why && b === 0 && !nextMarked && (nextMarked = true);
+      return `<button class="node${why ? " locked" : ""}${lv.boss ? " boss" : ""}${lv.boss && b ? " beaten" : ""}${isNext ? " next" : ""}" data-w="${w.id}" data-l="${lv.id}" ${why ? `data-why="${esc(why)}"` : ""}>
+        <span class="num">${why ? "🔒" : lv.boss ? (b ? "👑" : w.boss.emoji) : i + 1}</span>
+        <span class="nm">${esc(lv.boss ? w.boss.name : lv.name)}</span>
+        ${why ? `<span class="req">${esc(lv.boss ? `Needs ${BOSS_GATE} ⭐` : "Locked")}</span>` : `<span class="st">${starRow(b)}</span>`}
+      </button>`;
+    }).join("");
+    return `<section class="world" style="--world:${w.color}">
+      <h2>${w.icon} ${esc(w.name)} ${beaten ? "👑" : ""}<small>${worldStars(w)} / ${regular(w).length * 3} ⭐</small></h2>
+      <p class="sub">${esc(w.blurb)}</p>
+      <div class="path">${nodes}</div>
+    </section>`;
+  }).join("");
+  const crowns = WORLDS.filter(w => best(w.levels[w.levels.length - 1]) > 0).length;
+  app.innerHTML = `
+    <div class="top"><h1>👑 Crown <span>Quest</span></h1><span class="spacer"></span>
+      ${ds > 0 ? `<span class="pill">🔥 ${ds}-day streak</span>` : ""}
+      <span class="pill">👑 ${crowns} / ${WORLDS.length}</span>
+      <button class="pill" id="snd" aria-label="Sound on or off">${S.sound ? "🔊 Sound on" : "🔇 Sound off"}</button></div>
+    <div class="rank">Rank: <b>${RANKS[r][1]}</b> · ${S.xp} XP ${nextAt ? `<span style="opacity:.8">· ${nextAt - S.xp} XP to ${RANKS[r + 1][1]}</span>` : "· top rank!"}
+      <div class="xpbar"><i style="width:${pct}%"></i></div></div>
+    ${cave.length ? `<div class="cave"><div class="txt"><b>💪 Comeback Cave</b><br>${cave.length} question${cave.length > 1 ? "s" : ""} got away from you. Come back and beat ${cave.length > 1 ? "them" : "it"} for bonus XP!</div>
+      <button class="btn gold" id="cave">Enter the cave</button></div>` : ""}
+    ${worlds}
+    <div class="shelf"><h3>Badges (${Object.keys(S.badges).length} / ${BADGES.length})</h3>
+      <div class="badges">${BADGES.map(b => `<span class="badge${S.badges[b[0]] ? "" : " off"}" title="${esc(b[3])}"><i>${b[1]}</i><span><b>${esc(b[2])}</b><br><small>${esc(b[3])}</small></span></span>`).join("")}</div></div>
+    ${parents()}`;
+  $("#snd").onclick = () => { S.sound = !S.sound; save(); showMap(); if (S.sound) SFX.right(); };
+  if ($("#cave")) $("#cave").onclick = startCave;
+  app.querySelectorAll(".node").forEach(n => n.onclick = () => {
+    if (n.dataset.why) { flash("toast", "🔒 " + n.dataset.why, 2600); SFX.wrong(); return; }
+    const w = WORLDS.find(w => w.id === n.dataset.w); startLevel(w, w.levels.find(l => l.id === n.dataset.l));
+  });
+  const reset = $("#reset");
+  if (reset) reset.onclick = () => { if (confirm("Wipe ALL progress in this game on this device? This can't be undone.")) { localStorage.removeItem(KEY); S = load(); showMap(); } };
+  window.scrollTo(0, 0);
+}
+function parents() {
+  const rows = {};
+  allQuestions().forEach(({ q, w }) => {
+    const k = w.name + " · " + q.cat, r = rows[k] = rows[k] || { n: 0, seen: 0, first: 0, second: 0 }, s = S.q[q.id];
+    r.n++; if (s && s.seen) { r.seen++; if (s.first === 2) r.first++; else if (s.first === 1) r.second++; }
+  });
+  return `<details class="parents"><summary>For grown-ups: progress by question type</summary>
+    <p>“Right first time” counts the very first attempt at each question. Progress is saved in this browser on this device only.</p>
+    <table><tr><th>Question type</th><th class="n">Tried</th><th class="n">Right first time</th><th class="n">Right after a hint</th></tr>
+    ${Object.entries(rows).map(([k, r]) => `<tr><td>${esc(k)}</td><td class="n">${r.seen} of ${r.n}</td><td class="n">${r.first}</td><td class="n">${r.second}</td></tr>`).join("")}</table>
+    <button class="btn ghost" id="reset">Reset all progress…</button></details>`;
+}
+
+/* ---------- playing a level ---------- */
+let play = null;
+function startLevel(w, lv) { play = { w, lv, items: lv.questions.map(q => ({ q, lv })), idx: 0, pts: 0, res: [], cave: false }; begin(); }
+function startCave() {
+  const items = caveList().slice(0, 5).map(x => ({ q: x.q, lv: x.lv, w: x.w }));
+  play = { w: { name: "Comeback Cave", color: "#b97f00" }, lv: { id: "cave", name: "Comeback Cave" }, items, idx: 0, pts: 0, res: [], cave: true }; begin();
+}
+function begin() {
+  newBadges = []; play.rank0 = rankOf(S.xp);
+  const t = today(); if (!S.days.includes(t)) { S.days.push(t); S.days = S.days.slice(-60); save(); }
+  showQuestion();
+}
+function showQuestion() {
+  const p = play, it = p.items[p.idx], q = it.q, lv = it.lv, boss = p.lv.boss;
+  p.tries = 0; p.done = false;
+  document.querySelectorAll(".combo").forEach(c => c.remove());
+  const max = p.items.length * 2;
+  const passage = lv.passage ? `<div class="card passage"><h3>${lv.passage.title}</h3>${lv.passage.note ? `<p class="note">${lv.passage.note}</p>` : ""}${lv.passage.html}</div>` : "";
+  app.innerHTML = `
+    <div class="playbar"><button class="pill" id="quit">← Map</button><span class="title">${esc(p.w.name)} · ${esc(boss ? p.w.boss.name : p.lv.name)}</span><span class="spacer" style="flex:1"></span>
+      <span class="dots">${p.items.map((_, i) => `<i class="${i < p.idx ? "p" + p.res[i] : i === p.idx ? "cur" : ""}"></i>`).join("")}</span><span class="pill" id="gems">💎 ${p.pts}</span></div>
+    ${boss ? `<div class="bossbox"><div class="face" id="face">${p.w.boss.emoji}</div><div class="info"><b>${esc(p.w.boss.name)}</b>
+      <div class="hp"><i id="hp" style="width:${100 * (max - p.pts) / max}%"></i></div><div class="say" id="say">${esc(p.idx === 0 ? p.w.boss.taunt : "Is that all you've got?")}</div></div></div>` : ""}
+    <div class="stage${passage ? " has-passage" : ""}" style="--world:${p.w.color}">${passage}
+      <div class="card"><div class="qhead"><span>Question ${p.idx + 1} of ${p.items.length}</span><span>${esc(q.cat)}</span></div>
+        <div class="stem">${q.stem}</div>
+        <div class="opts${q.visual ? " visual" : ""}" id="opts">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><span class="let">${LETTERS[i]}</span><span>${o}</span></button>`).join("")}</div>
+        <div id="fb" aria-live="polite"></div></div></div>`;
+  $("#quit").onclick = () => { if (p.idx === 0 && p.tries === 0 || confirm("Leave this level? Your stars for this try won't be saved.")) showMap(); };
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => choose(Number(b.dataset.i), b));
+  window.scrollTo(0, 0);
+}
+function choose(i, btn) {
+  const p = play, it = p.items[p.idx], q = it.q;
+  if (p.done || btn.disabled) return;
+  p.tries++;
+  const right = i === q.answer, fb = $("#fb"), boss = p.lv.boss;
+  if (!right && p.tries === 1) {
+    btn.classList.add("wrong"); btn.disabled = true; SFX.wrong(); streak = 0;
+    if (boss) { const f = $("#face"); f.classList.remove("laugh"); void f.offsetWidth; f.classList.add("laugh"); $("#say").textContent = "Ha! Not quite…"; }
+    fb.innerHTML = `<div class="fb hint"><h4>💡 Not yet. Here's a hint</h4><p>${q.hint}</p><p><b>Have another go.</b></p></div>`;
+    return;
+  }
+  p.done = true;
+  const pts = right ? (p.tries === 1 ? 2 : 1) : 0;
+  p.pts += pts; p.res[p.idx] = pts;
+  app.querySelectorAll(".opt").forEach(b => { b.disabled = true; const j = Number(b.dataset.i); if (j === q.answer) b.classList.add("right"); else if (j === i) b.classList.add("wrong"); else b.classList.add("dim"); });
+  $("#gems").textContent = "💎 " + p.pts;
+  /* remember how this question went */
+  const s = S.q[q.id] = S.q[q.id] || { seen: 0, best: 0 };
+  const before = s.best || 0, wasMissed = s.seen > 0 && before < 2;
+  if (!s.seen) s.first = pts;
+  s.seen++; s.best = Math.max(before, pts);
+  let gain = Math.max(0, pts - before) * 10 + (pts ? 1 : 0);
+  if (pts === 2 && wasMissed) { gain += 10; award("comeback"); }
+  S.xp += gain;
+  if (pts === 2) { streak++; if (streak === 5) award("streak5"); if (streak === 10) award("streak10"); } else streak = 0;
+  save();
+  if (boss && pts) { const f = $("#face"); f.classList.remove("hit"); void f.offsetWidth; f.classList.add("hit"); $("#hp").style.width = (100 * (p.items.length * 2 - p.pts) / (p.items.length * 2)) + "%"; $("#say").textContent = pts === 2 ? "Ouch! A direct hit!" : "Oof… that one grazed me."; SFX.hit(); }
+  if (pts === 2) { SFX.right(); if (streak >= 3) flash("combo", `🔥 ${streak} in a row!`); } else if (pts === 1) SFX.retry(); else SFX.wrong();
+  const head = pts === 2 ? (wasMissed ? "💪 You beat it this time! +2 💎" : "✅ Right first time! +2 💎") : pts === 1 ? "👍 Got it on the second go. +1 💎" : "This one got away. Here's how it works";
+  const last = p.idx === p.items.length - 1;
+  fb.innerHTML = `<div class="fb ${pts ? "good" : "miss"}"><h4>${head}</h4>${q.explain}${pts < 2 ? `<p><b>${p.cave ? "It stays in the Comeback Cave until you get it first time." : "You'll meet this one again in the Comeback Cave."}</b></p>` : ""}</div>
+    <div class="next"><button class="btn" id="next" style="background:${p.w.color}">${last ? "Finish →" : "Next question →"}</button></div>`;
+  $("#next").onclick = () => { if (last) finish(); else { p.idx++; showQuestion(); } };
+  $("#next").scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+function finish() {
+  const p = play, lv = p.lv, n = p.items.length, max = n * 2;
+  const lines = [];
+  let stars = 0, title, big;
+  if (p.cave) {
+    const beat = p.res.filter(r => r === 2).length, left = caveList().length;
+    big = beat === n ? "💪" : "🕯️"; title = beat ? `You beat ${beat} of ${n}!` : "They got away again";
+    lines.push(left ? `${left} question${left > 1 ? "s" : ""} still hiding in the cave.` : "The cave is empty. Every question you have met is beaten!");
+    if (beat) { SFX.win(); if (beat === n) confetti(90); }
+  } else {
+    stars = starsFor(lv, p.pts);
+    const rec = S.levels[lv.id] = S.levels[lv.id] || { stars: 0, pts: 0, plays: 0 };
+    const beforeStars = rec.stars, unlockedBefore = unlockedIds();
+    rec.plays++; rec.pts = Math.max(rec.pts, p.pts);
+    if (stars > beforeStars) { S.xp += (stars - beforeStars) * 10 + (lv.boss && !beforeStars ? 100 : 0); rec.stars = stars; }
+    award("first"); if (stars === 3 && !lv.boss) award("three");
+    if (lv.boss && stars) { award("boss_" + p.w.id); if (p.pts === max) award("perfect"); if (WORLDS.every(w => best(w.levels[w.levels.length - 1]) > 0)) award("all"); }
+    const ds = dayStreak(); if (ds >= 3) award("days3"); if (ds >= 7) award("days7");
+    save();
+    const opened = unlockedIds().filter(id => !unlockedBefore.includes(id));
+    if (lv.boss) {
+      if (stars) { big = "👑"; title = `You defeated ${p.w.boss.name}!`; lines.push(esc(p.w.boss.defeat)); if (!beforeStars) lines.push(`You won the <b>${esc(p.w.crown)}</b>. +100 XP`); SFX.boss(); confetti(260); }
+      else { big = p.w.boss.emoji; title = `${p.w.boss.name} got away…`; lines.push(`You did ${p.pts} damage out of ${max}. You need ${max - 3} to win. Read the explanations, then come back stronger!`); SFX.wrong(); }
+    } else {
+      big = stars === 3 ? "🎉" : stars ? "🙂" : "🌱"; title = stars === 3 ? "Perfect level!" : stars === 2 ? "Level cleared!" : stars === 1 ? "Nearly there!" : "Keep training!";
+      lines.push(`You scored ${p.pts} of ${max} 💎.`);
+      if (stars < 2) lines.push("You need 2 ⭐ to unlock the next level. Have another go: you've seen how each one works now.");
+      else if (stars === 2 && rec.stars < 3) lines.push("Play again and get every question first time for 3 ⭐.");
+      if (stars >= 2) { SFX.win(); if (stars === 3) confetti(); }
+    }
+    opened.forEach(id => { const x = findLevel(id); lines.push(`🔓 Unlocked: <b>${esc(x.lv.boss ? x.w.boss.name + " (boss!)" : x.lv.name)}</b>`); });
+    if (!lv.boss && !opened.length && stars >= 2) { const s = worldStars(p.w); if (s < BOSS_GATE && lockReason(p.w, p.w.levels.length - 1) && regular(p.w).every(l => best(l) >= 2)) lines.push(`You have ${s} ⭐ here. Get ${BOSS_GATE} ⭐ to wake the boss: replay a level for 3 ⭐.`); }
+  }
+  const missed = p.res.filter(r => r < 2).length;
+  if (!p.cave && missed) lines.push(`${missed} question${missed > 1 ? "s are" : " is"} waiting in the 💪 Comeback Cave.`);
+  newBadges.forEach(b => lines.push(`${b[1]} New badge: <b>${esc(b[2])}</b>`));
+  const r = rankOf(S.xp);
+  if (p.rank0 !== undefined && r > p.rank0) lines.push(`⬆️ New rank: <b>${RANKS[r][1]}</b>!`);
+  save();
+  app.innerHTML = `<div class="card result"><div class="big">${big}</div><h2>${esc(title)}</h2>
+    ${p.cave ? "" : `<div class="stars">${[0, 1, 2].map(i => `<span class="${i < stars ? "on" : ""}">⭐</span>`).join("")}</div>`}
+    <div class="lines">${lines.map(l => `<div>${l}</div>`).join("")}</div>
+    <div class="acts"><button class="btn ghost" id="again">Play again</button><button class="btn" id="map" style="background:${p.w.color}">Back to the map →</button></div></div>`;
+  $("#map").onclick = showMap;
+  $("#again").onclick = () => { if (p.cave) { if (caveList().length) startCave(); else showMap(); } else startLevel(p.w, lv); };
+  window.scrollTo(0, 0);
+}
+const unlockedIds = () => WORLDS.flatMap(w => w.levels.filter((l, i) => !lockReason(w, i)).map(l => l.id));
+const findLevel = id => { for (const w of WORLDS) { const lv = w.levels.find(l => l.id === id); if (lv) return { w, lv }; } };
+showMap();
+})();
+</script>
+</body>
+</html>
