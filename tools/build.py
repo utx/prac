@@ -261,5 +261,7 @@ if __name__ == "__main__":
     build_index(menu)
     build_admin(vs)
     print("built pracadmin/index.html")
+    import build_game
+    build_game.main()   # the adventure game at prac2/ (separate from the tests)
     held = [n for n, _, meta in vs if not published(meta)]
     print(f"index.html: {len(menu)} test(s)" + (f"; held for review (admin page only): {', '.join(f'v{n}' for n in held)}" if held else ""))

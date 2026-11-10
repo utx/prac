@@ -424,6 +424,9 @@ function render() {
       <td><a class="btn primary" href="../tests/v${t.version}/index.html?admin=1">Practice</a></td></tr>`).join("")}</table></div></div>` : "";
 
   // all tests
+  const gameCard = `<div class="card"><h2>Crown Quest (the adventure game)</h2>
+    <p class="sub">The game lives at <a href="../prac2/index.html">prac2/</a>. “Practice” opens it with every level unlocked and saves nothing, so the real game progress on this device is not touched.</p>
+    <a class="btn primary" id="game-practice" href="../prac2/index.html?admin=1">Practice</a></div>`;
   const testsTable = `<div class="card"><h2>All tests</h2><p class="sub">“Practice” opens a test without recording anything. You can also mark tests done or not done here.</p>
     <div class="tw"><table class="t"><tr><th>Test</th><th>Reading</th><th>Status</th><th>First score</th><th>R / T / M</th><th>Time</th>${reviewRows ? "<th>Your review</th>" : ""}<th></th></tr>
     ${[...MENU].reverse().map(t => {
@@ -473,7 +476,7 @@ function render() {
       <button class="btn danger" id="clear">Clear all progress</button></div></div>`;
 
   app.innerHTML = `<h1>Progress</h1><p class="sub">Only tests done from the student page are counted. Tests opened from here are never recorded.</p>
-    ${heldCard}${tiles}${focus}<div class="grid2">${bySection}${byFormat}</div><div style="height:18px"></div>${scoreChart}${byType}${habits}${mistakes}${fbCard}${testsTable}${data}`;
+    ${heldCard}${tiles}${focus}<div class="grid2">${bySection}${byFormat}</div><div style="height:18px"></div>${scoreChart}${byType}${habits}${mistakes}${fbCard}${gameCard}${testsTable}${data}`;
 
   app.querySelectorAll("[data-approve]").forEach(b => b.onclick = () => approveTest(+b.dataset.approve, b));
   app.querySelectorAll("[data-flag]").forEach(b => b.onclick = () => {
