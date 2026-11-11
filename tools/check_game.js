@@ -29,7 +29,8 @@ for (const w of WORLDS) {
   if (!w.levels[w.levels.length - 1].boss || w.levels.filter(l => l.boss).length !== 1) bad(`${w.id}: the last level (only) must be the boss`);
   for (const lv of w.levels) {
     if (ids.has(lv.id)) bad(`duplicate level id ${lv.id}`); ids.add(lv.id);
-    if (lv.questions.length !== (lv.boss ? 5 : 4)) bad(`${lv.id}: expected ${lv.boss ? 5 : 4} questions`);
+    const size = lv.boss ? 5 : lv.long ? 6 : 4;   // a long reading passage carries six questions
+    if (lv.questions.length !== size) bad(`${lv.id}: expected ${size} questions`);
     const letters = {};
     for (const q of lv.questions) {
       nq++;
@@ -119,6 +120,19 @@ console.log(`content: ${WORLDS.length} worlds, ${nq} questions checked`);
     if (!/chest4/.test(await page.$eval(".timecard .chest", e => e.getAttribute("src")))) bad(`${label}: a full hour should show the overflowing chest`);
     if (await secs() !== 3600) bad(`${label}: everything right first time should earn exactly one hour, not ${await secs()} s`);
     const st = await page.evaluate(() => JSON.parse(localStorage.getItem("prac2.v1")));
+    /* a speed run: one go per question against the clock; it must not touch stars or question records */
+    {
+      const lv = WORLDS[2].levels[0], before = JSON.stringify(st.q) + JSON.stringify(st.levels[lv.id].stars);
+      await page.click(`.speedchip[data-l="${lv.id}"]`);
+      if (!(await page.$("#clock"))) bad(`${label}: the speed run shows no clock`);
+      for (const q of lv.questions) { await page.click(`.opt[data-i="${q.answer}"]`); if (await page.$(".fb.hint")) bad(`${label}: a speed run gave a hint`); await page.click("#next"); }
+      if (!/beaten/i.test(await page.textContent(".result h2"))) bad(`${label}: an all-correct speed run was not a win`);
+      await page.click("#map");
+      if (!(await page.$(`.speedchip.done[data-l="${lv.id}"]`))) bad(`${label}: the beaten speed run is not marked on the map`);
+      const st2 = await page.evaluate(() => JSON.parse(localStorage.getItem("prac2.v1")));
+      if (JSON.stringify(st2.q) + JSON.stringify(st2.levels[lv.id].stars) !== before) bad(`${label}: a speed run changed the stars or the question records`);
+      if (!st2.badges.speed1) bad(`${label}: no badge for the first speed run`);
+    }
     if (!st.badges.all || !st.badges.boss_maths || !st.badges.three) bad(`${label}: badges were not awarded (${Object.keys(st.badges)})`);
     await page.reload();
     if ((await page.$$(".node.boss.beaten")).length !== 3) bad(`${label}: progress was not kept after a reload`);

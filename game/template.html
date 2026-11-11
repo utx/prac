@@ -54,6 +54,12 @@
   .node.boss .num { background: #7a1f3d; font-size: 24px; }
   .node.boss.beaten .num { background: var(--gold); }
   @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(245,184,46,.12); } }
+  .speed { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 10px; font-size: 14px; color: var(--ink-soft); }
+  .speed b { color: var(--ink); }
+  .speedchip { font: inherit; font-size: 13.5px; font-weight: 700; border: 2px solid #0d1330; border-radius: 99px; background: #fff; color: var(--ink); padding: 3px 11px; }
+  .speedchip:hover { background: #ffe81a; }
+  .speedchip.done { background: #ffe81a; }
+  #clock.low { background: #c0392b; border-color: #fff; animation: pulse 1s infinite; }
   .cave { background: #fff8e6; border: 2px dashed var(--gold-deep); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px;
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .cave .txt { flex: 1 1 240px; }
@@ -280,6 +286,8 @@ const BADGES = [
   ["comeback", "💪", "Comeback kid", "Beat a question that beat you before"],
   ["days3", "📅", "Three days running", "Play 3 days in a row"],
   ["days7", "🗓️", "A whole week", "Play 7 days in a row"],
+  ["speed1", "⚡", "Quick thinker", "Beat your first speed run"],
+  ["speed5", "🌩️", "Lightning", "Beat 5 speed runs"],
   ...WORLDS.map(w => ["boss_" + w.id, "👑", w.crown, "Defeat " + w.boss.name]),
   ["perfect", "💎", "Flawless", "Defeat a boss without a single miss"],
   ["all", "🏆", "Triple crown", "Win all three crowns"],
@@ -383,7 +391,7 @@ let streak = 0;
 /* ---------- the map ---------- */
 const starRow = (n, of = 3) => Array.from({ length: of }, (_, i) => `<span class="${i < n ? "" : "off"}">⭐</span>`).join("");
 function showMap() {
-  play = null;
+  play = null; stopSpeed();
   const r = rankOf(S.xp), nextAt = RANKS[r + 1] ? RANKS[r + 1][0] : null, base = RANKS[r][0];
   const pct = nextAt ? Math.round(100 * (S.xp - base) / (nextAt - base)) : 100;
   const ds = dayStreak(), cave = caveList();
@@ -405,6 +413,8 @@ function showMap() {
         <h2>${ISLE[w.id] ? "" : w.icon + " "}${esc(w.name)} ${beaten ? "👑" : ""}<small>${worldStars(w)} / ${regular(w).length * 3} ⭐</small></h2>
         <p class="sub">${esc(w.blurb)}</p></div></div>
       <div class="path">${nodes}</div>
+      <div class="speed"><b>⚡ Speed runs</b>${(() => { const open = w.levels.filter(l => PRACTICE || best(l) >= (l.boss ? 1 : 2));
+        return open.length ? "against the clock, no hints:" + open.map(l => `<button class="speedchip${(S.levels[l.id] || {}).fast ? " done" : ""}" data-w="${w.id}" data-l="${l.id}">${(S.levels[l.id] || {}).fast ? "⚡ " : ""}${esc(l.boss ? w.boss.name : l.name)}</button>`).join("") : "get 2 ⭐ on a level to unlock its speed run."; })()}</div>
     </section>`;
   }).join("");
   const crowns = WORLDS.filter(w => best(w.levels[w.levels.length - 1]) > 0).length;
@@ -431,6 +441,7 @@ function showMap() {
     <p class="legal">A private, non-commercial fan project. Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.</p>`;
   $("#snd").onclick = () => { S.sound = !S.sound; save(); showMap(); if (S.sound) SFX.right(); };
   if ($("#cave")) $("#cave").onclick = startCave;
+  app.querySelectorAll(".speedchip").forEach(c => c.onclick = () => { const w = WORLDS.find(w => w.id === c.dataset.w); startSpeed(w, w.levels.find(l => l.id === c.dataset.l)); });
   app.querySelectorAll(".node").forEach(n => n.onclick = () => {
     if (n.dataset.why) { flash("toast", "🔒 " + n.dataset.why, 2600); SFX.wrong(); return; }
     const w = WORLDS.find(w => w.id === n.dataset.w); startLevel(w, w.levels.find(l => l.id === n.dataset.l));
@@ -573,6 +584,70 @@ function finish() {
     <div class="acts"><button class="btn ghost" id="again">Play again</button><button class="btn" id="map" style="background:${p.w.color}">Back to the map →</button></div></div>`;
   $("#map").onclick = showMap;
   $("#again").onclick = () => { if (p.cave) { if (caveList().length) startCave(); else showMap(); } else startLevel(p.w, lv); };
+  window.scrollTo(0, 0);
+}
+/* ---------- speed runs: a level he has already passed, against the clock ----------
+   Like the real test: about 70 seconds a question (plus reading time for a passage), one go at
+   each question, no hints. All but one right before the clock runs out wins the level's ⚡.
+   Speed runs never change the stars, the question records or the Fortnite time. */
+let speed = null, speedTimer = null;
+const speedSecs = lv => lv.questions.length * 70 + (lv.passage ? 120 : 0);
+const clockText = s => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+function stopSpeed() { clearInterval(speedTimer); speedTimer = null; speed = null; }
+function startSpeed(w, lv) {
+  stopSpeed(); play = null;
+  speed = { w, lv, idx: 0, right: 0, left: speedSecs(lv), paused: false };
+  speedTimer = setInterval(() => {
+    if (!speed || speed.paused) return;
+    speed.left--;
+    const c = $("#clock"); if (c) { c.textContent = "⏱ " + clockText(Math.max(0, speed.left)); c.classList.toggle("low", speed.left <= 30); }
+    if (speed.left <= 0) endSpeed(true);
+  }, 1000);
+  showSpeedQuestion();
+}
+function showSpeedQuestion() {
+  const s = speed, lv = s.lv, q = lv.questions[s.idx];
+  s.paused = false;
+  const passage = lv.passage ? `<div class="card passage"><h3>${lv.passage.title}</h3>${lv.passage.note ? `<p class="note">${lv.passage.note}</p>` : ""}${lv.passage.html}</div>` : "";
+  app.innerHTML = `
+    <div class="playbar"><button class="pill" id="quit">← Map</button><span class="title">⚡ Speed run · ${esc(lv.boss ? s.w.boss.name : lv.name)}</span><span class="spacer" style="flex:1"></span>
+      <span class="dots">${lv.questions.map((_, i) => `<i class="${i === s.idx ? "cur" : ""}"></i>`).join("")}</span><span class="pill${s.left <= 30 ? " low" : ""}" id="clock">⏱ ${clockText(s.left)}</span></div>
+    <div class="stage${passage ? " has-passage" : ""}" style="--world:${s.w.color}">${passage}
+      <div class="card"><div class="qhead"><span>Question ${s.idx + 1} of ${lv.questions.length}</span><span>One go · no hints</span></div>
+        <div class="stem">${q.stem}</div>
+        <div class="opts${q.visual ? " visual" : ""}">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><span class="let">${LETTERS[i]}</span><span>${o}</span></button>`).join("")}</div>
+        <div id="fb" aria-live="polite"></div></div></div>`;
+  $("#quit").onclick = showMap;
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (s.paused) return;
+    s.paused = true;                                    // the clock waits while he looks at the result
+    const i = Number(b.dataset.i), ok = i === q.answer;
+    if (ok) { s.right++; SFX.right(); } else SFX.wrong();
+    app.querySelectorAll(".opt").forEach(x => { x.disabled = true; const j = Number(x.dataset.i); x.classList.add(j === q.answer ? "right" : j === i ? "wrong" : "dim"); });
+    const last = s.idx === lv.questions.length - 1;
+    $("#fb").innerHTML = `<div class="fb ${ok ? "good" : "miss"}"><h4>${ok ? "✅ Right!" : "❌ Not this time"}</h4></div><div class="next"><button class="btn" id="next">${last ? "Finish →" : "Next question →"}</button></div>`;
+    $("#next").onclick = () => { if (last) endSpeed(false); else { s.idx++; showSpeedQuestion(); } };
+    $("#next").scrollIntoView({ block: "nearest" });
+  });
+  window.scrollTo(0, 0);
+}
+function endSpeed(timeUp) {
+  const s = speed, lv = s.lv, n = lv.questions.length, won = s.right >= n - 1;
+  clearInterval(speedTimer); speedTimer = null;
+  newBadges = [];
+  const lines = [`You got <b>${s.right} of ${n}</b> right${timeUp ? " before the clock ran out" : ` with ${clockText(Math.max(0, s.left))} to spare`}.`];
+  if (won) {
+    const rec = S.levels[lv.id] = S.levels[lv.id] || { stars: 0, pts: 0, plays: 0 };
+    if (!rec.fast) { rec.fast = true; S.xp += 30; lines.push("First time beaten: +30 XP."); }
+    award("speed1"); if (Object.values(S.levels).filter(l => l.fast).length >= 5) award("speed5");
+    save(); SFX.win(); confetti(120);
+  } else { lines.push(`You need ${n - 1} right to win the ⚡. ${timeUp ? "Keep moving: if one question is taking too long, pick your best answer and go on." : "Slow down just enough to read each question properly."}`); SFX.wrong(); }
+  newBadges.forEach(b => lines.push(`${b[1]} New badge: <b>${esc(b[2])}</b>`));
+  app.innerHTML = `<div class="card result"><div class="big">${won ? "⚡" : timeUp ? "⏰" : "🌱"}</div><h2>${won ? "Speed run beaten!" : timeUp ? "Out of time" : "Not quite"}</h2>
+    <div class="lines">${lines.map(l => `<div>${l}</div>`).join("")}</div>
+    <div class="acts"><button class="btn ghost" id="again">Try again</button><button class="btn" id="map">Back to the map →</button></div></div>`;
+  const w = s.w; speed = null;
+  $("#map").onclick = showMap; $("#again").onclick = () => startSpeed(w, lv);
   window.scrollTo(0, 0);
 }
 const unlockedIds = () => WORLDS.flatMap(w => w.levels.filter((l, i) => !lockReason(w, i)).map(l => l.id));

@@ -117,6 +117,32 @@
   }
   const GAUGES = `<div class="figure"><svg viewBox="0 0 330 226" width="330" role="img" aria-label="Two rain gauges. Monday's gauge is labelled 0, 10, 20 and 30 millimetres, with four small marks between each pair of labels. Its water reaches the third small mark above 10. Tuesday's gauge is labelled 0, 20 and 40 millimetres, with three small marks between each pair of labels. Its water reaches the third small mark above 20.">${gauge(20, "Monday", [0, 10, 20, 30], 5, 16, 30)}${gauge(190, "Tuesday", [0, 20, 40], 4, 35, 40)}</svg></div>`;
 
+  /* ---- Shape Shoals (level 3): four shape-and-space diagrams ---- */
+  /* Q1: a pattern to finish so that the dashed line is a line of symmetry. Cells are [row, col] on a 4 by 6 grid. */
+  const SYM = (() => {
+    const u = 34, shaded = [[0, 0], [1, 1], [1, 2], [2, 0], [3, 2], [0, 5], [1, 3]];
+    let g = "";
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++)
+      g += `<rect x="${10 + c * u}" y="${10 + r * u}" width="${u}" height="${u}" fill="${shaded.some(s => s[0] === r && s[1] === c) ? "#4dabf7" : "#fff"}" stroke="${INK}" stroke-width="1.5"/>`;
+    g += `<line x1="${10 + 3 * u}" x2="${10 + 3 * u}" y1="2" y2="${18 + 4 * u}" stroke="#e03131" stroke-width="3" stroke-dasharray="7 5"/>`;
+    return `<div class="figure"><svg viewBox="0 0 ${20 + 6 * u} ${20 + 4 * u}" width="${20 + 6 * u}" role="img" aria-label="A grid 6 squares wide and 4 squares high, with a dashed line down the middle (3 columns on each side). Shaded on the left: top row, 1st column; second row, 2nd and 3rd columns; third row, 1st column; bottom row, 3rd column. Shaded on the right: top row, 6th column; second row, 4th column.">${g}</svg></div>`;
+  })();
+  /* Q2: a T-shape; six square corners and two "inside-out" corners */
+  const TEE = `<div class="figure"><svg viewBox="0 0 220 190" width="220" role="img" aria-label="A shape like a capital T, made of a wide bar across the top and a narrower stem going down from its middle. It has eight corners: the four corners of the top bar's ends, the two corners at the bottom of the stem, and two corners where the stem meets the bar."><polygon points="20,20 200,20 200,70 135,70 135,170 85,170 85,70 20,70" fill="#ffe7a3" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/></svg></div>`;
+  /* Q3: a park map. Places sit where lines cross: [across, up] */
+  const PARK = (() => {
+    const u = 36, ox = 30, oy = 20, X = c => ox + c * u, Y = r => oy + (5 - r) * u;
+    const places = [["Tree", 4, 1], ["Well", 2, 3], ["Shed", 6, 3], ["Pond", 2, 4], ["Bench", 4, 4], ["Gate", 0, 1]];
+    let g = "";
+    for (let c = 0; c <= 7; c++) g += `<line x1="${X(c)}" x2="${X(c)}" y1="${Y(5)}" y2="${Y(0)}" stroke="#aab3c2" stroke-width="1.5"/>`;
+    for (let r = 0; r <= 5; r++) g += `<line x1="${X(0)}" x2="${X(7)}" y1="${Y(r)}" y2="${Y(r)}" stroke="#aab3c2" stroke-width="1.5"/>`;
+    places.forEach(([n, c, r]) => { g += `<circle cx="${X(c)}" cy="${Y(r)}" r="6" fill="#e03131" stroke="${INK}" stroke-width="1.5"/>` + T(X(c) + 9, Y(r) - 8, n, 'font-weight="700"'); });
+    g += `<line x1="${X(7) + 34}" x2="${X(7) + 34}" y1="78" y2="30" stroke="${INK}" stroke-width="2.5"/><polygon points="${X(7) + 34},20 ${X(7) + 27},34 ${X(7) + 41},34" fill="${INK}"/>` + T(X(7) + 34, 96, "N", 'text-anchor="middle" font-weight="700"');
+    return `<div class="figure"><svg viewBox="0 0 ${X(7) + 60} ${Y(0) + 16}" width="${X(7) + 60}" role="img" aria-label="A map on a square grid with north at the top. Positions are given as squares across from the left edge and squares up from the bottom edge. Tree: 4 across, 1 up. Well: 2 across, 3 up. Shed: 6 across, 3 up. Pond: 2 across, 4 up. Bench: 4 across, 4 up. Gate: 0 across, 1 up.">${g}</svg></div>`;
+  })();
+  /* Q4: an L-shaped garden, not to scale (real sizes 10 by 7, with a 6 by 4 corner missing) */
+  const ELL = `<div class="figure"><svg viewBox="0 0 280 200" width="280" role="img" aria-label="An L-shaped garden. Every corner is a right angle. The bottom side is 10 m. The left side is 7 m. The top side, which only goes part of the way across, is 4 m. The short side on the right is 3 m. Two sides, the ones that make the step in the L, have no lengths marked. Not to scale."><polygon points="40,20 120,20 120,100 240,100 240,160 40,160" fill="#dff0d8" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>${T(140, 180, "10 m", 'text-anchor="middle" font-weight="700"')}${T(32, 95, "7 m", 'text-anchor="end" font-weight="700"')}${T(80, 14, "4 m", 'text-anchor="middle" font-weight="700"')}${T(248, 135, "3 m", 'font-weight="700"')}<text x="140" y="197" font-size="12" text-anchor="middle" fill="#55607a">not to scale</text></svg></div>`;
+
   const BEADS = seq => `<div class="figure" style="font-size:24px;letter-spacing:2px">${seq} …</div>`;
 
   WORLDS.push({
@@ -172,6 +198,31 @@
             options: ["8", "9", "10", "11", "12"], answer: 4,
             hint: `The pattern repeats every 4 beads, with 2 reds in each block. How many whole blocks fit into 22, and which beads are left over?`,
             explain: `<p>Each block of 4 beads (red, red, blue, green) has 2 reds. 22 = 5 blocks (20 beads) + 2 more beads. The 5 blocks have 10 reds, and the next 2 beads are red, red. 10 + 2 = <b>12</b>.</p><p class="why-not">10 counts only the whole blocks and forgets the 2 beads left over. 11 counts just one of them.</p>` },
+        ],
+      },
+      {
+        id: "m6", name: "Shape Shoals",
+        questions: [
+          { id: "m6a", cat: "Area, perimeter & 3D",
+            stem: `<p>Some squares of this grid are shaded. The red dashed line must become a <b>line of symmetry</b>: each side must be a mirror image of the other.</p>${SYM}<p>What is the <b>smallest</b> number of <b>extra</b> squares that must be shaded?</p>`,
+            options: ["2", "3", "4", "5", "7"], answer: 1,
+            hint: `Take each shaded square in turn and find its mirror partner: the same row, and the same number of squares from the dashed line on the other side. Is the partner shaded already?`,
+            explain: `<p>Every shaded square needs a partner the same distance from the line. The left side has 5 shaded squares, so the right side needs 5. Two of those partners are shaded already (top row at the far right, and second row next to the line). That leaves <b>3</b> to shade: second row, third row and bottom row.</p><p class="why-not">5 forgets that two partners are already shaded. 7 is the number of squares shaded at the start. 2 is the number already done, not the number still needed.</p>` },
+          { id: "m6b", cat: "Area, perimeter & 3D",
+            stem: `<p>The corner of a page fits exactly into a right angle.</p>${TEE}<p>Imagine the shape is a flat tray. At how many of its corners would a page corner fit exactly <b>inside</b> the tray?</p>`,
+            options: ["2", "4", "6", "8", "10"], answer: 2,
+            hint: `Go round the shape corner by corner, staying <b>inside</b> it. At two of the corners the inside opens out wide, so a page corner would not fit snugly there.`,
+            explain: `<p>The shape has 8 corners. At 6 of them (the four ends of the top bar and the two at the bottom of the stem) a page corner fits snugly inside: these are right angles. At the 2 corners where the stem meets the bar, the <em>inside</em> of the shape wraps round the corner: that angle is three square corners, not one. So <b>6</b> are right angles.</p><p class="why-not">8 counts every corner, including the two where the right angle is on the outside. 4 counts only the top bar. 2 counts only the corners that are different.</p>` },
+          { id: "m6c", cat: "Measurement & scales",
+            stem: `<p>The map shows a park. Each square is one step, and north is at the top.</p>${PARK}<p>Ravi starts at the <b>Tree</b>. He walks <b>3 steps north</b>, <b>2 steps east</b>, <b>1 step south</b> and then <b>4 steps west</b>. Where does he finish?</p>`,
+            options: ["Bench", "Gate", "Pond", "Shed", "Well"], answer: 4,
+            hint: `Trace each move with your finger from where the last one ended. East is to the right and west is to the left; north is up the page.`,
+            explain: `<p>From the Tree, 3 north takes him level with the Bench. 2 east moves him right, 1 south brings him down a row, and 4 west takes him back past the Tree's column to 2 squares left of it. He is 2 rows above the Tree and 2 columns to its left: the <b>Well</b>.</p><p class="why-not">The Shed is where he ends up if he forgets the last move west. The Pond is where he would be without the step south. The Bench is where he is after the first move only. The Gate is 4 steps west of the Tree, ignoring everything else.</p>` },
+          { id: "m6d", cat: "Area, perimeter & 3D",
+            stem: `<p>The diagram shows an L-shaped garden. Every corner is a right angle. Two of the sides have no length marked.</p>${ELL}<p>What is the <b>perimeter</b> of the garden?</p>`,
+            options: ["24 m", "28 m", "30 m", "34 m", "70 m"], answer: 3,
+            hint: `Find the two missing sides first. The top side and the missing flat side together stretch as far as the bottom side. The same idea works for the upright sides.`,
+            explain: `<p>The two flat sides on top must add up to the bottom side: 4 + ? = 10, so the missing flat side is 6 m. The two upright sides on the right must add up to the left side: 3 + ? = 7, so the missing upright side is 4 m. Perimeter: 10 + 7 + 4 + 3 + 6 + 4 = <b>34 m</b>.</p><p class="why-not">24 m adds only the four sides that are marked. 28 m and 30 m find only one of the missing sides. 70 m multiplies 10 by 7, which is neither the perimeter nor the area of this shape.</p>` },
         ],
       },
       {
