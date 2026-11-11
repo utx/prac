@@ -87,6 +87,24 @@ the snail is fast asleep.</p>`,
 <p>He laughed, set the cup on her stool, and went. Tamsin drank it slowly. It was warm and far too sweet, and she could not remember tasting anything better.</p>`,
   };
 
+  const BLACKOUT = {
+    title: "Blackout",
+    html: `<p>The lights went out at ten past seven, in the middle of Mina’s maths homework, and the whole building seemed to hold its breath. The fridge stopped humming. The lift, somewhere below, gave a clunk and went quiet.</p>
+<p>“Candles,” said Mum, already feeling along the shelf above the cooker. She found six, lit one, and pressed two more into Mina’s hands. “Take these down to Mr Okonkwo in 2B. He won’t have any.”</p>
+<p>Mina did not move. Mr Okonkwo was the reason children in the building walked past the second floor without talking. He had a grey beard and a door that was always shut, and he had once handed back a ball that had bounced down the stairwell without saying a single word. Nobody had kicked a ball on the stairs since.</p>
+<p>“He’s eighty-one and he’s sitting in the dark,” said Mum, which was not an argument so much as a fact, and Mina found herself on the stairs.</p>
+<p>The stairwell was a different place without its lights. Her candle made a small yellow room that travelled down with her, and beyond it the building muttered: a baby crying on the fourth floor, somebody laughing, a chair scraping. On the third-floor landing two boys from 3A were sitting on the steps with a torch, doing nothing in particular. They watched her go by. “She’s going to 2B,” one of them whispered, in the voice people use for hospitals.</p>
+<p>She knocked so quietly that she had to do it again.</p>
+<p>The door opened at once, as if he had been standing behind it. Mr Okonkwo looked at the candles, then at Mina, and something in the grey beard rearranged itself. “Well,” he said. “Light. Come in before it blows out.”</p>
+<p>She had not planned on going in. But he had already turned away, and it seemed ruder to stay outside than to follow. The flat smelled of oranges. On the table, where the candle went, there was a chessboard set out for a game, with nobody sitting on the other side.</p>
+<p>“My brother’s,” said Mr Okonkwo, seeing her look. “He plays white. I post him my move on Mondays, and he posts me his.” He considered the board. “He has been thinking about that knight since August.”</p>
+<p>Then he opened a cupboard and took out something wrapped in a blanket, and the something turned out to be an accordion.</p>
+<p>Afterwards, nobody could say who came down first. Perhaps it was the boys from 3A, drawn by the sound, their torch forgotten on the step. Perhaps it was the baby’s mother, because the baby had stopped crying. By half past eight the second-floor landing was full of people sitting on the stairs with candles in jam jars, and Mr Okonkwo was in his doorway on a kitchen chair, playing a tune that made the old lady from 5C clap out of time.</p>
+<p>At nine o’clock the lights came back. The stairwell jumped into its usual hard white, and everyone blinked, and the fridges all over the building started humming again.</p>
+<p>Nobody stood up.</p>
+<p>Mr Okonkwo looked at the bulb above his head as though it had interrupted him. Then he reached inside his door, without leaving the chair, and switched it off.</p>`,
+  };
+
   WORLDS.push({
     id: "reading", name: "Story Forest", icon: "🌲", color: "#2e7d4f", crown: "Leaf Crown",
     blurb: "Words, poems and stories hide their secrets here. Hybrid, the dragon ninja, guards the Leaf Crown.",
@@ -203,6 +221,41 @@ the snail is fast asleep.</p>`,
           { id: "r5d", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 4</b>?</p>`, options: SENTS, answer: 4,
             hint: `The sentence after the gap mentions “<b>this uneven squeezing</b>”. Which sentence describes squeezing that is uneven?`,
             explain: `<p><b>E</b>. The stiff parts and stretchy parts “press on it with different strength”: that is the “uneven squeezing” the last sentence refers to.</p><p class="why-not">C is the sentence that is never used: it is about wombats, but nothing around any gap is about burrows. D’s “unusual shape” has already been dealt with in the second paragraph.</p>` },
+        ],
+      },
+      {
+        id: "r6", name: "The Long Road", passage: BLACKOUT, long: true,
+        questions: [
+          { id: "r6a", cat: "Purpose of a detail",
+            stem: `<p>Why does the writer tell us about the <b>ball on the stairwell</b>?</p>`,
+            options: ["To show that the children of the building were badly behaved.", "To show why the children were wary of Mr Okonkwo.", "To explain why Mr Okonkwo kept his door shut.", "To suggest that Mr Okonkwo disliked noise."], answer: 1,
+            hint: `Look at the sentence it sits in: “Mr Okonkwo was the reason children … walked past the second floor without talking.” What is the ball an example of?`,
+            explain: `<p>The paragraph is explaining why Mina doesn’t want to go. The ball is the evidence the children have: he handed it back “without saying a single word”, and nobody has played on the stairs since. It shows <b>why they were wary of him</b>, on very little evidence.</p><p class="why-not">The story doesn’t criticise the children. We are never told why his door is shut or that he minds noise: he says nothing at all, and the children have filled in the rest themselves.</p>` },
+          { id: "r6b", cat: "Feelings & inference",
+            stem: `<p>One of the boys whispers “in the voice people use for hospitals”. What does this tell us?</p>`,
+            options: ["He thinks Mina is going somewhere frightening.", "He is worried that Mr Okonkwo might be ill.", "He is trying not to wake the baby on the fourth floor.", "He is making fun of Mina for being afraid."], answer: 0,
+            hint: `When do people lower their voices in a hospital? Think about how the boys feel about flat 2B.`,
+            explain: `<p>People speak in hushed, serious voices in hospitals. The boy uses that voice for “She’s going to 2B”, as if she were heading somewhere grave. It shows the children’s shared awe of the flat: to him, Mina is <b>going somewhere frightening</b>.</p><p class="why-not">Nobody thinks Mr Okonkwo is ill; “hospitals” describes the tone, not the reason. The baby is two floors up, and there is no teasing in a hushed voice.</p>` },
+          { id: "r6c", cat: "Feelings & inference",
+            stem: `<p>“<b>She knocked so quietly that she had to do it again.</b>” What does this show about Mina?</p>`,
+            options: ["She did not want to disturb the neighbours.", "She thought Mr Okonkwo might be asleep.", "She half hoped that nobody would answer.", "She was holding too many candles to knock properly."], answer: 2,
+            hint: `She has come all the way down the stairs, but how does she feel about the door actually opening?`,
+            explain: `<p>A knock too quiet to be heard is the knock of someone who would rather not be answered. Mina has done as she was told, but <b>part of her hopes the door stays shut</b>. The writer shows her nervousness through what she does, without saying it.</p><p class="why-not">The building is already full of noise, so she isn’t protecting the neighbours. Nothing suggests she thinks he is asleep, and she manages to knock again with the same candles.</p>` },
+          { id: "r6d", cat: "Purpose of a detail",
+            stem: `<p>What does the <b>chessboard</b> tell us about Mr Okonkwo?</p>`,
+            options: ["He is too impatient to finish a game.", "He has no friends or family left to visit him.", "He is cleverer than his neighbours.", "He is less alone than the children imagine."], answer: 3,
+            hint: `The other chair is empty, but is the game really being played by one person? Read what he says about Mondays.`,
+            explain: `<p>The empty chair looks lonely, and that is what Mina first sees. But the game is with his brother, by post, one move a week, and he jokes fondly about it (“thinking about that knight since August”). The man behind the shut door has patience, humour and someone he cares about: he is <b>less alone than the children think</b>.</p><p class="why-not">A game that has lasted since August shows patience, not impatience. He has a brother he writes to every week. The story says nothing about how clever he is.</p>` },
+          { id: "r6e", cat: "Vocabulary & idioms",
+            stem: `<p>When Mr Okonkwo sees Mina, “<b>something in the grey beard rearranged itself</b>”. What is happening?</p>`,
+            options: ["He is tidying his beard before speaking.", "He is beginning to smile.", "He is about to tell her off.", "He is trying to remember who she is."], answer: 1,
+            hint: `What is hidden behind a beard that can move when a person is pleased? Look at what he says next.`,
+            explain: `<p>Mina can’t see his mouth, only the beard moving. His next words are friendly (“Well. Light. Come in before it blows out”), so the movement is the start of <b>a smile</b>. The writer describes it the way a nervous child would see it.</p><p class="why-not">He doesn’t touch his beard. He welcomes her straight away, so he is neither cross nor confused about who she is.</p>` },
+          { id: "r6f", cat: "Character & structure",
+            stem: `<p>At the end the lights come back, but “Nobody stood up”, and Mr Okonkwo switches his light off. What is the writer showing?</p>`,
+            options: ["The neighbours did not trust the power to stay on.", "Mr Okonkwo wanted everyone to go home.", "The evening together mattered more than the light.", "The music was too loud for anyone to notice the lights."], answer: 2,
+            hint: `The blackout was the problem at the start. By the end, what would be lost if everyone simply went back to their own flats?`,
+            explain: `<p>The power cut was supposed to be the trouble, yet when it ends nobody wants the evening to end with it. Mr Okonkwo looks at the bulb “as though it had interrupted him” and turns it off so the music and candlelight can go on. What the neighbours found in the dark, <b>each other’s company</b>, matters more to them than getting the light back.</p><p class="why-not">Nobody mentions the power failing again. Switching the light off keeps people there; it doesn’t send them home. Everyone noticed the lights (“everyone blinked”) and chose to stay anyway.</p>` },
         ],
       },
       {

@@ -346,6 +346,24 @@ the snail is fast asleep.</p>`,
 <p>He laughed, set the cup on her stool, and went. Tamsin drank it slowly. It was warm and far too sweet, and she could not remember tasting anything better.</p>`,
   };
 
+  const BLACKOUT = {
+    title: "Blackout",
+    html: `<p>The lights went out at ten past seven, in the middle of Mina’s maths homework, and the whole building seemed to hold its breath. The fridge stopped humming. The lift, somewhere below, gave a clunk and went quiet.</p>
+<p>“Candles,” said Mum, already feeling along the shelf above the cooker. She found six, lit one, and pressed two more into Mina’s hands. “Take these down to Mr Okonkwo in 2B. He won’t have any.”</p>
+<p>Mina did not move. Mr Okonkwo was the reason children in the building walked past the second floor without talking. He had a grey beard and a door that was always shut, and he had once handed back a ball that had bounced down the stairwell without saying a single word. Nobody had kicked a ball on the stairs since.</p>
+<p>“He’s eighty-one and he’s sitting in the dark,” said Mum, which was not an argument so much as a fact, and Mina found herself on the stairs.</p>
+<p>The stairwell was a different place without its lights. Her candle made a small yellow room that travelled down with her, and beyond it the building muttered: a baby crying on the fourth floor, somebody laughing, a chair scraping. On the third-floor landing two boys from 3A were sitting on the steps with a torch, doing nothing in particular. They watched her go by. “She’s going to 2B,” one of them whispered, in the voice people use for hospitals.</p>
+<p>She knocked so quietly that she had to do it again.</p>
+<p>The door opened at once, as if he had been standing behind it. Mr Okonkwo looked at the candles, then at Mina, and something in the grey beard rearranged itself. “Well,” he said. “Light. Come in before it blows out.”</p>
+<p>She had not planned on going in. But he had already turned away, and it seemed ruder to stay outside than to follow. The flat smelled of oranges. On the table, where the candle went, there was a chessboard set out for a game, with nobody sitting on the other side.</p>
+<p>“My brother’s,” said Mr Okonkwo, seeing her look. “He plays white. I post him my move on Mondays, and he posts me his.” He considered the board. “He has been thinking about that knight since August.”</p>
+<p>Then he opened a cupboard and took out something wrapped in a blanket, and the something turned out to be an accordion.</p>
+<p>Afterwards, nobody could say who came down first. Perhaps it was the boys from 3A, drawn by the sound, their torch forgotten on the step. Perhaps it was the baby’s mother, because the baby had stopped crying. By half past eight the second-floor landing was full of people sitting on the stairs with candles in jam jars, and Mr Okonkwo was in his doorway on a kitchen chair, playing a tune that made the old lady from 5C clap out of time.</p>
+<p>At nine o’clock the lights came back. The stairwell jumped into its usual hard white, and everyone blinked, and the fridges all over the building started humming again.</p>
+<p>Nobody stood up.</p>
+<p>Mr Okonkwo looked at the bulb above his head as though it had interrupted him. Then he reached inside his door, without leaving the chair, and switched it off.</p>`,
+  };
+
   WORLDS.push({
     id: "reading", name: "Story Forest", icon: "🌲", color: "#2e7d4f", crown: "Leaf Crown",
     blurb: "Words, poems and stories hide their secrets here. Hybrid, the dragon ninja, guards the Leaf Crown.",
@@ -462,6 +480,41 @@ the snail is fast asleep.</p>`,
           { id: "r5d", cat: "Sentence links", stem: `<p>Which sentence fits <b>gap 4</b>?</p>`, options: SENTS, answer: 4,
             hint: `The sentence after the gap mentions “<b>this uneven squeezing</b>”. Which sentence describes squeezing that is uneven?`,
             explain: `<p><b>E</b>. The stiff parts and stretchy parts “press on it with different strength”: that is the “uneven squeezing” the last sentence refers to.</p><p class="why-not">C is the sentence that is never used: it is about wombats, but nothing around any gap is about burrows. D’s “unusual shape” has already been dealt with in the second paragraph.</p>` },
+        ],
+      },
+      {
+        id: "r6", name: "The Long Road", passage: BLACKOUT, long: true,
+        questions: [
+          { id: "r6a", cat: "Purpose of a detail",
+            stem: `<p>Why does the writer tell us about the <b>ball on the stairwell</b>?</p>`,
+            options: ["To show that the children of the building were badly behaved.", "To show why the children were wary of Mr Okonkwo.", "To explain why Mr Okonkwo kept his door shut.", "To suggest that Mr Okonkwo disliked noise."], answer: 1,
+            hint: `Look at the sentence it sits in: “Mr Okonkwo was the reason children … walked past the second floor without talking.” What is the ball an example of?`,
+            explain: `<p>The paragraph is explaining why Mina doesn’t want to go. The ball is the evidence the children have: he handed it back “without saying a single word”, and nobody has played on the stairs since. It shows <b>why they were wary of him</b>, on very little evidence.</p><p class="why-not">The story doesn’t criticise the children. We are never told why his door is shut or that he minds noise: he says nothing at all, and the children have filled in the rest themselves.</p>` },
+          { id: "r6b", cat: "Feelings & inference",
+            stem: `<p>One of the boys whispers “in the voice people use for hospitals”. What does this tell us?</p>`,
+            options: ["He thinks Mina is going somewhere frightening.", "He is worried that Mr Okonkwo might be ill.", "He is trying not to wake the baby on the fourth floor.", "He is making fun of Mina for being afraid."], answer: 0,
+            hint: `When do people lower their voices in a hospital? Think about how the boys feel about flat 2B.`,
+            explain: `<p>People speak in hushed, serious voices in hospitals. The boy uses that voice for “She’s going to 2B”, as if she were heading somewhere grave. It shows the children’s shared awe of the flat: to him, Mina is <b>going somewhere frightening</b>.</p><p class="why-not">Nobody thinks Mr Okonkwo is ill; “hospitals” describes the tone, not the reason. The baby is two floors up, and there is no teasing in a hushed voice.</p>` },
+          { id: "r6c", cat: "Feelings & inference",
+            stem: `<p>“<b>She knocked so quietly that she had to do it again.</b>” What does this show about Mina?</p>`,
+            options: ["She did not want to disturb the neighbours.", "She thought Mr Okonkwo might be asleep.", "She half hoped that nobody would answer.", "She was holding too many candles to knock properly."], answer: 2,
+            hint: `She has come all the way down the stairs, but how does she feel about the door actually opening?`,
+            explain: `<p>A knock too quiet to be heard is the knock of someone who would rather not be answered. Mina has done as she was told, but <b>part of her hopes the door stays shut</b>. The writer shows her nervousness through what she does, without saying it.</p><p class="why-not">The building is already full of noise, so she isn’t protecting the neighbours. Nothing suggests she thinks he is asleep, and she manages to knock again with the same candles.</p>` },
+          { id: "r6d", cat: "Purpose of a detail",
+            stem: `<p>What does the <b>chessboard</b> tell us about Mr Okonkwo?</p>`,
+            options: ["He is too impatient to finish a game.", "He has no friends or family left to visit him.", "He is cleverer than his neighbours.", "He is less alone than the children imagine."], answer: 3,
+            hint: `The other chair is empty, but is the game really being played by one person? Read what he says about Mondays.`,
+            explain: `<p>The empty chair looks lonely, and that is what Mina first sees. But the game is with his brother, by post, one move a week, and he jokes fondly about it (“thinking about that knight since August”). The man behind the shut door has patience, humour and someone he cares about: he is <b>less alone than the children think</b>.</p><p class="why-not">A game that has lasted since August shows patience, not impatience. He has a brother he writes to every week. The story says nothing about how clever he is.</p>` },
+          { id: "r6e", cat: "Vocabulary & idioms",
+            stem: `<p>When Mr Okonkwo sees Mina, “<b>something in the grey beard rearranged itself</b>”. What is happening?</p>`,
+            options: ["He is tidying his beard before speaking.", "He is beginning to smile.", "He is about to tell her off.", "He is trying to remember who she is."], answer: 1,
+            hint: `What is hidden behind a beard that can move when a person is pleased? Look at what he says next.`,
+            explain: `<p>Mina can’t see his mouth, only the beard moving. His next words are friendly (“Well. Light. Come in before it blows out”), so the movement is the start of <b>a smile</b>. The writer describes it the way a nervous child would see it.</p><p class="why-not">He doesn’t touch his beard. He welcomes her straight away, so he is neither cross nor confused about who she is.</p>` },
+          { id: "r6f", cat: "Character & structure",
+            stem: `<p>At the end the lights come back, but “Nobody stood up”, and Mr Okonkwo switches his light off. What is the writer showing?</p>`,
+            options: ["The neighbours did not trust the power to stay on.", "Mr Okonkwo wanted everyone to go home.", "The evening together mattered more than the light.", "The music was too loud for anyone to notice the lights."], answer: 2,
+            hint: `The blackout was the problem at the start. By the end, what would be lost if everyone simply went back to their own flats?`,
+            explain: `<p>The power cut was supposed to be the trouble, yet when it ends nobody wants the evening to end with it. Mr Okonkwo looks at the bulb “as though it had interrupted him” and turns it off so the music and candlelight can go on. What the neighbours found in the dark, <b>each other’s company</b>, matters more to them than getting the light back.</p><p class="why-not">Nobody mentions the power failing again. Switching the light off keeps people there; it doesn’t send them home. Everyone noticed the lights (“everyone blinked”) and chose to stay anyway.</p>` },
         ],
       },
       {
@@ -837,6 +890,32 @@ the snail is fast asleep.</p>`,
   }
   const GAUGES = `<div class="figure"><svg viewBox="0 0 330 226" width="330" role="img" aria-label="Two rain gauges. Monday's gauge is labelled 0, 10, 20 and 30 millimetres, with four small marks between each pair of labels. Its water reaches the third small mark above 10. Tuesday's gauge is labelled 0, 20 and 40 millimetres, with three small marks between each pair of labels. Its water reaches the third small mark above 20.">${gauge(20, "Monday", [0, 10, 20, 30], 5, 16, 30)}${gauge(190, "Tuesday", [0, 20, 40], 4, 35, 40)}</svg></div>`;
 
+  /* ---- Shape Shoals (level 3): four shape-and-space diagrams ---- */
+  /* Q1: a pattern to finish so that the dashed line is a line of symmetry. Cells are [row, col] on a 4 by 6 grid. */
+  const SYM = (() => {
+    const u = 34, shaded = [[0, 0], [1, 1], [1, 2], [2, 0], [3, 2], [0, 5], [1, 3]];
+    let g = "";
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++)
+      g += `<rect x="${10 + c * u}" y="${10 + r * u}" width="${u}" height="${u}" fill="${shaded.some(s => s[0] === r && s[1] === c) ? "#4dabf7" : "#fff"}" stroke="${INK}" stroke-width="1.5"/>`;
+    g += `<line x1="${10 + 3 * u}" x2="${10 + 3 * u}" y1="2" y2="${18 + 4 * u}" stroke="#e03131" stroke-width="3" stroke-dasharray="7 5"/>`;
+    return `<div class="figure"><svg viewBox="0 0 ${20 + 6 * u} ${20 + 4 * u}" width="${20 + 6 * u}" role="img" aria-label="A grid 6 squares wide and 4 squares high, with a dashed line down the middle (3 columns on each side). Shaded on the left: top row, 1st column; second row, 2nd and 3rd columns; third row, 1st column; bottom row, 3rd column. Shaded on the right: top row, 6th column; second row, 4th column.">${g}</svg></div>`;
+  })();
+  /* Q2: a T-shape; six square corners and two "inside-out" corners */
+  const TEE = `<div class="figure"><svg viewBox="0 0 220 190" width="220" role="img" aria-label="A shape like a capital T, made of a wide bar across the top and a narrower stem going down from its middle. It has eight corners: the four corners of the top bar's ends, the two corners at the bottom of the stem, and two corners where the stem meets the bar."><polygon points="20,20 200,20 200,70 135,70 135,170 85,170 85,70 20,70" fill="#ffe7a3" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/></svg></div>`;
+  /* Q3: a park map. Places sit where lines cross: [across, up] */
+  const PARK = (() => {
+    const u = 36, ox = 30, oy = 20, X = c => ox + c * u, Y = r => oy + (5 - r) * u;
+    const places = [["Tree", 4, 1], ["Well", 2, 3], ["Shed", 6, 3], ["Pond", 2, 4], ["Bench", 4, 4], ["Gate", 0, 1]];
+    let g = "";
+    for (let c = 0; c <= 7; c++) g += `<line x1="${X(c)}" x2="${X(c)}" y1="${Y(5)}" y2="${Y(0)}" stroke="#aab3c2" stroke-width="1.5"/>`;
+    for (let r = 0; r <= 5; r++) g += `<line x1="${X(0)}" x2="${X(7)}" y1="${Y(r)}" y2="${Y(r)}" stroke="#aab3c2" stroke-width="1.5"/>`;
+    places.forEach(([n, c, r]) => { g += `<circle cx="${X(c)}" cy="${Y(r)}" r="6" fill="#e03131" stroke="${INK}" stroke-width="1.5"/>` + T(X(c) + 9, Y(r) - 8, n, 'font-weight="700"'); });
+    g += `<line x1="${X(7) + 34}" x2="${X(7) + 34}" y1="78" y2="30" stroke="${INK}" stroke-width="2.5"/><polygon points="${X(7) + 34},20 ${X(7) + 27},34 ${X(7) + 41},34" fill="${INK}"/>` + T(X(7) + 34, 96, "N", 'text-anchor="middle" font-weight="700"');
+    return `<div class="figure"><svg viewBox="0 0 ${X(7) + 60} ${Y(0) + 16}" width="${X(7) + 60}" role="img" aria-label="A map on a square grid with north at the top. Positions are given as squares across from the left edge and squares up from the bottom edge. Tree: 4 across, 1 up. Well: 2 across, 3 up. Shed: 6 across, 3 up. Pond: 2 across, 4 up. Bench: 4 across, 4 up. Gate: 0 across, 1 up.">${g}</svg></div>`;
+  })();
+  /* Q4: an L-shaped garden, not to scale (real sizes 10 by 7, with a 6 by 4 corner missing) */
+  const ELL = `<div class="figure"><svg viewBox="0 0 280 200" width="280" role="img" aria-label="An L-shaped garden. Every corner is a right angle. The bottom side is 10 m. The left side is 7 m. The top side, which only goes part of the way across, is 4 m. The short side on the right is 3 m. Two sides, the ones that make the step in the L, have no lengths marked. Not to scale."><polygon points="40,20 120,20 120,100 240,100 240,160 40,160" fill="#dff0d8" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>${T(140, 180, "10 m", 'text-anchor="middle" font-weight="700"')}${T(32, 95, "7 m", 'text-anchor="end" font-weight="700"')}${T(80, 14, "4 m", 'text-anchor="middle" font-weight="700"')}${T(248, 135, "3 m", 'font-weight="700"')}<text x="140" y="197" font-size="12" text-anchor="middle" fill="#55607a">not to scale</text></svg></div>`;
+
   const BEADS = seq => `<div class="figure" style="font-size:24px;letter-spacing:2px">${seq} …</div>`;
 
   WORLDS.push({
@@ -892,6 +971,31 @@ the snail is fast asleep.</p>`,
             options: ["8", "9", "10", "11", "12"], answer: 4,
             hint: `The pattern repeats every 4 beads, with 2 reds in each block. How many whole blocks fit into 22, and which beads are left over?`,
             explain: `<p>Each block of 4 beads (red, red, blue, green) has 2 reds. 22 = 5 blocks (20 beads) + 2 more beads. The 5 blocks have 10 reds, and the next 2 beads are red, red. 10 + 2 = <b>12</b>.</p><p class="why-not">10 counts only the whole blocks and forgets the 2 beads left over. 11 counts just one of them.</p>` },
+        ],
+      },
+      {
+        id: "m6", name: "Shape Shoals",
+        questions: [
+          { id: "m6a", cat: "Area, perimeter & 3D",
+            stem: `<p>Some squares of this grid are shaded. The red dashed line must become a <b>line of symmetry</b>: each side must be a mirror image of the other.</p>${SYM}<p>What is the <b>smallest</b> number of <b>extra</b> squares that must be shaded?</p>`,
+            options: ["2", "3", "4", "5", "7"], answer: 1,
+            hint: `Take each shaded square in turn and find its mirror partner: the same row, and the same number of squares from the dashed line on the other side. Is the partner shaded already?`,
+            explain: `<p>Every shaded square needs a partner the same distance from the line. The left side has 5 shaded squares, so the right side needs 5. Two of those partners are shaded already (top row at the far right, and second row next to the line). That leaves <b>3</b> to shade: second row, third row and bottom row.</p><p class="why-not">5 forgets that two partners are already shaded. 7 is the number of squares shaded at the start. 2 is the number already done, not the number still needed.</p>` },
+          { id: "m6b", cat: "Area, perimeter & 3D",
+            stem: `<p>The corner of a page fits exactly into a right angle.</p>${TEE}<p>Imagine the shape is a flat tray. At how many of its corners would a page corner fit exactly <b>inside</b> the tray?</p>`,
+            options: ["2", "4", "6", "8", "10"], answer: 2,
+            hint: `Go round the shape corner by corner, staying <b>inside</b> it. At two of the corners the inside opens out wide, so a page corner would not fit snugly there.`,
+            explain: `<p>The shape has 8 corners. At 6 of them (the four ends of the top bar and the two at the bottom of the stem) a page corner fits snugly inside: these are right angles. At the 2 corners where the stem meets the bar, the <em>inside</em> of the shape wraps round the corner: that angle is three square corners, not one. So <b>6</b> are right angles.</p><p class="why-not">8 counts every corner, including the two where the right angle is on the outside. 4 counts only the top bar. 2 counts only the corners that are different.</p>` },
+          { id: "m6c", cat: "Measurement & scales",
+            stem: `<p>The map shows a park. Each square is one step, and north is at the top.</p>${PARK}<p>Ravi starts at the <b>Tree</b>. He walks <b>3 steps north</b>, <b>2 steps east</b>, <b>1 step south</b> and then <b>4 steps west</b>. Where does he finish?</p>`,
+            options: ["Bench", "Gate", "Pond", "Shed", "Well"], answer: 4,
+            hint: `Trace each move with your finger from where the last one ended. East is to the right and west is to the left; north is up the page.`,
+            explain: `<p>From the Tree, 3 north takes him level with the Bench. 2 east moves him right, 1 south brings him down a row, and 4 west takes him back past the Tree's column to 2 squares left of it. He is 2 rows above the Tree and 2 columns to its left: the <b>Well</b>.</p><p class="why-not">The Shed is where he ends up if he forgets the last move west. The Pond is where he would be without the step south. The Bench is where he is after the first move only. The Gate is 4 steps west of the Tree, ignoring everything else.</p>` },
+          { id: "m6d", cat: "Area, perimeter & 3D",
+            stem: `<p>The diagram shows an L-shaped garden. Every corner is a right angle. Two of the sides have no length marked.</p>${ELL}<p>What is the <b>perimeter</b> of the garden?</p>`,
+            options: ["24 m", "28 m", "30 m", "34 m", "70 m"], answer: 3,
+            hint: `Find the two missing sides first. The top side and the missing flat side together stretch as far as the bottom side. The same idea works for the upright sides.`,
+            explain: `<p>The two flat sides on top must add up to the bottom side: 4 + ? = 10, so the missing flat side is 6 m. The two upright sides on the right must add up to the left side: 3 + ? = 7, so the missing upright side is 4 m. Perimeter: 10 + 7 + 4 + 3 + 6 + 4 = <b>34 m</b>.</p><p class="why-not">24 m adds only the four sides that are marked. 28 m and 30 m find only one of the missing sides. 70 m multiplies 10 by 7, which is neither the perimeter nor the area of this shape.</p>` },
         ],
       },
       {

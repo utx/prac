@@ -29,7 +29,8 @@ for (const w of WORLDS) {
   if (!w.levels[w.levels.length - 1].boss || w.levels.filter(l => l.boss).length !== 1) bad(`${w.id}: the last level (only) must be the boss`);
   for (const lv of w.levels) {
     if (ids.has(lv.id)) bad(`duplicate level id ${lv.id}`); ids.add(lv.id);
-    if (lv.questions.length !== (lv.boss ? 5 : 4)) bad(`${lv.id}: expected ${lv.boss ? 5 : 4} questions`);
+    const size = lv.boss ? 5 : lv.long ? 6 : 4;   // a long reading passage carries six questions
+    if (lv.questions.length !== size) bad(`${lv.id}: expected ${size} questions`);
     const letters = {};
     for (const q of lv.questions) {
       nq++;
