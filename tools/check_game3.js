@@ -357,13 +357,15 @@ function checkLayout(M, where, GAP) {
     st = await state();
     if (st.match.stage !== 2 || !(await page.$(".banner"))) bad(`${label}: the storm did not close after circle 1`);
     if (Object.values(st.time.days)[0] !== 15) bad(`${label}: clearing circle 1 should earn 15 minutes, not ${Object.values(st.time.days)[0]}`);
-    if (aliveOf(st.match) !== 50) bad(`${label}: 50 players should be left after circle 1, not ${aliveOf(st.match)}`);
+    /* the storm leaves exactly 50, 20 and 2 players; a chest or move finished straight after can knock out one or two more */
+    const stormLeft = (M, n) => M.feed.some(f => f.t === `The storm is closing. ${n} players left`) && aliveOf(M) <= n;
+    if (!stormLeft(st.match, 50)) bad(`${label}: the storm should leave 50 players after circle 1 (${aliveOf(st.match)} left)`);
     if (st.match.bots.some(b => b.a && dist([b.x, b.y], st.match.circles[2]) > R[2])) bad(`${label}: players were left outside the circle`);
     if ((await page.$$(".mk.foe.open")).length !== 3) bad(`${label}: circle 2 should show 3 new opponents`);
     await shot("circle2");
     await clearCircle();
     st = await state();
-    if (Object.values(st.time.days)[0] !== 35 || aliveOf(st.match) !== 20) bad(`${label}: after circle 2: 35 minutes and 20 players expected`);
+    if (Object.values(st.time.days)[0] !== 35 || !stormLeft(st.match, 20)) bad(`${label}: after circle 2: 35 minutes and 20 players expected (${Object.values(st.time.days)[0]} minutes, ${aliveOf(st.match)} players)`);
     await clearCircle();
     st = await state();
     if (Object.values(st.time.days)[0] !== 60) bad(`${label}: reaching the boss should earn the full 60 minutes, not ${Object.values(st.time.days)[0]}`);
