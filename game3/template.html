@@ -252,6 +252,20 @@
   .chestcard .chestimg { width: 160px; display: block; margin: 4px auto 8px; animation: chestglow 1.6s ease-in-out infinite; }
   .chestcard h3 { text-align: center; font-size: 24px; margin: 0 0 6px; }
   @keyframes chestglow { 50% { filter: drop-shadow(0 0 18px #ffd21a); transform: translateY(-5px); } }
+  .lootreveal { --rar: #888; text-align: center; color: #fff; border: 4px solid var(--navy); border-bottom-width: 8px; border-radius: 16px; padding: 12px 14px 14px; margin: 0 0 16px;
+    background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--rar) 35%, #fff), color-mix(in srgb, var(--rar) 95%, #000));
+    box-shadow: 0 0 0 4px var(--gold), 0 0 34px color-mix(in srgb, var(--rar) 75%, transparent); animation: lootpop .7s cubic-bezier(.2, 1.6, .4, 1) both; }
+  .lootreveal .got { font: italic 900 16px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
+  .lootreveal img { width: 128px; height: 128px; object-fit: contain; display: block; margin: 6px auto 4px; filter: drop-shadow(0 6px 0 rgba(0,0,0,.35)); animation: lootspin 1s ease-out both; }
+  .lootreveal .rarity { display: inline-block; background: rgba(13,19,48,.8); border-radius: 999px; padding: 2px 14px; font: italic 900 13px "Arial Black", Impact, sans-serif; letter-spacing: 2px; text-transform: uppercase; }
+  .lootreveal b.nm { display: block; font: italic 900 32px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-shadow: 0 3px 0 rgba(0,0,0,.45); line-height: 1.15; margin-top: 4px; }
+  .lootreveal .what { background: rgba(255,255,255,.96); color: var(--ink); border-radius: 10px; padding: 10px 12px; margin-top: 10px; font-size: 16.5px; text-align: left; }
+  @keyframes lootpop { 0% { transform: scale(.55); } 100% { transform: none; } }
+  @keyframes lootspin { 0% { transform: scale(.4) rotate(-25deg); } 60% { transform: scale(1.15) rotate(6deg); } 100% { transform: none; } }
+  .act.fresh, .act.fresh:disabled { filter: none; opacity: 1; box-shadow: 0 0 0 4px var(--gold), 0 0 18px var(--gold); animation: glowpulse 1.2s ease-in-out 4; }
+  @keyframes glowpulse { 50% { box-shadow: 0 0 0 7px var(--gold), 0 0 30px var(--gold); } }
+  .float.loot { color: var(--gold); font-size: 24px; }
+  @media (max-width: 520px) { .lootreveal b.nm { font-size: 25px; } .lootreveal img { width: 100px; height: 100px; } }
   .loot { --rar: #888; display: flex; align-items: center; gap: 14px; border: 3px solid var(--navy); border-bottom-width: 7px; border-radius: 12px; padding: 10px 14px; margin-top: 14px; color: #fff;
     background: linear-gradient(180deg, color-mix(in srgb, var(--rar) 60%, #fff), color-mix(in srgb, var(--rar) 92%, #000)); animation: pop .6s; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
   .loot img { width: 80px; height: 80px; object-fit: contain; flex: none; filter: drop-shadow(0 4px 0 rgba(0,0,0,.35)); }
@@ -301,6 +315,13 @@ const LOOT = [
   { id: "gold", name: "Pot of Gold", img: "coins", rar: "Epic", col: "#a34dff", w: 6, what: "+60 coins." },
   { id: "chug", name: "Chug Jug", img: "chugjug", rar: "Legendary", col: "#ffb21a", w: 4, what: "Drunk at once: full health and full shield." },
 ];
+/* what to say about items you keep: [one, more than one, how to use it] */
+const HOLD = {
+  med: ["Med Kit", "Med Kits", "Tap the Med Kit button under the fight picture any time for +50 health."],
+  shield: ["Shield Potion", "Shield Potions", "Tap the Shield button under the fight picture any time for +50 shield."],
+  bush: ["Bush", "Bushes", "Tap the Bush button before you shoot: if you then miss, they can’t find you and you take no damage."],
+  boogie: ["Boogie Bomb", "Boogie Bombs", "Save it for a fight: when an opponent makes a move, a Boogie Bomb button appears. Throw it and they dance instead of attacking."],
+};
 const CARRY = 3, MAXHP = 100, MAXSH = 50, SUPPLY_HEAL = 40, RUSH_DMG = 15, FOE_HEAL = 20;
 /* storm circles: opponent health, damage of a miss, damage of a wrong move, coins for an elimination,
    Fortnite minutes for clearing the circle, and the circle's radius (% of the map) */
@@ -749,6 +770,7 @@ function battle(fx) {
   const q = mode === "q" ? resolve(pend.ref) : mode === "chestq" ? resolve(ch.ref) : null;
   document.documentElement.style.setProperty("--kind", q ? KIND[q.kind].col : k.col);
   const headReady = M.streak % 3 === 2;
+  const fresh = id => mode === "chestq" && ch.chosen !== null && ch.glow === id ? " fresh" : "";
   let h = `<div class="playbar"><button class="pill" id="back" ${idle ? "" : "disabled title='Finish this first'"}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="pill" id="alive" data-n="${alive(M)}">👥 ${alive(M)} left</span><span class="spacer" style="flex:1"></span>
     <button class="pill" id="coins">${pic("coins")} ${S.coins}</button><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>
   <div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
@@ -764,9 +786,9 @@ function battle(fx) {
   </div>
   <div class="actions">
     <button class="act gun" id="shoot" style="--rar:${gun().col}" ${idle ? "" : "disabled"}>${gunPic(S.gun)}<span><b>${gun().name}</b><small>${gun().dmg} damage a hit${headReady ? " · next one ×2!" : ""}</small></span><span class="go">Shoot</span></button>
-    <button class="act" id="usemed" style="--rar:#3fae2a" ${!S.items.med || M.hp >= MAXHP || over ? "disabled" : ""}>${pic("medkit")}<span><b>Med Kit ×${S.items.med}</b><small>+50 health</small></span></button>
-    <button class="act" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
-    <button class="act" id="usebush" style="--rar:#3fae2a" ${!S.items.bush || M.bush || !idle ? "disabled" : ""}>${pic("bush")}<span><b>Bush ×${S.items.bush}</b><small>${M.bush ? "Hiding!" : "Hide: a miss costs nothing"}</small></span></button>
+    <button class="act${fresh("med")}" id="usemed" style="--rar:#3fae2a" ${!S.items.med || M.hp >= MAXHP || over ? "disabled" : ""}>${pic("medkit")}<span><b>Med Kit ×${S.items.med}</b><small>+50 health</small></span></button>
+    <button class="act${fresh("shield")}" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
+    <button class="act${fresh("bush")}" id="usebush" style="--rar:#3fae2a" ${!S.items.bush || M.bush || !idle ? "disabled" : ""}>${pic("bush")}<span><b>Bush ×${S.items.bush}</b><small>${M.bush ? "Hiding!" : "Hide: a miss costs nothing"}</small></span></button>
   </div>`;
   const showPassage = mode === "q" && q.kind === "reading";
   h += `<div class="stage${showPassage ? " has-passage" : ""}">${showPassage ? passageHtml(o, q) : ""}`;
@@ -788,10 +810,13 @@ function battle(fx) {
       <p>To open it, answer one <b>${KIND[ch.kind].label.toLowerCase()}</b> question. Get it right for a Fortnite power-up. Get it wrong and the lock holds, but nothing else happens.</p>
       <div class="next"><button class="btn ghost" id="chestleave">Leave it</button> <button class="btn" id="chestopen">Open it ▶</button></div></div>`;
   } else if (mode === "chestq") {
-    h += `<div class="card chestcard" id="qcard" data-q="${qkey(ch.ref)}" data-seed="${ch.ref.seed !== undefined ? ch.ref.seed : ""}"><div class="qhead"><span>🎁 Chest · ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, ch.chosen)}`;
+    const won = ch.chosen !== null && ch.chosen === q.answer, lt = won ? LOOT.find(x => x.id === ch.loot) : null;
+    h += `<div class="card chestcard" id="qcard" data-q="${qkey(ch.ref)}" data-seed="${ch.ref.seed !== undefined ? ch.ref.seed : ""}">`;
+    if (won) h += `<div class="lootreveal" style="--rar:${lt.col}" id="loot" data-loot="${lt.id}"><div class="got">The chest bursts open! You got:</div>${pic(lt.img, "")}<span class="rarity">${lt.rar}</span><b class="nm">${lt.name}</b><div class="what">${ch.got || lt.what}</div></div>`;
+    h += `<div class="qhead"><span>🎁 Chest · ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, ch.chosen)}`;
     if (ch.chosen !== null) {
       const ok = ch.chosen === q.answer, l = LOOT.find(x => x.id === ch.loot);
-      h += ok ? `<div class="loot" style="--rar:${l.col}" id="loot" data-loot="${l.id}">${pic(l.img, "")}<div><small>${l.rar}</small><b>${l.name}</b>${l.what}${ch.note || ""}</div></div><div class="fb good"><h4>The chest bursts open!</h4>${q.explain}</div>`
+      h += ok ? `<div class="fb good"><h4>Right! That’s how the chest opened.</h4>${q.explain}</div>`
         : `<div class="fb miss"><h4>The lock holds. No loot this time.</h4><p>The answer was <b>${LETTERS[q.answer]}</b>.</p>${q.explain}</div>`;
       h += `<div class="next"><button class="btn" id="next">${o.dead ? (o.boss ? "Victory Royale ▶" : "Back to the island ▶") : "Back to the fight ▶"}</button></div>`;
     }
@@ -818,6 +843,7 @@ function battle(fx) {
     if (fx.hit === false && !fx.dmg && fx.bush) add("Hidden!", "onme safe");
     if (fx.heal) add("+" + fx.heal, "onfoe heal");
     if (fx.anim === "dance") add("Boogie!", "onfoe safe");
+    if (fx.loot) add("+ " + fx.loot + "!", "onme loot");
   }
   $("#back").onclick = () => { if (mode === "idle") home(); };
   const shoot = () => { if (!(mode === "idle" && !o.dead && M.hp > 0)) return; nextQ(o); battle(); const c = $("#qcard"); if (c && window.innerWidth < 821) c.scrollIntoView({ behavior: "smooth", block: "start" }); };
@@ -895,17 +921,21 @@ function chestAnswer(i) {
   record(ch.ref, ok);
   ch.chosen = i;
   if (ok) {
-    const l = rollLoot(); ch.loot = l.id; ch.note = "";
+    const l = rollLoot(), h0 = M.hp, s0 = M.shield, c0 = S.coins;
+    ch.loot = l.id;
     if (["med", "shield", "boogie", "bush"].includes(l.id)) {
-      if (S.items[l.id] < CARRY) S.items[l.id]++;
-      else { S.coins += 20; S.stats.lootCoins += 20; ch.note = " You can’t carry any more, so you sell it for 20 coins."; }
-    } else if (l.id === "slurp") { M.hp = Math.min(MAXHP, M.hp + 25); M.shield = Math.min(MAXSH, M.shield + 25); }
-    else if (l.id === "chug") { M.hp = MAXHP; M.shield = MAXSH; }
-    else if (l.id === "gold") { S.coins += 60; S.stats.lootCoins += 60; }
+      if (S.items[l.id] < CARRY) { S.items[l.id]++; ch.got = `<b>You now have ${S.items[l.id]} ${S.items[l.id] === 1 ? HOLD[l.id][0] : HOLD[l.id][1]}.</b> ${HOLD[l.id][2]}`; ch.glow = l.id; }
+      else { S.coins += 20; S.stats.lootCoins += 20; ch.got = `You already carry ${CARRY}, the most you can hold, so you sell it: <b>coins ${c0} → ${S.coins}</b>.`; }
+    } else if (l.id === "gold") { S.coins += 60; S.stats.lootCoins += 60; ch.got = `<b>Coins ${c0} → ${S.coins}.</b> Spend them in the shop on the island.`; }
+    else {
+      if (l.id === "slurp") { M.hp = Math.min(MAXHP, M.hp + 25); M.shield = Math.min(MAXSH, M.shield + 25); } else { M.hp = MAXHP; M.shield = MAXSH; }
+      ch.got = `You drink it straight away: <b>health ${h0} → ${M.hp}</b> and <b>shield ${s0} → ${M.shield}</b>.${h0 === MAXHP && s0 === MAXSH ? " (You were already full.)" : ""}`;
+    }
     beep(SND.chest);
   } else beep(SND.miss);
   others(rnd(2));
-  battle();
+  battle(ok ? { loot: LOOT.find(x => x.id === ch.loot).name } : undefined);
+  const r = $("#loot") || $(".fb"); if (r) r.scrollIntoView({ block: "center" });
 }
 function next() {
   const M = S.match, o = M.opps[M.cur];

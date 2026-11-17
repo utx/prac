@@ -320,6 +320,11 @@ function checkLayout(M, where, GAP) {
           if (wantLoot) {
             loot++;
             if (!(await page.$("#loot"))) bad(`${label}: a right chest answer gave no loot`);
+            else {
+              const lt = await page.$eval("#loot", e => e.textContent), inView = await page.$eval("#loot", e => { const r = e.getBoundingClientRect(); return r.top < window.innerHeight && r.bottom > 0; });
+              if (!/You got/.test(lt) || !/You now have|→|already carry/.test(lt)) bad(`${label}: the loot reveal should say what you got and what changed (${lt.slice(0, 120)})`);
+              if (!inView) bad(`${label}: the loot reveal is off the screen`);
+            }
             await shot("loot");
           } else if (await page.$("#loot")) bad(`${label}: a wrong chest answer gave loot`);
           continue;
