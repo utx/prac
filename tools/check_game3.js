@@ -80,6 +80,7 @@ for (const t of [1, 2, 3]) if (C.READING.filter(p => p.tier === t).length < 2) b
   const old = new Set(); for (const w of WORLDS) for (const lv of w.levels) for (const q of lv.questions) old.add(text(q.stem).toLowerCase());
   for (const q of Object.values(HAND)) if (text(q.stem).length > 40 && old.has(text(q.stem).toLowerCase())) bad(`${q.id}: same question as one in Crown Quest`);
 }
+{ const stems = new Map(); for (const q of Object.values(HAND)) { const k = text(q.stem).toLowerCase(); if (k.length > 40 && !q.gap) { if (stems.has(k)) bad(`${q.id}: same question as ${stems.get(k)}`); stems.set(k, q.id); } } }
 const nHand = Object.keys(HAND).length;
 console.log(`hand-written: ${C.READING.length} passages, ${nHand} questions (${C.READING.reduce((a, p) => a + p.questions.length, 0)} reading, ${C.THINKING.length} thinking, ${C.MATHS.length} maths)`);
 
@@ -100,6 +101,24 @@ function solveLines(v, lines) {
     }
   }
   return v;
+}
+/* cube helpers for the checks: faces of a cube model, and a dice rolled over a net (a different method from the game's folding) */
+function vox(cells) {
+  const has = new Set(cells.map(c => c.join(","))); let out = 0, floor = 0, seen = 0;
+  for (const [x, y, z] of cells) for (const [a, b, c] of [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) if (!has.has(`${x + a},${y + b},${z + c}`)) { out++; if (c === -1 && z === 0) floor++; if ((a === 1) || (b === -1) || (c === 1)) seen++; }
+  return { n: cells.length, out, floor, seen };
+}
+function roll(cells) {   // the bottom slot of a dice rolled square by square over the net
+  const at = new Map(cells.map((c, i) => [c.join(","), i])), slot = [], q = [[0, { B: "b", T: "t", N: "n", S: "s", E: "e", W: "w" }]]; slot[0] = "b";
+  while (q.length) {
+    const [i, d] = q.shift(), [x, y] = cells[i];
+    for (const [dx, dy, nd] of [[1, 0, { B: d.E, E: d.T, T: d.W, W: d.B, N: d.N, S: d.S }], [-1, 0, { B: d.W, W: d.T, T: d.E, E: d.B, N: d.N, S: d.S }], [0, 1, { B: d.S, S: d.T, T: d.N, N: d.B, E: d.E, W: d.W }], [0, -1, { B: d.N, N: d.T, T: d.S, S: d.B, E: d.E, W: d.W }]]) {
+      const j = at.get(`${x + dx},${y + dy}`);
+      if (j === undefined || slot[j]) continue;
+      slot[j] = nd.B; q.push([j, nd]);
+    }
+  }
+  return slot;
 }
 const SOLVE = {
   pict: d => (d.rows[d.a][1] - d.rows[d.b][1]) * d.key,
@@ -131,6 +150,17 @@ const SOLVE = {
   totals2: d => { const v = {}, lines = []; d.cells.forEach((r, i) => { r.forEach((x, j) => v[`${i},${j}`] = x); lines.push([[0, 1, 2].map(j => `${i},${j}`), `${i},3`]); }); d.colTotals.forEach((t, j) => { v["c" + j] = t; lines.push([[0, 1, 2].map(i => `${i},${j}`), "c" + j]); }); return solveLines(v, lines)[d.ask.join(",")]; },
   totals3: d => { const v = { g: d.grand }, lines = []; d.cells.forEach((r, i) => { r.forEach((x, j) => v[`${i},${j}`] = x); lines.push([[0, 1, 2].map(j => `${i},${j}`), `${i},3`]); }); lines.push([d.cells.map((_, i) => `${i},3`), "g"]); return solveLines(v, lines)[d.ask.join(",")]; },
   tabletotal: d => { const t = d.rows.map(r => r[0] + r[1]), m = Math.max(...t); return t.filter(x => x === m).length === 1 ? DAYS[t.indexOf(m)] : "tie"; },
+  /* cube templates: count everything one small cube at a time */
+  paintcube: d => { let c = 0; for (let x = 0; x < d.n; x++) for (let y = 0; y < d.n; y++) for (let z = 0; z < d.n; z++) if ([x, y, z].reduce((a, v) => a + (v === 0) + (v === d.n - 1), 0) === d.k) c++; return c; },
+  stack: d => { const v = vox(d.rows.flatMap((r, i) => r.flatMap((h, x) => Array.from({ length: h }, (_, z) => [x, d.rows.length - 1 - i, z])))); return d.ask === "paint" ? v.out : d.ask === "see" ? v.out - v.floor : 6 * v.n - v.out + v.floor; },
+  stairs: d => { const c = []; for (let x = 0; x < d.k; x++) for (let z = 0; z < d.k - x; z++) for (let y = 0; y < d.d; y++) c.push([x, y, z]); const v = vox(c); return d.ask === "cubes" ? v.n : v.out; },
+  solidparts: d => {
+    const n = d.n, V = [], E = [];
+    if (d.type === "prism") { for (let i = 0; i < 2 * n; i++) V.push(i); for (let i = 0; i < n; i++) E.push([i, (i + 1) % n], [n + i, n + (i + 1) % n], [i, n + i]); return { faces: n + 2, edges: E.length, corners: V.length }[d.ask]; }
+    for (let i = 0; i <= n; i++) V.push(i); for (let i = 0; i < n; i++) E.push([i, (i + 1) % n], [i, n]); return { faces: n + 1, edges: E.length, corners: V.length }[d.ask];
+  },
+  netopp: d => { const s = roll(d.cells); if (new Set(s).size !== 6) return "not a net"; const i = d.labels.indexOf(d.ask), o = { b: "t", t: "b", n: "s", s: "n", e: "w", w: "e" }[s[i]]; return d.labels[s.indexOf(o)]; },
+  isnet: d => { const ok = d.list.map(c => new Set(roll(c)).size === 6); return ok.filter(Boolean).length === 1 ? ok.indexOf(true) : -1; },
   sessions: d => { let n = 0; for (let w = 1; w <= d.W; w++) for (let k = 0; k < d.d; k++) if (w !== 2) n++; return n - 1; },
 };
 /* is the picture drawn from the same numbers? (heights of columns, dots, symbols, liquid levels, table cells) */
@@ -147,6 +177,10 @@ const DRAWN = {
   gridperim: (d, s) => rects(s, 28).length === sum(d.heights),
   towers: (d, s) => text(s).includes(d.grid.join("")) || d.grid.every(g => s.includes(`<td>${g}</td>`)),
   bus: (d, s) => d.times.every(b => b.every(t => s.includes(clock(t)))),
+  paintcube: (d, s) => (s.match(/class="face"/g) || []).length === 3 * d.n * d.n,
+  stack: (d, s) => { const c = d.rows.flatMap((r, i) => r.flatMap((h, x) => Array.from({ length: h }, (_, z) => [x, d.rows.length - 1 - i, z]))); return (s.match(/class="face"/g) || []).length === vox(c).seen && (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.rows.flat().join(); },
+  stairs: (d, s) => { const c = []; for (let x = 0; x < d.k; x++) for (let z = 0; z < d.k - x; z++) for (let y = 0; y < d.d; y++) c.push([x, y, z]); return (s.match(/class="face"/g) || []).length === vox(c).seen; },
+  netopp: (d, s) => (s.match(/<rect/g) || []).length === 6 && d.labels.every(l => s.includes(`>${l}</text>`)),
   tabletotal: (d, s) => (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.rows.flat().join(),
   droplow: (d, s) => (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.scores.flat().join(),
   totals2: (d, s) => (s.match(/<td>(\d+|\?)<\/td>/g) || []).map(x => /\?/.test(x) ? null : num(x)).join() === [...d.cells.flat(), ...d.colTotals].join(),
@@ -162,16 +196,17 @@ for (const g of C.GENS) {
   for (let seed = 1; seed <= SEEDS; seed++) {
     let q; try { q = g.make(rng(seed * 7919)); } catch (e) { no(`seed ${seed} crashed: ${e.message}`); continue; }
     nGen++;
-    if (q.options.length !== want || new Set(q.options.map(text)).size !== want) no(`seed ${seed}: needs ${want} different options (${q.options.map(text).join(" | ")})`);
+    if (q.options.length !== want || new Set(q.options.map(o => q.visual ? o : text(o))).size !== want) no(`seed ${seed}: needs ${want} different options (${q.options.map(text).join(" | ")})`);
     if (!(q.answer >= 0 && q.answer < want)) { no(`seed ${seed}: bad answer index`); continue; }
     if (/undefined|NaN|null|Infinity/.test(text(q.stem) + text(q.explain) + q.options.join())) no(`seed ${seed}: broken text`);
     if (!/why-not/.test(q.explain)) no(`the explanation must say why the traps are wrong`);
     longest(q, `template ${g.id} seed ${seed}`);
     const mine = SOLVE[g.id](q.data), shown = text(q.options[q.answer]);
-    const same = typeof mine === "number" ? (g.id === "droplow" ? mine === q.answer : near(mine, num(shown))) : mine === shown;
+    const same = typeof mine === "number" ? (["droplow", "isnet"].includes(g.id) ? mine === q.answer : near(mine, num(shown))) : mine === shown;
     if (!same) no(`seed ${seed}: the marked answer is "${shown}" but working it out separately gives "${mine}"`);
-    if (typeof mine === "number" && g.id !== "droplow" && q.options.filter(o => near(num(text(o)), mine)).length !== 1) no(`seed ${seed}: not exactly one correct option`);
+    if (typeof mine === "number" && !["droplow", "isnet"].includes(g.id) && q.options.filter(o => near(num(text(o)), mine)).length !== 1) no(`seed ${seed}: not exactly one correct option`);
     if (DRAWN[g.id] && !DRAWN[g.id](q.data, q.stem)) no(`seed ${seed}: the picture does not match the numbers`);
+    if (g.id === "isnet" && !q.options.every(o => (o.match(/<rect/g) || []).length === 6)) no(`seed ${seed}: every shape must have six squares`);
     const again = g.make(rng(seed * 7919));
     if (again.stem !== q.stem || again.answer !== q.answer) no(`seed ${seed}: the same seed gave a different question`);
     letters[q.answer] = (letters[q.answer] || 0) + 1;

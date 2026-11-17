@@ -68,6 +68,27 @@ const LIB = (() => {
   }
   const jugAria = ({ max, major, minor, level, unit, title = "A container" }) => `${title}: the scale is labelled every ${major} ${unit} up to ${max} ${unit}, with ${minor - 1} small unlabelled mark${minor - 1 === 1 ? "" : "s"} between each pair of labels. The liquid reaches ${level % major === 0 ? "the " + level + " " + unit + " label" : "small mark number " + ((level % major) / (major / minor)) + " above the " + (level - level % major) + " " + unit + " label"}.`;
 
+  /* cube models drawn at a slant: cells = [[x, y, z], …] (x to the right, y going back, z up); only faces you can see are drawn */
+  function blocks(cells, { u = 30, aria = "", fill = ["#ffd8a8", "#ffe9cf", "#e8a06a"] } = {}) {
+    const dx = u * 0.5, dy = u * 0.4, has = new Set(cells.map(c => c.join(",")));
+    const X = Math.max(...cells.map(c => c[0])) + 1, Y = Math.max(...cells.map(c => c[1])) + 1, Z = Math.max(...cells.map(c => c[2])) + 1;
+    const W = Math.round(X * u + Y * dx + 8), H = Math.round(Z * u + Y * dy + 8), ox = 4, oy = H - 4;
+    const P = (x, y, z) => `${(ox + x * u + y * dx).toFixed(1)},${(oy - z * u - y * dy).toFixed(1)}`;
+    const k = (x, y, z) => has.has(`${x},${y},${z}`);
+    const poly = (pts, f) => `<polygon class="face" points="${pts.join(" ")}" fill="${f}" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>`;
+    let g = "";
+    for (const [x, y, z] of cells.slice().sort((a, b) => b[1] - a[1] || a[2] - b[2] || a[0] - b[0])) {
+      if (!k(x, y - 1, z)) g += poly([P(x, y, z), P(x + 1, y, z), P(x + 1, y, z + 1), P(x, y, z + 1)], fill[0]);
+      if (!k(x, y, z + 1)) g += poly([P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], fill[1]);
+      if (!k(x + 1, y, z)) g += poly([P(x + 1, y, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x + 1, y, z + 1)], fill[2]);
+    }
+    return `<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${aria}">${g}</svg>`;
+  }
+  /* a plan seen from above: rows of tower heights, front row last */
+  const plan = (rows, note = "") => `<div class="figure"><div style="display:inline-block"><table class="grid" style="font-weight:700;margin:0">${rows.map(r => `<tr>${r.map(h => `<td>${h}</td>`).join("")}</tr>`).join("")}</table><div style="font-size:14px;font-weight:700;letter-spacing:2px;margin-top:4px">▲ FRONT ▲</div>${note}</div></div>`;
+  /* cells of towers standing on a plan (rows listed back to front) */
+  const towers = rows => { const cells = [], n = rows.length; rows.forEach((r, i) => r.forEach((h, x) => { for (let z = 0; z < h; z++) cells.push([x, n - 1 - i, z]); })); return cells; };
+
   /* random helpers on top of a seeded random-number function */
   const R = r => ({
     int: (a, b) => a + Math.floor(r() * (b - a + 1)),
@@ -91,5 +112,5 @@ const LIB = (() => {
   }
   const gen = (id, kind, tier, cat, fn) => GENS.push({ id, kind, tier, cat, make: r => fn(R(r)) });
   const NAMES = ["Ava", "Ben", "Cleo", "Dev", "Esha", "Finn", "Gia", "Hugo", "Isla", "Jai", "Kira", "Leo", "Mila", "Noah", "Omar", "Pia", "Remy", "Suki", "Theo", "Uma", "Vera", "Will", "Yusuf", "Zoe"];
-  return { T, fig, tbl, money, clock, dur, frac, colGraph, pictGraph, dotPlot, jugSvg, jugAria, R, opts, gen, NAMES };
+  return { T, fig, tbl, money, clock, dur, frac, colGraph, pictGraph, dotPlot, jugSvg, jugAria, R, opts, gen, NAMES, blocks, plan, towers };
 })();

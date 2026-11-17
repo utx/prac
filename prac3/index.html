@@ -335,6 +335,27 @@ const LIB = (() => {
   }
   const jugAria = ({ max, major, minor, level, unit, title = "A container" }) => `${title}: the scale is labelled every ${major} ${unit} up to ${max} ${unit}, with ${minor - 1} small unlabelled mark${minor - 1 === 1 ? "" : "s"} between each pair of labels. The liquid reaches ${level % major === 0 ? "the " + level + " " + unit + " label" : "small mark number " + ((level % major) / (major / minor)) + " above the " + (level - level % major) + " " + unit + " label"}.`;
 
+  /* cube models drawn at a slant: cells = [[x, y, z], …] (x to the right, y going back, z up); only faces you can see are drawn */
+  function blocks(cells, { u = 30, aria = "", fill = ["#ffd8a8", "#ffe9cf", "#e8a06a"] } = {}) {
+    const dx = u * 0.5, dy = u * 0.4, has = new Set(cells.map(c => c.join(",")));
+    const X = Math.max(...cells.map(c => c[0])) + 1, Y = Math.max(...cells.map(c => c[1])) + 1, Z = Math.max(...cells.map(c => c[2])) + 1;
+    const W = Math.round(X * u + Y * dx + 8), H = Math.round(Z * u + Y * dy + 8), ox = 4, oy = H - 4;
+    const P = (x, y, z) => `${(ox + x * u + y * dx).toFixed(1)},${(oy - z * u - y * dy).toFixed(1)}`;
+    const k = (x, y, z) => has.has(`${x},${y},${z}`);
+    const poly = (pts, f) => `<polygon class="face" points="${pts.join(" ")}" fill="${f}" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>`;
+    let g = "";
+    for (const [x, y, z] of cells.slice().sort((a, b) => b[1] - a[1] || a[2] - b[2] || a[0] - b[0])) {
+      if (!k(x, y - 1, z)) g += poly([P(x, y, z), P(x + 1, y, z), P(x + 1, y, z + 1), P(x, y, z + 1)], fill[0]);
+      if (!k(x, y, z + 1)) g += poly([P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], fill[1]);
+      if (!k(x + 1, y, z)) g += poly([P(x + 1, y, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x + 1, y, z + 1)], fill[2]);
+    }
+    return `<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${aria}">${g}</svg>`;
+  }
+  /* a plan seen from above: rows of tower heights, front row last */
+  const plan = (rows, note = "") => `<div class="figure"><div style="display:inline-block"><table class="grid" style="font-weight:700;margin:0">${rows.map(r => `<tr>${r.map(h => `<td>${h}</td>`).join("")}</tr>`).join("")}</table><div style="font-size:14px;font-weight:700;letter-spacing:2px;margin-top:4px">▲ FRONT ▲</div>${note}</div></div>`;
+  /* cells of towers standing on a plan (rows listed back to front) */
+  const towers = rows => { const cells = [], n = rows.length; rows.forEach((r, i) => r.forEach((h, x) => { for (let z = 0; z < h; z++) cells.push([x, n - 1 - i, z]); })); return cells; };
+
   /* random helpers on top of a seeded random-number function */
   const R = r => ({
     int: (a, b) => a + Math.floor(r() * (b - a + 1)),
@@ -358,7 +379,7 @@ const LIB = (() => {
   }
   const gen = (id, kind, tier, cat, fn) => GENS.push({ id, kind, tier, cat, make: r => fn(R(r)) });
   const NAMES = ["Ava", "Ben", "Cleo", "Dev", "Esha", "Finn", "Gia", "Hugo", "Isla", "Jai", "Kira", "Leo", "Mila", "Noah", "Omar", "Pia", "Remy", "Suki", "Theo", "Uma", "Vera", "Will", "Yusuf", "Zoe"];
-  return { T, fig, tbl, money, clock, dur, frac, colGraph, pictGraph, dotPlot, jugSvg, jugAria, R, opts, gen, NAMES };
+  return { T, fig, tbl, money, clock, dur, frac, colGraph, pictGraph, dotPlot, jugSvg, jugAria, R, opts, gen, NAMES, blocks, plan, towers };
 })();
 
 /* STORM ISLAND: where the land is on the map picture, made by game3/art/landmask.py (do not edit by hand).
@@ -800,6 +821,163 @@ const LAND = [
 })();
 
 /* ---------------------------------------------------------------
+   STORM ISLAND: cube and solid-shape templates (Nov 2026, second question set).
+   "How many faces of this cube" questions, drawn fresh each time:
+   painted cubes, cube models on a plan, staircases, prisms and pyramids,
+   nets (which face is opposite, which shape folds into a cube).
+   tools/check_game3.js works every answer out again by its own method.
+   --------------------------------------------------------------- */
+(() => {
+  const { T, fig, opts, gen, blocks, plan, towers } = LIB;
+  const B = s => `<b>${s}</b>`;
+  const sum = a => a.reduce((x, y) => x + y, 0);
+
+  /* ---------- painted cube cut into small cubes ---------- */
+  gen("paintcube", "maths", 3, "Area, perimeter & 3D", R => {
+    let n, k;
+    do { n = R.int(3, 5); k = R.int(0, 3); } while (n === 3 && k === 2);   // Crown Quest already asks 3 × 3 × 3 with two faces
+    const m = n - 2, cnt = [m ** 3, 6 * m * m, 12 * m, 8];
+    const words = ["no painted faces at all", "exactly one painted face", "exactly two painted faces", "exactly three painted faces"];
+    const wrongs = [[(n - 1) ** 3, m * m, 6 * m * m, n * n], [6 * n * n, 4 * m * m, 6 * m, 12 * m], [12 * n, 24, 6 * m * m, 8], [6, 12 * m, 4, 24]][k];
+    const cells = []; for (let x = 0; x < n; x++) for (let y = 0; y < n; y++) for (let z = 0; z < n; z++) cells.push([x, y, z]);
+    const o = opts(R, cnt[k], wrongs);
+    const where = [`hidden inside, in a ${m} × ${m} × ${m} block: ${m} × ${m} × ${m} = ${cnt[0]}`, `in the middle of each of the 6 faces, a ${m} × ${m} square: 6 × ${m * m} = ${cnt[1]}`,
+      `along each of the 12 edges, between the corners: ${m} on each edge, 12 × ${m} = ${cnt[2]}`, `at the 8 corners: ${cnt[3]}`][k];
+    return { ...o, data: { n, k },
+      stem: `<p>A large cube is made of ${B(n ** 3)} small cubes, ${n} long, ${n} wide and ${n} high. The whole outside of the large cube is painted, and then it is taken apart.</p>${fig(blocks(cells, { u: n > 4 ? 22 : 26, aria: `A large cube made of small cubes, ${n} along each edge.` }))}<p>How many small cubes have ${B(words[k])}?</p>`,
+      explain: `<p>Think about where each small cube sits. Corner cubes have 3 painted faces. Cubes along an edge, between two corners, have 2. Cubes in the middle of a face have 1. Cubes hidden inside have none.</p><p>The cubes asked for are ${where}. So the answer is ${B(cnt[k])}.</p><p>Check: ${cnt[3]} + ${cnt[2]} + ${cnt[1]} + ${cnt[0]} = ${n ** 3}, the number of small cubes.</p><p class="why-not">The usual slips: counting a whole edge (${n} cubes) instead of only the ${m} between the corners, counting a whole face (${n} × ${n}) instead of the ${m} × ${m} middle, or forgetting that a cube has 12 edges and 6 faces.</p>` };
+  });
+
+  /* ---------- a cube model standing on a plan ---------- */
+  const faces = rows => {   // exposed faces of towers on a plan, counted side by side
+    let top = 0, side = 0, n = 0;
+    const H = (i, j) => (rows[i] && rows[i][j]) || 0;
+    rows.forEach((r, i) => r.forEach((h, j) => { if (!h) return; n += h; top++; for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) side += Math.max(0, h - H(i + a, j + b)); }));
+    return { n, top, side, all: 2 * top + side };
+  };
+  gen("stack", "maths", 3, "Area, perimeter & 3D", R => {
+    let rows, f;
+    do {
+      rows = [0, 1].map(() => [0, 1, 2].map(() => R.int(0, 3)));
+      f = faces(rows);
+    } while (f.n < 5 || f.n > 9 || rows.flat().filter(h => !h).length > 1 || !rows[1].some(Boolean) || rows.flat().filter(h => h === 3).length > 2);
+    const ask = R.pick(["paint", "hidden", "see"]);
+    const correct = ask === "paint" ? f.all : ask === "hidden" ? 6 * f.n - f.all + f.top : f.all - f.top;
+    const drawn = blocks(towers(rows), { u: 30, aria: `A model of cubes built on the plan.` });
+    const inPicture = (drawn.match(/class="face"/g) || []).length;
+    const q = { paint: `The whole outside of the model is painted, ${B("including the bottom")}. How many small square faces are painted?`,
+      hidden: `How many faces of the small cubes are ${B("hidden")}, because they touch another cube or the table?`,
+      see: `Mia walks all the way round the model and looks down on it from above. How many small square faces can she see altogether? (She can’t see the bottom.)` }[ask];
+    const o = opts(R, correct, ask === "paint" ? [6 * f.n, f.all - f.top, inPicture, f.n * 4] : ask === "hidden" ? [6 * f.n - f.all, f.top, f.n, 6 * f.n - inPicture] : [inPicture, f.all, 6 * f.n, 5 * f.n]);
+    return { ...o, data: { rows, ask },
+      stem: `<p>Cubes are glued together on a table to make this model. The plan shows how many cubes are in each tower.</p><div class="figure" style="display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap">${blocks(towers(rows), { u: 30, aria: `A model of ${f.n} cubes standing in towers. Seen from above, the back row of towers is ${rows[0].join(", ")} cubes tall and the front row is ${rows[1].join(", ")} cubes tall, from left to right.` })}${plan(rows)}</div><p>${q}</p>`,
+      explain: `<p>Count the outside faces in groups. Tops: one for each tower, ${f.top}. Bottoms: also ${f.top}. Sides: go round every tower and count the squares that don’t touch a neighbouring tower: ${f.side}.</p><p>So the outside has ${f.top} + ${f.top} + ${f.side} = ${f.all} faces. ${ask === "paint" ? `All of them are painted: ${B(correct)}.` : ask === "see" ? `Mia can see all of them except the ${f.top} on the bottom: ${f.all} − ${f.top} = ${B(correct)}.` : `The ${f.n} cubes have 6 × ${f.n} = ${6 * f.n} faces altogether. ${f.all} are on the outside, but the ${f.top} on the bottom touch the table, so the hidden ones are ${6 * f.n} − ${f.all} + ${f.top} = ${B(correct)}.`}</p><p class="why-not">The picture only shows three sides of the model (${inPicture} faces): the back, the left side and the bottom are there too. ${6 * f.n} counts every face of every cube, even where two cubes are glued together.</p>` };
+  });
+
+  /* ---------- a staircase of cubes ---------- */
+  gen("stairs", "maths", 2, "Area, perimeter & 3D", R => {
+    const k = R.int(3, 5), d = R.int(1, 3), ask = R.pick(["cubes", "paint"]);
+    const cubes = d * k * (k + 1) / 2, paint = k * (k + 1) + 4 * k * d;
+    const cells = []; for (let x = 0; x < k; x++) for (let z = 0; z < k - x; z++) for (let y = 0; y < d; y++) cells.push([x, y, z]);
+    const front = k * (k + 1) / 2;
+    const o = ask === "cubes" ? opts(R, cubes, [front, k * k * d, front + (d - 1) * k, cubes + k]) : opts(R, paint, [6 * cubes, paint - k * d, front * 2 + 3 * k * d, paint - k * d - k * d]);
+    return { ...o, data: { k, d, ask },
+      stem: `<p>This staircase is made of cubes. It has ${B(k + " steps")}, and it is ${B(d === 1 ? "one cube deep" : d + " cubes deep")}: every step goes ${d === 1 ? "back just one cube" : `all the way back, ${d} cubes`}.</p>${fig(blocks(cells, { u: 26, aria: `A staircase of cubes with ${k} steps, ${d} cube${d > 1 ? "s" : ""} deep. The tallest column, on the left, is ${k} cubes high; each column to its right is one cube lower.` }))}<p>${ask === "cubes" ? `How many cubes are in the staircase?` : `The whole staircase is painted, ${B("including the bottom")}. How many small square faces are painted?`}</p>`,
+      explain: ask === "cubes"
+        ? `<p>Count one slice from the front: the columns are ${Array.from({ length: k }, (_, i) => k - i).join(" + ")} = ${front} cubes. There are ${d} slice${d > 1 ? "s" : ""} going back, so ${front} × ${d} = ${B(cubes)} cubes.</p><p class="why-not">${front} counts only the front slice${d > 1 ? " you can see" : ""}. ${k * k * d} would be a full block with no steps cut out.</p>`
+        : `<p>Count the faces side by side. Front and back: ${front} + ${front} = ${2 * front}. Tops of the steps: ${k} × ${d} = ${k * d}. Bottom: ${k * d}. The tall left side: ${k} × ${d} = ${k * d}. The step edges on the right: one row of ${d} for each step, ${k * d}.</p><p>${2 * front} + ${k * d} + ${k * d} + ${k * d} + ${k * d} = ${B(paint)}.</p><p class="why-not">${6 * cubes} counts every face of every cube, even where cubes are glued together. ${paint - k * d} forgets the bottom.</p>` };
+  });
+
+  /* ---------- prisms and pyramids: faces, edges and corners ---------- */
+  const BASE = { 3: ["triangular", "triangles"], 4: ["square", "squares"], 5: ["pentagonal", "pentagons"], 6: ["hexagonal", "hexagons"], 8: ["octagonal", "octagons"] };
+  function solid(type, n) {
+    const cx = 110, cy = 140, rx = 80, ry = 26, hgt = type === "prism" ? 90 : 110, a0 = Math.PI / 2 + Math.PI / n + 0.32;   // turned a little so no face is seen flat on
+    const pt = (i, up) => [cx + rx * Math.cos(a0 + 2 * Math.PI * i / n), cy + ry * Math.sin(a0 + 2 * Math.PI * i / n) - up];
+    const back = i => Math.sin(a0 + 2 * Math.PI * i / n) + Math.sin(a0 + 2 * Math.PI * (i + 1) / n) < -0.001;
+    const line = (p, q, dash) => `<line x1="${p[0].toFixed(1)}" y1="${p[1].toFixed(1)}" x2="${q[0].toFixed(1)}" y2="${q[1].toFixed(1)}" stroke="${INK}" stroke-width="2" ${dash ? 'stroke-dasharray="5 4" opacity=".6"' : ""}/>`;
+    let g = "";
+    for (let i = 0; i < n; i++) g += line(pt(i, 0), pt(i + 1, 0), back(i));
+    if (type === "prism") {
+      for (let i = 0; i < n; i++) g += line(pt(i, hgt), pt(i + 1, hgt), false);
+      for (let i = 0; i < n; i++) g += line(pt(i, 0), pt(i, hgt), back(i) && back((i + n - 1) % n));   // hidden only when both base edges beside it are at the back
+    } else {
+      const ap = [cx, cy - hgt];
+      for (let i = 0; i < n; i++) g += line(pt(i, 0), ap, back(i) && back((i + n - 1) % n));
+    }
+    return `<svg viewBox="0 0 220 ${type === "prism" ? 180 : 180}" width="220" role="img" aria-label="${n === 8 ? "An" : "A"} ${BASE[n][0]} ${type}. Edges at the back are dashed.">${g}</svg>`;
+  }
+  gen("solidparts", "maths", 2, "Area, perimeter & 3D", R => {
+    const n = R.pick([3, 4, 5, 6, 8]), type = R.pick(["prism", "pyramid"]), ask = R.pick(["faces", "edges", "corners"]);
+    const P = { faces: n + 2, edges: 3 * n, corners: 2 * n }, Y = { faces: n + 1, edges: 2 * n, corners: n + 1 }, me = type === "prism" ? P : Y, other = type === "prism" ? Y : P;
+    const correct = me[ask], wrongs = [other[ask], ...["faces", "edges", "corners"].filter(x => x !== ask).map(x => me[x]), ask === "faces" ? me.faces - 1 : ask === "edges" ? n : me.corners - n];
+    const an = n === 8 ? "an" : "a", name = type === "prism" ? (n === 4 ? "a prism with square ends" : `${an} ${BASE[n][0]} prism`) : `${an} ${BASE[n][0]} pyramid`;
+    const o = opts(R, correct, wrongs);
+    const how = type === "prism"
+      ? { faces: `two ends (both ${BASE[n][1]}) plus one rectangle for each of the ${n} sides of an end: ${n} + 2 = ${B(correct)}`, edges: `${n} round the bottom end, ${n} round the top end and ${n} joining them: ${n} × 3 = ${B(correct)}`, corners: `${n} on the bottom end and ${n} on the top end: ${n} × 2 = ${B(correct)}` }[ask]
+      : { faces: `one base (a ${BASE[n][0].replace("al", "")} shape with ${n} sides) plus one triangle for each side of the base: ${n} + 1 = ${B(correct)}`.replace("a square shape", "a square").replace("a triangular shape", "a triangle"), edges: `${n} round the base and ${n} going up to the point: ${n} × 2 = ${B(correct)}`, corners: `${n} round the base and 1 at the point: ${n} + 1 = ${B(correct)}` }[ask];
+    return { ...o, data: { n, type, ask },
+      stem: `<p>This solid is ${B(name)}.</p>${fig(solid(type, n))}<p>How many ${B(ask)} does it have?${ask === "corners" ? " (Corners are also called vertices.)" : ""}</p>`,
+      explain: `<p>Count it in parts. ${name[0].toUpperCase() + name.slice(1)} has ${how}.</p><p class="why-not">${other[ask]} is the number for a ${type === "prism" ? "pyramid" : "prism"} with the same ${type === "prism" ? "ends" : "base"}. Mixing up faces, edges and corners gives the other numbers. Remember the dashed edges at the back: they count too.</p>` };
+  });
+
+  /* ---------- nets of a cube ---------- */
+  const K = cs => cs.map(c => c.join(",")).sort().join(";");
+  const norm = cs => { const x0 = Math.min(...cs.map(c => c[0])), y0 = Math.min(...cs.map(c => c[1])); return cs.map(([x, y]) => [x - x0, y - y0]); };
+  const canon = cs => { let best = null; for (let r = 0; r < 8; r++) { const t = norm(cs.map(([x, y]) => { let p = r & 4 ? [-x, y] : [x, y]; for (let i = 0; i < (r & 3); i++) p = [-p[1], p[0]]; return p; })); const k = K(t); if (best === null || k < best) best = k; } return best; };
+  /* fold a net: each square gets the direction its face points once folded (the first square is the bottom) */
+  function fold(cells) {
+    const at = new Map(cells.map((c, i) => [c.join(","), i])), fr = [{ N: [0, 0, -1], E: [1, 0, 0], S: [0, 1, 0] }], neg = v => v.map(a => -a), q = [0];
+    while (q.length) {
+      const i = q.shift(), f = fr[i], [x, y] = cells[i];
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const j = at.get(`${x + dx},${y + dy}`);
+        if (j === undefined || fr[j]) continue;
+        fr[j] = dx === 1 ? { N: f.E, E: neg(f.N), S: f.S } : dx === -1 ? { N: neg(f.E), E: f.N, S: f.S } : dy === 1 ? { N: f.S, E: f.E, S: neg(f.N) } : { N: neg(f.S), E: f.E, S: f.N };
+        q.push(j);
+      }
+    }
+    return fr.map(f => f.N.join(","));
+  }
+  const folds = cs => new Set(fold(cs)).size === 6;
+  const SHAPES = (() => {   // every shape of 6 squares joined edge to edge
+    let polys = new Map([["0,0", [[0, 0]]]]);
+    for (let n = 1; n < 6; n++) {
+      const nx = new Map();
+      for (const cs of polys.values()) for (const [x, y] of cs) for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        if (cs.some(d => d[0] === x + a && d[1] === y + b)) continue;
+        const ncs = norm([...cs, [x + a, y + b]]); nx.set(K(ncs), ncs);
+      }
+      polys = nx;
+    }
+    const all = [...polys.values()].filter(cs => { const w = Math.max(...cs.map(c => c[0])) + 1, h = Math.max(...cs.map(c => c[1])) + 1; return (w <= 4 && h <= 3) || (w <= 3 && h <= 4) || (w === 5 && h === 2); });
+    return { good: all.filter(folds), bad: all.filter(cs => !folds(cs)) };
+  })();
+  const netSvg = (cells, labels = null, u = 32) => {
+    const w = Math.max(...cells.map(c => c[0])) + 1, h = Math.max(...cells.map(c => c[1])) + 1;
+    const g = cells.map(([x, y], i) => `<rect x="${3 + x * u}" y="${3 + y * u}" width="${u}" height="${u}" fill="${labels ? "#fff3c4" : "#c9e8ff"}" stroke="${INK}" stroke-width="2"/>` + (labels ? `<text x="${3 + x * u + u / 2}" y="${3 + y * u + u / 2 + 7}" font-size="20" font-weight="700" text-anchor="middle" fill="${INK}">${labels[i]}</text>` : "")).join("");
+    const rows = Array.from({ length: h }, (_, y) => `Row ${y + 1}: ` + Array.from({ length: w }, (_, x) => { const i = cells.findIndex(c => c[0] === x && c[1] === y); return i < 0 ? "empty" : labels ? labels[i] : "square"; }).join(", ")).join(". ");
+    return `<svg viewBox="0 0 ${w * u + 6} ${h * u + 6}" width="${w * u + 6}" height="${h * u + 6}" role="img" aria-label="A shape of six squares on a grid ${w} wide and ${h} tall. ${rows}.">${g}</svg>`;
+  };
+  gen("netopp", "thinking", 1, "Spatial", R => {
+    const cells = R.pick(SHAPES.good), labels = R.shuffle(["A", "B", "C", "D", "E", "F"]), f = fold(cells);
+    const i = R.int(0, 5), opp = f.findIndex(v => v === f[i].split(",").map(a => String(-Number(a) || 0)).join(","));
+    const others = R.shuffle([0, 1, 2, 3, 4, 5].filter(j => j !== i && j !== opp)).slice(0, 3);
+    const set = R.shuffle([opp, ...others]), options = set.map(j => labels[j]);
+    return { options, answer: set.indexOf(opp), data: { cells, labels, ask: labels[i] },
+      stem: `<p>This net is folded up to make a cube.</p>${fig(netSvg(cells, labels))}<p>Which letter ends up on the face ${B("opposite")} ${B(labels[i])}?</p>`,
+      explain: `<p>Fold it in your head, one flap at a time: keep ${labels[i]} on the table as the bottom and fold the squares next to it up to make the walls. The face that ends up on top, ${B(labels[opp])}, is opposite ${labels[i]}.</p><p>A quick check: two squares in a straight line with exactly one square between them are always opposite.</p><p class="why-not">A face that touches ${labels[i]} in the net, even at a corner, can’t be opposite it: once folded it is one of the four walls next to ${labels[i]}.</p>` };
+  });
+  gen("isnet", "thinking", 2, "Spatial", R => {
+    const good = R.pick(SHAPES.good), seen = new Set([canon(good)]), bad = [];
+    while (bad.length < 3) { const b = R.pick(SHAPES.bad), c = canon(b); if (!seen.has(c)) { seen.add(c); bad.push(b); } }
+    const list = R.shuffle([good, ...bad]);
+    return { visual: true, options: list.map(cs => netSvg(cs)), answer: list.indexOf(good), data: { list },
+      stem: `<p>Each shape is made of six squares. Only one of them can be folded along the lines to make a closed cube.</p><p>Which one?</p>`,
+      explain: `<p>Fold each shape in your head: pick one square as the bottom and fold the squares around it up into walls. In the shapes that don’t work, two squares land on the same side of the cube and one side is left open.</p><p>Warning signs: four squares in a 2 by 2 block, five squares in a row, or a row of four with two squares sticking out on the same side.</p><p class="why-not">A shape with six squares has the right number of faces, but that isn’t enough: they also have to be arranged so that no two of them overlap when folded.</p>` };
+  });
+})();
+
+/* ---------------------------------------------------------------
    STORM ISLAND: maths questions (hand-written). Five options (A–E).
    These cover the topics the self-redrawing templates (generators.js) do not:
    place value, turns and angles, mass, chance, combinations, symmetry, 3D shapes,
@@ -913,6 +1091,138 @@ const LAND = [
       stem: `<p>Zed starts saving on a <b>Monday</b>. He puts <b>$2.00</b> in his money box that day. Every day after that he puts in <b>50c more</b> than he did the day before.</p><p>On which day does the total in his money box first become <b>more than $15</b>?</p>`,
       options: ["Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], answer: 3,
       explain: `<p>Keep a running total. Monday $2.00 (total $2.00). Tuesday $2.50 (total $4.50). Wednesday $3.00 (total $7.50). Thursday $3.50 (total $11.00). Friday $4.00 (total $15.00). Saturday $4.50 (total $19.50).</p><p>On Friday the total is exactly $15, which is not <i>more than</i> $15. It first passes $15 on <b>Saturday</b>.</p><p class="why-not">Friday is the trap: “more than $15” does not include $15 itself. The earlier days come from adding $2 every day and forgetting the amounts grow.</p>` },
+  );
+})();
+
+/* ---------------------------------------------------------------
+   STORM ISLAND: second set of maths questions (Nov 2026). Five options (A–E).
+   tier 1–3 = storm circle 1–3; tier 4 = the boss.
+   --------------------------------------------------------------- */
+(() => {
+  const { fig, blocks, frac, T, tbl, colGraph } = LIB;
+  const THERMO = (() => {
+    const y = v => 230 - v * 5;
+    let g = `<rect x="60" y="20" width="22" height="220" rx="11" fill="#fff" stroke="${INK}" stroke-width="2.5"/><circle cx="71" cy="248" r="16" fill="#e5484d" stroke="${INK}" stroke-width="2.5"/><rect x="66" y="${y(26)}" width="10" height="${248 - y(26)}" fill="#e5484d"/>`;
+    for (let v = 0; v <= 40; v += 2) { const big = v % 10 === 0; g += `<line x1="82" x2="${big ? 100 : 92}" y1="${y(v)}" y2="${y(v)}" stroke="${INK}" stroke-width="2"/>`; if (big) g += T(106, y(v) + 5, v + " °C"); }
+    return fig(`<svg viewBox="0 0 180 272" width="170" role="img" aria-label="A thermometer marked 0, 10, 20, 30 and 40 °C, with four small marks between each pair of labels. The red liquid reaches the third small mark above 20 °C.">${g}</svg>`);
+  })();
+  const LINE = (() => {
+    const times = ["6 am", "9 am", "12 pm", "3 pm", "6 pm"], temps = [8, 14, 22, 24, 18], X = i => 70 + i * 64, Y = v => 220 - v * 7.5;
+    let g = "";
+    for (let v = 0; v <= 26; v += 2) g += `<line x1="56" x2="340" y1="${Y(v)}" y2="${Y(v)}" stroke="#c5ccd8" stroke-width="1"/>` + (v % 4 === 0 ? T(48, Y(v) + 5, v, 'text-anchor="end"') : "");
+    g += `<line x1="56" x2="56" y1="${Y(26)}" y2="220" stroke="${INK}" stroke-width="2"/><line x1="56" x2="340" y1="220" y2="220" stroke="${INK}" stroke-width="2"/>`;
+    g += `<polyline points="${temps.map((t, i) => `${X(i)},${Y(t)}`).join(" ")}" fill="none" stroke="#e5484d" stroke-width="3"/>` + temps.map((t, i) => `<circle cx="${X(i)}" cy="${Y(t)}" r="5" fill="#e5484d" stroke="${INK}" stroke-width="1.5"/>`).join("");
+    times.forEach((t, i) => { g += T(X(i), 240, t, 'text-anchor="middle"'); });
+    g += `<text x="14" y="120" font-size="13" fill="${INK}" text-anchor="middle" transform="rotate(-90 14 120)">Temperature (°C)</text>`;
+    return fig(`<svg viewBox="0 0 350 250" width="350" role="img" aria-label="A line graph of the temperature during one day. The scale has a line every 2 degrees, labelled every 4. 6 am: 8 degrees. 9 am: 14 degrees. 12 pm: 22 degrees. 3 pm: 24 degrees. 6 pm: 18 degrees.">${g}</svg>`);
+  })();
+  const box = (X, Y, Z, opt) => { const c = []; for (let x = 0; x < X; x++) for (let y = 0; y < Y; y++) for (let z = 0; z < Z; z++) c.push([x, y, z]); return fig(blocks(c, opt)); };
+
+  MATHS.push(
+    /* ===================== circle 1 ===================== */
+    { id: "n101", tier: 1, cat: "Number & place value",
+      stem: `<p>Which number is <b>300 less</b> than <b>5 105</b>?</p>`,
+      options: ["2 105", "4 805", "4 905", "5 075", "5 405"], answer: 1,
+      explain: `<p>Take 3 hundreds from 5 105. There is only 1 hundred, so swap a thousand for 10 hundreds: 5 105 is 4 thousands, 11 hundreds and 5. Take away 3 hundreds: 4 thousands, 8 hundreds and 5 = <b>4 805</b>.</p><p class="why-not">5 075 takes away 30 and 2 105 takes away 3 000. 5 405 adds. 4 905 takes away only 200.</p>` },
+    { id: "n102", tier: 1, cat: "Money & best value",
+      stem: `<p>Mia buys <b>3 apples</b> at <b>65c each</b>. She pays with a <b>$5 note</b>.</p><p>How much change does she get?</p>`,
+      options: ["$1.95", "$3.05", "$3.15", "$3.95", "$4.35"], answer: 1,
+      explain: `<p>3 × 65c = $1.95. Change: $5.00 − $1.95 = <b>$3.05</b>.</p><p class="why-not">$1.95 is what she spent. $4.35 is the change for one apple. $3.15 and $3.95 come from slips when taking away the cents.</p>` },
+    { id: "n103", tier: 1, cat: "Area, perimeter & 3D",
+      stem: `<p>Sam builds a solid cube that is <b>3 small cubes</b> long, 3 wide and 3 high.</p>${box(3, 3, 3, { u: 34, aria: "A large cube made of small cubes, 3 along each edge." })}<p>How many small cubes does he use?</p>`,
+      options: ["9", "18", "27", "36", "81"], answer: 2,
+      explain: `<p>Each layer is 3 × 3 = 9 cubes, and there are 3 layers: 9 × 3 = <b>27</b>.</p><p class="why-not">9 is just one layer. 18 is two layers. Counting only the faces you can see in the picture misses the cubes hidden inside and at the back.</p>` },
+    { id: "n104", tier: 1, cat: "Time & timetables",
+      stem: `<p>A cake goes into the oven at <b>3:45 pm</b> and needs <b>50 minutes</b>.</p><p>When should it come out?</p>`,
+      options: ["4:15 pm", "4:25 pm", "4:35 pm", "4:45 pm", "5:35 pm"], answer: 2,
+      explain: `<p>15 minutes takes it to 4:00 pm, and the other 35 minutes takes it to <b>4:35 pm</b>.</p><p class="why-not">4:45 pm adds an hour instead of 50 minutes. 5:35 pm adds an extra hour. 4:25 pm and 4:15 pm come from counting the minutes to the hour wrongly.</p>` },
+
+    { id: "n105", tier: 1, cat: "Measurement & scales",
+      stem: `<p>What temperature does this thermometer show?</p>${THERMO}`,
+      options: ["21 °C", "23 °C", "24 °C", "26 °C", "30 °C"], answer: 3,
+      explain: `<p>From one label to the next is 10 degrees, split into 5 equal steps, so each small mark is 10 ÷ 5 = 2 degrees. The liquid is 3 marks above 20: 20 + 3 × 2 = <b>26 °C</b>.</p><p class="why-not">23 °C counts each small mark as 1 degree. 24 °C counts only two marks, and 30 °C is the next label up.</p>` },
+
+    /* ===================== circle 2 ===================== */
+    { id: "n201", tier: 2, cat: "Fractions",
+      stem: `<p>A box holds <b>24 pencils</b>. One third of them are red and one quarter are blue. The rest are green.</p><p>How many pencils are green?</p>`,
+      options: ["7", "10", "12", "14", "17"], answer: 1,
+      explain: `<p>Red: 24 ÷ 3 = 8. Blue: 24 ÷ 4 = 6. Green: 24 − 8 − 6 = <b>10</b>.</p><p class="why-not">12 takes the rest as half. 17 subtracts 3 and 4 instead of the fractions of 24. 14 forgets one of the colours.</p>` },
+    { id: "n202", tier: 2, cat: "Area, perimeter & 3D",
+      stem: `<p>A square-based pyramid is glued on top of a cube so that the pyramid’s base fits exactly over the top of the cube.</p><p>How many <b>faces</b> does the new solid have?</p>`,
+      options: ["8", "9", "10", "11", "12"], answer: 1,
+      explain: `<p>The cube has 6 faces and the pyramid has 5. When they are glued, the top of the cube and the base of the pyramid are hidden inside: 6 + 5 − 2 = <b>9</b>.</p><p>Check by counting: the cube’s bottom and 4 sides, plus the pyramid’s 4 triangles, is 9.</p><p class="why-not">11 just adds the two solids. 10 takes away only one of the glued faces, but both are hidden.</p>` },
+    { id: "n203", tier: 2, cat: "Chance & counting",
+      stem: `<p>A bag holds <b>4 red</b>, <b>4 blue</b> and <b>2 green</b> counters. Lee takes one without looking.</p><div class="box">1. Red and blue are equally likely.<br>2. Green is more likely than blue.<br>3. It is impossible to take a yellow counter.</div><p>Which statements are <b>correct</b>?</p>`,
+      options: ["1 only", "3 only", "1 and 2 only", "1 and 3 only", "1, 2 and 3"], answer: 3,
+      explain: `<p>1 is correct: there are 4 red and 4 blue. 2 is wrong: there are fewer green (2) than blue (4), so green is less likely. 3 is correct: there are no yellow counters. So <b>1 and 3 only</b>.</p><p class="why-not">Statement 2 has the comparison the wrong way round, so any answer that includes 2 is wrong.</p>` },
+    { id: "n204", tier: 2, cat: "Patterns & sequences",
+      stem: `<p>Matchsticks are used to make a row of squares. One square needs 4 matchsticks, two squares in a row need 7, and three need 10.</p><p>How many matchsticks are needed for a row of <b>12 squares</b>?</p>`,
+      options: ["34", "36", "37", "40", "48"], answer: 2,
+      explain: `<p>The first square needs 4 matchsticks. Every square after that shares a side with the one before, so it needs only 3 more: 4 + 11 × 3 = <b>37</b>.</p><p class="why-not">48 = 12 × 4 forgets that the squares share sides. 36 = 12 × 3 forgets the extra matchstick at the start.</p>` },
+    { id: "n205", tier: 2, cat: "Measurement & scales",
+      stem: `<p>What is the angle between the hour hand and the minute hand of a clock at exactly <b>4:00</b>?</p>`,
+      options: ["90°", "100°", "120°", "140°", "160°"], answer: 2,
+      explain: `<p>A full turn is 360° and the 12 numbers split it into 12 equal parts of 30°. At 4:00 the hands point at 12 and 4, four parts apart: 4 × 30° = <b>120°</b>.</p><p class="why-not">90° is a quarter turn (3:00). 100° and 140° come from using 25° or 35° for each step between numbers.</p>` },
+
+    { id: "n206", tier: 2, cat: "Graphs & data",
+      stem: colGraph({ labels: ["Mar", "Apr", "May", "Jun"], series: [{ name: "", color: "#69db7c", values: [15, 10, 25, 20] }], max: 30, step: 5, ylabel: "Books read",
+        aria: "A column graph of books read each month. The scale goes 0, 5, 10, 15, 20, 25, 30. March reaches 15, April 10, May 25 and June 20." }) + `<p>How many more books were read in the <b>two busiest</b> months together than in the <b>two quietest</b> months together?</p>`,
+      options: ["5", "10", "15", "20", "45"], answer: 3,
+      explain: `<p>Read each column: March 15, April 10, May 25, June 20. Busiest two: May and June, 25 + 20 = 45. Quietest two: March and April, 15 + 10 = 25. Difference: 45 − 25 = <b>20</b>.</p><p class="why-not">45 stops after adding the busiest months. 15 compares only the busiest and quietest single months (25 − 10).</p>` },
+    { id: "n207", tier: 2, cat: "Time & timetables",
+      stem: `<p>Ferries run from City Wharf to Palm Isle.</p>${tbl(["", "Ferry 1", "Ferry 2", "Ferry 3", "Ferry 4"], [["City Wharf", "9:15 am", "10:05 am", "10:45 am", "11:25 am"], ["Palm Isle", "9:50 am", "10:40 am", "11:20 am", "12:00 pm"]])}<p>Zoe reaches City Wharf at <b>10:20 am</b> and takes the next ferry. How long is it from when she reaches the wharf until she arrives at Palm Isle?</p>`,
+      options: ["1 hour", "25 minutes", "35 minutes", "55 minutes", "1 hour 20 minutes"], answer: 0,
+      explain: `<p>Ferry 2 left at 10:05, before Zoe arrived. The next is Ferry 3 at 10:45, which reaches Palm Isle at 11:20. From 10:20 to 11:20 is <b>1 hour</b> (25 minutes waiting and 35 minutes on the ferry).</p><p class="why-not">35 minutes is only the trip and 25 minutes only the wait. 1 hour 20 minutes would mean taking Ferry 4.</p>` },
+
+    /* ===================== circle 3 ===================== */
+    { id: "n301", tier: 3, cat: "Area, perimeter & 3D",
+      stem: `<p>The six faces of a cube have a total area of <b>54 cm²</b>.</p><p>How long is one edge of the cube?</p>`,
+      options: ["3 cm", "4.5 cm", "6 cm", "9 cm", "27 cm"], answer: 0,
+      explain: `<p>The 6 faces are equal squares, so one face is 54 ÷ 6 = 9 cm². A square of 9 cm² has sides of <b>3 cm</b>, because 3 × 3 = 9.</p><p class="why-not">9 cm is the area of one face, not its side. 4.5 cm halves the area instead of finding the square root. 27 cm halves 54.</p>` },
+    { id: "n302", tier: 3, cat: "Rates",
+      stem: `<p>Three taps, all running together, fill a tub in <b>12 minutes</b>.</p><p>How long would <b>four</b> taps, running at the same rate, take to fill it?</p>`,
+      options: ["8 minutes", "9 minutes", "11 minutes", "13 minutes", "16 minutes"], answer: 1,
+      explain: `<p>One tap alone would take 3 × 12 = 36 minutes. Four taps share the job: 36 ÷ 4 = <b>9 minutes</b>.</p><p class="why-not">16 minutes thinks more taps take longer. 13 and 11 just add or take away one minute for one tap.</p>` },
+    { id: "n303", tier: 3, cat: "Number & place value",
+      stem: `<p>Three numbers in a row (like 5, 6, 7) add up to <b>72</b>.</p><p>What is the <b>largest</b> of the three?</p>`,
+      options: ["23", "24", "25", "26", "36"], answer: 2,
+      explain: `<p>The middle number is 72 ÷ 3 = 24, so the numbers are 23, 24 and 25. The largest is <b>25</b>.</p><p class="why-not">24 is the middle number and 23 the smallest. 36 is half of 72, which would be two numbers, not three.</p>` },
+    { id: "n304", tier: 3, cat: "Chance & counting",
+      stem: `<p>At a bike shop you choose one bike, one helmet and one bell. There are <b>3 bikes</b>, <b>2 helmets</b> and <b>5 bells</b>.</p><p>How many different sets can you choose?</p>`,
+      options: ["10", "11", "15", "30", "60"], answer: 3,
+      explain: `<p>Each bike can go with either helmet: 3 × 2 = 6 pairs. Each pair can go with any of 5 bells: 6 × 5 = <b>30</b>.</p><p class="why-not">11 adds instead of multiplying. 15 forgets the helmets, and 10 forgets the bikes.</p>` },
+    { id: "n305", tier: 3, cat: "Money & best value",
+      stem: `<p>The same juice is sold in five sizes.</p><p>Which is the <b>cheapest for each litre</b>?</p>`,
+      options: ["250 mL for $0.65", "500 mL for $1.30", "1 L for $2.40", "2 L for $4.60", "3 L for $6.60"], answer: 4,
+      explain: `<p>Work out the price of 1 litre each time. 250 mL × 4: $2.60. 500 mL × 2: $2.60. 1 L: $2.40. 2 L ÷ 2: $2.30. 3 L ÷ 3: $2.20. The cheapest is <b>3 L for $6.60</b>.</p><p class="why-not">The 250 mL bottle has the smallest price tag, but you get very little juice. A bigger size isn’t always better value, so you have to work each one out.</p>` },
+
+    { id: "n306", tier: 3, cat: "Graphs & data",
+      stem: `<p>The graph shows the temperature on one day.</p>${LINE}<p>Between which two times <b>next to each other</b> did the temperature rise the most?</p>`,
+      options: ["6 am and 9 am", "9 am and 12 pm", "12 pm and 3 pm", "3 pm and 6 pm", "It rose the same each time"], answer: 1,
+      explain: `<p>Read each point (the lines are 2 degrees apart): 8, 14, 22, 24, 18. The rises are 6 (6 am to 9 am), 8 (9 am to 12 pm) and 2 (12 pm to 3 pm), and then it falls. The biggest rise is <b>between 9 am and 12 pm</b>.</p><p class="why-not">The highest temperature is at 3 pm, but the rise into it is only 2. Between 3 pm and 6 pm the temperature goes down.</p>` },
+
+    /* ===================== the boss ===================== */
+    { id: "n401", tier: 4, cat: "Area, perimeter & 3D",
+      stem: `<p>A block is made of small cubes: <b>5 long</b>, <b>3 wide</b> and <b>4 high</b>. The whole outside is painted, and then the block is taken apart.</p>${box(5, 3, 4, { u: 26, aria: "A block of small cubes, 5 long, 3 wide and 4 high." })}<p>How many small cubes have <b>no paint at all</b>?</p>`,
+      options: ["2", "6", "12", "24", "60"], answer: 1,
+      explain: `<p>The unpainted cubes are hidden inside, one layer in from every face. Take one cube off each end of every direction: 5 − 2 = 3 long, 3 − 2 = 1 wide, 4 − 2 = 2 high. That hidden block has 3 × 1 × 2 = <b>6</b> cubes.</p><p class="why-not">60 is every cube. 12 and 24 only take one layer off one side of each direction instead of both.</p>` },
+    { id: "n402", tier: 4, cat: "Fractions",
+      stem: `<p>Ava spent <b>one quarter</b> of her money on a book and then <b>$6</b> on lunch. She now has exactly <b>half</b> of her money left.</p><p>How much did she start with?</p>`,
+      options: ["$12", "$18", "$24", "$32", "$48"], answer: 2,
+      explain: `<p>She spent half of her money altogether: one quarter on the book and $6 on lunch. So the $6 must be the other quarter. One quarter is $6, so she started with 4 × $6 = <b>$24</b>.</p><p>Check: $24 − $6 (book) − $6 (lunch) = $12, which is half of $24.</p><p class="why-not">$12 is what she has left. $48 treats $6 as one eighth.</p>` },
+    { id: "n403", tier: 4, cat: "Time & timetables",
+      stem: `<p>In a year that is <b>not</b> a leap year, what date is exactly <b>100 days after 1 January</b>?</p>`,
+      options: ["9 April", "10 April", "11 April", "12 April", "10 May"], answer: 2,
+      explain: `<p>Count the days. 31 January is 30 days after 1 January. 28 February is 30 + 28 = 58 days after. 31 March is 58 + 31 = 89 days after. 11 more days reaches <b>11 April</b>.</p><p class="why-not">10 April counts 1 January itself as the first day. 12 April counts the days in February as 29 or 30. 10 May is a month too far.</p>` },
+    { id: "n404", tier: 4, cat: "Measurement & scales",
+      stem: `<p>On a map, <b>1 cm</b> stands for <b>250 m</b>. Two towns are <b>6.4 cm</b> apart on the map.</p><p>How far apart are they really?</p>`,
+      options: ["160 m", "250 m", "640 m", "1.6 km", "16 km"], answer: 3,
+      explain: `<p>6 cm is 6 × 250 = 1 500 m, and 0.4 cm is 0.4 × 250 = 100 m. Altogether 1 600 m = <b>1.6 km</b>.</p><p class="why-not">640 m treats every centimetre as 100 m. 16 km is ten times too big, and 160 m is ten times too small.</p>` },
+    { id: "n405", tier: 4, cat: "Graphs & data",
+      stem: colGraph({ labels: ["Chess", "Drama", "Art"], series: [{ name: "Boys", color: "#4dabf7", values: [8, 4, 6] }, { name: "Girls", color: "#ffa94d", values: [6, 10, 9] }], max: 12, step: 2, ylabel: "Children",
+        aria: "A column graph with two columns for each club, boys and girls. The scale goes up in 2s to 12. Chess: boys 8, girls 6. Drama: boys 4, girls 10. Art: boys 6, girls halfway between 8 and 10." }) + `<p>The graph shows how many boys and girls are in three clubs. Nobody is in more than one club.</p><p>Altogether, how many more girls than boys are in the clubs?</p>`,
+      options: ["7", "3", "5", "9", "25"], answer: 0,
+      explain: `<p>Girls: 6 + 10 + 9 = 25. Boys: 8 + 4 + 6 = 18. Difference: 25 − 18 = <b>7</b>. (The girls’ Art column stops halfway between 8 and 10, so it is 9.)</p><p class="why-not">25 is the number of girls, not the difference. Reading the Art column as 8 or 10 gives 6 or 8. Comparing only one club gives a different answer again.</p>` },
   );
 })();
 
@@ -1138,6 +1448,232 @@ he’ll welcome every bird that wants a rest.</p>`,
 })();
 
 /* ---------------------------------------------------------------
+   STORM ISLAND: second set of reading passages (Nov 2026), all original.
+   cloze ×2, story ×2, missing sentences, poem, four extracts ×2.
+   tier 1–3 = storm circle 1–3.
+   --------------------------------------------------------------- */
+(() => {
+  const G = n => `<span data-g="${n}" class="gap">(${n}) ______</span>`;
+  const gapQ = (id, n, options, answer, explain) => ({ id, gap: n, cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap ${n}</b>?</p>`, options, answer, explain });
+  const EX = ["Extract A", "Extract B", "Extract C", "Extract D"];
+  const exQ = (id, cat, what, answer, explain) => ({ id, cat, stem: `<p>Which extract ${what}?</p>`, options: EX, answer, explain });
+
+  /* ============ circle 1: cloze ============ */
+  READING.push({
+    id: "kayak", tier: 1, format: "cloze", title: "First Strokes",
+    note: "Some words are missing from this piece about a first kayaking lesson. Choose the word that fits each gap best.",
+    html: `<p>The kayak looked far too narrow to hold a person, let alone a nervous one. Our instructor, Bree, assured us that capsizing on a lake this calm was almost unheard ${G(1)}, which did little to settle my stomach.</p>
+<p>Getting in was an ordeal in ${G(2)}. I lowered myself from the jetty with all the grace of a sack of potatoes, and the boat lurched so violently that Bree had to grab the rope. Once I was seated, though, it steadied, and she showed us how to ${G(3)} the paddle: one blade dips in on the left, then the other on the right, in a steady rhythm like a slow clock.</p>
+<p>For the first ten minutes I went mostly in circles. My left arm, it seemed, was a good deal stronger than my right, and the kayak ${G(4)} its nose towards the bank every time I stopped concentrating.</p>
+<p>Gradually, however, the strokes began to feel less like a battle and more like a conversation with the water. By the time we reached the far end of the lake, I was gliding past reeds and ducks with what I hoped was an ${G(5)} of calm.</p>
+<p>On the way back, a gust of wind sent a small wave over the front of the kayak and straight into my lap. An hour earlier, that would have been the ${G(6)} of my worst fears. Instead, I laughed, shook the water off my hands and kept paddling.</p>`,
+    questions: [
+      gapQ("r9a", 1, ["of", "for", "about", "from"], 0, `<p>“<b>Unheard of</b>” is a fixed phrase meaning “almost never happens”.</p><p class="why-not">You can hear <i>about</i> or <i>from</i> someone, but the set phrase is only ever “unheard of”. “Unheard for” is not English.</p>`),
+      gapQ("r9b", 2, ["turn", "itself", "short", "part"], 1, `<p>“An ordeal <b>in itself</b>” means that this one step was already a big struggle, before the paddling even began.</p><p class="why-not">“In turn”, “in short” and “in part” are real phrases, but they mean “one after another”, “to sum up” and “partly”, which don’t fit here.</p>`),
+      gapQ("r9c", 3, ["store", "carry", "wield", "lift"], 2, `<p>The rest of the sentence explains how to <i>use</i> the paddle, stroke by stroke. To <b>wield</b> something is to hold and use a tool with skill.</p><p class="why-not">“Store”, “carry” and “lift” are all things you can do with a paddle, but they are about putting it away or moving it, not paddling with it.</p>`),
+      gapQ("r9d", 4, ["drifted", "leaned", "swerved", "swung"], 3, `<p>The gap is followed by “its nose”: the word must be able to take an object. The kayak <b>swung</b> its nose towards the bank.</p><p class="why-not">A boat can drift, lean or swerve towards the bank, but it can’t “drift its nose” or “swerve its nose”. Those words don’t take an object.</p>`),
+      gapQ("r9e", 5, ["air", "ounce", "echo", "order"], 0, `<p>“An <b>air</b> of calm” means looking calm on the outside. The writer only “hoped” they looked calm, which fits.</p><p class="why-not">“An ounce of calm” would mean only a tiny bit of calm, the opposite of gliding along smoothly. “An echo of calm” and “an order of calm” don’t make sense.</p>`),
+      gapQ("r9f", 6, ["reason", "realisation", "recollection", "reminder"], 1, `<p>Think about the whole passage. The writer started out terrified of tipping over and getting wet. A wave in the lap would once have been their worst fears coming true: the <b>realisation</b> of their worst fears.</p><p class="why-not">You have a reason <i>for</i> a fear, not “of” it. A recollection or a reminder of a fear would be a memory of it, not the fear actually happening.</p>`),
+    ],
+  });
+
+  /* ============ circle 1: story ============ */
+  READING.push({
+    id: "dumplings", tier: 1, format: "story", title: "The Recipe Card",
+    note: "Read the story, then answer the questions.",
+    html: `<p>The card lived in the kitchen drawer, under the takeaway menus. Its corners were as soft as felt, and Po Po’s handwriting sloped across it like a row of birds leaning into the wind. Halfway down, a brown splash had swallowed two whole lines.</p>
+<p>“Dumplings,” said Lin, holding it up. “For Mum’s birthday. I can do it.”</p>
+<p>Dad looked at the card, then at the kitchen, which he had cleaned that morning. “Of course you can,” he said, in the voice he used at the dentist.</p>
+<p>The dough was easy. The filling was not. Where the splash began, the card said “one spoon of” and then nothing at all. Lin stared at it for a long time. Then she shut her eyes and tried to remember Po Po’s kitchen: the steam on the window, the radio muttering, the small dish of dark sauce that always stood by the chopping board.</p>
+<p>“Soy sauce,” she said. “And something else. Something that smelt like toasted nuts.”</p>
+<p>Dad suggested pepper. Lin shook her head. She opened the spice cupboard and unscrewed the lids one at a time, sniffing, until she found it at the very back: a bottle of sesame oil with a faded label in Po Po’s writing.</p>
+<p>The first dumplings came out lopsided, like boats that had lost an argument with a wave. By the twentieth, Lin’s fingers had found the folds on their own.</p>
+<p>At dinner Mum bit into one and went very still. She put her chopsticks down.</p>
+<p>“Is it too salty?” Lin asked.</p>
+<p>Mum shook her head. She didn’t seem able to say anything, so she reached across the table and squeezed Lin’s hand instead.</p>
+<p>Later, while Dad washed up, Lin took a pencil and, in her own careful printing, filled in the two missing lines.</p>`,
+    questions: [
+      { id: "r10a", cat: "Purpose of a detail", stem: `<p>The card’s corners were “<b>as soft as felt</b>”. What does this detail suggest?</p>`,
+        options: ["It had been made out of cloth.", "Lin was holding it far too tightly.", "It had been used many times over the years.", "It had been left out in the rain on the back step."], answer: 2,
+        explain: `<p>Card goes soft at the corners when it has been picked up and handled again and again. The detail tells us the recipe was <b>used many times</b>, so it mattered to the family.</p><p class="why-not">“As soft as felt” is a comparison: the card isn’t made of cloth. The brown splash shows one spill, not rain, and Lin has only just picked it up.</p>` },
+      { id: "r10b", cat: "Feelings & inference", stem: `<p>Dad says “Of course you can” “<b>in the voice he used at the dentist</b>”. What does this show?</p>`,
+        options: ["He was annoyed about the mess she would make.", "He was trying to sound braver than he felt.", "He did not hear what Lin had asked him.", "He was speaking quietly so Mum would not hear."], answer: 1,
+        explain: `<p>At the dentist people put on a calm, cheerful voice to hide that they are worried. Dad glances at his clean kitchen and says yes, but he is <b>hiding his worry</b>.</p><p class="why-not">He is a little worried about the mess, but he isn’t annoyed: he still says yes. He clearly heard her, and nothing suggests he is whispering.</p>` },
+      { id: "r10c", cat: "Character & structure", stem: `<p>How does Lin work out what was in the missing lines?</p>`,
+        options: ["She remembers Po Po’s kitchen and hunts for the smell.", "She follows Dad’s suggestion about the pepper.", "She reads the label on the bottle of sesame oil.", "She works it out from the shape and colour of the brown splash."], answer: 0,
+        explain: `<p>Lin shuts her eyes and <b>remembers</b> the sauce and the smell of Po Po’s cooking, then sniffs each jar until she finds the one that matches.</p><p class="why-not">She turns down Dad’s pepper. She only sees the label after she has found the right smell. The splash hides the words; it doesn’t give them away.</p>` },
+      { id: "r10d", cat: "Comparisons & imagery", stem: `<p>The first dumplings were “<b>like boats that had lost an argument with a wave</b>”. What does this comparison suggest?</p>`,
+        options: ["They were sinking in the boiling water.", "They were bent and knocked out of shape.", "They were too big to fit in the pot.", "They floated to the top when they were cooked."], answer: 1,
+        explain: `<p>A boat that has “lost” to a wave has been battered and tipped over. The first dumplings were <b>lopsided and out of shape</b>, and the funny comparison shows Lin isn’t upset about it.</p><p class="why-not">The comparison is about their shape, not about water: nothing is sinking or floating, and nothing is said about their size.</p>` },
+      { id: "r10e", cat: "Character & structure", stem: `<p>At the end, Lin fills in the two missing lines “<b>in her own careful printing</b>”. What does this show?</p>`,
+        options: ["She wants to correct Po Po’s mistakes.", "She is practising her handwriting for school.", "She plans to give the card to Mum as a birthday present.", "She now knows the recipe and is keeping it alive."], answer: 3,
+        explain: `<p>Lin has rediscovered the lost part of the recipe, and Mum’s reaction shows how much it means. By writing it in, <b>she keeps the family recipe going</b> for the future, in her own hand beside Po Po’s.</p><p class="why-not">The lines weren’t mistakes: they had been splashed away. Nothing mentions school, and the card goes back to being used, not given away.</p>` },
+    ],
+  });
+
+  /* ============ circle 1: missing sentences ============ */
+  const ECH = [
+    "About ten days later, the egg hatches.",
+    "Instead, an echidna has a long, sticky tongue.",
+    "It is one of only two kinds of mammal in the world that lay eggs.",
+    "Many people mistake the echidna for a porcupine.",
+    "Spines, as you can imagine, are not something a mother wants in her pouch.",
+    "Underneath them grows a coat of ordinary fur, which keeps the animal warm.",
+  ];
+  const echQ = (id, n, answer, explain) => ({ id, gap: n, cat: "Sentence links", stem: `<p>Which sentence fits <b>gap ${n}</b>? (Each sentence is used once only, and one is not used at all.)</p>`, options: ECH, answer, explain });
+  READING.push({
+    id: "echidna", tier: 1, format: "missing sentences", title: "Spines, Eggs and a Very Long Tongue", bank: true,
+    note: "Five sentences have been taken out of this article. Choose the sentence that fits each gap. There is one extra sentence that is not needed.",
+    html: `<p>Australia is full of strange animals, but the short-beaked echidna may be the strangest of all. It looks like a cross between a hedgehog and an anteater, yet it is closely related to neither. ${G(1)} The only other member of that very small club is the platypus.</p>
+<p>An echidna’s spines are actually hairs, thickened and hardened over millions of years. ${G(2)} When it is frightened, an echidna does not run away. It digs straight down into the soil, leaving only a patch of spiky back showing, and clings on so tightly that a hungry fox can do nothing but give up.</p>
+<p>Echidnas have no teeth, and they do not need any. ${G(3)} It flicks in and out of an ant nest, collecting ants and termites, which the echidna then crushes between hard pads in its mouth.</p>
+<p>Raising a family is just as unusual. The female lays a single soft egg, about the size of a grape, and rolls it into a pouch on her belly. ${G(4)} The baby, which is called a puggle, is pink, blind and no bigger than a jelly bean. It stays in the pouch, drinking milk, until its spines begin to grow.</p>
+<p>${G(5)} At that point the mother digs a burrow, tucks the puggle inside and goes off to feed, returning only every few days.</p>`,
+    questions: [
+      echQ("r11a", 1, 2, `<p>The next sentence talks about “that very small club” and says its only other member is the platypus. The gap must name the club: <b>mammals that lay eggs</b>.</p><p class="why-not">The porcupine sentence is about the right animal, but it gives no “club” for the platypus to belong to.</p>`),
+      echQ("r11b", 2, 5, `<p>The sentence before says the spines are really hairs. “<b>Underneath them</b>” points back to the spines and adds more about the echidna’s coat.</p><p class="why-not">“Spines … are not something a mother wants in her pouch” is about spines too, but it belongs with the baby, not here: there is no pouch yet in this paragraph.</p>`),
+      echQ("r11c", 3, 1, `<p>“They do not need any [teeth].” The next word must say what it uses <b>instead</b>, and the sentence after the gap begins “It flicks in and out”: “It” is the tongue.</p><p class="why-not">No other sentence explains what “It” is, or what the echidna eats with.</p>`),
+      echQ("r11d", 4, 0, `<p>The egg has just gone into the pouch, and the next sentence introduces “The baby”. In between, the egg must hatch: “<b>About ten days later, the egg hatches.</b>”</p><p class="why-not">Without this sentence, a baby would suddenly appear from nowhere.</p>`),
+      echQ("r11e", 5, 4, `<p>The puggle stays in the pouch until its spines grow, and the next sentence says “At that point” the mother puts it in a burrow. The joke about <b>spines in a pouch</b> explains why: that point is when the spines arrive.</p><p class="why-not">The sentence left over, about people mistaking the echidna for a porcupine, is on topic but has nothing to link it to any gap.</p>`),
+    ],
+  });
+
+  /* ============ circle 2: poem ============ */
+  READING.push({
+    id: "puddle", tier: 2, format: "poem", title: "Puddle",
+    note: "Read the poem, then answer the questions.",
+    html: `<p class="poem">The storm has gone, but left a piece of sky
+set like a small blue window in the road.
+Clouds walk across it slowly, upside down,
+and a gull goes flying underneath the ground.
+
+The puddle holds the whole tall world quite still:
+the lamp post, leaning, and the gutter’s edge,
+the red front door of number twenty-three,
+my face, surprised, looking up at me.
+
+Then Billy’s boots come thundering down the hill.
+The sky breaks into fifty shaking parts,
+the lamp post wobbles like a jelly mould,
+and number twenty-three goes swimming off.
+
+I wait. The pieces wander, find their places,
+the edges knit together, smooth and slow,
+and quietly, as if nothing had happened,
+the puddle puts the sky back where it goes.</p>`,
+    questions: [
+      { id: "r12a", cat: "Comparisons & imagery", stem: `<p>What is the “<b>small blue window in the road</b>”?</p>`,
+        options: ["a drain cover in the middle of the road", "the sky reflected in the puddle", "a piece of broken glass on the street", "a patch of blue paint on the road"], answer: 1,
+        explain: `<p>The storm has “left a piece of sky” in the road. A puddle on a clear day <b>reflects the blue sky</b>, so it looks like a window you could see through.</p><p class="why-not">The poem is about the puddle all the way through. Nothing mentions a drain, glass or paint: “window” is a comparison.</p>` },
+      { id: "r12b", cat: "Purpose of a detail", stem: `<p>Why does the poet say “a gull goes flying <b>underneath the ground</b>”?</p>`,
+        options: ["The gull is diving into a drain.", "The gull is flying very low over the road after the storm.", "The gull’s reflection appears below the puddle’s surface.", "The gull is hiding from the storm."], answer: 2,
+        explain: `<p>In a reflection, things in the sky appear <i>down</i> in the puddle. The gull’s <b>reflection</b> seems to fly below the road. That is also why the clouds walk “upside down”.</p><p class="why-not">A gull flying low would still be above the ground, and the storm is over. Nothing suggests a drain.</p>` },
+      { id: "r12c", cat: "Character & structure", stem: `<p>In the second verse, where is the speaker and what are they doing?</p>`,
+        options: ["Standing at the red door of number twenty-three", "Lying on the road, looking up at the sky", "Watching the street from an upstairs window", "Looking down into the puddle at the reflections"], answer: 3,
+        explain: `<p>Everything in this verse is seen <i>in</i> the puddle, ending with “my face … looking up at me”. The speaker is <b>bending over the puddle</b>, seeing their own reflection look back.</p><p class="why-not">The red door is one of the reflections, not where the speaker stands. Their face looks <i>up</i> from the puddle, so they are looking down, not lying on the road or watching from a window.</p>` },
+      { id: "r12d", cat: "Comparisons & imagery", stem: `<p>“<b>the lamp post wobbles like a jelly mould, / and number twenty-three goes swimming off</b>”. What is happening?</p>`,
+        options: ["Billy’s splash makes the reflections shake and slide.", "Billy knocks over the lamp post as he runs.", "The storm starts again and floods the street.", "Billy’s heavy boots shake the houses all along the street."], answer: 0,
+        explain: `<p>Billy runs through the puddle and the water ripples. The <b>reflections</b> of the lamp post and the house shake and slide about. The real ones don’t move at all.</p><p class="why-not">These lines are still about what the puddle shows. A splash can’t knock down a lamp post or shake a house, and the storm has gone.</p>` },
+      { id: "r12e", cat: "Main idea", stem: `<p>What does the last verse suggest about the puddle?</p>`,
+        options: ["It dries up once the sun comes out.", "It is angry with Billy for splashing through it so hard.", "It shows a different sky from before.", "It calmly mends itself, as if nothing happened."], answer: 3,
+        explain: `<p>The pieces “find their places”, the edges “knit together”, and the puddle puts the sky back “quietly, as if nothing had happened”. The puddle <b>calmly repairs</b> the picture.</p><p class="why-not">The puddle is given human actions, but they are calm, not angry. It puts the same sky back “where it goes”, and nothing dries up.</p>` },
+    ],
+  });
+
+  /* ============ circle 2: four extracts ============ */
+  READING.push({
+    id: "gardens", tier: 2, format: "four extracts", title: "Gardens",
+    note: "Read the four extracts about gardens. For each question, choose the extract that fits best.",
+    html: `<div class="extract"><b class="tag">Extract A</b><p>My grandfather talked to his tomatoes. Every evening he walked along the row with the hose, telling each plant about his day, and every evening I hid behind the shed in case the neighbours heard. He said the plants liked the company. I said plants couldn’t hear. He just smiled and kept watering. He has been gone four years now, and my own tomatoes are doing well this summer. I have not told anyone why I go out to water them so late, when the street is quiet.</p></div>
+<div class="extract"><b class="tag">Extract B</b><p>A healthy garden depends on workers that no one ever sees. Earthworms tunnel through the soil, letting in air and water, and they drag fallen leaves underground, where the leaves rot and feed the plants. A worm has no lungs; it breathes through its damp skin, which may be why worms come up when heavy rain fills their tunnels. The naturalist Charles Darwin was so impressed by worms that he studied them for many years, and his very last book, published in 1881, was about them.</p></div>
+<div class="extract"><b class="tag">Extract C</b><p>Every child in the class had planted a bean in a paper cup. By the second week, the windowsill was a forest of green shoots. Only Nora’s cup showed bare, brown soil. She watered it every morning anyway, and when Jack asked if she had forgotten to put a bean in, she said, “It’s thinking.” On the last day of term, when everyone else was carrying their plants home, a pale green loop pushed up through the soil, as if it had just remembered something.</p></div>
+<div class="extract"><b class="tag">Extract D</b><p>Every primary school should give up a strip of its playground to a vegetable garden. Children who grow carrots tend to eat them; children who only see carrots on a plate often push them aside. A garden also teaches what no worksheet can: that some things cannot be hurried, and that looking after something is a job you do every day, not only when you feel like it. The cost is small. A few raised beds, some seeds and a tap are all it takes.</p></div>`,
+    questions: [
+      exQ("r13a", "Feelings & inference", "shows someone now doing something they were once embarrassed by", 0, `<p>In <b>Extract A</b> the writer used to hide behind the shed when Grandfather talked to his plants. Now they water their own tomatoes “so late, when the street is quiet”, and won’t say why: they have started talking to them too.</p><p class="why-not">Nora in C does something odd, but she is never embarrassed by it. B and D explain and argue.</p>`),
+      exQ("r13b", "Main idea", "suggests that unseen helpers matter more than they look", 1, `<p><b>Extract B</b> begins: “A healthy garden depends on workers that no one ever sees”, and shows how earthworms feed and loosen the soil.</p><p class="why-not">Extract D lists what a garden teaches, but it isn’t about hidden helpers.</p>`),
+      exQ("r13c", "Feelings & inference", "shows patience being rewarded at the very last moment", 2, `<p>In <b>Extract C</b>, Nora waters her bare cup every day, and on the last day of term her bean finally comes up.</p><p class="why-not">Extract D <i>says</i> that some things can’t be hurried, but it doesn’t show it happening. In A the tomatoes are simply doing well.</p>`),
+      exQ("r13d", "Tone & attitude", "tries to persuade the reader that something should change", 3, `<p><b>Extract D</b> argues that “every primary school should” make a vegetable garden, and answers the worry about cost.</p><p class="why-not">The other extracts describe or explain; none of them asks the reader to change anything.</p>`),
+      exQ("r13e", "Purpose of a detail", "suggests why a creature appears after heavy rain", 1, `<p><b>Extract B</b>: a worm breathes through its skin, “which may be why worms come up when heavy rain fills their tunnels”.</p><p class="why-not">Nobody in A or C mentions rain or creatures, and D is about vegetables.</p>`),
+    ],
+  });
+
+  /* ============ circle 2: cloze ============ */
+  READING.push({
+    id: "snailfilm", tier: 2, format: "cloze", title: "Forty-One Seconds",
+    note: "Some words are missing from this piece about making a short animated film. Choose the word that fits each gap best.",
+    html: `<p>Our film lasts exactly forty-one seconds. It took us three weekends to make.</p>
+<p>The idea seemed simple enough. My friend Arjun and I would model a plasticine snail, photograph it, move it a ${G(1)} distance, photograph it again, and repeat. When the photos were played quickly one after another, the snail would appear to crawl across the table.</p>
+<p>What we had failed to take into ${G(2)} was how many photographs that would need. Every second of film uses twelve pictures, so forty-one seconds meant almost five hundred of them, and for each one the snail had to be nudged, the lamp checked and the camera kept perfectly still.</p>
+<p>Disaster struck on the second Saturday. Arjun’s little sister, who found our project ${G(3)}, decided that the snail needed a hat. She pressed a blob of yellow plasticine onto its shell and squashed it flat. Forty pictures’ worth of careful work was ruined, and Arjun was so cross that he could barely bring himself ${G(4)} speak to her.</p>
+<p>In the end, though, we ${G(5)} the hat into the story. Halfway across the table the snail now stops, a gust of wind blows its hat off, and it spends the rest of the film chasing it.</p>
+<p>At the school film night, the audience laughed loudest at that part. Arjun’s sister, sitting in the front row, looked ${G(6)} pleased with herself.</p>`,
+    questions: [
+      gapQ("r14a", 1, ["minute", "trivial", "scanty", "feeble"], 0, `<p>“Minute” (said my-NEWT) means <b>very small</b>: the snail is moved a tiny distance each time.</p><p class="why-not">“Trivial” means unimportant, not small in size. “Scanty” means not enough, and “feeble” means weak: neither describes a distance.</p>`),
+      gapQ("r14b", 2, ["mind", "account", "notice", "regard"], 1, `<p>To “<b>take into account</b>” is a fixed phrase meaning to think about something when you plan.</p><p class="why-not">You can “bear in mind”, “take notice of” or “have regard for” something, but only “account” follows “take into”.</p>`),
+      gapQ("r14c", 3, ["irritable", "irrelevant", "irresistible", "irreversible"], 2, `<p>She couldn’t keep her hands off it: she found the project <b>irresistible</b>.</p><p class="why-not">These words look alike. “Irritable” describes a grumpy person, not a project. “Irrelevant” would mean it didn’t matter to her, yet she joined in. “Irreversible” means it can’t be undone.</p>`),
+      gapQ("r14d", 4, ["to", "for", "at", "so"], 0, `<p>The phrase is “<b>bring yourself to</b> do something”: Arjun could barely bring himself to speak.</p><p class="why-not">“Bring himself for”, “at” or “so speak” are not English.</p>`),
+      gapQ("r14e", 5, ["tied", "folded", "wove", "painted"], 2, `<p>To <b>weave</b> something into a story is to make it part of the plot. They turned the accident into the best scene.</p><p class="why-not">You can tie, fold or paint a real hat, but none of those words means making it part of a story.</p>`),
+      gapQ("r14f", 6, ["barely", "thoroughly", "sorely", "hardly"], 1, `<p>Read the whole passage: her hat caused the disaster, but it became the scene the audience loved most. No wonder she looked <b>thoroughly</b> (completely) pleased with herself.</p><p class="why-not">“Barely” and “hardly” would mean she was not pleased, which misses the point of the ending. “Sorely” goes with words like “tempted” or “missed”, not “pleased”.</p>`),
+    ],
+  });
+
+  /* ============ circle 3: story ============ */
+  READING.push({
+    id: "wrongbus", tier: 3, format: "story", title: "The Wrong Bus",
+    note: "Read the story, then answer the questions.",
+    html: `<p>Theo had caught the 412 home from school by himself every day for two weeks, and he had begun to feel that he was rather good at it. So he did not look up from his book when the bus pulled away, and he did not notice, for several stops, that the shops outside were the wrong shops.</p>
+<p>When he did notice, the feeling arrived all at once, the way cold water does.</p>
+<p>He pressed the bell. He got off. The bus sighed and drove away, and Theo stood on a footpath he had never seen, holding a book about a boy who sailed around the world alone.</p>
+<p>His phone had nine per cent battery. He looked at it, then put it back in his pocket, because Mum was at work and the word “lost” felt too heavy to type.</p>
+<p>There was a bus shelter across the road, and in it sat an old man with a tartan shopping trolley. Theo crossed, read the timetable twice without understanding it, and sat down at the far end of the bench.</p>
+<p>“The 412 goes the other way from this side,” said the old man, not looking at him. “People always think it’s this side.”</p>
+<p>“I know,” said Theo, who had not known.</p>
+<p>The old man nodded slowly, as if that were a very reasonable answer. “Course you do. Next one’s in eleven minutes. From over there.” He pointed across the road with his chin.</p>
+<p>Theo thanked him and crossed back. He waited eleven minutes. He did not open his book.</p>
+<p>When the right bus came, he chose a seat by the window and watched every shop go past, naming them under his breath, as if they might change their minds and become different shops.</p>
+<p>At home, Mum asked how his day had been.</p>
+<p>“Fine,” said Theo. Then, after a moment: “I learnt something about buses.”</p>`,
+    questions: [
+      { id: "r15a", cat: "Comparisons & imagery", stem: `<p>When Theo notices, “the feeling arrived all at once, <b>the way cold water does</b>”. What does this comparison suggest?</p>`,
+        options: ["He was cold because a window was open.", "He slowly began to feel a little worried.", "He felt a sudden shock as he realised.", "He was excited about exploring somewhere new."], answer: 2,
+        explain: `<p>Cold water doesn’t creep up on you: it hits you all at once and takes your breath away. Theo’s realisation is a <b>sudden shock</b>.</p><p class="why-not">The cold is only a comparison. “All at once” is the opposite of slowly, and nothing about getting lost excites him.</p>` },
+      { id: "r15b", cat: "Feelings & inference", stem: `<p>Why does Theo put his phone away without messaging his mum?</p>`,
+        options: ["His battery was much too low to send Mum a message.", "Admitting he was lost felt like too big a thing.", "Mum had told him never to text her at work.", "He had already worked out the way home."], answer: 1,
+        explain: `<p>“The word ‘lost’ felt too heavy to type.” Saying he is lost would make it real, and would mean <b>admitting</b> his mistake.</p><p class="why-not">Nine per cent battery is enough for a short message, so that isn’t the reason. Nothing says Mum forbids texts, and he doesn’t yet know the way: he can’t even read the timetable.</p>` },
+      { id: "r15c", cat: "Character & structure", stem: `<p>“<b>‘I know,’ said Theo, who had not known.</b>” What does this show about Theo?</p>`,
+        options: ["He doesn’t want to look as if he needs help.", "He has caught a bus from this very stop many times before.", "He is being rude to the old man on purpose.", "He hasn’t understood what the old man said."], answer: 0,
+        explain: `<p>Theo pretends he already knew because he is embarrassed: he <b>doesn’t want to look lost</b> or in need of help.</p><p class="why-not">He has never seen this footpath before. He thanks the old man later, so he isn’t being rude, and he understands well enough to cross the road.</p>` },
+      { id: "r15d", cat: "Feelings & inference", stem: `<p>The old man nods “<b>as if that were a very reasonable answer</b>” and says “Course you do.” What is he doing?</p>`,
+        options: ["He truly believes that Theo knew the way.", "He is quietly making fun of Theo for getting lost.", "He is going along with Theo to spare his pride.", "He wants Theo to leave him in peace."], answer: 2,
+        explain: `<p>The old man can see that Theo didn’t know, but he <b>plays along kindly</b> so Theo doesn’t feel silly, and still tells him exactly where to go.</p><p class="why-not">“As if” shows he doesn’t really believe it. He isn’t mocking (he helps), and he is the one who starts the conversation.</p>` },
+      { id: "r15e", cat: "Purpose of a detail", stem: `<p>On the right bus, Theo names every shop “<b>as if they might change their minds and become different shops</b>”. Why?</p>`,
+        options: ["He is learning all of the shop names for a school project.", "He is checking carefully, no longer so sure of himself.", "He is bored because he has finished his book.", "He wants to prove to the old man he knew the way."], answer: 1,
+        explain: `<p>At the start Theo was so sure of himself that he read his book and missed the wrong shops. Now he <b>checks every one</b>, and the joke about shops changing their minds shows how little he trusts himself after the scare.</p><p class="why-not">He hasn’t finished his book: he “did not open” it. The old man has gone, and nothing mentions a project.</p>` },
+      { id: "r15f", cat: "Character & structure", stem: `<p>The story ends: “<b>‘Fine,’ said Theo. Then, after a moment: ‘I learnt something about buses.’</b>” What does this ending suggest?</p>`,
+        options: ["He wants to keep the whole day a secret.", "He enjoyed a science lesson about transport.", "He wants Mum to drive him to school from now on.", "He is ready to admit a little of what happened."], answer: 3,
+        explain: `<p>“Fine” hides the scare, but “after a moment” he adds a small hint. He is <b>ready to share a little</b>, in his own way, now that it is over.</p><p class="why-not">He doesn’t keep it all secret, because he drops the hint. “Something about buses” refers to his own mistake, not a lesson, and nothing suggests he wants to stop catching the bus.</p>` },
+    ],
+  });
+
+  /* ============ circle 3: four extracts ============ */
+  READING.push({
+    id: "messages", tier: 3, format: "four extracts", title: "Messages",
+    note: "Read the four extracts about sending messages. For each question, choose the extract that fits best.",
+    html: `<div class="extract"><b class="tag">Extract A</b><p>For three years I wrote to a girl in Finland whom I never met. Her letters came on thin blue paper, and each one took nearly a month to arrive, so that by the time I read about her new kitten, the kitten was probably a cat. I didn’t mind. I kept every letter in a shoebox and reread them while I waited for the next. I think I knew her better, in the end, than some of the people I saw every day.</p></div>
+<div class="extract"><b class="tag">Extract B</b><p>Long before telephones, people trusted messages to pigeons. A homing pigeon taken far from its loft will fly straight back to it, and a note tied to its leg travels too. Scientists still argue about exactly how the birds find their way; the sun and the Earth’s magnetism probably both play a part. In 1918, during the First World War, a pigeon named Cher Ami carried a message from a group of trapped soldiers to their own side. The bird was badly wounded on the way, but the message got through, and around two hundred soldiers were rescued.</p></div>
+<div class="extract"><b class="tag">Extract C</b><p>Sami wrote the note on the back of a shopping list: his name, his town and the words “Please write back.” He pushed it into an empty juice bottle and threw it as far as he could from the end of the jetty. Then he forgot about it, the way you forget about most things when you are eight. Six years later, a letter arrived from a fisherman on the other side of the bay, with a photo of a muddy bottle and the words: “Sorry it took so long.”</p></div>
+<div class="extract"><b class="tag">Extract D</b><p>A text message takes three seconds to send and about as long to forget. A handwritten thank-you card is a different thing altogether. Someone had to choose it, find a pen, think about what to say and walk to a letterbox. That effort is part of the message. It says “you were worth my time” before the reader has even opened the envelope. We should send fewer texts and more cards, especially to the people who matter most.</p></div>`,
+    questions: [
+      exQ("r16a", "Main idea", "suggests that waiting for a message made it more precious", 0, `<p>In <b>Extract A</b> each letter took a month, and the writer reread old ones “while I waited for the next”: the slowness made the letters treasured.</p><p class="why-not">In C the reply takes six years, but Sami had forgotten about it, so he wasn’t waiting. D is about effort, not waiting.</p>`),
+      exQ("r16b", "Purpose of a detail", "describes a message that got through in spite of an injury", 1, `<p>In <b>Extract B</b>, the pigeon “was badly wounded on the way, but the message got through”.</p><p class="why-not">Nobody is hurt in the other extracts. The bottle in C is only muddy.</p>`),
+      exQ("r16c", "Main idea", "mentions something that experts still cannot fully explain", 1, `<p><b>Extract B</b>: “Scientists still argue about exactly how the birds find their way.”</p><p class="why-not">The other extracts contain surprises, but nothing that experts are puzzling over.</p>`),
+      exQ("r16d", "Tone & attitude", "argues that the trouble taken over a message is part of what it says", 3, `<p><b>Extract D</b>: “That effort is part of the message. It says ‘you were worth my time’.”</p><p class="why-not">Extract A shows letters being treasured, but it doesn’t argue anything about effort, and it doesn’t try to persuade the reader.</p>`),
+      exQ("r16e", "Feelings & inference", "describes a reply that the sender had stopped expecting", 2, `<p>In <b>Extract C</b>, Sami forgot about his bottle, and the reply came six years later from a stranger.</p><p class="why-not">The writer of A expects every letter: they are waiting for the next one.</p>`),
+    ],
+  });
+})();
+
+/* ---------------------------------------------------------------
    STORM ISLAND: thinking questions (hand-written). Four options (A–D).
    tier 1–3 = storm circle 1–3; tier 4 = the boss (hardest third of the sample papers).
    --------------------------------------------------------------- */
@@ -1300,6 +1836,155 @@ he’ll welcome every bird that wants a rest.</p>`,
       stem: `<div class="box">Councillor Abara: “We should plant shady trees along the footpaths of Main Street. Then more people will walk to the shops in summer instead of driving.”</div><p>Which statement, if true, best supports the councillor’s claim?</p>`,
       options: ["Streets lined with trees look more attractive to visitors.", "Many people say Main Street is too hot to walk along in summer.", "Parking spaces near the shops are very hard to find during summer.", "People who walk to the shops tend to visit more of them."], answer: 1,
       explain: `<p>The claim is that <i>shade</i> will get people walking. That only works if <b>heat is what stops them now</b>. If people say the street is too hot to walk along, shady trees remove the reason they drive.</p><p class="why-not">Looking attractive is a different benefit of trees. Scarce parking is a reason to walk that has nothing to do with trees. More shop visits is a result of walking, not a reason that trees would cause it.</p>` },
+  );
+})();
+
+/* ---------------------------------------------------------------
+   STORM ISLAND: second set of thinking questions (Nov 2026). Four options (A–D).
+   tier 1–3 = storm circle 1–3; tier 4 = the boss.
+   --------------------------------------------------------------- */
+(() => {
+  const { tbl, fig, blocks } = LIB;
+  const WHO = (a, b) => [`${a} only`, `${b} only`, `Both ${a} and ${b}`, `Neither ${a} nor ${b}`];
+  const cube = (n, opt) => { const c = []; for (let x = 0; x < n; x++) for (let y = 0; y < n; y++) for (let z = 0; z < n; z++) c.push([x, y, z]); return fig(blocks(c, opt)); };
+  const BLOCK = (() => { const c = []; for (let x = 0; x < 3; x++) for (let y = 0; y < 2; y++) c.push([x, y, 0]); return fig(blocks(c, { u: 34, aria: "A flat block of six small cubes, 3 cubes long, 2 cubes wide and 1 cube high." })); })();
+
+  THINKING.push(
+    /* ===================== circle 1 ===================== */
+    { id: "u101", tier: 1, cat: "Supports the claim",
+      stem: `<div class="box">Mr Ito, the librarian: “We should put the new picture books on the lowest shelves. Then the youngest children will borrow more of them.”</div><p>Which statement, if true, best supports Mr Ito’s claim?</p>`,
+      options: ["The new picture books have bright covers.", "Older children in the school prefer to borrow chapter books.", "The youngest children can’t reach the high shelves.", "The lowest shelves are the easiest ones to dust."], answer: 2,
+      explain: `<p>The claim links low shelves to more borrowing by the youngest children. If they <b>can’t reach the high shelves</b>, moving the books down is exactly what lets them borrow more.</p><p class="why-not">Bright covers would attract children wherever the books were. What older children like, and which shelves are easy to dust, say nothing about the youngest children borrowing more.</p>` },
+    { id: "u102", tier: 1, cat: "Spot the mistake",
+      stem: `<div class="box">Mia started playing music to her tomato plant in spring. By summer it had grown much taller.<br>Mia: “That proves music makes plants grow.”</div><p>Which one of these shows the mistake Mia has made?</p>`,
+      options: ["The plant may have grown because the weather got warmer.", "Other people in her family may not like the music Mia plays.", "Some kinds of plants may not grow tomatoes.", "Mia may have more than one tomato plant."], answer: 0,
+      explain: `<p>Plants grow from spring to summer anyway. Mia has <b>ignored another possible cause</b>: warmer weather and longer days, not the music, may have made it grow.</p><p class="why-not">Whether people like her music, which plants grow tomatoes and how many plants she has don’t show what is wrong with her conclusion.</p>` },
+    { id: "u103", tier: 1, cat: "Whose reasoning",
+      stem: `<div class="box">Rule: to be in the swimming final, you <b>must</b> swim your heat in under 40 seconds. Only the eight fastest swimmers go through.</div><p>Ana: “Kai swam his heat in 38 seconds, so he is definitely in the final.”</p><p>Ben: “Lucy is in the final, so she must have swum her heat in under 40 seconds.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Ana", "Ben"), answer: 1,
+      explain: `<p>Under 40 seconds is <b>needed</b> for the final, so anyone in the final, like Lucy, must have done it: <b>Ben</b> is right.</p><p class="why-not">But being under 40 seconds doesn’t <i>guarantee</i> a place: if eight other swimmers were faster than Kai, he misses out. So Ana is wrong.</p>` },
+    { id: "u104", tier: 1, cat: "Tables & timetables",
+      stem: `<p>At a sports day, each race gives <b>3 points</b> for 1st, <b>2 points</b> for 2nd and <b>1 point</b> for 3rd.</p>${tbl(["Race", "1st", "2nd", "3rd"], [["Sprint", "Red", "Blue", "Gold"], ["Relay", "Blue", "Red", "Gold"], ["Hurdles", "Gold", "Blue", "Red"]])}<p>Which house scored the most points?</p>`,
+      options: ["Red", "Blue", "Gold", "It is a tie"], answer: 1,
+      explain: `<p>Add up each house: Red 3 + 2 + 1 = 6. <b>Blue</b> 2 + 3 + 2 = 7. Gold 1 + 1 + 3 = 5.</p><p class="why-not">Every house won exactly one race, so counting wins makes it look like a tie. The 2nd places matter too, and Blue came 2nd twice.</p>` },
+    { id: "u105", tier: 1, cat: "Spatial",
+      stem: `<p>A wooden cube is painted <b>red on the top and the bottom</b> and blue on the other four faces. It is then cut into 8 equal small cubes.</p>${cube(2, { u: 44, fill: ["#74c0fc", "#ff6b6b", "#4dabf7"], aria: "A cube cut into 8 small cubes, 2 along each edge. The top is red and the sides are blue." })}<p>How many of the small cubes have some red paint on them?</p>`,
+      options: ["2", "4", "6", "8"], answer: 3,
+      explain: `<p>Every small cube is in either the top layer or the bottom layer. The top four all have a red top, and the bottom four all have a red bottom. So <b>all 8</b> have some red.</p><p class="why-not">4 counts only the top layer you can see in the picture. The bottom face is red too.</p>` },
+    { id: "u106", tier: 1, cat: "Rules & codes",
+      stem: `<p>In a made-up language:</p><div class="box">“mipo tak” means “red apple”<br>“mipo sul” means “red bus”<br>“lin sul” means “blue bus”</div><p>What does “<b>lin tak</b>” mean?</p>`,
+      options: ["red apple", "blue bus", "blue apple", "red bus"], answer: 2,
+      explain: `<p>“mipo” appears in both phrases with “red”, so mipo = red. Then tak = apple and sul = bus, and “lin sul” = blue bus gives lin = blue. So “lin tak” is <b>blue apple</b>.</p><p class="why-not">The other options use a word in the wrong meaning, or copy one of the given phrases.</p>` },
+    { id: "u107", tier: 1, cat: "Must or cannot be true",
+      stem: `<div class="box">Every cupcake on the tray has icing.<br>Some of the cupcakes with icing also have sprinkles.<br>Ella takes one cupcake from the tray.</div><p>Which one of these <b>must</b> be true?</p>`,
+      options: ["Ella’s cupcake has sprinkles.", "Some cupcakes have sprinkles but no icing.", "Ella’s cupcake has no sprinkles.", "Ella’s cupcake has icing."], answer: 3,
+      explain: `<p>Every cupcake on the tray has icing, so <b>Ella’s must have icing</b>.</p><p class="why-not">Only <i>some</i> have sprinkles, so hers may or may not. Every cupcake has icing, so none can have sprinkles without it.</p>` },
+    { id: "u108", tier: 1, cat: "Number problems",
+      stem: `<p>Ava is standing in a line. She is <b>9th</b> counting from the front and <b>6th</b> counting from the back.</p><p>How many people are in the line?</p>`,
+      options: ["3", "13", "14", "15"], answer: 2,
+      explain: `<p>There are 8 people in front of Ava and 5 behind her. With Ava: 8 + 1 + 5 = <b>14</b>.</p><p class="why-not">9 + 6 = 15 counts Ava twice. 13 leaves her out, and 3 is just the difference.</p>` },
+
+    /* ===================== circle 2 ===================== */
+    { id: "u201", tier: 2, cat: "Spot the mistake",
+      stem: `<div class="box">Oscar asked the four other members of his chess club whether the school should hold a chess tournament. All four said yes.<br>Oscar: “Everyone at school wants a chess tournament.”</div><p>Which one of these shows the mistake Oscar has made?</p>`,
+      options: ["A tournament may take a long time to organise.", "Oscar may not be the best player in the club.", "Some people at the school may like draughts more than chess.", "The people Oscar asked may all already love chess."], answer: 3,
+      explain: `<p>Oscar only asked the chess club, people who <b>already love chess</b>. Their answer tells him nothing about the rest of the school.</p><p class="why-not">How long it takes to organise, how good Oscar is, and draughts don’t explain what is wrong with judging a whole school from four club members.</p>` },
+    { id: "u202", tier: 2, cat: "Supports the claim",
+      stem: `<div class="box">Coach Ruiz: “Players should drink water at every quarter break. Then they will play better in the last quarter.”</div><p>Which statement, if true, best supports the coach’s claim?</p>`,
+      options: ["Players who are short of water tire and make mistakes.", "Water costs much less than sports drinks.", "Most netball games are played in four quarters.", "Good players are often seen drinking water at the breaks."], answer: 0,
+      explain: `<p>The claim needs a link from drinking water to playing better late in the game. If players short of water <b>tire and make mistakes</b>, drinking at each break prevents that.</p><p class="why-not">Cost and the number of quarters are true but beside the point. “Good players are seen drinking water” is a link the wrong way round: they might drink because they play hard, not play well because they drink.</p>` },
+    { id: "u203", tier: 2, cat: "Whose reasoning",
+      stem: `<div class="box">School rule: if it is raining at lunchtime, everyone stays in the library. The rule is always followed.</div><p>Pia: “The children are not in the library at lunchtime, so it can’t be raining.”</p><p>Raj: “It is raining at lunchtime, so the children are in the library.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Pia", "Raj"), answer: 2,
+      explain: `<p>The rule says rain at lunchtime always means the library, so Raj is right. And if the children are <i>not</i> in the library, it can’t be raining, or the rule would have sent them there: Pia is right too. <b>Both</b> are correct.</p><p class="why-not">The mistake to avoid is turning the rule round: “they are in the library, so it must be raining” would be wrong, because children can be in the library for other reasons. Neither Pia nor Raj does that.</p>` },
+    { id: "u204", tier: 2, cat: "Tables & timetables",
+      stem: `<p>The swim club’s usual timetable:</p>${tbl(["Day", "Start", "Finish"], [["Monday", "4:00 pm", "5:00 pm"], ["Wednesday", "4:00 pm", "5:00 pm"], ["Friday", "4:00 pm", "5:00 pm"], ["Saturday", "9:00 am", "10:30 am"]])}<p>This week, Wednesday is cancelled, and Saturday starts <b>half an hour late</b> but finishes at the usual time.</p><p>How much training is there this week?</p>`,
+      options: ["2½ hours", "3 hours", "3½ hours", "4½ hours"], answer: 1,
+      explain: `<p>Monday 1 hour + Friday 1 hour + Saturday 9:30 to 10:30, 1 hour = <b>3 hours</b>.</p><p class="why-not">4½ hours is a normal week. 3½ hours forgets that Saturday is shorter, and 2½ hours takes off too much.</p>` },
+    { id: "u205", tier: 2, cat: "Spatial",
+      stem: `<p>On a dice, opposite faces always add up to <b>7</b>.</p><p>Three dice are stacked in a tower on a table. The top of the tower shows <b>5</b>.</p><p>What is the total of the five faces you can’t see because they are pressed against another dice or the table?</p>`,
+      options: ["21", "19", "16", "14"], answer: 2,
+      explain: `<p>The hidden faces are the bottom of the top dice, and the top and bottom of the other two dice.</p><p>The top dice shows 5, so its bottom is 7 − 5 = 2. The middle and bottom dice each hide a top and a bottom that are opposite faces: 7 each. Total: 2 + 7 + 7 = <b>16</b>.</p><p class="why-not">21 counts 7 for all three dice, but the top dice’s top (5) is on show. 19 subtracts the 2 instead of the 5.</p>` },
+    { id: "u206", tier: 2, cat: "Rules & codes",
+      stem: `<p>Four friends each have a different pet: a cat, a dog, a fish and a bird.</p><div class="box">Ali doesn’t have the cat or the dog.<br>Bea has the fish.<br>Cal doesn’t have the dog.</div><p>Who has the dog?</p>`,
+      options: ["Ali", "Bea", "Cal", "Dee"], answer: 3,
+      explain: `<p>Bea has the fish. Ali can’t have the cat or the dog, so Ali has the bird. Cal can’t have the dog, so Cal has the cat. That leaves the dog for <b>Dee</b>.</p><p class="why-not">Dee isn’t mentioned in any clue, which makes her easy to overlook, but the pets left over after the clues tell you hers.</p>` },
+    { id: "u207", tier: 2, cat: "Number problems",
+      stem: `<p>Six classes each send <b>3 children</b> to a quiz. The children are put into teams of <b>4</b>.</p><p>How many more children are needed so that every child is in a full team?</p>`,
+      options: ["6", "4", "3", "2"], answer: 3,
+      explain: `<p>6 × 3 = 18 children. Teams of 4: four full teams use 16, leaving 2 in a team that needs 4. So <b>2</b> more children are needed (20 = 5 teams of 4).</p><p class="why-not">4 is the team size, not the number missing. 6 is the number of classes, and 3 is how many each class sent.</p>` },
+    { id: "u208", tier: 2, cat: "Spatial",
+      stem: `<p>Six small cubes are glued together to make this block.</p>${BLOCK}<p>How many small square faces are on the outside of the block, including the bottom?</p>`,
+      options: ["18", "22", "24", "36"], answer: 1,
+      explain: `<p>Count the outside in pairs. Top and bottom: 6 + 6 = 12. Front and back: 3 + 3 = 6. The two ends: 2 + 2 = 4. Total <b>22</b>.</p><p class="why-not">36 is every face of all six cubes, including the ones glued together inside. 24 and 18 come from counting one pair of sides wrongly or missing the bottom.</p>` },
+
+    /* ===================== circle 3 ===================== */
+    { id: "u301", tier: 3, cat: "Spot the mistake",
+      stem: `<div class="box">Last month, the kiosk at the beach sold 300 ice blocks and the kiosk at the park sold 200.<br>Max: “People like the beach kiosk’s ice blocks better.”</div><p>Which one of these shows the mistake Max has made?</p>`,
+      options: ["The park kiosk may also sell sandwiches and drinks.", "Far more people may pass the beach kiosk each day.", "Some people may not eat ice blocks at all.", "Both kiosks may charge the same for an ice block."], answer: 1,
+      explain: `<p>Max compares totals that aren’t fair to compare. If <b>far more people pass the beach kiosk</b>, it would sell more even if people liked both equally.</p><p class="why-not">What else the park kiosk sells, people who never eat ice blocks, and equal prices don’t show why the totals can’t be compared.</p>` },
+    { id: "u302", tier: 3, cat: "Supports the claim",
+      stem: `<div class="box">Ms Park: “Our class should have quiet reading straight after lunch instead of at the end of the day. Then more children will finish their books.”</div><p>Which statement, if true, best supports Ms Park’s claim?</p>`,
+      options: ["End-of-day reading often gets cut short by packing up.", "Children who finish books usually enjoy reading.", "The library is busiest straight after lunch.", "Some children in the class read much faster than the others."], answer: 0,
+      explain: `<p>If reading time at the end of the day <b>often gets cut short</b>, moving it gives the children more real reading time, so more books get finished.</p><p class="why-not">Enjoying reading and reading speed are true but don’t show that the new time helps. A busy library after lunch has nothing to do with reading in class.</p>` },
+    { id: "u303", tier: 3, cat: "Whose reasoning",
+      stem: `<div class="box">Only children who have returned their permission note can go on the excursion.</div><p>Pia: “Tom has returned his note, so he will definitely go on the excursion.”</p><p>Raj: “Sara didn’t go on the excursion, so she can’t have returned her note.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Pia", "Raj"), answer: 3,
+      explain: `<p>A note is <b>needed</b> to go, but it doesn’t <i>guarantee</i> going. Tom could be sick on the day, so Pia is wrong. Sara could have returned her note and then been sick too, so Raj is wrong. <b>Neither</b> is correct.</p><p class="why-not">The rule only tells you about children who <i>do</i> go: they must have returned a note. It says nothing certain about the ones who stay behind.</p>` },
+    { id: "u304", tier: 3, cat: "Spatial",
+      stem: `<p>A cube has six different colours. <b>Red is opposite blue</b>, <b>green is opposite yellow</b>, and <b>white is opposite black</b>.</p><p>The cube sits on a table with red on top and green facing you.</p><p>Which colour <b>could</b> be on the right-hand side?</p>`,
+      options: ["blue", "yellow", "black", "red"], answer: 2,
+      explain: `<p>Red is on top, so blue is underneath. Green faces you, so yellow is at the back. The left and right sides must be the last pair: white and black. So the right side could be <b>black</b>.</p><p class="why-not">Blue is on the bottom and yellow at the back, and red is on top, so none of them can be on the right.</p>` },
+    { id: "u305", tier: 3, cat: "Tables & timetables",
+      stem: `<p>The 1st of the month is a <b>Tuesday</b>.</p><p>On what date is the <b>third Friday</b> of the month?</p>`,
+      options: ["11th", "17th", "18th", "21st"], answer: 2,
+      explain: `<p>If the 1st is a Tuesday, the first Friday is the 4th. Add a week each time: the 11th, then the <b>18th</b>.</p><p class="why-not">The 11th is the second Friday. The 17th and 21st come from counting the Fridays from the wrong starting day.</p>` },
+    { id: "u306", tier: 3, cat: "Must or cannot be true",
+      stem: `<p>One of Ann, Bob and Cat ate the last biscuit.</p><div class="box">Ann: “Bob ate it.”<br>Bob: “Ann is lying.”<br>Cat: “I didn’t eat it.”</div><p><b>Exactly one</b> of them is telling the truth. Who ate the biscuit?</p>`,
+      options: ["Ann", "Bob", "It can’t be worked out", "Cat"], answer: 3,
+      explain: `<p>Ann and Bob can’t both be telling the truth, and they can’t both be lying: one of them must be the one honest person. So Cat is lying, and “I didn’t eat it” is false: <b>Cat</b> ate it.</p><p>Check: Ann lies (Bob didn’t eat it), Bob tells the truth, Cat lies. Exactly one truth.</p><p class="why-not">If Bob had eaten it, Ann and Cat would both be telling the truth. If Ann had, Bob and Cat would both be telling the truth.</p>` },
+    { id: "u307", tier: 3, cat: "Rules & codes",
+      stem: `<p>The numbers <b>12, 20, 28 and 36</b> belong to a club. The numbers <b>16, 22, 24 and 30</b> do not.</p><p>Which of these numbers belongs to the club?</p>`,
+      options: ["32", "40", "48", "60"], answer: 3,
+      explain: `<p>Every member is in the 4 times table, but 16 and 24 are in it too and are not members. The members are 4 × 3, 4 × 5, 4 × 7 and 4 × 9: 4 times an <b>odd</b> number. 60 = 4 × 15, so <b>60</b> belongs.</p><p class="why-not">32 = 4 × 8, 40 = 4 × 10 and 48 = 4 × 12 are 4 times an even number, like 16 and 24, which are not in the club.</p>` },
+    { id: "u308", tier: 3, cat: "Spatial",
+      stem: `<p>A large cube is made of 64 small cubes, 4 along each edge. Only its <b>top</b> and its <b>bottom</b> are painted.</p>${cube(4, { u: 26, fill: ["#ffe9cf", "#ff6b6b", "#f4c7a1"], aria: "A large cube made of small cubes, 4 along each edge. The top and the bottom are painted red." })}<p>How many small cubes have <b>no paint at all</b>?</p>`,
+      options: ["48", "32", "16", "8"], answer: 1,
+      explain: `<p>The paint only touches the top layer (16 cubes) and the bottom layer (16 cubes). The two middle layers have none: 64 − 16 − 16 = <b>32</b>.</p><p class="why-not">8 is the answer for a cube painted on all six faces, which this one isn’t. 48 takes off only one layer.</p>` },
+
+    /* ===================== the boss ===================== */
+    { id: "u401", tier: 4, cat: "Whose reasoning",
+      stem: `<div class="box">A box holds 5 green, 3 yellow and 2 white tennis balls. Nobody can see into the box.</div><p>Pia: “If I take out 4 balls, I am certain to get at least two of the same colour.”</p><p>Raj: “If I take out 6 balls, I am certain to get at least one green.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Pia", "Raj"), answer: 2,
+      explain: `<p>Think of the unluckiest case each time. There are only 3 colours, so 3 balls could all be different, but a 4th must match one: Pia is right. There are 3 + 2 = 5 balls that aren’t green, so 5 balls could all miss, but a 6th must be green: Raj is right. <b>Both</b> are correct.</p><p class="why-not">It is easy to think 6 isn’t enough because there are 5 green balls, but what matters is how many balls are <i>not</i> green.</p>` },
+    { id: "u402", tier: 4, cat: "Spot the mistake",
+      stem: `<div class="box">Some of the tomatoes in the garden have been eaten overnight. Mum found possum footprints in the soil.<br>Zac: “So it wasn’t the birds.”</div><p>Which one of these shows the mistake Zac has made?</p>`,
+      options: ["The birds and the possum may both have eaten some.", "Possums may come out mainly at night, when birds are asleep.", "Some of the tomatoes may not have been ripe.", "Mum may grow other vegetables as well."], answer: 0,
+      explain: `<p>Zac thinks that if the possum did it, the birds didn’t. But one cause doesn’t rule out another: <b>both may have eaten some</b>.</p><p class="why-not">Possums coming out at night supports Mum’s idea rather than showing Zac’s mistake. Ripeness and other vegetables are beside the point.</p>` },
+    { id: "u403", tier: 4, cat: "Number problems",
+      stem: `<p>Tickets to a show cost <b>$4</b> for a child and <b>$7</b> for an adult. A group buys <b>9 tickets</b> and pays <b>$51</b>.</p><p>How many adults are in the group?</p>`,
+      options: ["3", "4", "5", "6"], answer: 2,
+      explain: `<p>If all 9 were children, it would cost 9 × $4 = $36. The group paid $15 more. Each adult instead of a child adds $3, so there are $15 ÷ $3 = <b>5</b> adults.</p><p>Check: 5 × $7 + 4 × $4 = $35 + $16 = $51.</p><p class="why-not">4 is the number of children. 3 and 6 come from dividing by the wrong price difference.</p>` },
+    { id: "u404", tier: 4, cat: "Spatial",
+      stem: `<p>A dice sits on a table with <b>1 on top</b>. It is tipped over forwards, away from you, so that it rolls onto the next face. This is done <b>four times</b> in a row, in the same direction.</p><p>Which number is on top now?</p>`,
+      options: ["1", "2", "5", "6"], answer: 0,
+      explain: `<p>Each tip is a quarter turn. Four quarter turns in the same direction make a full turn, so the dice ends up just as it started: <b>1</b> on top.</p><p class="why-not">6 is on top after only two tips (halfway round). It’s tempting to think the dice keeps changing, but after four tips it is back where it began.</p>` },
+    { id: "u405", tier: 4, cat: "Tables & timetables",
+      stem: `<p>A bus leaves the station every <b>12 minutes</b> and a train every <b>20 minutes</b>. Both leave together at <b>7:00 am</b>.</p><p>When do they next leave together?</p>`,
+      options: ["7:40 am", "8:00 am", "8:20 am", "9:00 am"], answer: 1,
+      explain: `<p>Bus: 7:12, 7:24, 7:36, 7:48, 8:00. Train: 7:20, 7:40, 8:00. The first time on both lists is <b>8:00 am</b> (60 minutes is the first number in both the 12 and 20 times tables).</p><p class="why-not">7:40 is a train time but not a bus time. 8:20 is the train’s next time after 8:00. 9:00 is a time they are both at the station again, but not the next one.</p>` },
+    { id: "u406", tier: 4, cat: "Supports the claim",
+      stem: `<div class="box">The principal: “If we put in more bike racks, more students will ride to school.”</div><p>Which statement, if true, best supports the principal’s claim?</p>`,
+      options: ["Riding a bike to school is good exercise.", "Students who ride to school usually arrive a little earlier than the others.", "Bike racks cost less than a new car park.", "Many say they don’t ride because there is nowhere to leave their bikes."], answer: 3,
+      explain: `<p>The claim only works if the lack of racks is what stops students riding. If many say they <b>don’t ride because there’s nowhere to leave their bikes</b>, more racks remove that reason.</p><p class="why-not">Exercise and arriving early are reasons riding is good, not reasons racks would change anything. Cost is about the school’s money, not students’ choices.</p>` },
+    { id: "u407", tier: 4, cat: "Order & arrangement",
+      stem: `<p>Five children stand in a line at the canteen.</p><div class="box">Pat is somewhere ahead of Quinn.<br>Rose is directly behind Pat.<br>Sam is last.<br>Tia is not first.</div><p>Who is <b>first</b> in the line?</p>`,
+      options: ["Pat", "Quinn", "Rose", "Tia"], answer: 0,
+      explain: `<p>Sam is last and Tia isn’t first. Rose stands directly behind Pat, so Rose can’t be first. Quinn is behind Pat, so Quinn can’t be first. That leaves <b>Pat</b>.</p><p class="why-not">The clues don’t say where Quinn and Tia stand exactly, but they don’t need to: only one person can be first.</p>` },
+    { id: "u408", tier: 4, cat: "Spatial",
+      stem: `<p>A large cube is made of 27 small cubes. The whole outside is painted, and then it is taken apart.</p>${cube(3, { u: 34, aria: "A large cube made of 27 small cubes, 3 along each edge, painted all over." })}<p>Altogether, how many faces of the small cubes are <b>not</b> painted?</p>`,
+      options: ["54", "81", "108", "162"], answer: 2,
+      explain: `<p>27 small cubes have 27 × 6 = 162 faces. The painted ones are the outside of the large cube: 6 sides of 9 squares = 54. So 162 − 54 = <b>108</b> faces are not painted.</p><p class="why-not">162 is all the faces and 54 is the painted ones: both stop one step short. 81 assumes exactly half are painted.</p>` },
   );
 })();
 
