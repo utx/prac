@@ -161,6 +161,17 @@ const SOLVE = {
   },
   netopp: d => { const s = roll(d.cells); if (new Set(s).size !== 6) return "not a net"; const i = d.labels.indexOf(d.ask), o = { b: "t", t: "b", n: "s", s: "n", e: "w", w: "e" }[s[i]]; return d.labels[s.indexOf(o)]; },
   isnet: d => { const ok = d.list.map(c => new Set(roll(c)).size === 6); return ok.filter(Boolean).length === 1 ? ok.indexOf(true) : -1; },
+  /* third set (generators3.js) */
+  pyramid: d => brute(x => (d.a + x) + (x + d.c) === d.top),
+  clockadd: d => clock(d.start + d.N),
+  datesback: d => { const t = new Date(2027, d.mo, d.d); t.setDate(t.getDate() - d.N); return `${t.getDate()} ${t.toLocaleString("en-AU", { month: "long" })}`; },
+  share: d => { for (let k = 1; k < 100; k++) if ((d.a + d.b) * k === d.tot) return d.b * k; },
+  spinways: d => { let w = 0; for (let i = 1; i <= d.n; i++) for (let j = 1; j <= d.m; j++) if (i + j === d.X) w++; return w; },
+  meet: d => { const k = new Set([0]); d.meets.forEach(([x, y]) => { if (k.has(x) || k.has(y)) { k.add(x); k.add(y); } }); return k.size; },
+  robotwalk: d => { let vx = 0, vy = 1, x = 0, y = 0; for (const s of d.steps) { [vx, vy] = s.t === "right" ? [vy, -vx] : [-vy, vx]; x += vx * s.n; y += vy * s.n; }
+    const sq = n => `${Math.abs(n)} square${Math.abs(n) === 1 ? "" : "s"}`; const p = [y > 0 ? sq(y) + " north" : y < 0 ? sq(y) + " south" : "", x > 0 ? sq(x) + " east" : x < 0 ? sq(x) + " west" : ""].filter(Boolean);
+    return p.length ? p.join(" and ") + " of the start" : "Back where it started"; },
+  mirrorclock: d => { const t = 12 * 60 - (d.h * 60 + d.m), h = Math.floor(t / 60); return `${h}:${String(t % 60).padStart(2, "0")}`; },
   sessions: d => { let n = 0; for (let w = 1; w <= d.W; w++) for (let k = 0; k < d.d; k++) if (w !== 2) n++; return n - 1; },
 };
 /* is the picture drawn from the same numbers? (heights of columns, dots, symbols, liquid levels, table cells) */
@@ -181,6 +192,8 @@ const DRAWN = {
   stack: (d, s) => { const c = d.rows.flatMap((r, i) => r.flatMap((h, x) => Array.from({ length: h }, (_, z) => [x, d.rows.length - 1 - i, z]))); return (s.match(/class="face"/g) || []).length === vox(c).seen && (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.rows.flat().join(); },
   stairs: (d, s) => { const c = []; for (let x = 0; x < d.k; x++) for (let z = 0; z < d.k - x; z++) for (let y = 0; y < d.d; y++) c.push([x, y, z]); return (s.match(/class="face"/g) || []).length === vox(c).seen; },
   netopp: (d, s) => (s.match(/<rect/g) || []).length === 6 && d.labels.every(l => s.includes(`>${l}</text>`)),
+  pyramid: (d, s) => [d.a, d.c, d.top].every(v => s.includes(`>${v}</text>`)) && s.includes(">?</text>"),
+  mirrorclock: (d, s) => s.includes("seem to show " + d.h + ":" + String(d.m).padStart(2, "0")),
   tabletotal: (d, s) => (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.rows.flat().join(),
   droplow: (d, s) => (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.scores.flat().join(),
   totals2: (d, s) => (s.match(/<td>(\d+|\?)<\/td>/g) || []).map(x => /\?/.test(x) ? null : num(x)).join() === [...d.cells.flat(), ...d.colTotals].join(),

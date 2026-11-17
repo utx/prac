@@ -458,7 +458,11 @@ function pickQ(kind, tier, M) {
   const fresh = c.filter(r => !M.asked.includes(qkey(r)));
   if (fresh.length) c = fresh;
   c = shuffle(c).sort((a, b) => lastUsed(qkey(a)) - lastUsed(qkey(b)));
-  const ref = c[0];
+  /* variety: don't ask the same type of question twice in a row if another type is waiting */
+  const catOf = r => r.t === "g" ? (GENS.find(g => g.id === r.id) || {}).cat : (HAND[r.id] || {}).cat;
+  M.lastCat = M.lastCat || {};
+  const ref = c.find(r => catOf(r) !== M.lastCat[kind]) || c[0];
+  M.lastCat[kind] = catOf(ref);
   if (ref.t === "g") ref.seed = rnd(2 ** 31);
   M.asked.push(qkey(ref));
   return ref;
