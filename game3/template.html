@@ -252,6 +252,20 @@
   .chestcard .chestimg { width: 160px; display: block; margin: 4px auto 8px; animation: chestglow 1.6s ease-in-out infinite; }
   .chestcard h3 { text-align: center; font-size: 24px; margin: 0 0 6px; }
   @keyframes chestglow { 50% { filter: drop-shadow(0 0 18px #ffd21a); transform: translateY(-5px); } }
+  .lootreveal { --rar: #888; text-align: center; color: #fff; border: 4px solid var(--navy); border-bottom-width: 8px; border-radius: 16px; padding: 12px 14px 14px; margin: 0 0 16px;
+    background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--rar) 35%, #fff), color-mix(in srgb, var(--rar) 95%, #000));
+    box-shadow: 0 0 0 4px var(--gold), 0 0 34px color-mix(in srgb, var(--rar) 75%, transparent); animation: lootpop .7s cubic-bezier(.2, 1.6, .4, 1) both; }
+  .lootreveal .got { font: italic 900 16px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
+  .lootreveal img { width: 128px; height: 128px; object-fit: contain; display: block; margin: 6px auto 4px; filter: drop-shadow(0 6px 0 rgba(0,0,0,.35)); animation: lootspin 1s ease-out both; }
+  .lootreveal .rarity { display: inline-block; background: rgba(13,19,48,.8); border-radius: 999px; padding: 2px 14px; font: italic 900 13px "Arial Black", Impact, sans-serif; letter-spacing: 2px; text-transform: uppercase; }
+  .lootreveal b.nm { display: block; font: italic 900 32px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-shadow: 0 3px 0 rgba(0,0,0,.45); line-height: 1.15; margin-top: 4px; }
+  .lootreveal .what { background: rgba(255,255,255,.96); color: var(--ink); border-radius: 10px; padding: 10px 12px; margin-top: 10px; font-size: 16.5px; text-align: left; }
+  @keyframes lootpop { 0% { transform: scale(.55); } 100% { transform: none; } }
+  @keyframes lootspin { 0% { transform: scale(.4) rotate(-25deg); } 60% { transform: scale(1.15) rotate(6deg); } 100% { transform: none; } }
+  .act.fresh, .act.fresh:disabled { filter: none; opacity: 1; box-shadow: 0 0 0 4px var(--gold), 0 0 18px var(--gold); animation: glowpulse 1.2s ease-in-out 4; }
+  @keyframes glowpulse { 50% { box-shadow: 0 0 0 7px var(--gold), 0 0 30px var(--gold); } }
+  .float.loot { color: var(--gold); font-size: 24px; }
+  @media (max-width: 520px) { .lootreveal b.nm { font-size: 25px; } .lootreveal img { width: 100px; height: 100px; } }
   .loot { --rar: #888; display: flex; align-items: center; gap: 14px; border: 3px solid var(--navy); border-bottom-width: 7px; border-radius: 12px; padding: 10px 14px; margin-top: 14px; color: #fff;
     background: linear-gradient(180deg, color-mix(in srgb, var(--rar) 60%, #fff), color-mix(in srgb, var(--rar) 92%, #000)); animation: pop .6s; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
   .loot img { width: 80px; height: 80px; object-fit: contain; flex: none; filter: drop-shadow(0 4px 0 rgba(0,0,0,.35)); }
@@ -284,8 +298,8 @@ const pic = (name, cls = "ico") => `<img class="${cls}" src="art/${name}.webp" a
 /* ---------- the game's numbers ---------- */
 const GUNS = [
   { id: "pistol", name: "Suppressed Pistol", rar: "Common", col: "#8a94a6", dmg: 25, cost: 0 },
-  { id: "shotgun", name: "Tactical Shotgun", rar: "Rare", col: "#2f8fff", dmg: 35, cost: 250 },
-  { id: "minigun", name: "Minigun", rar: "Legendary", col: "#ffb21a", dmg: 50, cost: 800 },
+  { id: "shotgun", name: "Tactical Shotgun", rar: "Rare", col: "#2f8fff", dmg: 30, cost: 250 },
+  { id: "minigun", name: "Minigun", rar: "Legendary", col: "#ffb21a", dmg: 35, cost: 800 },
 ];
 const ITEMS = [   // sold in the shop
   { id: "med", name: "Med Kit", img: "medkit", col: "#3fae2a", cost: 30, what: "+50 health" },
@@ -301,14 +315,21 @@ const LOOT = [
   { id: "gold", name: "Pot of Gold", img: "coins", rar: "Epic", col: "#a34dff", w: 6, what: "+60 coins." },
   { id: "chug", name: "Chug Jug", img: "chugjug", rar: "Legendary", col: "#ffb21a", w: 4, what: "Drunk at once: full health and full shield." },
 ];
+/* what to say about items you keep: [one, more than one, how to use it] */
+const HOLD = {
+  med: ["Med Kit", "Med Kits", "Tap the Med Kit button under the fight picture any time for +50 health."],
+  shield: ["Shield Potion", "Shield Potions", "Tap the Shield button under the fight picture any time for +50 shield."],
+  bush: ["Bush", "Bushes", "Tap the Bush button before you shoot: if you then miss, they can’t find you and you take no damage."],
+  boogie: ["Boogie Bomb", "Boogie Bombs", "Save it for a fight: when an opponent makes a move, a Boogie Bomb button appears. Throw it and they dance instead of attacking."],
+};
 const CARRY = 3, MAXHP = 100, MAXSH = 50, SUPPLY_HEAL = 40, RUSH_DMG = 15, FOE_HEAL = 20;
-/* storm circles: opponent health, damage of a miss, damage of a wrong move, coins for an elimination,
+/* storm circles: opponent health (thinking and maths; a reading opponent has one bar for each question on its passage), damage of a miss, damage of a wrong move, coins for an elimination,
    Fortnite minutes for clearing the circle, and the circle's radius (% of the map) */
 const STAGE = {
-  1: { hp: 50, dmg: 20, slip: 10, coins: 15, min: 15, r: 75 },
-  2: { hp: 70, dmg: 25, slip: 12, coins: 25, min: 20, r: 38 },
-  3: { hp: 85, dmg: 30, slip: 15, coins: 35, min: 25, r: 26 },
-  4: { hp: 140, dmg: 35, slip: 18, coins: 80, min: 0, r: 15 },
+  1: { hp: 100, dmg: 15, slip: 10, coins: 15, min: 15, r: 75 },
+  2: { hp: 125, dmg: 20, slip: 12, coins: 25, min: 20, r: 38 },
+  3: { hp: 150, dmg: 25, slip: 15, coins: 35, min: 25, r: 26 },
+  4: { hp: 200, dmg: 30, slip: 18, coins: 80, min: 0, r: 15 },
 };
 const START = 100, WIN_COINS = 50;
 /* other players still standing when the storm closes after circle 1, 2, 3 (so 50, 20 and 2 players are left) */
@@ -437,7 +458,11 @@ function pickQ(kind, tier, M) {
   const fresh = c.filter(r => !M.asked.includes(qkey(r)));
   if (fresh.length) c = fresh;
   c = shuffle(c).sort((a, b) => lastUsed(qkey(a)) - lastUsed(qkey(b)));
-  const ref = c[0];
+  /* variety: don't ask the same type of question twice in a row if another type is waiting */
+  const catOf = r => r.t === "g" ? (GENS.find(g => g.id === r.id) || {}).cat : (HAND[r.id] || {}).cat;
+  M.lastCat = M.lastCat || {};
+  const ref = c.find(r => catOf(r) !== M.lastCat[kind]) || c[0];
+  M.lastCat[kind] = catOf(ref);
   if (ref.t === "g") ref.seed = rnd(2 ** 31);
   M.asked.push(qkey(ref));
   return ref;
@@ -455,7 +480,11 @@ function pickPassage(tier, M, not) {
 function nextQ(o) {
   const M = S.match;
   if (o.kind === "reading") {
-    if (!o.pid || !o.queue.length) Object.assign(o, pickPassage(o.tier, M, o.pid));
+    if (!o.pid || !o.queue.length) {
+      const first = !o.pid;
+      Object.assign(o, pickPassage(o.tier, M, o.pid));
+      if (first) o.hp = o.max = PASS[o.pid].questions.length;   // David (Nov 2026): every question on the passage must be answered
+    }
     const id = o.queue.shift();
     const st = S.q["p:" + o.pid]; st.start = (PASS[o.pid].questions.findIndex(q => q.id === id) + 1) % PASS[o.pid].questions.length;
     o.pending = { ref: { t: "h", id }, chosen: null };
@@ -488,7 +517,8 @@ function tryMatch() {
       const p = landNear(c[s], STAGE[s].r * (s === 1 ? 0.62 : 0.72), pts, GAP[s]); if (!p) return null;
       pts.push(p);
       const [img, name] = foe(kind);
-      opps.push({ kind, tier: s, stage: s, img, name, x: p[0], y: p[1], hp: STAGE[s].hp, max: STAGE[s].hp, dead: false, shots: 0, pending: null, pid: null, queue: [], threat: null });
+      const hp = kind === "reading" ? 5 : STAGE[s].hp;
+      opps.push({ kind, tier: s, stage: s, img, name, x: p[0], y: p[1], hp, max: hp, dead: false, shots: 0, pending: null, pid: null, queue: [], threat: null });
     }
     supply[s] = landNear(c[s], STAGE[s].r * 0.72, pts, GAP[s]); if (!supply[s]) return null;
   }
@@ -558,7 +588,7 @@ function foeDown(o) {
 }
 
 /* ---------- drawing ---------- */
-const bar = (cls, v, max) => `<div class="bar ${cls}"><i style="width:${Math.max(0, 100 * v / max)}%"></i><span>${Math.round(v)}</span></div>`;
+const bar = (cls, v, max, label = null) => `<div class="bar ${cls}"><i style="width:${Math.max(0, 100 * v / max)}%"></i><span>${label === null ? Math.round(v) : label}</span></div>`;
 const chestStage = () => { const p = 100 * earnedToday() / S.time.cap; return p <= 0 ? 0 : p >= 99.99 ? 4 : 1 + Math.min(2, Math.floor(p / 34)); };
 const mins = m => `${m} min`;
 function timeCard() {
@@ -749,11 +779,12 @@ function battle(fx) {
   const q = mode === "q" ? resolve(pend.ref) : mode === "chestq" ? resolve(ch.ref) : null;
   document.documentElement.style.setProperty("--kind", q ? KIND[q.kind].col : k.col);
   const headReady = M.streak % 3 === 2;
+  const fresh = id => mode === "chestq" && ch.chosen !== null && ch.glow === id ? " fresh" : "";
   let h = `<div class="playbar"><button class="pill" id="back" ${idle ? "" : "disabled title='Finish this first'"}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="pill" id="alive" data-n="${alive(M)}">👥 ${alive(M)} left</span><span class="spacer" style="flex:1"></span>
     <button class="pill" id="coins">${pic("coins")} ${S.coins}</button><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>
   <div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
     <div class="hud me"><b>You${M.bush ? " 🌿" : ""}</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}<small class="pips" title="Every third right answer in a row is a headshot">${[0, 1, 2].map(i => `<i class="${i < M.streak % 3 ? "on" : ""}"></i>`).join("")} ${headReady ? "Headshot ready!" : "Headshot streak"}</small></div>
-    <div class="hud foe"><b>${esc(o.name)}</b><small>${k.icon} ${o.boss ? "Boss · thinking and maths" : k.label + " opponent"}</small>${bar("ehp", o.hp, o.max)}</div>
+    <div class="hud foe"><b>${esc(o.name)}</b><small>${k.icon} ${o.boss ? "Boss · thinking and maths" : k.label + " opponent"}</small>${bar("ehp", o.hp, o.max, o.kind === "reading" ? o.hp + " to go" : null)}</div>
     <div class="fighter me${over ? " ko" : ""}${fx && fx.anim === "jump" ? " jumping" : ""}${fx && fx.anim === "rush" ? " rushing" : ""}" id="hero"><img src="${skin()[4]}${skin()[0]}.webp" alt="Your hero"></div>
     ${M.bush ? `<img class="bushhide" src="art/bush.webp" alt="">` : ""}
     ${fx && fx.anim === "build" ? `<div class="wall">${ICON.build}</div>` : ""}
@@ -764,20 +795,20 @@ function battle(fx) {
   </div>
   <div class="actions">
     <button class="act gun" id="shoot" style="--rar:${gun().col}" ${idle ? "" : "disabled"}>${gunPic(S.gun)}<span><b>${gun().name}</b><small>${gun().dmg} damage a hit${headReady ? " · next one ×2!" : ""}</small></span><span class="go">Shoot</span></button>
-    <button class="act" id="usemed" style="--rar:#3fae2a" ${!S.items.med || M.hp >= MAXHP || over ? "disabled" : ""}>${pic("medkit")}<span><b>Med Kit ×${S.items.med}</b><small>+50 health</small></span></button>
-    <button class="act" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
-    <button class="act" id="usebush" style="--rar:#3fae2a" ${!S.items.bush || M.bush || !idle ? "disabled" : ""}>${pic("bush")}<span><b>Bush ×${S.items.bush}</b><small>${M.bush ? "Hiding!" : "Hide: a miss costs nothing"}</small></span></button>
+    <button class="act${fresh("med")}" id="usemed" style="--rar:#3fae2a" ${!S.items.med || M.hp >= MAXHP || over ? "disabled" : ""}>${pic("medkit")}<span><b>Med Kit ×${S.items.med}</b><small>+50 health</small></span></button>
+    <button class="act${fresh("shield")}" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
+    <button class="act${fresh("bush")}" id="usebush" style="--rar:#3fae2a" ${!S.items.bush || M.bush || !idle ? "disabled" : ""}>${pic("bush")}<span><b>Bush ×${S.items.bush}</b><small>${M.bush ? "Hiding!" : "Hide: a miss costs nothing"}</small></span></button>
   </div>`;
   const showPassage = mode === "q" && q.kind === "reading";
   h += `<div class="stage${showPassage ? " has-passage" : ""}">${showPassage ? passageHtml(o, q) : ""}`;
   if (mode === "idle") {
     h += `<div class="card" id="qcard" data-q="" data-seed=""><div class="aimhelp"><b>${esc(o.name)}</b> is in your sights.<br>Tap your gun or the enemy to take a shot. Every shot is a question.<br>
-      <small>A right answer hits for ${gun().dmg}${headReady ? " (a headshot: double!)" : ""}. A wrong answer misses, and ${esc(o.name)} shoots back for ${st.dmg}.</small></div></div>`;
+      <small>${o.kind === "reading" ? `Answer every question on the passage: each right answer knocks off one bar (${o.shots ? o.hp + " to go" : "one bar for each question"}).` : `A right answer hits for ${gun().dmg}${headReady ? " (a headshot: double!)" : ""}.`} A wrong answer misses, and ${esc(o.name)} shoots back for ${st.dmg}.</small></div></div>`;
   } else if (mode === "q") {
     h += `<div class="card" id="qcard" data-q="${qkey(pend.ref)}" data-seed="${pend.ref.seed !== undefined ? pend.ref.seed : ""}"><div class="qhead"><span>${KIND[q.kind].icon} ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, pend.chosen)}`;
     if (pend.chosen !== null) {
       const ok = pend.chosen === q.answer, out = pend.out || {};
-      const head = ok ? (out.head ? `HEADSHOT! ${out.dmg} damage.` : `Hit! ${out.dmg} damage.`) + (o.dead ? ` ${esc(o.name)} is eliminated!` : "")
+      const head = ok ? (o.kind === "reading" ? (o.dead ? `Hit! That was the last bar: ${esc(o.name)} is eliminated!` : `Hit! One bar down, ${o.hp} to go.`) : (out.head ? `HEADSHOT! ${out.dmg} damage.` : `Hit! ${out.dmg} damage.`) + (o.dead ? ` ${esc(o.name)} is eliminated!` : ""))
         : out.bush ? `Miss! But you were hiding in a bush, so ${esc(o.name)} couldn’t find you. No damage.` : `Miss! ${esc(o.name)} shoots back: ${out.dmg} damage.`;
       const label = over ? "Eliminated ▶" : o.dead && o.boss ? "Victory Royale ▶" : pend.chest ? "Something’s glowing… ▶" : pend.threat ? `Watch ${esc(o.name)}! ▶` : o.dead ? "Back to the island ▶" : "Next shot ▶";
       h += `<div class="fb ${ok ? "good" : "miss"}"><h4>${head}</h4>${ok ? "" : `<p>The answer was <b>${LETTERS[q.answer]}</b>.</p>`}${q.explain}</div><div class="next"><button class="btn" id="next">${label}</button></div>`;
@@ -788,10 +819,13 @@ function battle(fx) {
       <p>To open it, answer one <b>${KIND[ch.kind].label.toLowerCase()}</b> question. Get it right for a Fortnite power-up. Get it wrong and the lock holds, but nothing else happens.</p>
       <div class="next"><button class="btn ghost" id="chestleave">Leave it</button> <button class="btn" id="chestopen">Open it ▶</button></div></div>`;
   } else if (mode === "chestq") {
-    h += `<div class="card chestcard" id="qcard" data-q="${qkey(ch.ref)}" data-seed="${ch.ref.seed !== undefined ? ch.ref.seed : ""}"><div class="qhead"><span>🎁 Chest · ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, ch.chosen)}`;
+    const won = ch.chosen !== null && ch.chosen === q.answer, lt = won ? LOOT.find(x => x.id === ch.loot) : null;
+    h += `<div class="card chestcard" id="qcard" data-q="${qkey(ch.ref)}" data-seed="${ch.ref.seed !== undefined ? ch.ref.seed : ""}">`;
+    if (won) h += `<div class="lootreveal" style="--rar:${lt.col}" id="loot" data-loot="${lt.id}"><div class="got">The chest bursts open! You got:</div>${pic(lt.img, "")}<span class="rarity">${lt.rar}</span><b class="nm">${lt.name}</b><div class="what">${ch.got || lt.what}</div></div>`;
+    h += `<div class="qhead"><span>🎁 Chest · ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, ch.chosen)}`;
     if (ch.chosen !== null) {
       const ok = ch.chosen === q.answer, l = LOOT.find(x => x.id === ch.loot);
-      h += ok ? `<div class="loot" style="--rar:${l.col}" id="loot" data-loot="${l.id}">${pic(l.img, "")}<div><small>${l.rar}</small><b>${l.name}</b>${l.what}${ch.note || ""}</div></div><div class="fb good"><h4>The chest bursts open!</h4>${q.explain}</div>`
+      h += ok ? `<div class="fb good"><h4>Right! That’s how the chest opened.</h4>${q.explain}</div>`
         : `<div class="fb miss"><h4>The lock holds. No loot this time.</h4><p>The answer was <b>${LETTERS[q.answer]}</b>.</p>${q.explain}</div>`;
       h += `<div class="next"><button class="btn" id="next">${o.dead ? (o.boss ? "Victory Royale ▶" : "Back to the island ▶") : "Back to the fight ▶"}</button></div>`;
     }
@@ -818,6 +852,7 @@ function battle(fx) {
     if (fx.hit === false && !fx.dmg && fx.bush) add("Hidden!", "onme safe");
     if (fx.heal) add("+" + fx.heal, "onfoe heal");
     if (fx.anim === "dance") add("Boogie!", "onfoe safe");
+    if (fx.loot) add("+ " + fx.loot + "!", "onme loot");
   }
   $("#back").onclick = () => { if (mode === "idle") home(); };
   const shoot = () => { if (!(mode === "idle" && !o.dead && M.hp > 0)) return; nextQ(o); battle(); const c = $("#qcard"); if (c && window.innerWidth < 821) c.scrollIntoView({ behavior: "smooth", block: "start" }); };
@@ -842,7 +877,7 @@ function answer(i) {
   let fx;
   if (ok) {
     M.hits++; M.streak++;
-    const head = M.streak % 3 === 0, dmg = gun().dmg * (head ? 2 : 1);
+    const rd = o.kind === "reading", head = !rd && M.streak % 3 === 0, dmg = rd ? 1 : gun().dmg * (head ? 2 : 1);   // reading: one bar for each right answer
     o.hp = Math.max(0, o.hp - dmg); fx = { hit: true, dmg, head }; beep(head ? SND.head : SND.hit);
     others(rnd(3));
     if (o.hp <= 0) foeDown(o);
@@ -872,7 +907,8 @@ function counter(c) {
     th.res = `You throw a Boogie Bomb. ${esc(o.name)} can’t stop dancing, so the move never happens!`;
   } else if (c === mv.counter) {
     th.good = true;
-    if (th.move === "heal") {
+    if (th.move === "heal" && o.kind === "reading") th.res = `You rush in and stop ${esc(o.name)} healing!`;   // a reading fight always needs every question
+    else if (th.move === "heal") {
       o.hp = Math.max(0, o.hp - RUSH_DMG); fx.hit = true; fx.dmg = RUSH_DMG;
       th.res = mv.good.replace("{n}", esc(o.name)).replace("{d}", RUSH_DMG);
       if (o.hp <= 0) foeDown(o);
@@ -880,7 +916,8 @@ function counter(c) {
     beep(SND.hit);
   } else {
     th.good = false;
-    if (th.move === "heal") { o.hp = Math.min(o.max, o.hp + FOE_HEAL); fx.heal = FOE_HEAL; th.res = `${mv.bad[c].replace("{n}", esc(o.name))} +${FOE_HEAL} health for ${esc(o.name)}.`; }
+    if (th.move === "heal" && o.kind === "reading") { o.hp++; o.max = Math.max(o.max, o.hp); fx.heal = 1; th.res = `${mv.bad[c].replace("{n}", esc(o.name))} ${esc(o.name)} gets a bar back: one more question to answer.`; }
+    else if (th.move === "heal") { o.hp = Math.min(o.max, o.hp + FOE_HEAL); fx.heal = FOE_HEAL; th.res = `${mv.bad[c].replace("{n}", esc(o.name))} +${FOE_HEAL} health for ${esc(o.name)}.`; }
     else { const d = STAGE[o.stage].slip; hurt(M, d); fx.hit = false; fx.dmg = d; th.res = `${mv.bad[c]} −${d} health.`; }
     beep(M.hp <= 0 ? SND.ko : SND.miss);
   }
@@ -895,17 +932,21 @@ function chestAnswer(i) {
   record(ch.ref, ok);
   ch.chosen = i;
   if (ok) {
-    const l = rollLoot(); ch.loot = l.id; ch.note = "";
+    const l = rollLoot(), h0 = M.hp, s0 = M.shield, c0 = S.coins;
+    ch.loot = l.id;
     if (["med", "shield", "boogie", "bush"].includes(l.id)) {
-      if (S.items[l.id] < CARRY) S.items[l.id]++;
-      else { S.coins += 20; S.stats.lootCoins += 20; ch.note = " You can’t carry any more, so you sell it for 20 coins."; }
-    } else if (l.id === "slurp") { M.hp = Math.min(MAXHP, M.hp + 25); M.shield = Math.min(MAXSH, M.shield + 25); }
-    else if (l.id === "chug") { M.hp = MAXHP; M.shield = MAXSH; }
-    else if (l.id === "gold") { S.coins += 60; S.stats.lootCoins += 60; }
+      if (S.items[l.id] < CARRY) { S.items[l.id]++; ch.got = `<b>You now have ${S.items[l.id]} ${S.items[l.id] === 1 ? HOLD[l.id][0] : HOLD[l.id][1]}.</b> ${HOLD[l.id][2]}`; ch.glow = l.id; }
+      else { S.coins += 20; S.stats.lootCoins += 20; ch.got = `You already carry ${CARRY}, the most you can hold, so you sell it: <b>coins ${c0} → ${S.coins}</b>.`; }
+    } else if (l.id === "gold") { S.coins += 60; S.stats.lootCoins += 60; ch.got = `<b>Coins ${c0} → ${S.coins}.</b> Spend them in the shop on the island.`; }
+    else {
+      if (l.id === "slurp") { M.hp = Math.min(MAXHP, M.hp + 25); M.shield = Math.min(MAXSH, M.shield + 25); } else { M.hp = MAXHP; M.shield = MAXSH; }
+      ch.got = `You drink it straight away: <b>health ${h0} → ${M.hp}</b> and <b>shield ${s0} → ${M.shield}</b>.${h0 === MAXHP && s0 === MAXSH ? " (You were already full.)" : ""}`;
+    }
     beep(SND.chest);
   } else beep(SND.miss);
   others(rnd(2));
-  battle();
+  battle(ok ? { loot: LOOT.find(x => x.id === ch.loot).name } : undefined);
+  const r = $("#loot") || $(".fb"); if (r) r.scrollIntoView({ block: "center" });
 }
 function next() {
   const M = S.match, o = M.opps[M.cur];

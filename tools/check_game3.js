@@ -161,6 +161,17 @@ const SOLVE = {
   },
   netopp: d => { const s = roll(d.cells); if (new Set(s).size !== 6) return "not a net"; const i = d.labels.indexOf(d.ask), o = { b: "t", t: "b", n: "s", s: "n", e: "w", w: "e" }[s[i]]; return d.labels[s.indexOf(o)]; },
   isnet: d => { const ok = d.list.map(c => new Set(roll(c)).size === 6); return ok.filter(Boolean).length === 1 ? ok.indexOf(true) : -1; },
+  /* third set (generators3.js) */
+  pyramid: d => brute(x => (d.a + x) + (x + d.c) === d.top),
+  clockadd: d => clock(d.start + d.N),
+  datesback: d => { const t = new Date(2027, d.mo, d.d); t.setDate(t.getDate() - d.N); return `${t.getDate()} ${t.toLocaleString("en-AU", { month: "long" })}`; },
+  share: d => { for (let k = 1; k < 100; k++) if ((d.a + d.b) * k === d.tot) return d.b * k; },
+  spinways: d => { let w = 0; for (let i = 1; i <= d.n; i++) for (let j = 1; j <= d.m; j++) if (i + j === d.X) w++; return w; },
+  meet: d => { const k = new Set([0]); d.meets.forEach(([x, y]) => { if (k.has(x) || k.has(y)) { k.add(x); k.add(y); } }); return k.size; },
+  robotwalk: d => { let vx = 0, vy = 1, x = 0, y = 0; for (const s of d.steps) { [vx, vy] = s.t === "right" ? [vy, -vx] : [-vy, vx]; x += vx * s.n; y += vy * s.n; }
+    const sq = n => `${Math.abs(n)} square${Math.abs(n) === 1 ? "" : "s"}`; const p = [y > 0 ? sq(y) + " north" : y < 0 ? sq(y) + " south" : "", x > 0 ? sq(x) + " east" : x < 0 ? sq(x) + " west" : ""].filter(Boolean);
+    return p.length ? p.join(" and ") + " of the start" : "Back where it started"; },
+  mirrorclock: d => { const t = 12 * 60 - (d.h * 60 + d.m), h = Math.floor(t / 60); return `${h}:${String(t % 60).padStart(2, "0")}`; },
   sessions: d => { let n = 0; for (let w = 1; w <= d.W; w++) for (let k = 0; k < d.d; k++) if (w !== 2) n++; return n - 1; },
 };
 /* is the picture drawn from the same numbers? (heights of columns, dots, symbols, liquid levels, table cells) */
@@ -181,6 +192,8 @@ const DRAWN = {
   stack: (d, s) => { const c = d.rows.flatMap((r, i) => r.flatMap((h, x) => Array.from({ length: h }, (_, z) => [x, d.rows.length - 1 - i, z]))); return (s.match(/class="face"/g) || []).length === vox(c).seen && (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.rows.flat().join(); },
   stairs: (d, s) => { const c = []; for (let x = 0; x < d.k; x++) for (let z = 0; z < d.k - x; z++) for (let y = 0; y < d.d; y++) c.push([x, y, z]); return (s.match(/class="face"/g) || []).length === vox(c).seen; },
   netopp: (d, s) => (s.match(/<rect/g) || []).length === 6 && d.labels.every(l => s.includes(`>${l}</text>`)),
+  pyramid: (d, s) => [d.a, d.c, d.top].every(v => s.includes(`>${v}</text>`)) && s.includes(">?</text>"),
+  mirrorclock: (d, s) => s.includes("seem to show " + d.h + ":" + String(d.m).padStart(2, "0")),
   tabletotal: (d, s) => (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.rows.flat().join(),
   droplow: (d, s) => (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.scores.flat().join(),
   totals2: (d, s) => (s.match(/<td>(\d+|\?)<\/td>/g) || []).map(x => /\?/.test(x) ? null : num(x)).join() === [...d.cells.flat(), ...d.colTotals].join(),
@@ -236,7 +249,7 @@ if (!/id="game3-practice" href="\.\.\/prac3\/index\.html\?admin=1"/.test(fs.read
 /* ---- 3. browser ---- */
 const answerOf = (key, seed) => key.startsWith("g:") ? C.GENS.find(g => g.id === key.slice(2)).make(rng(Number(seed))).answer : HAND[key].answer;
 const COUNTER = { shoot: "build", grenade: "jump", heal: "rush" };
-const R = { 1: 75, 2: 38, 3: 26, 4: 15 }, STAGE_HP = { 1: 50, 2: 70, 3: 85, 4: 140 }, MISS = { 1: 20, 2: 25, 3: 30, 4: 35 }, SLIP = { 1: 10, 2: 12, 3: 15, 4: 18 };
+const R = { 1: 75, 2: 38, 3: 26, 4: 15 }, STAGE_HP = { 1: 100, 2: 125, 3: 150, 4: 200 }, MISS = { 1: 15, 2: 20, 3: 25, 4: 30 }, SLIP = { 1: 10, 2: 12, 3: 15, 4: 18 };
 const landAt = (x, y) => { const gx = Math.floor(x / 2.5), gy = Math.floor(y / 2.5); return gx >= 0 && gy >= 0 && gx < 40 && gy < 40 && C.LAND[gy][gx] === "1"; };
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 const aliveOf = M => 1 + M.opps.filter(o => !o.dead).length + M.bots.filter(b => b.a).length;
@@ -279,9 +292,9 @@ function checkLayout(M, where, GAP) {
 
     /* take one shot from the idle battle screen; checks the damage, including headshots */
     const fire = async right => {
-      const before = await state(), o0 = before.match.opps[before.match.cur], gunDmg = { pistol: 25, shotgun: 35, minigun: 50 }[before.gun];
       await page.click("#shoot");
       await page.waitForSelector("#qcard .opt:not([disabled])");
+      const before = await state(), o0 = before.match.opps[before.match.cur], gunDmg = { pistol: 25, shotgun: 30, minigun: 35 }[before.gun];
       const { q, seed } = await page.$eval("#qcard", e => ({ q: e.dataset.q, seed: e.dataset.seed }));
       const ans = answerOf(q, seed), n = (await page.$$("#qcard .opt")).length;
       await overflow(q);
@@ -291,11 +304,11 @@ function checkLayout(M, where, GAP) {
       if (!(await page.$("#back[disabled]"))) bad(`${label}: you can walk away before pressing Next`);
       const after = await state(), o1 = after.match.opps[after.match.cur];
       if (right) {
-        const head = (before.match.streak + 1) % 3 === 0;
+        const rd = o0.kind === "reading", head = !rd && (before.match.streak + 1) % 3 === 0, want = rd ? 1 : gunDmg * (head ? 2 : 1);
         if (head) headshots++;
-        if (o1.hp !== Math.max(0, o0.hp - gunDmg * (head ? 2 : 1))) bad(`${label}: a ${head ? "headshot" : "hit"} should do ${gunDmg * (head ? 2 : 1)} damage (${o0.hp} → ${o1.hp})`);
+        if (o1.hp !== Math.max(0, o0.hp - want)) bad(`${label}: a ${rd ? "reading hit" : head ? "headshot" : "hit"} should do ${want} damage (${o0.hp} → ${o1.hp})`);
       } else {
-        const want = before.match.bush ? 0 : MISS[o0.stage], lost = before.match.hp + before.match.shield - after.match.hp - after.match.shield;
+        const want = before.match.bush ? 0 : Math.min(MISS[o0.stage], before.match.hp + before.match.shield), lost = before.match.hp + before.match.shield - after.match.hp - after.match.shield;
         if (lost !== want) bad(`${label}: a miss in circle ${o0.stage} should cost ${want}, not ${lost}`);
         if (after.match.streak !== 0) bad(`${label}: a miss should end the headshot streak`);
       }
@@ -320,6 +333,11 @@ function checkLayout(M, where, GAP) {
           if (wantLoot) {
             loot++;
             if (!(await page.$("#loot"))) bad(`${label}: a right chest answer gave no loot`);
+            else {
+              const lt = await page.$eval("#loot", e => e.textContent), inView = await page.$eval("#loot", e => { const r = e.getBoundingClientRect(); return r.top < window.innerHeight && r.bottom > 0; });
+              if (!/You got/.test(lt) || !/You now have|→|already carry/.test(lt)) bad(`${label}: the loot reveal should say what you got and what changed (${lt.slice(0, 120)})`);
+              if (!inView) bad(`${label}: the loot reveal is off the screen`);
+            }
             await shot("loot");
           } else if (await page.$("#loot")) bad(`${label}: a wrong chest answer gave loot`);
           continue;
@@ -333,17 +351,28 @@ function checkLayout(M, where, GAP) {
           const a = await state(), ao = a.match.opps[a.match.cur], lost = b.match.hp + b.match.shield - a.match.hp - a.match.shield;
           if (opt.wrong) {
             opt.wrong = false;
-            if (mv === "heal" ? ao.hp !== Math.min(bo.max, bo.hp + 20) : lost !== SLIP[bo.stage]) bad(`${label}: the wrong move against "${mv}" had the wrong effect`);
+            if (mv === "heal" ? ao.hp !== (bo.kind === "reading" ? bo.hp + 1 : Math.min(bo.max, bo.hp + 20)) : lost !== SLIP[bo.stage]) bad(`${label}: the wrong move against "${mv}" had the wrong effect`);
             await shot("wrongmove");
-          } else if (lost !== 0 || (mv === "heal" && ao.hp !== Math.max(0, bo.hp - 15))) bad(`${label}: the right move against "${mv}" had the wrong effect`);
+          } else if (lost !== 0 || (mv === "heal" && ao.hp !== (bo.kind === "reading" ? bo.hp : Math.max(0, bo.hp - 15)))) bad(`${label}: the right move against "${mv}" had the wrong effect`);
           continue;
         }
         break;
       }
     };
     const beat = async () => {
-      for (let n = 0; n < 15; n++) { if (await page.$("#island")) return; await fire(true); await settle(); }
-      bad(`${label}: an opponent took more than 15 shots`);
+      let shots = 0, rd = null;
+      for (let n = 0; n < 40; n++) {
+        if (await page.$("#island")) {
+          /* a reading opponent needs one right answer for every question on its passage (David, Nov 2026) */
+          if (rd && rd.fresh && shots !== rd.len) bad(`${label}: a reading fight took ${shots} right answers, not the ${rd.len} questions on its passage`);
+          return;
+        }
+        const o = await cur();
+        await fire(true); shots++;
+        if (shots === 1 && o.kind === "reading") { const o2 = await cur(); rd = { fresh: o.shots === 0, len: C.READING.find(p => p.id === o2.pid).questions.length }; }
+        await settle();
+      }
+      bad(`${label}: an opponent took more than 40 shots`);
     };
     const clearCircle = async () => {
       const s0 = (await state()).match.stage;
@@ -438,7 +467,7 @@ function checkLayout(M, where, GAP) {
     /* eliminated: wrong answers until health runs out; coins, guns and minutes earned are kept */
     const keep = st.coins;
     await page.click("#drop"); await page.click("#jump"); await page.click(".mk.foe.open");
-    for (let n = 0; n < 5; n++) { await fire(false); await page.click("#next"); }
+    for (let n = 0; n < 7; n++) { await fire(false); await page.click("#next"); }   // 7 misses of 15 knock out 100 health
     st = await state();
     if (st.match !== null || st.stats.kos !== 1 || st.coins !== keep || st.gun !== "shotgun") bad(`${label}: being eliminated should end the match and keep coins and guns`);
     if (!/Eliminated![\s\S]*#\d+ of 100/.test(await page.$eval("#result", e => e.textContent))) bad(`${label}: no eliminated card with a placing`);
