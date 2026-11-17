@@ -195,6 +195,69 @@
   details.parents input { font: inherit; width: 80px; padding: 4px 6px; }
   .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0 14px; }
   .legal { color: rgba(255,255,255,.78); font-size: 12.5px; line-height: 1.45; margin: 16px 4px 0; text-align: center; }
+
+  /* ---- battle royale: the bus, other players, the feed (Nov 2026 rebuild) ---- */
+  .island.pick { cursor: crosshair; }
+  .island .botdot { fill: #fff; stroke: #0d1330; stroke-width: 2.5; }
+  .island .drop { animation: drop 1.1s ease-out both; transform-box: fill-box; transform-origin: center; }
+  @keyframes drop { 0% { transform: translateY(-70px) scale(1.8); opacity: 0; } 60% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+  .island .kill { stroke: #ff4d4d; stroke-width: 4; stroke-linecap: round; fill: none; transform-box: fill-box; transform-origin: center; animation: killfade 2.6s ease-out forwards; }
+  @keyframes killfade { 0% { opacity: 0; transform: scale(2.2); } 15% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+  .island .stormanim { animation: storm 1.8s ease-in-out both; transform-box: view-box; }
+  @keyframes storm { from { transform: translate(var(--dx), var(--dy)) scale(var(--k)); } to { transform: none; } }
+  .feed { position: absolute; left: 8px; top: 8px; max-width: 66%; display: flex; flex-direction: column; gap: 3px; pointer-events: none; z-index: 3; }
+  .fe { background: rgba(13,19,48,.8); color: #fff; font-size: 12.5px; font-weight: 700; border-radius: 6px; padding: 2px 8px; line-height: 1.35; width: fit-content; max-width: 100%; }
+  .fe.me { background: rgba(255,178,26,.95); color: #2a2100; } .fe.storm { background: rgba(138,63,240,.92); } .fe.info { background: rgba(47,143,255,.9); }
+  .fe.new { animation: slidein .5s ease-out both; }
+  @keyframes slidein { from { transform: translateX(-30px); opacity: 0; } }
+  .alivepill { position: absolute; right: 8px; top: 8px; z-index: 3; background: rgba(13,19,48,.88); color: #fff; font: italic 900 18px "Arial Black", Impact, sans-serif; border-radius: 8px; padding: 2px 10px; border: 2px solid #fff; }
+  .flybus { position: absolute; top: 14%; left: -22%; width: 96px; z-index: 3; pointer-events: none; animation: fly 7s linear infinite; }
+  @keyframes fly { to { left: 104%; } }
+  .buspick { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 16px 18px; text-align: center; color: #fff; background: linear-gradient(0deg, rgba(13,19,48,.9), rgba(13,19,48,.55) 75%, transparent); z-index: 3; }
+  .buspick p { margin: 0 0 8px; font-weight: 700; text-shadow: 0 2px 0 var(--navy); }
+  .mk.me { pointer-events: none; z-index: 1; width: 52px; } .mk.me .pic { width: 40px; height: 40px; border-color: #fff; background: #ffb21a; box-shadow: 0 0 0 3px #ffb21a; }
+  .mk.me .nm { background: #ffb21a; color: #2a2100; }
+  @media (max-width: 520px) { .fe { font-size: 10.5px; padding: 1px 6px; } .feed { max-width: 72%; } .alivepill { font-size: 14px; } .flybus { width: 64px; } .mk.me { width: 40px; } .mk.me .pic { width: 30px; height: 30px; } .buspick { font-size: 15px; } }
+
+  /* ---- battle: moves, chests, headshots ---- */
+  .arena .afeed { position: absolute; left: 8px; bottom: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 2; max-width: 62%; pointer-events: none; }
+  .arena .afeed .fe { font-size: 11.5px; }
+  .pips { margin-top: 4px; } .pips i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.3); margin-right: 3px; vertical-align: -1px; } .pips i.on { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+  .wall { position: absolute; bottom: 8px; left: calc(6% + 120px); width: 84px; height: 130px; z-index: 2; animation: wallup .35s ease-out both; transform-origin: bottom; }
+  .wall svg { width: 100%; height: 100%; display: block; }
+  @keyframes wallup { from { transform: scaleY(0); } }
+  .fighter.me.jumping { animation: jump .9s ease-out; } @keyframes jump { 40% { transform: translateY(-80px) rotate(-8deg); } }
+  .fighter.me.rushing { animation: rush .8s ease-in-out; } @keyframes rush { 45% { transform: translateX(150px); } }
+  .fighter.foe.dancing img { animation: dance .5s ease-in-out 5; } @keyframes dance { 25% { transform: rotate(-14deg) translateY(-10px); } 75% { transform: rotate(14deg) translateY(-10px); } }
+  .boom { position: absolute; left: 8%; bottom: 30px; width: 150px; height: 150px; border-radius: 50%; z-index: 2; pointer-events: none;
+    background: radial-gradient(circle, #fff6c2 0, #ffd21a 30%, #ff7a1a 55%, rgba(255,90,31,0) 70%); animation: boom .9s ease-out .25s both; }
+  .boom.missed { bottom: 0; }
+  @keyframes boom { 0% { transform: scale(.15); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+  .tracer { position: absolute; height: 4px; top: 56%; left: 26%; right: 26%; z-index: 2; pointer-events: none; background: linear-gradient(90deg, rgba(255,232,26,0), #ffe81a); transform-origin: right; animation: tracer .3s linear 4 both; }
+  .tracer.t2 { top: 50%; animation-delay: .15s; }
+  @keyframes tracer { 0% { opacity: 1; transform: scaleX(0); } 100% { opacity: 0; transform: scaleX(1); } }
+  .bushhide { position: absolute; left: 4%; bottom: 0; width: 120px; z-index: 2; opacity: .92; pointer-events: none; }
+  .float.head { color: #ff4dd8; font-size: 30px; } .float.heal { color: #7dff6b; } .float.safe { color: #7dff6b; }
+  .threat { border: 4px solid #ff5a4d; }
+  .threat .cue { display: flex; gap: 12px; align-items: center; font-size: 20px; font-weight: 800; }
+  .threat .cue svg, .threat .cue .cuepic { width: 60px; height: 60px; flex: none; object-fit: contain; animation: pop .5s; }
+  .threat .sub { margin: 12px 0 0; font-weight: 700; color: var(--ink-soft); }
+  .counters { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 10px; }
+  .counter { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border: 3px solid var(--navy); border-bottom-width: 7px; border-radius: 12px; background: #fff;
+    font: italic 900 15px "Arial Black", Impact, sans-serif; text-transform: uppercase; color: var(--ink); }
+  .counter:hover { background: #fff8d6; } .counter:active { transform: translateY(2px); border-bottom-width: 5px; }
+  .counter svg, .counter img { width: 52px; height: 52px; object-fit: contain; }
+  .counter.boog { background: #f3e8ff; }
+  .chestcard { border: 4px solid #ffb21a; box-shadow: 0 0 26px rgba(255,178,26,.55); text-align: left; }
+  .chestcard .chestimg { width: 160px; display: block; margin: 4px auto 8px; animation: chestglow 1.6s ease-in-out infinite; }
+  .chestcard h3 { text-align: center; font-size: 24px; margin: 0 0 6px; }
+  @keyframes chestglow { 50% { filter: drop-shadow(0 0 18px #ffd21a); transform: translateY(-5px); } }
+  .loot { --rar: #888; display: flex; align-items: center; gap: 14px; border: 3px solid var(--navy); border-bottom-width: 7px; border-radius: 12px; padding: 10px 14px; margin-top: 14px; color: #fff;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--rar) 60%, #fff), color-mix(in srgb, var(--rar) 92%, #000)); animation: pop .6s; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
+  .loot img { width: 80px; height: 80px; object-fit: contain; flex: none; filter: drop-shadow(0 4px 0 rgba(0,0,0,.35)); }
+  .loot b { font: italic 900 22px "Arial Black", Impact, sans-serif; text-transform: uppercase; display: block; }
+  .loot small { text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+  @media (max-width: 520px) { .wall { left: calc(2% + 84px); width: 60px; height: 96px; } .boom { width: 110px; height: 110px; } .bushhide { width: 86px; } .threat .cue { font-size: 17px; } }
 </style>
 </head>
 <body>
@@ -214,22 +277,43 @@ const app = document.getElementById("app");
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+/* Epic's own pictures (see the notice at the foot of the page) */
+const gunPic = id => `<img class="gunpic" src="art/gun-${id}.webp" alt="">`;
+const pic = (name, cls = "ico") => `<img class="${cls}" src="art/${name}.webp" alt="">`;
+
 /* ---------- the game's numbers ---------- */
 const GUNS = [
   { id: "pistol", name: "Suppressed Pistol", rar: "Common", col: "#8a94a6", dmg: 25, cost: 0 },
   { id: "shotgun", name: "Tactical Shotgun", rar: "Rare", col: "#2f8fff", dmg: 35, cost: 250 },
   { id: "minigun", name: "Minigun", rar: "Legendary", col: "#ffb21a", dmg: 50, cost: 800 },
 ];
-const ITEMS = [
+const ITEMS = [   // sold in the shop
   { id: "med", name: "Med Kit", img: "medkit", col: "#3fae2a", cost: 30, what: "+50 health" },
   { id: "shield", name: "Shield Potion", img: "shieldpotion", col: "#2f8fff", cost: 40, what: "+50 shield" },
 ];
-const CARRY = 3, MAXHP = 100, MAXSH = 50, CAMP_HEAL = 40;
-/* storm circles: enemy health, the damage a miss costs, coins for a win, and the storm's radius (% of the map) */
-const STAGE = { 1: { hp: 60, dmg: 20, coins: 15, r: 80 }, 2: { hp: 75, dmg: 25, coins: 25, r: 37 }, 3: { hp: 90, dmg: 30, coins: 35, r: 25 }, 4: { hp: 150, dmg: 35, coins: 80, r: 13.5 } };
-const WIN_COINS = 50;
-const WIN_MIN = 8;                                   // Fortnite minutes for winning a match (the boss is beaten)
-const missBonus = m => m === 0 ? 7 : m <= 2 ? 5 : m <= 4 ? 3 : m <= 6 ? 1 : 0;   // extra minutes for few misses
+/* what can be in a chest; w = how often (out of 100) */
+const LOOT = [
+  { id: "med", name: "Med Kit", img: "medkit", rar: "Common", col: "#8a94a6", w: 28, what: "One more Med Kit to carry (+50 health when you use it)." },
+  { id: "shield", name: "Shield Potion", img: "shieldpotion", rar: "Uncommon", col: "#3fae2a", w: 24, what: "One more Shield Potion to carry (+50 shield when you use it)." },
+  { id: "slurp", name: "Slurp Juice", img: "slurp", rar: "Rare", col: "#2f8fff", w: 16, what: "Drunk at once: +25 health and +25 shield." },
+  { id: "bush", name: "Bush", img: "bush", rar: "Rare", col: "#2f8fff", w: 12, what: "Hide in it before a shot: if you miss, they can't find you, so no damage." },
+  { id: "boogie", name: "Boogie Bomb", img: "boogie", rar: "Epic", col: "#a34dff", w: 10, what: "Throw it when an opponent makes a move: they dance instead." },
+  { id: "gold", name: "Pot of Gold", img: "coins", rar: "Epic", col: "#a34dff", w: 6, what: "+60 coins." },
+  { id: "chug", name: "Chug Jug", img: "chugjug", rar: "Legendary", col: "#ffb21a", w: 4, what: "Drunk at once: full health and full shield." },
+];
+const CARRY = 3, MAXHP = 100, MAXSH = 50, SUPPLY_HEAL = 40, RUSH_DMG = 15, FOE_HEAL = 20;
+/* storm circles: opponent health, damage of a miss, damage of a wrong move, coins for an elimination,
+   Fortnite minutes for clearing the circle, and the circle's radius (% of the map) */
+const STAGE = {
+  1: { hp: 50, dmg: 20, slip: 10, coins: 15, min: 15, r: 75 },
+  2: { hp: 70, dmg: 25, slip: 12, coins: 25, min: 20, r: 38 },
+  3: { hp: 85, dmg: 30, slip: 15, coins: 35, min: 25, r: 26 },
+  4: { hp: 140, dmg: 35, slip: 18, coins: 80, min: 0, r: 15 },
+};
+const START = 100, WIN_COINS = 50;
+/* other players still standing when the storm closes after circle 1, 2, 3 (so 50, 20 and 2 players are left) */
+const BOTS_AFTER = { 1: 42, 2: 15, 3: 0 };
+const GAP = { 1: 17, 2: 16, 3: 14, 4: 14 };   // how far apart the opponents of a circle stand
 const KIND = {
   reading: { label: "Reading", icon: "📖", arena: "arena-forest", col: "#2e7d4f" },
   thinking: { label: "Thinking", icon: "🧩", arena: "arena-peaks", col: "#7a4bb5" },
@@ -245,23 +329,50 @@ const BOSSES = [["omega", "Omega"], ["blackknight", "Black Knight"], ["iceking",
 const SKINS = [["jonesy", "Jonesy", "#8a94a6", 0, "art/"], ["renegade", "Renegade Raider", "#2f8fff", 1, "art/"], ["britebomber", "Brite Bomber", "#2f8fff", 2, P2],
   ["fishstick", "Fishstick", "#2f8fff", 3, P2], ["peely", "Peely", "#a34dff", 5, P2], ["raptor", "Raptor", "#ffb21a", 7, "art/"], ["cuddle", "Cuddle Team Leader", "#ffb21a", 9, P2],
   ["drift", "Drift", "#ffb21a", 12, P2], ["crackshot", "Crackshot", "#ffb21a", 15, "art/"], ["midas", "Midas", "#ffb21a", 20, P2]];
-/* where things stand on the island (% of the map) */
-const SPOTS = { 1: [[20, 17], [75, 16], [82, 75]], 2: [[20, 58], [70, 33]], 3: [[33, 40], [69, 67]], 4: [[50, 45]] };
-const SHOP_AT = [41, 58.5], CAMP_AT = [59, 57.5], EYE = [50, 52];   // the storm closes on EYE
-const PLANS = [[["reading", "thinking"], ["maths", "thinking"]], [["thinking", "maths"], ["reading", "maths"]], [["reading", "maths"], ["thinking", "maths"]]];
-
-/* Epic's own pictures of the guns and items (see the notice at the foot of the page) */
-const gunPic = id => `<img class="gunpic" src="art/gun-${id}.webp" alt="">`;
-const pic = (name, cls = "ico") => `<img class="${cls}" src="art/${name}.webp" alt="">`;
+/* places on the map picture (% across, % down), for the feed's "landed at …" */
+const ZONES = [["the Volcano", 60, 50], ["the Desert", 45, 28], ["the Purple Lake", 38, 52], ["the West Castle", 16, 49], ["North Isle", 22, 16], ["Lighthouse Isle", 75, 15],
+  ["the Orange Cape", 78, 38], ["Harbour Isle", 82, 75], ["Palm Isle", 18, 75], ["South Town", 45, 68], ["the Ring Gardens", 55, 79]];
+/* the other players (official outfit names) */
+const BOT_NAMES = ["Peely", "Fishstick", "Raven", "Drift", "Brite Bomber", "Cuddle Team Leader", "Midas", "Aura", "Calamity", "Lace", "Skye", "Jules", "Kit", "Brutus", "Mancake",
+  "Hybrid", "Leviathan", "Bunny Brawler", "Funk Ops", "Elite Agent", "Rust Lord", "Battlehawk", "Zoey", "Tricera Ops", "Codename E.L.F.", "Sun Strider", "Wildcat", "Galaxy", "Catalyst",
+  "Ruckus", "Toona Fish", "Guff", "Penny", "Kymera", "The Scientist", "Agent Peely", "Bullseye", "Nog Ops", "Teknique", "Valor", "Whiplash", "Wukong", "Chomp Sr.", "Moisty Merman",
+  "Love Ranger", "Burnout", "Grill Sergeant", "Sgt. Winter", "Cozy Chomps", "Carbon Commando", "Vendetta", "Shadow Ops", "Snorkel Ops", "Beach Bomber", "Sushi Master"];
+const WEAPONS = ["with a Pump Shotgun", "with an Assault Rifle", "with a Sniper Rifle", "with an SMG", "with a grenade", "with a Tactical Shotgun", "with a pickaxe", "with a Minigun"];
+/* the opponent's moves after each hit, and the counter that beats each one */
+const MOVES = {
+  shoot: { counter: "build", says: ["{n} raises a rifle and takes aim at you.", "{n} lines up a shot.", "{n} peeks out and points a weapon your way.", "{n} steadies the scope on you."],
+    good: "Your wall soaks up every bullet. No damage!", bad: { jump: "You jump, but bullets are faster than you.", rush: "You charge straight into the shots." } },
+  grenade: { counter: "jump", says: ["{n} pulls the pin on a grenade!", "{n} winds up to throw something.", "Something round and heavy comes flying at you from {n}!", "{n} lobs an explosive towards you."],
+    good: "You jump clear just as it goes off. No damage!", bad: { build: "It sails over your wall and goes off behind it.", rush: "You run straight into the blast." } },
+  heal: { counter: "rush", says: ["{n} ducks behind a rock and opens a med kit.", "{n} turns away to drink a shield potion.", "{n} stops shooting and starts patching up.", "{n} hides to heal."],
+    good: "You catch {n} healing: {d} damage!", bad: { build: "You build while {n} heals up.", jump: "You jump about while {n} heals up." } },
+};
+const COUNTERS = [{ id: "build", name: "Build a wall" }, { id: "jump", name: "Jump clear" }, { id: "rush", name: "Rush in" }];
+/* our own simple icons for the three moves */
+const ICON = {
+  build: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="6" width="38" height="36" rx="3" fill="#c98a4b" stroke="#0d1330" stroke-width="3"/><path d="M5 18H43M5 30H43M17 6V18M31 18V30M17 30V42" stroke="#0d1330" stroke-width="2.5"/></svg>`,
+  jump: `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3L41 22H30V40H18V22H7Z" fill="#3fa7ff" stroke="#0d1330" stroke-width="3" stroke-linejoin="round"/><path d="M12 45H36" stroke="#0d1330" stroke-width="3"/></svg>`,
+  rush: `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M20 9L40 24L20 39V30H9V18H20Z" fill="#ff7a1a" stroke="#0d1330" stroke-width="3" stroke-linejoin="round"/><path d="M1 14H11M1 34H11M3 24H7" stroke="#0d1330" stroke-width="3"/></svg>`,
+  aim: `<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15" fill="none" stroke="#e5484d" stroke-width="4"/><circle cx="24" cy="24" r="3" fill="#e5484d"/><path d="M24 2V14M24 34V46M2 24H14M34 24H46" stroke="#e5484d" stroke-width="4"/></svg>`,
+};
+const CUEPIC = { shoot: ICON.aim, grenade: pic("grenade", "cuepic"), heal: pic("medkit", "cuepic") };
 
 /* ---------- saved progress ---------- */
 /* Practice mode: opened from the admin page (?admin=1 after the PIN). Everything is owned and nothing is saved. */
 const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
-const FRESH = () => ({ coins: 0, crowns: 0, guns: { pistol: 1 }, gun: "pistol", items: { med: 1, shield: 0 }, skin: "jonesy", q: {}, seq: 1, n: 0, match: null, last: null,
-  time: { cap: 30, days: {}, used: 0 }, stats: { wins: 0, kos: 0 }, sound: true });
+const FRESH = () => ({ coins: 0, crowns: 0, guns: { pistol: 1 }, gun: "pistol", items: { med: 1, shield: 0, boogie: 0, bush: 0 }, skin: "jonesy", q: {}, seq: 1, n: 0, match: null, last: null,
+  time: { cap: 60, capSet: false, days: {}, used: 0 }, stats: { wins: 0, kos: 0, elims: 0, lootCoins: 0 }, sound: true });
 function load() {
-  if (PRACTICE) { const s = FRESH(); s.coins = 5000; GUNS.forEach(g => s.guns[g.id] = 1); s.items = { med: 3, shield: 3 }; s.crowns = 20; return s; }
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.guns) { const f = FRESH(); return Object.assign(f, s, { time: Object.assign(f.time, s.time), stats: Object.assign(f.stats, s.stats) }); } } catch (e) {}
+  if (PRACTICE) { const s = FRESH(); s.coins = 5000; GUNS.forEach(g => s.guns[g.id] = 1); s.items = { med: 3, shield: 3, boogie: 3, bush: 3 }; s.crowns = 20; return s; }
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && s.guns) {
+      const f = FRESH(), out = Object.assign(f, s, { time: Object.assign(f.time, s.time), stats: Object.assign(f.stats, s.stats), items: Object.assign(f.items, s.items) });
+      if (!out.time.capSet) out.time.cap = 60;                       // the daily limit became 60 minutes (Nov 2026) unless a grown-up has chosen one
+      if (out.match && out.match.v !== 2) out.match = null;          // a match saved by the first version of the game can't continue
+      return out;
+    }
+  } catch (e) {}
   return FRESH();
 }
 let S = load();
@@ -289,7 +400,21 @@ function beep(notes) {
     }
   } catch (e) {}
 }
-const SND = { hit: [[660, .08], [990, .14]], miss: [[200, .16, "sawtooth"], [140, .22, "sawtooth"]], win: [[523, .12], [659, .12], [784, .12], [1047, .3]], ko: [[300, .2, "sawtooth"], [200, .2, "sawtooth"], [120, .4, "sawtooth"]], buy: [[880, .08], [1320, .12]] };
+const SND = { hit: [[660, .08], [990, .14]], head: [[880, .06], [1320, .06], [1760, .18]], miss: [[200, .16, "sawtooth"], [140, .22, "sawtooth"]], win: [[523, .12], [659, .12], [784, .12], [1047, .3]],
+  ko: [[300, .2, "sawtooth"], [200, .2, "sawtooth"], [120, .4, "sawtooth"]], buy: [[880, .08], [1320, .12]], chest: [[523, .08], [784, .08], [1047, .08], [1568, .22]], storm: [[220, .2, "triangle"], [180, .3, "triangle"]] };
+
+/* ---------- the map ---------- */
+const landAt = (x, y) => { const gx = Math.floor(x / 2.5), gy = Math.floor(y / 2.5); return gx >= 0 && gy >= 0 && gx < 40 && gy < 40 && LAND[gy][gx] === "1"; };
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+/* a random spot on land within r of c, at least gap from every point in avoid (null if there is none) */
+function landNear(c, r, avoid = [], gap = 0) {
+  for (let t = 0; t < 600; t++) {
+    const a = Math.random() * 2 * Math.PI, d = Math.sqrt(Math.random()) * r, p = [Math.round((c[0] + d * Math.cos(a)) * 10) / 10, Math.round((c[1] + d * Math.sin(a)) * 10) / 10];
+    if (p[0] > 4 && p[0] < 96 && p[1] > 4 && p[1] < 96 && landAt(p[0], p[1]) && avoid.every(q => dist(p, q) >= gap)) return p;
+  }
+  return null;
+}
+const zoneOf = p => ZONES.reduce((b, z) => dist(p, [z[1], z[2]]) < dist(p, [b[1], b[2]]) ? z : b)[0];
 
 /* ---------- questions ---------- */
 const HAND = {}, GEN = {}, PASS = {};
@@ -314,6 +439,7 @@ function pickQ(kind, tier, M) {
   c = shuffle(c).sort((a, b) => lastUsed(qkey(a)) - lastUsed(qkey(b)));
   const ref = c[0];
   if (ref.t === "g") ref.seed = rnd(2 ** 31);
+  M.asked.push(qkey(ref));
   return ref;
 }
 function pickPassage(tier, M, not) {
@@ -335,28 +461,101 @@ function nextQ(o) {
     o.pending = { ref: { t: "h", id }, chosen: null };
   } else {
     const kind = o.boss ? (o.shots % 2 ? "maths" : "thinking") : o.kind;
-    const ref = pickQ(kind, o.tier, M);
-    M.asked.push(qkey(ref));
-    o.pending = { ref, chosen: null };
+    o.lastKind = kind;
+    o.pending = { ref: pickQ(kind, o.tier, M), chosen: null };
   }
   o.shots++;
 }
+function record(ref, ok) {
+  const key = qkey(ref), rec = S.q[key] || (S.q[key] = { r: 0, w: 0, t: 0 });
+  if (ok) { rec.r++; rec.t = ++S.seq; } else { rec.w++; rec.t = 1; }
+}
+/* a chest always asks a different kind of question from the opponent's (thinking or maths: a reading question needs a whole passage) */
+const chestKind = o => o.boss ? (o.lastKind === "maths" ? "thinking" : "maths") : o.kind === "reading" ? (rnd(2) ? "thinking" : "maths") : o.kind === "thinking" ? "maths" : "thinking";
 
 /* ---------- matches ---------- */
-function newMatch() {
-  const n = S.n, opps = [];
-  const used = {};
-  const foe = kind => { const list = FOES[kind]; used[kind] = (used[kind] || 0) + 1; return list[(n + used[kind]) % list.length]; };
-  const add = (kind, stage, at) => { const [img, name] = foe(kind); opps.push({ kind, tier: stage, stage, img, name, x: at[0], y: at[1], hp: STAGE[stage].hp, max: STAGE[stage].hp, dead: false, shots: 0, pending: null, pid: null, queue: [] }); };
-  shuffle(["reading", "thinking", "maths"]).forEach((k, i) => add(k, 1, SPOTS[1][i]));
-  const plan = PLANS[n % PLANS.length];
-  [2, 3].forEach(st => shuffle(plan[st - 2]).forEach((k, i) => add(k, st, SPOTS[st][i])));
+function tryMatch() {
+  const n = S.n, used = {};
+  const foe = kind => { used[kind] = (used[kind] || 0) + 1; const list = FOES[kind]; return list[(n + used[kind]) % list.length]; };
+  const c = { 1: [50, 50] };
+  c[2] = landNear([50, 52], 12); if (!c[2]) return null;
+  c[3] = landNear(c[2], STAGE[2].r - STAGE[3].r - 3); if (!c[3]) return null;
+  c[4] = landNear(c[3], STAGE[3].r - STAGE[4].r - 3); if (!c[4]) return null;
+  const opps = [], supply = {};
+  for (const s of [1, 2, 3]) {
+    const pts = [];
+    for (const kind of shuffle(["reading", "thinking", "maths"])) {   // every circle has one opponent of each kind
+      const p = landNear(c[s], STAGE[s].r * (s === 1 ? 0.62 : 0.72), pts, GAP[s]); if (!p) return null;
+      pts.push(p);
+      const [img, name] = foe(kind);
+      opps.push({ kind, tier: s, stage: s, img, name, x: p[0], y: p[1], hp: STAGE[s].hp, max: STAGE[s].hp, dead: false, shots: 0, pending: null, pid: null, queue: [], threat: null });
+    }
+    supply[s] = landNear(c[s], STAGE[s].r * 0.72, pts, GAP[s]); if (!supply[s]) return null;
+  }
+  const bp = landNear(c[4], 4); if (!bp) return null;
+  supply[4] = landNear(c[4], STAGE[4].r * 0.95, [bp], GAP[4]); if (!supply[4]) return null;
   const [bimg, bname] = BOSSES[n % BOSSES.length];
-  opps.push({ kind: "thinking", boss: true, tier: 4, stage: 4, img: bimg, name: bname, x: SPOTS[4][0][0], y: SPOTS[4][0][1], hp: STAGE[4].hp, max: STAGE[4].hp, dead: false, shots: 0, pending: null });
-  return { stage: 1, hp: MAXHP, shield: 0, misses: 0, hits: 0, opps, asked: [], camp: 0, cur: null, note: "" };
+  opps.push({ kind: "thinking", boss: true, tier: 4, stage: 4, img: bimg, name: bname, x: bp[0], y: bp[1], hp: STAGE[4].hp, max: STAGE[4].hp, dead: false, shots: 0, pending: null, threat: null });
+  const taken = new Set(opps.map(o => o.name)), names = shuffle(BOT_NAMES.filter(x => !taken.has(x))), bots = [];
+  for (let i = 0; i < START - 1 - opps.length; i++) {
+    const z = ZONES[rnd(ZONES.length)], p = landNear([z[1], z[2]], 7) || landNear([50, 50], 40);
+    bots.push({ n: names[i % names.length], x: p[0], y: p[1], a: true, z: z[0] });
+  }
+  return { v: 2, phase: "bus", stage: 1, circles: c, hp: MAXHP, shield: 0, misses: 0, hits: 0, streak: 0, bush: false, sinceChest: 0, opps, bots, supply, supplyUsed: 0,
+    me: null, asked: [], cur: null, chest: null, feed: [], feedNew: 0, fx: { killed: [] }, note: "", earned: 0 };
+}
+function newMatch() { for (;;) { const M = tryMatch(); if (M) return M; } }
+const alive = M => 1 + M.opps.filter(o => !o.dead).length + M.bots.filter(b => b.a).length;
+function feed(t, c = "") { const M = S.match; M.feed.push({ t, c }); if (M.feed.length > 40) M.feed.shift(); M.feedNew++; }
+/* other players eliminating each other, keeping enough of them for the storm to catch */
+function others(k, floor) {
+  const M = S.match;
+  if (floor === undefined) floor = M.stage <= 3 ? BOTS_AFTER[M.stage] + 3 : 0;
+  let done = 0;
+  for (let i = 0; i < k; i++) {
+    const live = M.bots.filter(b => b.a);
+    if (live.length <= floor) break;
+    const v = live[rnd(live.length)];
+    const killers = [...live.filter(b => b !== v && b.n !== v.n).map(b => b.n), ...M.opps.filter(o => !o.dead).map(o => o.name)];
+    v.a = false; M.fx.killed.push([v.x, v.y]); done++;
+    feed(`${killers[rnd(killers.length)]} eliminated ${v.n} ${WEAPONS[rnd(WEAPONS.length)]}`);
+  }
+  return done;
+}
+function land(p) {
+  const M = S.match;
+  M.me = p; M.phase = "play"; M.fx.landing = true;
+  const counts = {}; M.bots.forEach(b => counts[b.z] = (counts[b.z] || 0) + 1);
+  Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 3).forEach(([z, k]) => feed(`${k} players dropped at ${z}`, "info"));
+  feed(`You landed at ${zoneOf(p)}`, "me");
+  others(4 + rnd(4));
+  beep(SND.buy);
 }
 function hurt(M, dmg) { const s = Math.min(M.shield, dmg); M.shield -= s; M.hp = Math.max(0, M.hp - (dmg - s)); }
 function addMinutes(min) { const d = today(), got = Math.max(0, Math.min(min, S.time.cap - earnedToday())); S.time.days[d] = earnedToday() + got; return got; }
+function closeStorm() {
+  const M = S.match, s = M.stage, nx = s + 1, c = M.circles[nx], r = STAGE[nx].r;
+  const got = addMinutes(STAGE[s].min); M.earned += got;
+  const live = M.bots.filter(b => b.a);
+  let need = live.length - BOTS_AFTER[s], storm = 0;
+  for (const b of shuffle(live.filter(b => dist([b.x, b.y], c) > r - 2))) { if (need <= 0) break; b.a = false; M.fx.killed.push([b.x, b.y]); need--; storm++; }
+  if (storm) feed(`${storm} player${storm > 1 ? "s were" : " was"} caught in the storm`, "storm");
+  if (need > 0) others(need, BOTS_AFTER[s]);
+  for (const b of M.bots.filter(b => b.a && dist([b.x, b.y], c) > r - 2)) { const p = landNear(c, r * 0.85) || c; b.x = p[0]; b.y = p[1]; }   // the rest rotate into the circle
+  if (M.me && dist(M.me, c) > r - 2) M.me = landNear(c, r * 0.6) || c;
+  M.fx.closing = { from: s, to: nx };
+  M.stage = nx;
+  feed(`The storm is closing. ${alive(M)} players left`, "storm");
+  M.note = `<b>Circle ${s} cleared!</b> +${got} minutes of Fortnite time${got < STAGE[s].min ? " (today’s limit is reached)" : ""}. ` +
+    (nx === 4 ? "The storm closes on the last circle: only the boss is left!" : `Circle ${nx}: tougher opponents and harder questions.`);
+  beep(SND.storm);
+}
+function foeDown(o) {
+  const M = S.match;
+  o.dead = true; o.hp = 0; S.coins += STAGE[o.stage].coins; S.stats.elims++;
+  feed(`You eliminated ${o.name}`, "me"); M.fx.killed.push([o.x, o.y]);
+  if (!o.boss && M.opps.every(x => x.dead || x.stage !== M.stage)) closeStorm();
+}
 
 /* ---------- drawing ---------- */
 const bar = (cls, v, max) => `<div class="bar ${cls}"><i style="width:${Math.max(0, 100 * v / max)}%"></i><span>${Math.round(v)}</span></div>`;
@@ -368,28 +567,38 @@ function timeCard() {
     <div class="pie" style="--p:${Math.min(100, 100 * e / cap)}"></div>
     <div class="txt"><div class="lab">FORTNITE TIME EARNED TODAY</div><div class="bigt">${mins(e)}</div>
       <div class="of">of today’s limit of ${mins(cap)}${e >= cap ? " · <b>Limit reached. More tomorrow!</b>" : ""}</div>
-      <div class="of">Ready to use: <b>${mins(balance())}</b></div></div>
+      <div class="of">Clear circles 1, 2 and 3 for 15 + 20 + 25 = 60 minutes. Ready to use: <b>${mins(balance())}</b></div></div>
     <img class="chest" src="${P2}chest${chestStage()}.webp" alt="Treasure chest"></div>`;
 }
 function topBar() {
   return `<div class="top"><h1>Storm <span>Island</span></h1><span class="spacer"></span>
-    <span class="pill" id="crowns"><img src="${P2}crown3d.webp" alt="Crowns"> ${S.crowns}</span><span class="pill" id="coins">${pic("coins")} ${S.coins}</span>
+    <span class="pill" id="crowns"><img src="${P2}crown3d.webp" alt="Crowns"> ${S.crowns}</span><button class="pill" id="coins" title="Shop">${pic("coins")} ${S.coins}</button>
     <button class="pill" id="snd" title="Sound">${S.sound ? "🔊" : "🔇"}</button></div>`;
 }
-function islandSvg(M) {
-  const r = M ? STAGE[M.stage].r * 6 : 480, cx = EYE[0] * 6, cy = EYE[1] * 6;
-  return `<img class="mapimg" src="art/island.webp" alt="A map of the island">
-    <svg viewBox="0 0 600 600" role="img" aria-label="The purple storm covers everything outside the circle.">
-    <defs><mask id="storm"><rect width="600" height="600" fill="#fff"/><circle id="stormhole" cx="${cx}" cy="${cy}" style="r:${r}px" fill="#000"/></mask></defs>
-    <rect width="600" height="600" fill="#7a2fe0" opacity=".66" mask="url(#storm)"/><circle cx="${cx}" cy="${cy}" style="r:${r}px" fill="none" stroke="#f0dcff" stroke-width="4" stroke-dasharray="10 8"/></svg>`;
+function feedHtml(M, n) {
+  const start = Math.max(0, M.feed.length - n), fresh = M.feed.length - M.feedNew;
+  return M.feed.slice(start).map((f, i) => { const k = start + i, isNew = k >= fresh; return `<div class="fe ${f.c}${isNew ? " new" : ""}"${isNew ? ` style="animation-delay:${((k - Math.max(fresh, start)) * 0.35).toFixed(2)}s"` : ""}>${esc(f.t)}</div>`; }).join("");
 }
-function marker(o, i, M) {
+function islandSvg(M) {
+  const s = M ? M.stage : 1, c = M ? M.circles[s] : [50, 50], r = STAGE[s].r, cx = c[0] * 6, cy = c[1] * 6;
+  let anim = "";
+  if (M && M.fx.closing) {
+    const f = M.fx.closing, c0 = M.circles[f.from];
+    anim = ` class="stormanim" style="--dx:${((c0[0] - c[0]) * 6).toFixed(1)}px;--dy:${((c0[1] - c[1]) * 6).toFixed(1)}px;--k:${(STAGE[f.from].r / r).toFixed(3)};transform-origin:${cx}px ${cy}px"`;
+  }
+  let g = `<defs><mask id="storm"><rect width="600" height="600" fill="#fff"/><circle${anim} cx="${cx}" cy="${cy}" r="${r * 6}" fill="#000"/></mask></defs>
+    <rect width="600" height="600" fill="#7a2fe0" opacity=".62" mask="url(#storm)"/><circle${anim} cx="${cx}" cy="${cy}" r="${r * 6}" fill="none" stroke="#f0dcff" stroke-width="4" stroke-dasharray="10 8"/>`;
+  if (M && M.phase === "play") {
+    M.bots.forEach((b, i) => { if (b.a) g += `<circle class="botdot${M.fx.landing ? " drop" : ""}" cx="${b.x * 6}" cy="${b.y * 6}" r="5"${M.fx.landing ? ` style="animation-delay:${((i * 37) % 100) / 40}s"` : ""}/>`; });
+    M.fx.killed.forEach(([x, y], i) => { g += `<g transform="translate(${x * 6} ${y * 6})"><path class="kill" style="animation-delay:${(i % 12) * 0.12}s" d="M-7-7L7 7M7-7L-7 7"/></g>`; });
+  }
+  return `<img class="mapimg" src="art/island.webp" alt="A map of the island"><svg viewBox="0 0 600 600" role="img" aria-label="The purple storm covers everything outside the circle. White dots are other players.">${g}</svg>`;
+}
+function marker(o, i) {
   const k = o.boss ? { label: "Boss", icon: "👑", col: "#7a1f3d" } : KIND[o.kind];
-  const state = o.dead ? "dead" : o.stage === M.stage ? "open" : "later";
-  return `<button class="mk foe ${state}${o.boss ? " boss" : ""}" data-o="${i}" style="left:${o.x}%;top:${o.y}%;--kind:${k.col}" ${state === "open" ? "" : "disabled"} aria-label="${esc(o.name)}, ${k.label}${o.dead ? ", defeated" : state === "later" ? ", circle " + o.stage : ""}">
+  return `<button class="mk foe ${o.dead ? "dead" : "open"}${o.boss ? " boss" : ""}" data-o="${i}" style="left:${o.x}%;top:${o.y}%;--kind:${k.col}" ${o.dead ? "disabled" : ""} aria-label="${esc(o.name)}, ${k.label}${o.dead ? ", eliminated" : ""}">
     <span class="pic"><img src="art/${o.img}.webp" alt=""><span class="tag">${o.dead ? "✖" : k.icon}</span></span>
-    <span class="nm">${o.dead ? esc(o.name) : state === "later" ? (o.boss ? "Boss" : "Circle " + o.stage) : esc(o.name)}</span>
-    ${state === "open" && o.hp < o.max ? `<span class="mhp"><i style="width:${100 * o.hp / o.max}%"></i></span>` : ""}</button>`;
+    <span class="nm">${esc(o.name)}</span>${!o.dead && o.hp < o.max ? `<span class="mhp"><i style="width:${100 * o.hp / o.max}%"></i></span>` : ""}</button>`;
 }
 
 /* ---------- the island (home) ---------- */
@@ -398,42 +607,64 @@ function home() {
   if (M) M.cur = null;
   const res = S.last; S.last = null;
   let h = topBar();
-  if (PRACTICE) h += `<div class="note" id="practice-note"><div class="txt"><b>Practice mode</b><br>You own every gun and nothing you do here is saved. The real game progress is not touched.${M ? `<br>Jump to: <button class="btn small ghost" data-jump="2">Circle 2</button> <button class="btn small ghost" data-jump="3">Circle 3</button> <button class="btn small ghost" data-jump="4">Boss</button>` : ""}</div><a class="btn" href="../pracadmin/index.html">← Admin page</a></div>`;
+  if (PRACTICE) h += `<div class="note" id="practice-note"><div class="txt"><b>Practice mode</b><br>You own every gun and nothing you do here is saved. The real game progress is not touched.${M && M.phase === "play" ? `<br>Jump to: <button class="btn small ghost" data-jump="2">Circle 2</button> <button class="btn small ghost" data-jump="3">Circle 3</button> <button class="btn small ghost" data-jump="4">Boss</button>` : ""}</div><a class="btn" href="../pracadmin/index.html">← Admin page</a></div>`;
   if (res) h += resultCard(res);
   h += timeCard();
   if (M && M.note) { h += `<div class="banner">${pic("storm")} <span>${M.note}</span></div>`; M.note = ""; }
-  if (M) {
+  if (M && M.phase === "play") {
     h += `<div class="me-strip"><img src="${skin()[4]}${skin()[0]}.webp" alt="" width="54" height="54" style="object-fit:contain">
       <div class="grow"><b>Storm circle ${M.stage} of 4</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}</div>
-      <div class="kit">${gunPic(S.gun)}<small>${gun().name}</small></div><div class="kit">${pic("medkit")} ×${S.items.med} ${pic("shieldpotion")} ×${S.items.shield}</div></div>`;
+      <div class="kit">${gunPic(S.gun)}<small>${gun().name}</small></div>
+      <div class="kit">${pic("medkit")} ×${S.items.med} ${pic("shieldpotion")} ×${S.items.shield}<br>${pic("boogie")} ×${S.items.boogie} ${pic("bush")} ×${S.items.bush}</div></div>`;
   }
-  h += `<div class="island" id="island">${islandSvg(M)}`;
-  if (M) {
-    h += M.opps.map((o, i) => marker(o, i, M)).join("");
-    h += `<button class="mk spot" id="shop" style="left:${SHOP_AT[0]}%;top:${SHOP_AT[1]}%"><span class="pic">${pic("coins", "")}</span><span class="nm">Shop</span></button>`;
-    h += `<button class="mk spot${M.camp >= M.stage ? " usedup" : ""}" id="camp" style="left:${CAMP_AT[0]}%;top:${CAMP_AT[1]}%" ${M.camp >= M.stage || M.hp >= MAXHP ? "disabled" : ""}><span class="pic">${pic("medkit", "")}</span><span class="nm">${M.camp >= M.stage ? "Supplies (used)" : "Supplies +" + CAMP_HEAL}</span></button>`;
+  h += `<div class="island${M && M.phase === "bus" ? " pick" : ""}" id="island">${islandSvg(M)}`;
+  if (!M) {
+    h += `<div class="dropin">${pic("battlebus", "bus")}<button class="btn" id="drop">Drop in ▶</button><p>${S.n ? "Match " + (S.n + 1) + ". " : ""}100 players, one island. Every shot is a question. Clear each storm circle by beating a reading, a thinking and a maths opponent, then face the boss.</p></div>`;
+  } else if (M.phase === "bus") {
+    h += `${pic("battlebus", "flybus")}<div class="alivepill" id="alive" data-n="100">100 left</div>
+      <div class="buspick"><p>You’re on the Battle Bus with 99 other players. <b>Tap the island where you want to land.</b></p><button class="btn" id="jump">Jump anywhere ▶</button></div>`;
   } else {
-    h += `<div class="dropin">${pic("battlebus", "bus")}<button class="btn" id="drop">Drop in ▶</button><p>${S.n ? "Match " + (S.n + 1) + ". " : ""}Beat every opponent as the storm closes in, then face the boss in the last circle.</p></div>`;
+    const st = M.stage;
+    M.opps.forEach((o, i) => { if (o.stage === st) h += marker(o, i); });
+    const sp = M.supply[st], used = M.supplyUsed >= st;
+    h += `<button class="mk spot${used ? " usedup" : ""}" id="supply" style="left:${sp[0]}%;top:${sp[1]}%" ${used || M.hp >= MAXHP ? "disabled" : ""}><span class="pic">${pic("llama", "")}</span><span class="nm">${used ? "Supply drop (used)" : "Supply drop +" + SUPPLY_HEAL}</span></button>`;
+    h += `<div class="mk me" style="left:${M.me[0]}%;top:${M.me[1]}%"><span class="pic"><img src="${skin()[4]}${skin()[0]}.webp" alt=""></span><span class="nm">You</span></div>`;
+    h += `<div class="feed" id="feed">${feedHtml(M, 4)}</div><div class="alivepill" id="alive" data-n="${alive(M)}">${alive(M)} left</div>`;
   }
   h += `</div>`;
-  h += M ? `<p class="legend">Tap a glowing opponent to fight. 📖 reading · 🧩 thinking · 🔢 maths. Beat everyone in the circle and the storm closes in.</p>`
-         : `<p class="legend">Every shot is a question. A right answer is a hit. A wrong answer is a miss, and they shoot back.</p>`;
-  h += shopHtml(false) + lockerHtml() + parentsHtml();
+  h += !M ? `<p class="legend">A right answer is a hit. A wrong answer is a miss, and they shoot back. After every hit they make a move: build, jump or rush to beat it.</p>`
+    : M.phase === "bus" ? `<p class="legend">The storm will close in four times. Beat one reading, one thinking and one maths opponent to clear each circle.</p>`
+    : `<p class="legend">Tap a glowing opponent to fight: 📖 reading · 🧩 thinking · 🔢 maths. Beat all three and the storm closes in.</p>`;
+  h += shopHtml() + lockerHtml() + parentsHtml();
   h += `<p class="legal">A private, non-commercial fan project. Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.</p>`;
   app.innerHTML = h;
+  if (M) { M.fx = { killed: [] }; M.feedNew = 0; }
   save();
   wireCommon();
   const on = (sel, fn) => { const e = $(sel); if (e) e.onclick = fn; };
-  on("#drop", () => { S.match = newMatch(); home(); window.scrollTo(0, 0); });
-  on("#shop", () => { $("#shopshelf").scrollIntoView({ behavior: "smooth" }); });
-  on("#camp", () => { M.camp = M.stage; M.hp = Math.min(MAXHP, M.hp + CAMP_HEAL); M.note = `You open the supply drop: +${CAMP_HEAL} health. A new one lands in the next circle.`; beep(SND.buy); home(); });
+  on("#drop", () => { S.match = newMatch(); home(); });
+  on("#jump", e => { e.stopPropagation(); land(landNear([50, 50], 40)); home(); });
+  if (M && M.phase === "bus") $("#island").onclick = e => {
+    if (e.target.closest("#jump")) return;
+    const r = $("#island").getBoundingClientRect(), p = [Math.round(1000 * (e.clientX - r.left) / r.width) / 10, Math.round(1000 * (e.clientY - r.top) / r.height) / 10];
+    land(landAt(p[0], p[1]) && p[0] > 4 && p[0] < 96 && p[1] > 4 && p[1] < 96 ? p : landNear(p, 12) || landNear([50, 50], 40));
+    home();
+  };
+  on("#supply", () => { M.supplyUsed = M.stage; M.hp = Math.min(MAXHP, M.hp + SUPPLY_HEAL); M.note = `You open the supply drop: +${SUPPLY_HEAL} health. A new one lands in the next circle.`; beep(SND.buy); home(); });
   app.querySelectorAll(".mk.foe.open").forEach(b => b.onclick = () => { M.cur = Number(b.dataset.o); battle(); window.scrollTo(0, 0); });
-  app.querySelectorAll("[data-jump]").forEach(b => b.onclick = () => { const st = Number(b.dataset.jump); M.opps.forEach(o => { if (o.stage < st) o.dead = true; }); M.stage = st; home(); });
+  app.querySelectorAll("[data-jump]").forEach(b => b.onclick = () => {
+    const st = Number(b.dataset.jump);
+    while (M.stage < st) { M.opps.forEach(o => { if (o.stage === M.stage) o.dead = true; }); closeStorm(); }
+    home();
+  });
   wireShop(home);
   app.querySelectorAll("[data-skin]").forEach(b => b.onclick = () => { S.skin = b.dataset.skin; home(); });
   wireParents();
 }
-function wireCommon() { const s = $("#snd"); if (s) s.onclick = () => { S.sound = !S.sound; save(); s.textContent = S.sound ? "🔊" : "🔇"; }; }
+function wireCommon() {
+  const s = $("#snd"); if (s) s.onclick = () => { S.sound = !S.sound; save(); s.textContent = S.sound ? "🔊" : "🔇"; };
+  const c = $("#coins"); if (c) c.onclick = () => { const sh = $("#shopshelf"); if (sh) sh.scrollIntoView({ behavior: "smooth" }); else if (S.match && S.match.cur !== null && !busy()) home(); };
+}
 
 function shopHtml() {
   const guns = GUNS.map(g => {
@@ -443,7 +674,7 @@ function shopHtml() {
   }).join("");
   const items = ITEMS.map(it => `<div class="tile" style="--rar:${it.col}">${pic(it.img, "itempic")}<b>${it.name}</b><span>${it.what} · you have ${S.items[it.id]}</span>
       <button class="btn small" data-item="${it.id}" ${S.coins < it.cost || S.items[it.id] >= CARRY ? "disabled" : ""}>${S.items[it.id] >= CARRY ? "Full" : it.cost + " coins"}</button></div>`).join("");
-  return `<div class="shelf" id="shopshelf"><h3>Shop</h3><p class="sub">You have <b>${S.coins} coins</b>. Win fights to earn coins. A better gun does more damage with every right answer. You can carry ${CARRY} of each item.</p><div class="tiles">${guns}${items}</div></div>`;
+  return `<div class="shelf" id="shopshelf"><h3>Shop</h3><p class="sub">You have <b>${S.coins} coins</b>. Eliminations earn coins. A better gun does more damage with every right answer. You can carry ${CARRY} of each item. Boogie Bombs and Bushes only come from chests.</p><div class="tiles">${guns}${items}</div></div>`;
 }
 function wireShop(again) {
   app.querySelectorAll("[data-buy]").forEach(b => b.onclick = () => { const g = GUNS.find(x => x.id === b.dataset.buy); if (S.coins >= g.cost) { S.coins -= g.cost; S.guns[g.id] = 1; S.gun = g.id; beep(SND.buy); again(); } });
@@ -451,18 +682,18 @@ function wireShop(again) {
   app.querySelectorAll("[data-item]").forEach(b => b.onclick = () => { const it = ITEMS.find(x => x.id === b.dataset.item); if (S.coins >= it.cost && S.items[it.id] < CARRY) { S.coins -= it.cost; S.items[it.id]++; beep(SND.buy); again(); } });
 }
 function lockerHtml() {
-  return `<div class="shelf"><h3>Locker</h3><p class="sub">Every match you win gives a crown. Crowns unlock outfits. Tap one you own to wear it.</p><div class="tiles">${SKINS.map(([img, name, col, need, dir]) => {
+  return `<div class="shelf"><h3>Locker</h3><p class="sub">Every Victory Royale gives a crown. Crowns unlock outfits. Tap one you own to wear it.</p><div class="tiles">${SKINS.map(([img, name, col, need, dir]) => {
     const own = S.crowns >= need;
     return `<${own ? "button" : "div"} class="tile skin${own ? "" : " off"}${S.skin === img ? " cur" : ""}" style="--rar:${col}" ${own ? `data-skin="${img}"` : ""}><img src="${dir}${img}.webp" alt=""><b>${name}</b><span>${own ? (S.skin === img ? "Wearing" : "Unlocked") : need + (need === 1 ? " crown" : " crowns")}</span></${own ? "button" : "div"}>`;
   }).join("")}</div></div>`;
 }
 function resultCard(r) {
-  if (r.ko) return `<div class="card result" id="result" style="margin-bottom:14px"><h2>Knocked out!</h2><p>The storm takes this match, but you keep your coins, your guns and your items.<br>Read the explanations, stock up at the shop, and drop in again.</p></div>`;
-  return `<div class="card result" id="result" style="margin-bottom:14px"><div class="big">${pic("victory", "vic")}<img src="${P2}crown3d.webp" alt="Crown"></div><h2>Victory crown!</h2>
-    <div class="rows"><span>Shots on target</span><b>${r.hits} of ${r.hits + r.misses}</b><span>Coins for the win</span><b>+${WIN_COINS}</b>
-    <span>Fortnite time for winning</span><b>${mins(WIN_MIN)}</b><span>Bonus for ${r.misses === 0 ? "no misses" : r.misses + (r.misses === 1 ? " miss" : " misses")}</span><b>${mins(missBonus(r.misses))}</b>
-    <span>Added today</span><b id="gained">${mins(r.got)}</b></div>
-    ${r.got < WIN_MIN + missBonus(r.misses) ? `<p>Today’s limit of ${mins(S.time.cap)} is reached, so the rest was not added. You can still play for coins and crowns.</p>` : ""}</div>`;
+  if (r.ko) return `<div class="card result" id="result" style="margin-bottom:14px"><h2>Eliminated!</h2><p>You finished <b>#${r.place}</b> of 100.</p>
+    <p>You keep your coins, guns and items${r.earned ? `, and the <b>${mins(r.earned)}</b> of Fortnite time you earned this match` : ""}. Read the explanations, stock up at the shop and drop in again.</p></div>`;
+  return `<div class="card result" id="result" style="margin-bottom:14px"><div class="big">${pic("victory", "vic")}<img src="${P2}crown3d.webp" alt="Crown"></div><h2>Victory Royale!</h2>
+    <div class="rows"><span>Opponents you eliminated</span><b>${r.elims}</b><span>Shots on target</span><b>${r.hits} of ${r.hits + r.misses}</b>
+    <span>Coins for the win</span><b>+${WIN_COINS}</b><span>Fortnite time from this match</span><b id="gained">${mins(r.earned)}</b></div>
+    ${r.earned < 60 ? `<p>Today’s limit of ${mins(S.time.cap)} stopped some of the time being added. You still win the crown and the coins.</p>` : ""}</div>`;
 }
 
 /* ---------- for grown-ups ---------- */
@@ -478,17 +709,17 @@ function parentsHtml() {
   }
   const rows = Object.keys(cats).sort().map(k => `<tr><td>${esc(k)}</td><td class="n">${cats[k].r}</td><td class="n">${cats[k].w}</td></tr>`).join("");
   return `<details class="parents" id="parents"><summary>For grown-ups: Fortnite time and progress</summary>
-    <p><b>Fortnite time.</b> Each match won earns ${WIN_MIN} minutes, plus up to 7 more for few misses (no misses 7, one or two 5, three or four 3, five or six 1). Earnings stop at the daily limit. Earned so far: ${mins(earnedAll())}. Recorded as used: ${mins(S.time.used)}. <b>Ready to use: <span id="bal">${mins(balance())}</span></b>.</p>
+    <p><b>Fortnite time.</b> Each storm circle cleared earns time: 15 minutes for circle 1, 20 for circle 2 and 25 for circle 3, so reaching the boss earns the full hour. Beating the boss earns a crown and coins, not more time. Earnings stop at the daily limit. Earned so far: ${mins(earnedAll())}. Recorded as used: ${mins(S.time.used)}. <b>Ready to use: <span id="bal">${mins(balance())}</span></b>.</p>
     <div class="row"><label for="cap">Daily limit (minutes):</label> <input id="cap" type="number" min="5" max="180" step="5" value="${S.time.cap}"> <button class="btn small ghost" id="capsave">Save</button></div>
     <div class="row">Record time used: ${[5, 10, 15, 30].map(m => `<button class="btn small ghost" data-used="${m}">${m} min</button>`).join(" ")} <button class="btn small ghost" data-used="all">All of it</button> <button class="btn small ghost" data-used="undo">Undo all</button></div>
-    <p>Matches won: ${S.stats.wins}. Knock-outs: ${S.stats.kos}. Every question gets one go and no hints; after each answer the explanation is shown.</p>
+    <p>Victory Royales: ${S.stats.wins}. Times eliminated: ${S.stats.kos}. Every question gets one go and no hints; after each answer the explanation is shown. Chests ask a thinking or maths question, never the same kind as the opponent.</p>
     ${rows ? `<table><tr><th>Question type</th><th class="n">Right</th><th class="n">Missed</th></tr>${rows}</table>` : `<p>No questions answered yet.</p>`}
     <p>Progress is saved only in this browser on this device.</p>
     <div class="row"><button class="btn small ghost" id="reset">Start the whole game again</button></div></details>`;
 }
 function wireParents() {
   const keep = () => { home(); $("#parents").open = true; };
-  $("#capsave").onclick = () => { const v = Math.round(Number($("#cap").value)); if (v >= 5 && v <= 180) { S.time.cap = v; keep(); } };
+  $("#capsave").onclick = () => { const v = Math.round(Number($("#cap").value)); if (v >= 5 && v <= 180) { S.time.cap = v; S.time.capSet = true; keep(); } };
   app.querySelectorAll("[data-used]").forEach(b => b.onclick = () => {
     const u = b.dataset.used;
     S.time.used = u === "undo" ? 0 : u === "all" ? earnedAll() : Math.min(earnedAll(), S.time.used + Number(u));
@@ -498,116 +729,232 @@ function wireParents() {
 }
 
 /* ---------- the battle ---------- */
+function busy() { const M = S.match, o = M && M.cur !== null ? M.opps[M.cur] : null; return !!(o && (o.pending || o.threat || M.chest)); }
 function passageHtml(o, q) {
   const p = PASS[o.pid];
   let html = p.html;
   if (q.gap) html = html.replace(`data-g="${q.gap}" class="gap"`, `data-g="${q.gap}" class="gap cur"`);
   return `<div class="card passage"><h3>${p.title}</h3><p class="pnote">${p.note}</p>${html}</div>`;
 }
+function optsHtml(q, chosen) {
+  const done = chosen !== null;
+  return `<div class="opts${q.visual ? " visual" : ""}">${q.options.map((op, i) => `<button class="opt${done ? (i === q.answer ? " right" : i === chosen ? " wrong" : " dim") : ""}" data-i="${i}" ${done ? "disabled" : ""}><span class="let">${LETTERS[i]}</span><span>${op}</span></button>`).join("")}</div>`;
+}
 function battle(fx) {
-  const M = S.match, o = M.opps[M.cur], st = STAGE[o.stage], k = o.boss ? { label: "Boss", icon: "👑", arena: ["arena-peaks", "arena-reef", "arena-forest"][S.n % 3], col: "#7a1f3d" } : KIND[o.kind];
-  const pend = o.pending, q = pend ? resolve(pend.ref) : null, done = pend && pend.chosen !== null;
-  const qk = q ? KIND[q.kind] : k;
-  document.documentElement.style.setProperty("--kind", qk.col);
-  const over = M.hp <= 0, won = o.dead;
-  let h = `<div class="playbar"><button class="pill" id="back" ${pend && !done ? "disabled title='Answer this shot first'" : ""}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="spacer" style="flex:1"></span>
-    <span class="pill" id="coins">${pic("coins")} ${S.coins}</span><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min today</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>
+  const M = S.match, o = M.opps[M.cur], st = STAGE[o.stage];
+  const k = o.boss ? { label: "Boss", icon: "👑", arena: ["arena-peaks", "arena-reef", "arena-forest"][S.n % 3], col: "#7a1f3d" } : KIND[o.kind];
+  const pend = o.pending, ch = !pend ? M.chest : null, th = !pend && !ch ? o.threat : null;
+  const mode = pend ? "q" : ch ? (ch.phase === "offer" ? "offer" : "chestq") : th ? "threat" : "idle";
+  const over = M.hp <= 0, idle = mode === "idle" && !o.dead && !over;
+  const q = mode === "q" ? resolve(pend.ref) : mode === "chestq" ? resolve(ch.ref) : null;
+  document.documentElement.style.setProperty("--kind", q ? KIND[q.kind].col : k.col);
+  const headReady = M.streak % 3 === 2;
+  let h = `<div class="playbar"><button class="pill" id="back" ${idle ? "" : "disabled title='Finish this first'"}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="pill" id="alive" data-n="${alive(M)}">👥 ${alive(M)} left</span><span class="spacer" style="flex:1"></span>
+    <button class="pill" id="coins">${pic("coins")} ${S.coins}</button><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>
   <div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
-    <div class="hud me"><b>You</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}</div>
+    <div class="hud me"><b>You${M.bush ? " 🌿" : ""}</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}<small class="pips" title="Every third right answer in a row is a headshot">${[0, 1, 2].map(i => `<i class="${i < M.streak % 3 ? "on" : ""}"></i>`).join("")} ${headReady ? "Headshot ready!" : "Headshot streak"}</small></div>
     <div class="hud foe"><b>${esc(o.name)}</b><small>${k.icon} ${o.boss ? "Boss · thinking and maths" : k.label + " opponent"}</small>${bar("ehp", o.hp, o.max)}</div>
-    <div class="fighter me${over ? " ko" : ""}" id="hero"><img src="${skin()[4]}${skin()[0]}.webp" alt="Your hero"></div>
-    <button class="fighter foe${won ? " ko" : ""}${!pend && !won && !over ? " aim" : ""}" id="enemy" ${pend || won || over ? "disabled" : ""} aria-label="Shoot at ${esc(o.name)}"><img src="art/${o.img}.webp" alt=""><span class="cross"></span></button>
+    <div class="fighter me${over ? " ko" : ""}${fx && fx.anim === "jump" ? " jumping" : ""}${fx && fx.anim === "rush" ? " rushing" : ""}" id="hero"><img src="${skin()[4]}${skin()[0]}.webp" alt="Your hero"></div>
+    ${M.bush ? `<img class="bushhide" src="art/bush.webp" alt="">` : ""}
+    ${fx && fx.anim === "build" ? `<div class="wall">${ICON.build}</div>` : ""}
+    <button class="fighter foe${o.dead ? " ko" : ""}${idle ? " aim" : ""}${fx && fx.anim === "dance" ? " dancing" : ""}" id="enemy" ${idle ? "" : "disabled"} aria-label="Shoot at ${esc(o.name)}"><img src="art/${o.img}.webp" alt=""><span class="cross"></span></button>
+    ${fx && fx.move === "shoot" && fx.anim !== "dance" ? `<div class="tracer"></div><div class="tracer t2"></div>` : ""}
+    ${fx && fx.move === "grenade" && fx.anim !== "dance" ? `<div class="boom${fx.anim === "jump" ? " missed" : ""}"></div>` : ""}
+    <div class="afeed">${feedHtml(M, 2)}</div>
   </div>
   <div class="actions">
-    <button class="act gun" id="shoot" style="--rar:${gun().col}" ${pend || won || over ? "disabled" : ""}>${gunPic(S.gun)}<span><b>${gun().name}</b><small>${gun().dmg} damage a hit</small></span><span class="go">Shoot</span></button>
+    <button class="act gun" id="shoot" style="--rar:${gun().col}" ${idle ? "" : "disabled"}>${gunPic(S.gun)}<span><b>${gun().name}</b><small>${gun().dmg} damage a hit${headReady ? " · next one ×2!" : ""}</small></span><span class="go">Shoot</span></button>
     <button class="act" id="usemed" style="--rar:#3fae2a" ${!S.items.med || M.hp >= MAXHP || over ? "disabled" : ""}>${pic("medkit")}<span><b>Med Kit ×${S.items.med}</b><small>+50 health</small></span></button>
     <button class="act" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
+    <button class="act" id="usebush" style="--rar:#3fae2a" ${!S.items.bush || M.bush || !idle ? "disabled" : ""}>${pic("bush")}<span><b>Bush ×${S.items.bush}</b><small>${M.bush ? "Hiding!" : "Hide: a miss costs nothing"}</small></span></button>
   </div>`;
-  const showPassage = q && q.kind === "reading";
-  h += `<div class="stage${showPassage ? " has-passage" : ""}">${showPassage ? passageHtml(o, q) : ""}<div class="card" id="qcard" data-q="${pend ? qkey(pend.ref) : ""}" data-seed="${pend && pend.ref.seed !== undefined ? pend.ref.seed : ""}">`;
-  if (!q) {
-    h += `<div class="aimhelp"><b>${esc(o.name)}</b> is in your sights.<br>Tap your gun or the enemy to take a shot. Every shot is a question.<br>
-      <small>A right answer hits for ${gun().dmg}. A wrong answer misses, and ${esc(o.name)} shoots back for ${st.dmg}.</small></div>`;
-  } else {
-    h += `<div class="qhead"><span>${qk.icon} ${qk.label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>
-      <div class="opts${q.visual ? " visual" : ""}">${q.options.map((op, i) => `<button class="opt${done ? (i === q.answer ? " right" : i === pend.chosen ? " wrong" : " dim") : ""}" data-i="${i}" ${done ? "disabled" : ""}><span class="let">${LETTERS[i]}</span><span>${op}</span></button>`).join("")}</div>`;
-    if (done) {
-      const ok = pend.chosen === q.answer;
-      h += `<div class="fb ${ok ? "good" : "miss"}"><h4>${ok ? `Hit! ${gun().dmg} damage.` : `Miss! ${esc(o.name)} shoots back: ${st.dmg} damage.`}</h4>${ok ? "" : `<p>The answer was <b>${LETTERS[q.answer]}</b>.</p>`}${q.explain}</div>
-        <div class="next"><button class="btn" id="next">${over ? "Knocked out…" : won ? (o.boss ? "Claim your crown ▶" : `${esc(o.name)} is out! Back to the island ▶`) : "Next shot ▶"}</button></div>`;
+  const showPassage = mode === "q" && q.kind === "reading";
+  h += `<div class="stage${showPassage ? " has-passage" : ""}">${showPassage ? passageHtml(o, q) : ""}`;
+  if (mode === "idle") {
+    h += `<div class="card" id="qcard" data-q="" data-seed=""><div class="aimhelp"><b>${esc(o.name)}</b> is in your sights.<br>Tap your gun or the enemy to take a shot. Every shot is a question.<br>
+      <small>A right answer hits for ${gun().dmg}${headReady ? " (a headshot: double!)" : ""}. A wrong answer misses, and ${esc(o.name)} shoots back for ${st.dmg}.</small></div></div>`;
+  } else if (mode === "q") {
+    h += `<div class="card" id="qcard" data-q="${qkey(pend.ref)}" data-seed="${pend.ref.seed !== undefined ? pend.ref.seed : ""}"><div class="qhead"><span>${KIND[q.kind].icon} ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, pend.chosen)}`;
+    if (pend.chosen !== null) {
+      const ok = pend.chosen === q.answer, out = pend.out || {};
+      const head = ok ? (out.head ? `HEADSHOT! ${out.dmg} damage.` : `Hit! ${out.dmg} damage.`) + (o.dead ? ` ${esc(o.name)} is eliminated!` : "")
+        : out.bush ? `Miss! But you were hiding in a bush, so ${esc(o.name)} couldn’t find you. No damage.` : `Miss! ${esc(o.name)} shoots back: ${out.dmg} damage.`;
+      const label = over ? "Eliminated ▶" : o.dead && o.boss ? "Victory Royale ▶" : pend.chest ? "Something’s glowing… ▶" : pend.threat ? `Watch ${esc(o.name)}! ▶` : o.dead ? "Back to the island ▶" : "Next shot ▶";
+      h += `<div class="fb ${ok ? "good" : "miss"}"><h4>${head}</h4>${ok ? "" : `<p>The answer was <b>${LETTERS[q.answer]}</b>.</p>`}${q.explain}</div><div class="next"><button class="btn" id="next">${label}</button></div>`;
     }
+    h += `</div>`;
+  } else if (mode === "offer") {
+    h += `<div class="card chestcard" id="chest"><img class="chestimg" src="art/chest.webp" alt="A treasure chest"><h3 class="caps">You found a chest!</h3>
+      <p>To open it, answer one <b>${KIND[ch.kind].label.toLowerCase()}</b> question. Get it right for a Fortnite power-up. Get it wrong and the lock holds, but nothing else happens.</p>
+      <div class="next"><button class="btn ghost" id="chestleave">Leave it</button> <button class="btn" id="chestopen">Open it ▶</button></div></div>`;
+  } else if (mode === "chestq") {
+    h += `<div class="card chestcard" id="qcard" data-q="${qkey(ch.ref)}" data-seed="${ch.ref.seed !== undefined ? ch.ref.seed : ""}"><div class="qhead"><span>🎁 Chest · ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, ch.chosen)}`;
+    if (ch.chosen !== null) {
+      const ok = ch.chosen === q.answer, l = LOOT.find(x => x.id === ch.loot);
+      h += ok ? `<div class="loot" style="--rar:${l.col}" id="loot" data-loot="${l.id}">${pic(l.img, "")}<div><small>${l.rar}</small><b>${l.name}</b>${l.what}${ch.note || ""}</div></div><div class="fb good"><h4>The chest bursts open!</h4>${q.explain}</div>`
+        : `<div class="fb miss"><h4>The lock holds. No loot this time.</h4><p>The answer was <b>${LETTERS[q.answer]}</b>.</p>${q.explain}</div>`;
+      h += `<div class="next"><button class="btn" id="next">${o.dead ? (o.boss ? "Victory Royale ▶" : "Back to the island ▶") : "Back to the fight ▶"}</button></div>`;
+    }
+    h += `</div>`;
+  } else if (mode === "threat") {
+    h += `<div class="card threat" id="threat" data-move="${th.move}"><div class="cue">${CUEPIC[th.move]}<span>${esc(th.text)}</span></div>`;
+    if (!th.chosen) {
+      h += `<p class="sub">What do you do?</p><div class="counters">${COUNTERS.map(({ id, name }) => `<button class="counter" data-counter="${id}">${ICON[id]}<span>${name}</span></button>`).join("")}${S.items.boogie ? `<button class="counter boog" data-counter="boogie">${pic("boogie", "")}<span>Boogie Bomb ×${S.items.boogie}</span></button>` : ""}</div>`;
+    } else {
+      h += `<div class="fb ${th.good ? "good" : "miss"}"><h4>${th.good ? "Nice move!" : "Ouch!"}</h4><p>${th.res}</p>${th.good ? "" : `<p class="why-not">Tip: build a wall against shots, jump clear of grenades, and rush in when they stop to heal.</p>`}</div>
+        <div class="next"><button class="btn" id="next">${over ? "Eliminated ▶" : o.dead ? (o.boss ? "Victory Royale ▶" : `${esc(o.name)} is eliminated! Back to the island ▶`) : "Shoot again ▶"}</button></div>`;
+    }
+    h += `</div>`;
   }
-  h += `</div></div>`;
+  h += `</div>`;
   app.innerHTML = h;
+  M.fx = { killed: [] }; M.feedNew = 0;
   save();
   wireCommon();
   if (fx) {
-    const f = document.createElement("div"); f.className = "float " + (fx.hit ? "onfoe" : "onme"); f.textContent = fx.hit ? "−" + fx.dmg : "MISS! −" + fx.dmg; $(".arena").appendChild(f);
-    $(fx.hit ? "#enemy" : "#hero").classList.add("hit");
+    const add = (txt, cls) => { const f = document.createElement("div"); f.className = "float " + cls; f.textContent = txt; $(".arena").appendChild(f); };
+    if (fx.hit) { add((fx.head ? "HEADSHOT! −" : "−") + fx.dmg, "onfoe" + (fx.head ? " head" : "")); $("#enemy").classList.add("hit"); }
+    if (fx.hit === false && fx.dmg) { add((fx.miss ? "MISS! −" : "−") + fx.dmg, "onme"); $("#hero").classList.add("hit"); }
+    if (fx.hit === false && !fx.dmg && fx.bush) add("Hidden!", "onme safe");
+    if (fx.heal) add("+" + fx.heal, "onfoe heal");
+    if (fx.anim === "dance") add("Boogie!", "onfoe safe");
   }
-  $("#back").onclick = () => { if (!(pend && !done)) home(); };
-  const shoot = () => { if (o.pending || o.dead || M.hp <= 0) return; nextQ(o); battle(); const c = $("#qcard"); if (c && window.innerWidth < 821) c.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  $("#back").onclick = () => { if (mode === "idle") home(); };
+  const shoot = () => { if (!(mode === "idle" && !o.dead && M.hp > 0)) return; nextQ(o); battle(); const c = $("#qcard"); if (c && window.innerWidth < 821) c.scrollIntoView({ behavior: "smooth", block: "start" }); };
   $("#shoot").onclick = shoot; $("#enemy").onclick = shoot;
-  $("#usemed").onclick = () => { if (S.items.med && M.hp < MAXHP) { S.items.med--; M.hp = Math.min(MAXHP, M.hp + 50); beep(SND.buy); battle(); } };
-  $("#useshield").onclick = () => { if (S.items.shield && M.shield < MAXSH) { S.items.shield--; M.shield = Math.min(MAXSH, M.shield + 50); beep(SND.buy); battle(); } };
-  app.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(Number(b.dataset.i)));
-  const nx = $("#next");
-  if (nx) nx.onclick = () => {
-    o.pending = null;
-    if (M.hp <= 0) return knockedOut();
-    if (o.dead) return o.boss ? victory() : home(window.scrollTo(0, 0));
-    nextQ(o); battle(); window.scrollTo(0, 0);
-  };
+  $("#usemed").onclick = () => { if (S.items.med && M.hp < MAXHP && M.hp > 0) { S.items.med--; M.hp = Math.min(MAXHP, M.hp + 50); beep(SND.buy); battle(); } };
+  $("#useshield").onclick = () => { if (S.items.shield && M.shield < MAXSH && M.hp > 0) { S.items.shield--; M.shield = Math.min(MAXSH, M.shield + 50); beep(SND.buy); battle(); } };
+  $("#usebush").onclick = () => { if (S.items.bush && !M.bush && mode === "idle") { S.items.bush--; M.bush = true; beep(SND.buy); battle(); } };
+  if (mode === "q") app.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(Number(b.dataset.i)));
+  if (mode === "chestq") app.querySelectorAll(".opt").forEach(b => b.onclick = () => chestAnswer(Number(b.dataset.i)));
+  app.querySelectorAll("[data-counter]").forEach(b => b.onclick = () => counter(b.dataset.counter));
+  const on = (sel, fn) => { const e = $(sel); if (e) e.onclick = fn; };
+  on("#chestopen", () => { M.chest.phase = "q"; M.chest.ref = pickQ(M.chest.kind, Math.min(M.stage, 4), M); M.chest.chosen = null; beep(SND.chest); battle(); });
+  on("#chestleave", () => { M.chest = null; proceed(); });
+  on("#next", next);
 }
 function answer(i) {
   const M = S.match, o = M.opps[M.cur], pend = o.pending;
   if (!pend || pend.chosen !== null) return;
-  const q = resolve(pend.ref), key = qkey(pend.ref), rec = S.q[key] || (S.q[key] = { r: 0, w: 0, t: 0 });
+  const q = resolve(pend.ref), ok = i === q.answer;
+  record(pend.ref, ok);
   pend.chosen = i;
   let fx;
-  if (i === q.answer) {
-    rec.r++; rec.t = ++S.seq; M.hits++;
-    o.hp = Math.max(0, o.hp - gun().dmg);
-    fx = { hit: true, dmg: gun().dmg }; beep(SND.hit);
-    if (o.hp <= 0) {
-      o.dead = true; S.coins += STAGE[o.stage].coins;
-      if (!o.boss && M.opps.every(x => x.dead || x.stage !== M.stage)) {
-        M.stage++;
-        M.note = M.stage === 4 ? "The storm closes to the last circle. Only the boss is left!" : `The storm is closing! Circle ${M.stage}: tougher opponents, harder questions.`;
-      }
-    }
+  if (ok) {
+    M.hits++; M.streak++;
+    const head = M.streak % 3 === 0, dmg = gun().dmg * (head ? 2 : 1);
+    o.hp = Math.max(0, o.hp - dmg); fx = { hit: true, dmg, head }; beep(head ? SND.head : SND.hit);
+    others(rnd(3));
+    if (o.hp <= 0) foeDown(o);
+    M.sinceChest++;
+    pend.chest = !(o.dead && o.boss) && Math.random() < Math.min(1, 0.12 * M.sinceChest);   // more likely the longer it has been since the last chest
+    if (pend.chest) M.sinceChest = 0;
+    if (!o.dead) { const mv = ["shoot", "grenade", "heal"][rnd(3)], says = MOVES[mv].says; pend.threat = { move: mv, text: says[rnd(says.length)].replace("{n}", o.name), chosen: null }; }
   } else {
-    rec.w++; rec.t = 1; M.misses++;
-    hurt(M, STAGE[o.stage].dmg);
-    fx = { hit: false, dmg: STAGE[o.stage].dmg }; beep(M.hp <= 0 ? SND.ko : SND.miss);
+    M.misses++; M.streak = 0;
+    if (M.bush) { M.bush = false; fx = { hit: false, dmg: 0, bush: true, miss: true }; }
+    else { hurt(M, STAGE[o.stage].dmg); fx = { hit: false, dmg: STAGE[o.stage].dmg, miss: true }; }
+    others(rnd(2));
+    beep(M.hp <= 0 ? SND.ko : SND.miss);
   }
+  pend.out = { dmg: fx.dmg, head: fx.head, bush: fx.bush };
   battle(fx);
   const fb = $(".fb"); if (fb && window.innerWidth < 821) fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
+function counter(c) {
+  const M = S.match, o = M.opps[M.cur], th = o.threat;
+  if (!th || th.chosen) return;
+  if (c === "boogie" && !S.items.boogie) return;
+  th.chosen = c;
+  const mv = MOVES[th.move], fx = { anim: c, move: th.move };
+  if (c === "boogie") {
+    S.items.boogie--; th.good = true; fx.anim = "dance";
+    th.res = `You throw a Boogie Bomb. ${esc(o.name)} can’t stop dancing, so the move never happens!`;
+  } else if (c === mv.counter) {
+    th.good = true;
+    if (th.move === "heal") {
+      o.hp = Math.max(0, o.hp - RUSH_DMG); fx.hit = true; fx.dmg = RUSH_DMG;
+      th.res = mv.good.replace("{n}", esc(o.name)).replace("{d}", RUSH_DMG);
+      if (o.hp <= 0) foeDown(o);
+    } else th.res = mv.good;
+    beep(SND.hit);
+  } else {
+    th.good = false;
+    if (th.move === "heal") { o.hp = Math.min(o.max, o.hp + FOE_HEAL); fx.heal = FOE_HEAL; th.res = `${mv.bad[c].replace("{n}", esc(o.name))} +${FOE_HEAL} health for ${esc(o.name)}.`; }
+    else { const d = STAGE[o.stage].slip; hurt(M, d); fx.hit = false; fx.dmg = d; th.res = `${mv.bad[c]} −${d} health.`; }
+    beep(M.hp <= 0 ? SND.ko : SND.miss);
+  }
+  others(rnd(2));
+  battle(fx);
+}
+function rollLoot() { let r = rnd(100); for (const l of LOOT) { if (r < l.w) return l; r -= l.w; } return LOOT[0]; }
+function chestAnswer(i) {
+  const M = S.match, ch = M.chest;
+  if (!ch || ch.chosen !== null) return;
+  const q = resolve(ch.ref), ok = i === q.answer;
+  record(ch.ref, ok);
+  ch.chosen = i;
+  if (ok) {
+    const l = rollLoot(); ch.loot = l.id; ch.note = "";
+    if (["med", "shield", "boogie", "bush"].includes(l.id)) {
+      if (S.items[l.id] < CARRY) S.items[l.id]++;
+      else { S.coins += 20; S.stats.lootCoins += 20; ch.note = " You can’t carry any more, so you sell it for 20 coins."; }
+    } else if (l.id === "slurp") { M.hp = Math.min(MAXHP, M.hp + 25); M.shield = Math.min(MAXSH, M.shield + 25); }
+    else if (l.id === "chug") { M.hp = MAXHP; M.shield = MAXSH; }
+    else if (l.id === "gold") { S.coins += 60; S.stats.lootCoins += 60; }
+    beep(SND.chest);
+  } else beep(SND.miss);
+  others(rnd(2));
+  battle();
+}
+function next() {
+  const M = S.match, o = M.opps[M.cur];
+  if (o.pending && o.pending.chosen !== null) {
+    const p = o.pending; o.pending = null;
+    if (M.hp <= 0) return knockedOut();
+    if (p.chest) M.chest = { phase: "offer", kind: chestKind(o) };
+    if (p.threat) o.threat = p.threat;
+  } else if (M.chest && M.chest.phase === "q" && M.chest.chosen !== null) M.chest = null;
+  else if (o.threat && o.threat.chosen) { o.threat = null; if (M.hp <= 0) return knockedOut(); }
+  proceed();
+}
+function proceed() {
+  const M = S.match, o = M.opps[M.cur];
+  window.scrollTo(0, 0);
+  if (M.chest || o.threat || !o.dead) return battle();
+  if (o.boss) return victory();
+  home();
+}
 function victory() {
-  const M = S.match, want = WIN_MIN + missBonus(M.misses);
+  const M = S.match;
   S.coins += WIN_COINS; S.crowns++; S.stats.wins++; S.n++;
-  S.last = { hits: M.hits, misses: M.misses, got: addMinutes(want) };
+  S.last = { win: true, hits: M.hits, misses: M.misses, earned: M.earned, elims: M.opps.filter(o => o.dead).length };
   S.match = null; beep(SND.win);
   home(); window.scrollTo(0, 0);
 }
 function knockedOut() {
-  S.stats.kos++; S.match = null; S.last = { ko: true };
+  const M = S.match;
+  S.stats.kos++; S.last = { ko: true, place: alive(M), earned: M.earned }; S.match = null;
   home(); window.scrollTo(0, 0);
 }
 
-/* In practice mode only: show any one question in a battle (used by tools/check_game3.js to look at every question). */
-if (PRACTICE) window.__preview = ref => {
-  if (!S.match) S.match = newMatch();
-  const M = S.match, q = resolve(ref), o = M.opps.find(x => !x.boss && x.kind === q.kind);
-  M.opps.forEach(x => { x.dead = false; x.hp = x.max; x.pending = null; }); M.hp = MAXHP; M.cur = M.opps.indexOf(o);
-  if (q.kind === "reading") { o.pid = q.pid; o.queue = []; }
-  o.pending = { ref, chosen: null };
-  battle();
-};
+/* In practice mode only: show any one question in a battle, and the match maker (used by tools/check_game3.js). */
+if (PRACTICE) {
+  window.__preview = ref => {
+    if (!S.match) S.match = newMatch();
+    const M = S.match;
+    if (M.phase === "bus") land(landNear([50, 50], 40));
+    const q = resolve(ref), o = M.opps.find(x => !x.boss && x.kind === q.kind);
+    M.opps.forEach(x => { x.dead = false; x.hp = x.max; x.pending = null; x.threat = null; }); M.chest = null; M.hp = MAXHP; M.cur = M.opps.indexOf(o);
+    if (q.kind === "reading") { o.pid = q.pid; o.queue = []; }
+    o.pending = { ref, chosen: null };
+    battle();
+  };
+  window.__debug = { newMatch, landAt, STAGE, BOTS_AFTER, START, GAP, state: () => S };
+}
 
 /* ---------- start ---------- */
-if (S.match && S.match.cur !== null && S.match.opps[S.match.cur] && !S.match.opps[S.match.cur].dead && S.match.opps[S.match.cur].pending) battle(); else home();
+if (S.match && S.match.phase === "play" && S.match.cur !== null && S.match.opps[S.match.cur] && busy()) battle(); else home();
 })();
 </script>
 </body>
