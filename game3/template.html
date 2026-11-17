@@ -298,8 +298,8 @@ const pic = (name, cls = "ico") => `<img class="${cls}" src="art/${name}.webp" a
 /* ---------- the game's numbers ---------- */
 const GUNS = [
   { id: "pistol", name: "Suppressed Pistol", rar: "Common", col: "#8a94a6", dmg: 25, cost: 0 },
-  { id: "shotgun", name: "Tactical Shotgun", rar: "Rare", col: "#2f8fff", dmg: 35, cost: 250 },
-  { id: "minigun", name: "Minigun", rar: "Legendary", col: "#ffb21a", dmg: 50, cost: 800 },
+  { id: "shotgun", name: "Tactical Shotgun", rar: "Rare", col: "#2f8fff", dmg: 30, cost: 250 },
+  { id: "minigun", name: "Minigun", rar: "Legendary", col: "#ffb21a", dmg: 35, cost: 800 },
 ];
 const ITEMS = [   // sold in the shop
   { id: "med", name: "Med Kit", img: "medkit", col: "#3fae2a", cost: 30, what: "+50 health" },
@@ -323,13 +323,13 @@ const HOLD = {
   boogie: ["Boogie Bomb", "Boogie Bombs", "Save it for a fight: when an opponent makes a move, a Boogie Bomb button appears. Throw it and they dance instead of attacking."],
 };
 const CARRY = 3, MAXHP = 100, MAXSH = 50, SUPPLY_HEAL = 40, RUSH_DMG = 15, FOE_HEAL = 20;
-/* storm circles: opponent health, damage of a miss, damage of a wrong move, coins for an elimination,
+/* storm circles: opponent health (thinking and maths; a reading opponent has one bar for each question on its passage), damage of a miss, damage of a wrong move, coins for an elimination,
    Fortnite minutes for clearing the circle, and the circle's radius (% of the map) */
 const STAGE = {
-  1: { hp: 50, dmg: 20, slip: 10, coins: 15, min: 15, r: 75 },
-  2: { hp: 70, dmg: 25, slip: 12, coins: 25, min: 20, r: 38 },
-  3: { hp: 85, dmg: 30, slip: 15, coins: 35, min: 25, r: 26 },
-  4: { hp: 140, dmg: 35, slip: 18, coins: 80, min: 0, r: 15 },
+  1: { hp: 100, dmg: 15, slip: 10, coins: 15, min: 15, r: 75 },
+  2: { hp: 125, dmg: 20, slip: 12, coins: 25, min: 20, r: 38 },
+  3: { hp: 150, dmg: 25, slip: 15, coins: 35, min: 25, r: 26 },
+  4: { hp: 200, dmg: 30, slip: 18, coins: 80, min: 0, r: 15 },
 };
 const START = 100, WIN_COINS = 50;
 /* other players still standing when the storm closes after circle 1, 2, 3 (so 50, 20 and 2 players are left) */
@@ -476,7 +476,11 @@ function pickPassage(tier, M, not) {
 function nextQ(o) {
   const M = S.match;
   if (o.kind === "reading") {
-    if (!o.pid || !o.queue.length) Object.assign(o, pickPassage(o.tier, M, o.pid));
+    if (!o.pid || !o.queue.length) {
+      const first = !o.pid;
+      Object.assign(o, pickPassage(o.tier, M, o.pid));
+      if (first) o.hp = o.max = PASS[o.pid].questions.length;   // David (Nov 2026): every question on the passage must be answered
+    }
     const id = o.queue.shift();
     const st = S.q["p:" + o.pid]; st.start = (PASS[o.pid].questions.findIndex(q => q.id === id) + 1) % PASS[o.pid].questions.length;
     o.pending = { ref: { t: "h", id }, chosen: null };
@@ -509,7 +513,8 @@ function tryMatch() {
       const p = landNear(c[s], STAGE[s].r * (s === 1 ? 0.62 : 0.72), pts, GAP[s]); if (!p) return null;
       pts.push(p);
       const [img, name] = foe(kind);
-      opps.push({ kind, tier: s, stage: s, img, name, x: p[0], y: p[1], hp: STAGE[s].hp, max: STAGE[s].hp, dead: false, shots: 0, pending: null, pid: null, queue: [], threat: null });
+      const hp = kind === "reading" ? 5 : STAGE[s].hp;
+      opps.push({ kind, tier: s, stage: s, img, name, x: p[0], y: p[1], hp, max: hp, dead: false, shots: 0, pending: null, pid: null, queue: [], threat: null });
     }
     supply[s] = landNear(c[s], STAGE[s].r * 0.72, pts, GAP[s]); if (!supply[s]) return null;
   }
@@ -579,7 +584,7 @@ function foeDown(o) {
 }
 
 /* ---------- drawing ---------- */
-const bar = (cls, v, max) => `<div class="bar ${cls}"><i style="width:${Math.max(0, 100 * v / max)}%"></i><span>${Math.round(v)}</span></div>`;
+const bar = (cls, v, max, label = null) => `<div class="bar ${cls}"><i style="width:${Math.max(0, 100 * v / max)}%"></i><span>${label === null ? Math.round(v) : label}</span></div>`;
 const chestStage = () => { const p = 100 * earnedToday() / S.time.cap; return p <= 0 ? 0 : p >= 99.99 ? 4 : 1 + Math.min(2, Math.floor(p / 34)); };
 const mins = m => `${m} min`;
 function timeCard() {
@@ -775,7 +780,7 @@ function battle(fx) {
     <button class="pill" id="coins">${pic("coins")} ${S.coins}</button><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>
   <div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
     <div class="hud me"><b>You${M.bush ? " 🌿" : ""}</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}<small class="pips" title="Every third right answer in a row is a headshot">${[0, 1, 2].map(i => `<i class="${i < M.streak % 3 ? "on" : ""}"></i>`).join("")} ${headReady ? "Headshot ready!" : "Headshot streak"}</small></div>
-    <div class="hud foe"><b>${esc(o.name)}</b><small>${k.icon} ${o.boss ? "Boss · thinking and maths" : k.label + " opponent"}</small>${bar("ehp", o.hp, o.max)}</div>
+    <div class="hud foe"><b>${esc(o.name)}</b><small>${k.icon} ${o.boss ? "Boss · thinking and maths" : k.label + " opponent"}</small>${bar("ehp", o.hp, o.max, o.kind === "reading" ? o.hp + " to go" : null)}</div>
     <div class="fighter me${over ? " ko" : ""}${fx && fx.anim === "jump" ? " jumping" : ""}${fx && fx.anim === "rush" ? " rushing" : ""}" id="hero"><img src="${skin()[4]}${skin()[0]}.webp" alt="Your hero"></div>
     ${M.bush ? `<img class="bushhide" src="art/bush.webp" alt="">` : ""}
     ${fx && fx.anim === "build" ? `<div class="wall">${ICON.build}</div>` : ""}
@@ -794,12 +799,12 @@ function battle(fx) {
   h += `<div class="stage${showPassage ? " has-passage" : ""}">${showPassage ? passageHtml(o, q) : ""}`;
   if (mode === "idle") {
     h += `<div class="card" id="qcard" data-q="" data-seed=""><div class="aimhelp"><b>${esc(o.name)}</b> is in your sights.<br>Tap your gun or the enemy to take a shot. Every shot is a question.<br>
-      <small>A right answer hits for ${gun().dmg}${headReady ? " (a headshot: double!)" : ""}. A wrong answer misses, and ${esc(o.name)} shoots back for ${st.dmg}.</small></div></div>`;
+      <small>${o.kind === "reading" ? `Answer every question on the passage: each right answer knocks off one bar (${o.shots ? o.hp + " to go" : "one bar for each question"}).` : `A right answer hits for ${gun().dmg}${headReady ? " (a headshot: double!)" : ""}.`} A wrong answer misses, and ${esc(o.name)} shoots back for ${st.dmg}.</small></div></div>`;
   } else if (mode === "q") {
     h += `<div class="card" id="qcard" data-q="${qkey(pend.ref)}" data-seed="${pend.ref.seed !== undefined ? pend.ref.seed : ""}"><div class="qhead"><span>${KIND[q.kind].icon} ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, pend.chosen)}`;
     if (pend.chosen !== null) {
       const ok = pend.chosen === q.answer, out = pend.out || {};
-      const head = ok ? (out.head ? `HEADSHOT! ${out.dmg} damage.` : `Hit! ${out.dmg} damage.`) + (o.dead ? ` ${esc(o.name)} is eliminated!` : "")
+      const head = ok ? (o.kind === "reading" ? (o.dead ? `Hit! That was the last bar: ${esc(o.name)} is eliminated!` : `Hit! One bar down, ${o.hp} to go.`) : (out.head ? `HEADSHOT! ${out.dmg} damage.` : `Hit! ${out.dmg} damage.`) + (o.dead ? ` ${esc(o.name)} is eliminated!` : ""))
         : out.bush ? `Miss! But you were hiding in a bush, so ${esc(o.name)} couldn’t find you. No damage.` : `Miss! ${esc(o.name)} shoots back: ${out.dmg} damage.`;
       const label = over ? "Eliminated ▶" : o.dead && o.boss ? "Victory Royale ▶" : pend.chest ? "Something’s glowing… ▶" : pend.threat ? `Watch ${esc(o.name)}! ▶` : o.dead ? "Back to the island ▶" : "Next shot ▶";
       h += `<div class="fb ${ok ? "good" : "miss"}"><h4>${head}</h4>${ok ? "" : `<p>The answer was <b>${LETTERS[q.answer]}</b>.</p>`}${q.explain}</div><div class="next"><button class="btn" id="next">${label}</button></div>`;
@@ -868,7 +873,7 @@ function answer(i) {
   let fx;
   if (ok) {
     M.hits++; M.streak++;
-    const head = M.streak % 3 === 0, dmg = gun().dmg * (head ? 2 : 1);
+    const rd = o.kind === "reading", head = !rd && M.streak % 3 === 0, dmg = rd ? 1 : gun().dmg * (head ? 2 : 1);   // reading: one bar for each right answer
     o.hp = Math.max(0, o.hp - dmg); fx = { hit: true, dmg, head }; beep(head ? SND.head : SND.hit);
     others(rnd(3));
     if (o.hp <= 0) foeDown(o);
@@ -898,7 +903,8 @@ function counter(c) {
     th.res = `You throw a Boogie Bomb. ${esc(o.name)} can’t stop dancing, so the move never happens!`;
   } else if (c === mv.counter) {
     th.good = true;
-    if (th.move === "heal") {
+    if (th.move === "heal" && o.kind === "reading") th.res = `You rush in and stop ${esc(o.name)} healing!`;   // a reading fight always needs every question
+    else if (th.move === "heal") {
       o.hp = Math.max(0, o.hp - RUSH_DMG); fx.hit = true; fx.dmg = RUSH_DMG;
       th.res = mv.good.replace("{n}", esc(o.name)).replace("{d}", RUSH_DMG);
       if (o.hp <= 0) foeDown(o);
@@ -906,7 +912,8 @@ function counter(c) {
     beep(SND.hit);
   } else {
     th.good = false;
-    if (th.move === "heal") { o.hp = Math.min(o.max, o.hp + FOE_HEAL); fx.heal = FOE_HEAL; th.res = `${mv.bad[c].replace("{n}", esc(o.name))} +${FOE_HEAL} health for ${esc(o.name)}.`; }
+    if (th.move === "heal" && o.kind === "reading") { o.hp++; o.max = Math.max(o.max, o.hp); fx.heal = 1; th.res = `${mv.bad[c].replace("{n}", esc(o.name))} ${esc(o.name)} gets a bar back: one more question to answer.`; }
+    else if (th.move === "heal") { o.hp = Math.min(o.max, o.hp + FOE_HEAL); fx.heal = FOE_HEAL; th.res = `${mv.bad[c].replace("{n}", esc(o.name))} +${FOE_HEAL} health for ${esc(o.name)}.`; }
     else { const d = STAGE[o.stage].slip; hurt(M, d); fx.hit = false; fx.dmg = d; th.res = `${mv.bad[c]} −${d} health.`; }
     beep(M.hp <= 0 ? SND.ko : SND.miss);
   }
