@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storm Island</title>
+<style>
+  :root {
+    --ink: #1b2a41; --ink-soft: #55627a; --line: #d8dde6; --paper: #ffffff; --field: #f3f5f8;
+    --navy: #0d1330; --sky1: #16205c; --sky2: #5b2a9d; --gold: #ffe81a; --gold-deep: #ff9d1a; --storm: #8a3ff0;
+    --good: #1e8a55; --good-bg: #e2f5ea; --bad: #c0392b; --bad-bg: #fde8e5; --kind: #0b6fa4;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--sky2); }
+  html, body { margin: 0; min-height: 100%; color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+  body { background: linear-gradient(160deg, var(--sky1), var(--sky2)) fixed; }
+  button { font: inherit; cursor: pointer; color: inherit; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 14px 14px 70px; }
+  .caps { font-family: "Arial Black", Impact, sans-serif; font-style: italic; text-transform: uppercase; }
+
+  /* ---- top bar ---- */
+  .top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #fff; margin-bottom: 12px; }
+  .top h1 { font: italic 900 30px "Arial Black", Impact, sans-serif; text-transform: uppercase; margin: 0; letter-spacing: .5px; text-shadow: 0 3px 0 var(--navy); }
+  .top h1 span { color: var(--gold); }
+  .top .spacer { flex: 1; }
+  .pill { background: rgba(13,19,48,.6); border: 2px solid rgba(255,255,255,.28); color: #fff; border-radius: 999px;
+    padding: 4px 12px; font-size: 15px; font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+  .pill img { width: 24px; height: 24px; object-fit: contain; }
+  button.pill:hover { background: rgba(255,255,255,.22); }
+  .btn { background: var(--gold); color: #2a2100; border: 3px solid var(--navy); border-bottom-width: 6px; border-radius: 10px; padding: 8px 20px;
+    font: italic 900 18px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-decoration: none; display: inline-block; }
+  .btn:hover { filter: brightness(1.08); } .btn:active { transform: translateY(2px); border-bottom-width: 4px; }
+  .btn.blue { background: #3fa7ff; color: #fff; } .btn.ghost { background: #fff; color: var(--ink); } .btn.small { font-size: 14px; padding: 4px 12px; border-width: 2px; border-bottom-width: 4px; }
+  .btn:disabled { filter: grayscale(1); opacity: .6; cursor: default; }
+  .note { background: #fff8e6; border: 2px dashed var(--gold-deep); border-radius: 14px; padding: 12px 16px; margin-bottom: 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .note .txt { flex: 1 1 240px; }
+  .banner { background: var(--storm); color: #fff; border: 3px solid var(--navy); border-radius: 12px; padding: 8px 16px; margin-bottom: 12px; font-weight: 700; animation: pop .5s; }
+  @keyframes pop { 0% { transform: scale(.9); opacity: 0; } }
+
+  /* ---- Fortnite time ---- */
+  .timecard { background: var(--navy); color: #fff; border-radius: 16px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .pie { --p: 0; width: 112px; height: 112px; border-radius: 50%; flex: none; position: relative;
+    background: conic-gradient(var(--gold) calc(var(--p) * 1%), #2b3566 0); border: 5px solid #fff; box-shadow: 0 0 0 4px var(--navy), 0 0 22px rgba(255,232,26,.5); }
+  .pie::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(rgba(13,19,48,.55) 0 1.2deg, transparent 1.2deg 60deg); }
+  .timecard .txt { flex: 1 1 200px; }
+  .timecard .lab { color: var(--gold); font-size: 16px; font-weight: 700; }
+  .timecard .bigt { font: 900 34px/1.1 "Arial Black", Impact, sans-serif; }
+  .timecard .of { opacity: .88; font-size: 15px; }
+  .chest { width: 128px; height: 120px; object-fit: contain; flex: none; filter: drop-shadow(0 6px 4px rgba(0,0,0,.5)); }
+  @media (max-width: 520px) { .pie { width: 84px; height: 84px; } .chest { width: 84px; height: 80px; } .timecard .bigt { font-size: 26px; } .top h1 { font-size: 24px; } }
+
+  /* ---- the island ---- */
+  .island { position: relative; width: 100%; max-width: 640px; margin: 0 auto 14px; aspect-ratio: 1; border-radius: 18px; overflow: hidden; border: 4px solid var(--navy); background: #1d6fd0; }
+  .island svg, .island .mapimg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+  .island #stormhole { transition: r 1.4s ease-in-out; }
+  .mk { position: absolute; transform: translate(-50%, -50%); width: 68px; padding: 0; border: 0; background: none; text-align: center; color: #fff; line-height: 1.1; }
+  .mk .pic { width: 60px; height: 60px; margin: 0 auto; border-radius: 50%; border: 3px solid var(--navy); background: var(--kind); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 4px 0 rgba(13,19,48,.6); }
+  .mk .pic img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 50%; }
+  .mk .pic .em { font-size: 32px; }
+  .mk .tag { position: absolute; right: -8px; bottom: -6px; font-size: 18px; background: #fff; border: 2px solid var(--navy); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .mk .nm { display: inline-block; margin-top: 3px; font-size: 11.5px; font-weight: 800; background: rgba(13,19,48,.82); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
+  .mk .mhp { height: 6px; width: 46px; margin: 3px auto 0; background: rgba(13,19,48,.7); border-radius: 4px; overflow: hidden; }
+  .mk .mhp i { display: block; height: 100%; background: #ff5a4d; }
+  .mk.open .pic { border-color: var(--gold); animation: glow 1.6s infinite; }
+  .mk.open:hover .pic { transform: scale(1.08); }
+  .mk.later { opacity: .8; } .mk.later .pic { filter: grayscale(.7) brightness(.8); }
+  .mk.dead .pic { filter: grayscale(1) brightness(.55); } .mk.dead .nm { text-decoration: line-through; opacity: .8; }
+  .mk.boss .pic { width: 74px; height: 74px; background: #7a1f3d; } .mk.boss { width: 84px; }
+  .mk.spot .pic { background: #fff; border-radius: 14px; }
+  .mk.spot.usedup { opacity: .55; }
+  .mk:disabled { pointer-events: none; } .mk.open { z-index: 2; }
+  @keyframes glow { 50% { box-shadow: 0 0 0 7px rgba(255,232,26,.35), 0 4px 0 rgba(13,19,48,.6); } }
+  .dropin { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(13,19,48,.45); text-align: center; color: #fff; padding: 20px; }
+  .dropin .btn { font-size: 26px; padding: 12px 34px; }
+  .dropin p { margin: 0; font-weight: 700; text-shadow: 0 2px 0 var(--navy); max-width: 420px; }
+  @media (max-width: 520px) { .mk { width: 56px; } .mk .pic { width: 46px; height: 46px; } .mk.boss .pic { width: 56px; height: 56px; } .mk .nm { font-size: 10px; padding: 0 4px; } .mk .tag { width: 22px; height: 22px; font-size: 13px; } .mk .pic .em { font-size: 24px; } }
+  .legend { color: #fff; font-size: 14.5px; text-align: center; margin: -4px 0 14px; opacity: .92; }
+  .me-strip { background: rgba(13,19,48,.7); border: 2px solid rgba(255,255,255,.25); color: #fff; border-radius: 14px; padding: 8px 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .me-strip .grow { flex: 1 1 180px; }
+
+  /* ---- bars ---- */
+  .bar { position: relative; height: 18px; background: rgba(13,19,48,.75); border: 2px solid var(--navy); border-radius: 6px; overflow: hidden; margin-top: 3px; min-width: 110px; }
+  .bar i { display: block; height: 100%; transition: width .5s; }
+  .bar.hp i { background: linear-gradient(180deg, #7dff6b, #23b53a); } .bar.sh i { background: linear-gradient(180deg, #7fd4ff, #2f8fff); } .bar.ehp i { background: linear-gradient(180deg, #ff8a65, #e5484d); }
+  .bar span { position: absolute; inset: 0; text-align: center; font-size: 12px; line-height: 14px; font-weight: 800; color: #fff; text-shadow: 0 1px 0 #000; }
+  .bar.sh { height: 12px; } .bar.sh span { line-height: 8px; font-size: 10px; }
+
+  /* ---- battle ---- */
+  .playbar { display: flex; align-items: center; gap: 8px; color: #fff; margin-bottom: 10px; flex-wrap: wrap; }
+  .arena { position: relative; height: 290px; border-radius: 16px; overflow: hidden; border: 4px solid var(--navy); background: var(--navy) center bottom / cover no-repeat; margin-bottom: 10px; }
+  .hud { position: absolute; top: 8px; width: 42%; max-width: 250px; color: #fff; background: rgba(13,19,48,.78); border-radius: 10px; padding: 6px 10px 8px; font-size: 14px; }
+  .hud.me { left: 8px; } .hud.foe { right: 8px; }
+  .hud b { font: italic 900 16px "Arial Black", Impact, sans-serif; text-transform: uppercase; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hud small { display: block; opacity: .9; font-size: 12.5px; }
+  .fighter { position: absolute; bottom: 6px; width: 170px; height: 170px; padding: 0; border: 0; background: none; }
+  .fighter img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 0 rgba(0,0,0,.45)); display: block; }
+  .fighter.me { left: 6%; } .fighter.foe { right: 6%; }
+  .fighter.foe:not(:disabled):hover img { filter: drop-shadow(0 0 12px #fff) drop-shadow(0 6px 0 rgba(0,0,0,.45)); }
+  .fighter.foe:disabled { cursor: default; }
+  .fighter.foe .cross { position: absolute; left: 50%; top: 50%; width: 70px; height: 70px; margin: -35px 0 0 -35px; border: 4px solid var(--gold); border-radius: 50%; opacity: 0; pointer-events: none; }
+  .fighter.foe .cross::before, .fighter.foe .cross::after { content: ""; position: absolute; background: var(--gold); }
+  .fighter.foe .cross::before { left: 50%; top: -12px; bottom: -12px; width: 4px; margin-left: -2px; } .fighter.foe .cross::after { top: 50%; left: -12px; right: -12px; height: 4px; margin-top: -2px; }
+  .fighter.foe.aim .cross { opacity: .95; animation: aim 1.2s infinite; }
+  @keyframes aim { 50% { transform: scale(1.15); } }
+  .fighter.hit { animation: hit .55s; } .fighter.ko img { transform: rotate(80deg) translateY(30px); opacity: .5; transition: transform .6s, opacity .6s; }
+  @keyframes hit { 20% { transform: translateX(-10px) rotate(-10deg); filter: brightness(2.2); } 60% { transform: translateX(8px) rotate(6deg); } }
+  .float { position: absolute; top: 42%; font: italic 900 34px "Arial Black", Impact, sans-serif; color: var(--gold); text-shadow: 0 3px 0 var(--navy), 0 0 8px #000; pointer-events: none; animation: rise 1.5s forwards; white-space: nowrap; }
+  .float.onfoe { right: 12%; } .float.onme { left: 10%; color: #ff6b5e; }
+  @keyframes rise { 0% { transform: translateY(20px) scale(.6); opacity: 0; } 20% { opacity: 1; transform: translateY(0) scale(1.15); } 100% { transform: translateY(-60px); opacity: 0; } }
+  .actions { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .act { flex: 1 1 130px; display: flex; align-items: center; gap: 8px; text-align: left; background: linear-gradient(180deg, color-mix(in srgb, var(--rar, #5d6578) 60%, #fff), color-mix(in srgb, var(--rar, #5d6578) 92%, #000));
+    color: #fff; border: 3px solid var(--navy); border-bottom-width: 6px; border-radius: 10px; padding: 6px 10px; line-height: 1.2; min-width: 0; }
+  .act b { font: italic 900 14.5px "Arial Black", Impact, sans-serif; text-transform: uppercase; display: block; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
+  .act small { font-size: 12.5px; display: block; }
+  .gunpic { width: 76px; height: 38px; object-fit: cover; border-radius: 6px; border: 2px solid var(--navy); flex: none; display: block; }
+  .ico { width: 30px; height: 30px; object-fit: contain; flex: none; vertical-align: middle; }
+  .pill .ico { width: 24px; height: 24px; }
+  .kit { text-align: center; font-size: 14px; font-weight: 700; } .kit small { display: block; }
+  .banner { display: flex; align-items: center; gap: 10px; } .banner .ico { width: 44px; height: 44px; }
+  .dropin .bus { width: 110px; height: 110px; object-fit: contain; animation: bob 3s ease-in-out infinite; }
+  .mk.spot .pic img { object-fit: contain; border-radius: 0; padding: 5px; }
+  .act.gun { flex: 2 1 220px; } .act.gun .go { margin-left: auto; background: var(--gold); color: #2a2100; border-radius: 8px; padding: 4px 12px; font: italic 900 17px "Arial Black", Impact, sans-serif; }
+  .act:disabled { filter: grayscale(.8); opacity: .65; cursor: default; }
+  @media (max-width: 520px) { .act.gun { flex-basis: 100%; } .arena { height: 236px; } .fighter { width: 124px; height: 124px; } .fighter.me { left: 2%; } .fighter.foe { right: 2%; } .float { font-size: 26px; } }
+
+  /* ---- question ---- */
+  .stage { display: grid; gap: 12px; }
+  .stage.has-passage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  @media (max-width: 820px) { .stage.has-passage { grid-template-columns: minmax(0, 1fr); } }
+  .card { background: var(--paper); border-radius: 16px; padding: 16px 18px; min-width: 0; }
+  .passage h3 { margin: 0 0 4px; font-size: 20px; }
+  .passage .pnote { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 10px; }
+  .passage p { margin: 0 0 10px; }
+  .passage .poem { white-space: pre-line; font-size: 17px; line-height: 1.6; margin: 0 0 4px; }
+  .passage .extract { border-left: 4px solid var(--kind); padding: 2px 0 2px 12px; margin: 0 0 14px; }
+  .passage .extract b.tag { display: block; color: var(--kind); }
+  .passage .gap { white-space: nowrap; font-weight: 700; background: #eef1f6; border-radius: 4px; padding: 0 4px; }
+  .passage .gap.cur { background: var(--gold); box-shadow: 0 0 0 2px var(--navy); }
+  @media (min-width: 821px) { .passage { position: sticky; top: 10px; max-height: calc(100vh - 20px); overflow: auto; } }
+  .qhead { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--ink-soft); font-weight: 700; margin-bottom: 6px; }
+  .stem { font-size: 18px; }
+  .stem p { margin: 0 0 10px; }
+  .stem .box { background: var(--field); border-left: 4px solid var(--kind); border-radius: 6px; padding: 10px 14px; margin: 0 0 10px; }
+  .figure { margin: 10px 0; text-align: center; overflow-x: auto; }
+  .figure svg, .opt svg { max-width: 100%; height: auto; }
+  table.grid { border-collapse: collapse; margin: 8px auto; font-size: 17px; }
+  table.grid th, table.grid td { border: 1.5px solid var(--ink-soft); padding: 5px 10px; text-align: center; }
+  table.grid th { background: var(--field); }
+  table.grid td.fill { background: #fff3bf; font-weight: 800; }
+  .opts { display: grid; gap: 8px; margin-top: 12px; }
+  .opts.visual { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .opt { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--paper); border: 3px solid var(--line);
+    border-radius: 10px; padding: 9px 12px; color: var(--ink); font-size: 17px; width: 100%; min-width: 0; }
+  .opt:hover:not(:disabled) { border-color: var(--kind); background: var(--field); }
+  .opt:disabled { cursor: default; }
+  .opt .let { flex: none; width: 32px; height: 32px; border-radius: 8px; background: var(--field); border: 1.5px solid var(--line); font-weight: 800; display: flex; align-items: center; justify-content: center; transform: skewX(-6deg); }
+  .opt.right { border-color: var(--good); background: var(--good-bg); } .opt.right .let { background: var(--good); color: #fff; border-color: var(--good); }
+  .opt.wrong { border-color: var(--bad); background: var(--bad-bg); } .opt.wrong .let { background: var(--bad); color: #fff; border-color: var(--bad); }
+  .opt.dim { opacity: .55; }
+  .fb { margin-top: 14px; border-radius: 12px; padding: 12px 16px; }
+  .fb.good { background: var(--good-bg); border: 2px solid var(--good); } .fb.miss { background: var(--bad-bg); border: 2px solid var(--bad); }
+  .fb h4 { margin: 0 0 4px; font-size: 19px; }
+  .fb p { margin: 0 0 8px; } .fb p:last-child { margin: 0; }
+  .fb .why-not { color: var(--ink-soft); }
+  .next { margin-top: 14px; display: flex; justify-content: flex-end; }
+  .aimhelp { text-align: center; font-size: 18px; padding: 8px 0; }
+  .aimhelp .btn { margin-top: 8px; font-size: 22px; }
+
+  /* ---- shop, locker, results ---- */
+  .shelf { background: var(--paper); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
+  .shelf h3 { margin: 0 0 4px; font: italic 900 20px "Arial Black", Impact, sans-serif; text-transform: uppercase; }
+  .shelf p.sub { margin: 0 0 10px; color: var(--ink-soft); font-size: 15px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+  .tile { border: 3px solid var(--navy); border-bottom-width: 7px; border-radius: 10px; text-align: center; padding: 8px 6px; font-size: 13.5px; line-height: 1.3; color: #fff;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--rar) 55%, #fff), color-mix(in srgb, var(--rar) 90%, #000)); display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .tile b { font: italic 900 14px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
+  .tile img { width: 88px; height: 88px; object-fit: contain; } .tile .gunpic { width: 116px; height: 58px; } .tile .itempic { width: 64px; height: 64px; object-fit: contain; }
+  .tile .btn { margin-top: auto; }
+  .tile.off { --rar: #5d6578 !important; } .tile.off img { filter: brightness(0) opacity(.55); }
+  .tile.cur { box-shadow: 0 0 0 4px var(--gold); }
+  button.tile { cursor: pointer; }
+  .result { text-align: center; }
+  .result h2 { font: italic 900 34px "Arial Black", Impact, sans-serif; text-transform: uppercase; margin: 6px 0; }
+  .result .big img { width: 150px; height: 146px; object-fit: contain; animation: bob 2.6s ease-in-out infinite; }
+  .result .big img.vic { width: 120px; height: 100px; animation-delay: -1.2s; }
+  .result .rows { display: inline-grid; grid-template-columns: auto auto; gap: 4px 18px; text-align: left; margin: 10px auto; font-size: 18px; }
+  .result .rows b { text-align: right; }
+  @keyframes bob { 50% { transform: translateY(-7px); } }
+  details.parents { background: rgba(255,255,255,.94); border-radius: 12px; padding: 10px 16px; font-size: 15px; }
+  details.parents summary { cursor: pointer; font-weight: 700; color: var(--ink-soft); }
+  details.parents table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  details.parents td, details.parents th { border-bottom: 1px solid var(--line); padding: 5px 8px; text-align: left; }
+  details.parents td.n, details.parents th.n { text-align: right; }
+  details.parents input { font: inherit; width: 80px; padding: 4px 6px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0 14px; }
+  .legal { color: rgba(255,255,255,.78); font-size: 12.5px; line-height: 1.45; margin: 16px 4px 0; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const INK = "#1b2a41";
+const READING = [], THINKING = [], MATHS = [], GENS = [];
+/*__CONTENT__*/
+</script>
+<script>
+(() => {
+"use strict";
+const KEY = "prac3.v1";
+const LETTERS = "ABCDEF";
+const P2 = "../prac2/art/";          // pictures shared with Crown Quest
+const app = document.getElementById("app");
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ---------- the game's numbers ---------- */
+const GUNS = [
+  { id: "pistol", name: "Suppressed Pistol", rar: "Common", col: "#8a94a6", dmg: 25, cost: 0 },
+  { id: "shotgun", name: "Tactical Shotgun", rar: "Rare", col: "#2f8fff", dmg: 35, cost: 250 },
+  { id: "minigun", name: "Minigun", rar: "Legendary", col: "#ffb21a", dmg: 50, cost: 800 },
+];
+const ITEMS = [
+  { id: "med", name: "Med Kit", img: "medkit", col: "#3fae2a", cost: 30, what: "+50 health" },
+  { id: "shield", name: "Shield Potion", img: "shieldpotion", col: "#2f8fff", cost: 40, what: "+50 shield" },
+];
+const CARRY = 3, MAXHP = 100, MAXSH = 50, CAMP_HEAL = 40;
+/* storm circles: enemy health, the damage a miss costs, coins for a win, and the storm's radius (% of the map) */
+const STAGE = { 1: { hp: 60, dmg: 20, coins: 15, r: 80 }, 2: { hp: 75, dmg: 25, coins: 25, r: 37 }, 3: { hp: 90, dmg: 30, coins: 35, r: 25 }, 4: { hp: 150, dmg: 35, coins: 80, r: 13.5 } };
+const WIN_COINS = 50;
+const WIN_MIN = 8;                                   // Fortnite minutes for winning a match (the boss is beaten)
+const missBonus = m => m === 0 ? 7 : m <= 2 ? 5 : m <= 4 ? 3 : m <= 6 ? 1 : 0;   // extra minutes for few misses
+const KIND = {
+  reading: { label: "Reading", icon: "📖", arena: "arena-forest", col: "#2e7d4f" },
+  thinking: { label: "Thinking", icon: "🧩", arena: "arena-peaks", col: "#7a4bb5" },
+  maths: { label: "Maths", icon: "🔢", arena: "arena-reef", col: "#0b6fa4" },
+};
+const FOES = {
+  reading: [["lynx", "Lynx"], ["sparkle", "Sparkle Specialist"], ["ghoul", "Ghoul Trooper"]],
+  thinking: [["visitor", "The Visitor"], ["darkvoyager", "Dark Voyager"], ["carbide", "Carbide"]],
+  maths: [["rex", "Rex"], ["tomatohead", "Tomatohead"], ["beefboss", "Beef Boss"], ["meowscles", "Meowscles"]],
+};
+const BOSSES = [["omega", "Omega"], ["blackknight", "Black Knight"], ["iceking", "The Ice King"]];
+/* outfits for the hero: [picture, name, rarity colour, crowns needed, folder] */
+const SKINS = [["jonesy", "Jonesy", "#8a94a6", 0, "art/"], ["renegade", "Renegade Raider", "#2f8fff", 1, "art/"], ["britebomber", "Brite Bomber", "#2f8fff", 2, P2],
+  ["fishstick", "Fishstick", "#2f8fff", 3, P2], ["peely", "Peely", "#a34dff", 5, P2], ["raptor", "Raptor", "#ffb21a", 7, "art/"], ["cuddle", "Cuddle Team Leader", "#ffb21a", 9, P2],
+  ["drift", "Drift", "#ffb21a", 12, P2], ["crackshot", "Crackshot", "#ffb21a", 15, "art/"], ["midas", "Midas", "#ffb21a", 20, P2]];
+/* where things stand on the island (% of the map) */
+const SPOTS = { 1: [[20, 17], [75, 16], [82, 75]], 2: [[20, 58], [70, 33]], 3: [[33, 40], [69, 67]], 4: [[50, 45]] };
+const SHOP_AT = [41, 58.5], CAMP_AT = [59, 57.5], EYE = [50, 52];   // the storm closes on EYE
+const PLANS = [[["reading", "thinking"], ["maths", "thinking"]], [["thinking", "maths"], ["reading", "maths"]], [["reading", "maths"], ["thinking", "maths"]]];
+
+/* Epic's own pictures of the guns and items (see the notice at the foot of the page) */
+const gunPic = id => `<img class="gunpic" src="art/gun-${id}.webp" alt="">`;
+const pic = (name, cls = "ico") => `<img class="${cls}" src="art/${name}.webp" alt="">`;
+
+/* ---------- saved progress ---------- */
+/* Practice mode: opened from the admin page (?admin=1 after the PIN). Everything is owned and nothing is saved. */
+const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
+const FRESH = () => ({ coins: 0, crowns: 0, guns: { pistol: 1 }, gun: "pistol", items: { med: 1, shield: 0 }, skin: "jonesy", q: {}, seq: 1, n: 0, match: null, last: null,
+  time: { cap: 30, days: {}, used: 0 }, stats: { wins: 0, kos: 0 }, sound: true });
+function load() {
+  if (PRACTICE) { const s = FRESH(); s.coins = 5000; GUNS.forEach(g => s.guns[g.id] = 1); s.items = { med: 3, shield: 3 }; s.crowns = 20; return s; }
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.guns) { const f = FRESH(); return Object.assign(f, s, { time: Object.assign(f.time, s.time), stats: Object.assign(f.stats, s.stats) }); } } catch (e) {}
+  return FRESH();
+}
+let S = load();
+const save = () => { if (PRACTICE) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+const earnedToday = () => S.time.days[today()] || 0;
+const earnedAll = () => Object.values(S.time.days).reduce((a, b) => a + b, 0);
+const balance = () => Math.max(0, earnedAll() - S.time.used);
+const gun = () => GUNS.find(g => g.id === S.gun) || GUNS[0];
+const skin = () => SKINS.find(s => s[0] === S.skin) || SKINS[0];
+const rnd = n => Math.floor(Math.random() * n);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- sound ---------- */
+let AC = null;
+function beep(notes) {
+  if (!S.sound) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    let t = AC.currentTime;
+    for (const [f, d, type] of notes) {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type || "square"; o.frequency.value = f; g.gain.setValueAtTime(.06, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d); t += d * .8;
+    }
+  } catch (e) {}
+}
+const SND = { hit: [[660, .08], [990, .14]], miss: [[200, .16, "sawtooth"], [140, .22, "sawtooth"]], win: [[523, .12], [659, .12], [784, .12], [1047, .3]], ko: [[300, .2, "sawtooth"], [200, .2, "sawtooth"], [120, .4, "sawtooth"]], buy: [[880, .08], [1320, .12]] };
+
+/* ---------- questions ---------- */
+const HAND = {}, GEN = {}, PASS = {};
+for (const q of THINKING) HAND[q.id] = Object.assign(q, { kind: "thinking" });
+for (const q of MATHS) HAND[q.id] = Object.assign(q, { kind: "maths" });
+for (const p of READING) { PASS[p.id] = p; for (const q of p.questions) HAND[q.id] = Object.assign(q, { kind: "reading", pid: p.id }); }
+for (const g of GENS) GEN[g.id] = g;
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const qkey = ref => ref.t === "g" ? "g:" + ref.id : ref.id;
+function resolve(ref) {
+  if (ref.t === "g") { const g = GEN[ref.id]; return Object.assign({ id: "g:" + g.id, cat: g.cat, kind: g.kind }, g.make(rng(ref.seed))); }
+  return HAND[ref.id];
+}
+const lastUsed = k => (S.q[k] && S.q[k].t) || 0;
+/* least recently used first: questions never seen come first, then ones missed, then the oldest right answers */
+function pickQ(kind, tier, M) {
+  const hand = (kind === "thinking" ? THINKING : MATHS).filter(q => q.tier === tier).map(q => ({ t: "h", id: q.id }));
+  const gens = GENS.filter(g => g.kind === kind && (g.tier === tier || (tier === 4 && g.tier === 3))).map(g => ({ t: "g", id: g.id }));
+  let c = [...hand, ...gens];
+  const fresh = c.filter(r => !M.asked.includes(qkey(r)));
+  if (fresh.length) c = fresh;
+  c = shuffle(c).sort((a, b) => lastUsed(qkey(a)) - lastUsed(qkey(b)));
+  const ref = c[0];
+  if (ref.t === "g") ref.seed = rnd(2 ** 31);
+  return ref;
+}
+function pickPassage(tier, M, not) {
+  let c = READING.filter(p => p.tier === tier && p.id !== not);
+  const fresh = c.filter(p => !M.asked.includes("p:" + p.id));
+  if (fresh.length) c = fresh;
+  c = shuffle(c).sort((a, b) => lastUsed("p:" + a.id) - lastUsed("p:" + b.id));
+  const p = c[0], st = S.q["p:" + p.id] || (S.q["p:" + p.id] = { t: 0, start: 0 });
+  const ids = p.questions.map(q => q.id), k = (st.start || 0) % ids.length;
+  st.t = ++S.seq; M.asked.push("p:" + p.id);
+  return { pid: p.id, queue: [...ids.slice(k), ...ids.slice(0, k)] };
+}
+function nextQ(o) {
+  const M = S.match;
+  if (o.kind === "reading") {
+    if (!o.pid || !o.queue.length) Object.assign(o, pickPassage(o.tier, M, o.pid));
+    const id = o.queue.shift();
+    const st = S.q["p:" + o.pid]; st.start = (PASS[o.pid].questions.findIndex(q => q.id === id) + 1) % PASS[o.pid].questions.length;
+    o.pending = { ref: { t: "h", id }, chosen: null };
+  } else {
+    const kind = o.boss ? (o.shots % 2 ? "maths" : "thinking") : o.kind;
+    const ref = pickQ(kind, o.tier, M);
+    M.asked.push(qkey(ref));
+    o.pending = { ref, chosen: null };
+  }
+  o.shots++;
+}
+
+/* ---------- matches ---------- */
+function newMatch() {
+  const n = S.n, opps = [];
+  const used = {};
+  const foe = kind => { const list = FOES[kind]; used[kind] = (used[kind] || 0) + 1; return list[(n + used[kind]) % list.length]; };
+  const add = (kind, stage, at) => { const [img, name] = foe(kind); opps.push({ kind, tier: stage, stage, img, name, x: at[0], y: at[1], hp: STAGE[stage].hp, max: STAGE[stage].hp, dead: false, shots: 0, pending: null, pid: null, queue: [] }); };
+  shuffle(["reading", "thinking", "maths"]).forEach((k, i) => add(k, 1, SPOTS[1][i]));
+  const plan = PLANS[n % PLANS.length];
+  [2, 3].forEach(st => shuffle(plan[st - 2]).forEach((k, i) => add(k, st, SPOTS[st][i])));
+  const [bimg, bname] = BOSSES[n % BOSSES.length];
+  opps.push({ kind: "thinking", boss: true, tier: 4, stage: 4, img: bimg, name: bname, x: SPOTS[4][0][0], y: SPOTS[4][0][1], hp: STAGE[4].hp, max: STAGE[4].hp, dead: false, shots: 0, pending: null });
+  return { stage: 1, hp: MAXHP, shield: 0, misses: 0, hits: 0, opps, asked: [], camp: 0, cur: null, note: "" };
+}
+function hurt(M, dmg) { const s = Math.min(M.shield, dmg); M.shield -= s; M.hp = Math.max(0, M.hp - (dmg - s)); }
+function addMinutes(min) { const d = today(), got = Math.max(0, Math.min(min, S.time.cap - earnedToday())); S.time.days[d] = earnedToday() + got; return got; }
+
+/* ---------- drawing ---------- */
+const bar = (cls, v, max) => `<div class="bar ${cls}"><i style="width:${Math.max(0, 100 * v / max)}%"></i><span>${Math.round(v)}</span></div>`;
+const chestStage = () => { const p = 100 * earnedToday() / S.time.cap; return p <= 0 ? 0 : p >= 99.99 ? 4 : 1 + Math.min(2, Math.floor(p / 34)); };
+const mins = m => `${m} min`;
+function timeCard() {
+  const e = earnedToday(), cap = S.time.cap;
+  return `<div class="timecard" id="timecard" data-today="${e}" data-cap="${cap}" data-balance="${balance()}">
+    <div class="pie" style="--p:${Math.min(100, 100 * e / cap)}"></div>
+    <div class="txt"><div class="lab">FORTNITE TIME EARNED TODAY</div><div class="bigt">${mins(e)}</div>
+      <div class="of">of today’s limit of ${mins(cap)}${e >= cap ? " · <b>Limit reached. More tomorrow!</b>" : ""}</div>
+      <div class="of">Ready to use: <b>${mins(balance())}</b></div></div>
+    <img class="chest" src="${P2}chest${chestStage()}.webp" alt="Treasure chest"></div>`;
+}
+function topBar() {
+  return `<div class="top"><h1>Storm <span>Island</span></h1><span class="spacer"></span>
+    <span class="pill" id="crowns"><img src="${P2}crown3d.webp" alt="Crowns"> ${S.crowns}</span><span class="pill" id="coins">${pic("coins")} ${S.coins}</span>
+    <button class="pill" id="snd" title="Sound">${S.sound ? "🔊" : "🔇"}</button></div>`;
+}
+function islandSvg(M) {
+  const r = M ? STAGE[M.stage].r * 6 : 480, cx = EYE[0] * 6, cy = EYE[1] * 6;
+  return `<img class="mapimg" src="art/island.webp" alt="A map of the island">
+    <svg viewBox="0 0 600 600" role="img" aria-label="The purple storm covers everything outside the circle.">
+    <defs><mask id="storm"><rect width="600" height="600" fill="#fff"/><circle id="stormhole" cx="${cx}" cy="${cy}" style="r:${r}px" fill="#000"/></mask></defs>
+    <rect width="600" height="600" fill="#7a2fe0" opacity=".66" mask="url(#storm)"/><circle cx="${cx}" cy="${cy}" style="r:${r}px" fill="none" stroke="#f0dcff" stroke-width="4" stroke-dasharray="10 8"/></svg>`;
+}
+function marker(o, i, M) {
+  const k = o.boss ? { label: "Boss", icon: "👑", col: "#7a1f3d" } : KIND[o.kind];
+  const state = o.dead ? "dead" : o.stage === M.stage ? "open" : "later";
+  return `<button class="mk foe ${state}${o.boss ? " boss" : ""}" data-o="${i}" style="left:${o.x}%;top:${o.y}%;--kind:${k.col}" ${state === "open" ? "" : "disabled"} aria-label="${esc(o.name)}, ${k.label}${o.dead ? ", defeated" : state === "later" ? ", circle " + o.stage : ""}">
+    <span class="pic"><img src="art/${o.img}.webp" alt=""><span class="tag">${o.dead ? "✖" : k.icon}</span></span>
+    <span class="nm">${o.dead ? esc(o.name) : state === "later" ? (o.boss ? "Boss" : "Circle " + o.stage) : esc(o.name)}</span>
+    ${state === "open" && o.hp < o.max ? `<span class="mhp"><i style="width:${100 * o.hp / o.max}%"></i></span>` : ""}</button>`;
+}
+
+/* ---------- the island (home) ---------- */
+function home() {
+  const M = S.match;
+  if (M) M.cur = null;
+  const res = S.last; S.last = null;
+  let h = topBar();
+  if (PRACTICE) h += `<div class="note" id="practice-note"><div class="txt"><b>Practice mode</b><br>You own every gun and nothing you do here is saved. The real game progress is not touched.${M ? `<br>Jump to: <button class="btn small ghost" data-jump="2">Circle 2</button> <button class="btn small ghost" data-jump="3">Circle 3</button> <button class="btn small ghost" data-jump="4">Boss</button>` : ""}</div><a class="btn" href="../pracadmin/index.html">← Admin page</a></div>`;
+  if (res) h += resultCard(res);
+  h += timeCard();
+  if (M && M.note) { h += `<div class="banner">${pic("storm")} <span>${M.note}</span></div>`; M.note = ""; }
+  if (M) {
+    h += `<div class="me-strip"><img src="${skin()[4]}${skin()[0]}.webp" alt="" width="54" height="54" style="object-fit:contain">
+      <div class="grow"><b>Storm circle ${M.stage} of 4</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}</div>
+      <div class="kit">${gunPic(S.gun)}<small>${gun().name}</small></div><div class="kit">${pic("medkit")} ×${S.items.med} ${pic("shieldpotion")} ×${S.items.shield}</div></div>`;
+  }
+  h += `<div class="island" id="island">${islandSvg(M)}`;
+  if (M) {
+    h += M.opps.map((o, i) => marker(o, i, M)).join("");
+    h += `<button class="mk spot" id="shop" style="left:${SHOP_AT[0]}%;top:${SHOP_AT[1]}%"><span class="pic">${pic("coins", "")}</span><span class="nm">Shop</span></button>`;
+    h += `<button class="mk spot${M.camp >= M.stage ? " usedup" : ""}" id="camp" style="left:${CAMP_AT[0]}%;top:${CAMP_AT[1]}%" ${M.camp >= M.stage || M.hp >= MAXHP ? "disabled" : ""}><span class="pic">${pic("medkit", "")}</span><span class="nm">${M.camp >= M.stage ? "Supplies (used)" : "Supplies +" + CAMP_HEAL}</span></button>`;
+  } else {
+    h += `<div class="dropin">${pic("battlebus", "bus")}<button class="btn" id="drop">Drop in ▶</button><p>${S.n ? "Match " + (S.n + 1) + ". " : ""}Beat every opponent as the storm closes in, then face the boss in the last circle.</p></div>`;
+  }
+  h += `</div>`;
+  h += M ? `<p class="legend">Tap a glowing opponent to fight. 📖 reading · 🧩 thinking · 🔢 maths. Beat everyone in the circle and the storm closes in.</p>`
+         : `<p class="legend">Every shot is a question. A right answer is a hit. A wrong answer is a miss, and they shoot back.</p>`;
+  h += shopHtml(false) + lockerHtml() + parentsHtml();
+  h += `<p class="legal">A private, non-commercial fan project. Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.</p>`;
+  app.innerHTML = h;
+  save();
+  wireCommon();
+  const on = (sel, fn) => { const e = $(sel); if (e) e.onclick = fn; };
+  on("#drop", () => { S.match = newMatch(); home(); window.scrollTo(0, 0); });
+  on("#shop", () => { $("#shopshelf").scrollIntoView({ behavior: "smooth" }); });
+  on("#camp", () => { M.camp = M.stage; M.hp = Math.min(MAXHP, M.hp + CAMP_HEAL); M.note = `You open the supply drop: +${CAMP_HEAL} health. A new one lands in the next circle.`; beep(SND.buy); home(); });
+  app.querySelectorAll(".mk.foe.open").forEach(b => b.onclick = () => { M.cur = Number(b.dataset.o); battle(); window.scrollTo(0, 0); });
+  app.querySelectorAll("[data-jump]").forEach(b => b.onclick = () => { const st = Number(b.dataset.jump); M.opps.forEach(o => { if (o.stage < st) o.dead = true; }); M.stage = st; home(); });
+  wireShop(home);
+  app.querySelectorAll("[data-skin]").forEach(b => b.onclick = () => { S.skin = b.dataset.skin; home(); });
+  wireParents();
+}
+function wireCommon() { const s = $("#snd"); if (s) s.onclick = () => { S.sound = !S.sound; save(); s.textContent = S.sound ? "🔊" : "🔇"; }; }
+
+function shopHtml() {
+  const guns = GUNS.map(g => {
+    const own = S.guns[g.id], cur = S.gun === g.id;
+    return `<div class="tile${cur ? " cur" : ""}" style="--rar:${g.col}">${gunPic(g.id)}<b>${g.name}</b><span>${g.rar} · ${g.dmg} damage</span>
+      ${cur ? `<span>Equipped</span>` : own ? `<button class="btn small ghost" data-equip="${g.id}">Equip</button>` : `<button class="btn small" data-buy="${g.id}" ${S.coins < g.cost ? "disabled" : ""}>${g.cost} coins</button>`}</div>`;
+  }).join("");
+  const items = ITEMS.map(it => `<div class="tile" style="--rar:${it.col}">${pic(it.img, "itempic")}<b>${it.name}</b><span>${it.what} · you have ${S.items[it.id]}</span>
+      <button class="btn small" data-item="${it.id}" ${S.coins < it.cost || S.items[it.id] >= CARRY ? "disabled" : ""}>${S.items[it.id] >= CARRY ? "Full" : it.cost + " coins"}</button></div>`).join("");
+  return `<div class="shelf" id="shopshelf"><h3>Shop</h3><p class="sub">You have <b>${S.coins} coins</b>. Win fights to earn coins. A better gun does more damage with every right answer. You can carry ${CARRY} of each item.</p><div class="tiles">${guns}${items}</div></div>`;
+}
+function wireShop(again) {
+  app.querySelectorAll("[data-buy]").forEach(b => b.onclick = () => { const g = GUNS.find(x => x.id === b.dataset.buy); if (S.coins >= g.cost) { S.coins -= g.cost; S.guns[g.id] = 1; S.gun = g.id; beep(SND.buy); again(); } });
+  app.querySelectorAll("[data-equip]").forEach(b => b.onclick = () => { S.gun = b.dataset.equip; again(); });
+  app.querySelectorAll("[data-item]").forEach(b => b.onclick = () => { const it = ITEMS.find(x => x.id === b.dataset.item); if (S.coins >= it.cost && S.items[it.id] < CARRY) { S.coins -= it.cost; S.items[it.id]++; beep(SND.buy); again(); } });
+}
+function lockerHtml() {
+  return `<div class="shelf"><h3>Locker</h3><p class="sub">Every match you win gives a crown. Crowns unlock outfits. Tap one you own to wear it.</p><div class="tiles">${SKINS.map(([img, name, col, need, dir]) => {
+    const own = S.crowns >= need;
+    return `<${own ? "button" : "div"} class="tile skin${own ? "" : " off"}${S.skin === img ? " cur" : ""}" style="--rar:${col}" ${own ? `data-skin="${img}"` : ""}><img src="${dir}${img}.webp" alt=""><b>${name}</b><span>${own ? (S.skin === img ? "Wearing" : "Unlocked") : need + (need === 1 ? " crown" : " crowns")}</span></${own ? "button" : "div"}>`;
+  }).join("")}</div></div>`;
+}
+function resultCard(r) {
+  if (r.ko) return `<div class="card result" id="result" style="margin-bottom:14px"><h2>Knocked out!</h2><p>The storm takes this match, but you keep your coins, your guns and your items.<br>Read the explanations, stock up at the shop, and drop in again.</p></div>`;
+  return `<div class="card result" id="result" style="margin-bottom:14px"><div class="big">${pic("victory", "vic")}<img src="${P2}crown3d.webp" alt="Crown"></div><h2>Victory crown!</h2>
+    <div class="rows"><span>Shots on target</span><b>${r.hits} of ${r.hits + r.misses}</b><span>Coins for the win</span><b>+${WIN_COINS}</b>
+    <span>Fortnite time for winning</span><b>${mins(WIN_MIN)}</b><span>Bonus for ${r.misses === 0 ? "no misses" : r.misses + (r.misses === 1 ? " miss" : " misses")}</span><b>${mins(missBonus(r.misses))}</b>
+    <span>Added today</span><b id="gained">${mins(r.got)}</b></div>
+    ${r.got < WIN_MIN + missBonus(r.misses) ? `<p>Today’s limit of ${mins(S.time.cap)} is reached, so the rest was not added. You can still play for coins and crowns.</p>` : ""}</div>`;
+}
+
+/* ---------- for grown-ups ---------- */
+function parentsHtml() {
+  const cats = {};
+  for (const [k, v] of Object.entries(S.q)) {
+    if (k.startsWith("p:")) continue;
+    const q = k.startsWith("g:") ? GEN[k.slice(2)] : HAND[k];
+    if (!q) continue;
+    const key = (q.kind === "reading" ? "Reading" : q.kind === "thinking" ? "Thinking" : "Maths") + " · " + q.cat;
+    const c = cats[key] || (cats[key] = { r: 0, w: 0 });
+    c.r += v.r || 0; c.w += v.w || 0;
+  }
+  const rows = Object.keys(cats).sort().map(k => `<tr><td>${esc(k)}</td><td class="n">${cats[k].r}</td><td class="n">${cats[k].w}</td></tr>`).join("");
+  return `<details class="parents" id="parents"><summary>For grown-ups: Fortnite time and progress</summary>
+    <p><b>Fortnite time.</b> Each match won earns ${WIN_MIN} minutes, plus up to 7 more for few misses (no misses 7, one or two 5, three or four 3, five or six 1). Earnings stop at the daily limit. Earned so far: ${mins(earnedAll())}. Recorded as used: ${mins(S.time.used)}. <b>Ready to use: <span id="bal">${mins(balance())}</span></b>.</p>
+    <div class="row"><label for="cap">Daily limit (minutes):</label> <input id="cap" type="number" min="5" max="180" step="5" value="${S.time.cap}"> <button class="btn small ghost" id="capsave">Save</button></div>
+    <div class="row">Record time used: ${[5, 10, 15, 30].map(m => `<button class="btn small ghost" data-used="${m}">${m} min</button>`).join(" ")} <button class="btn small ghost" data-used="all">All of it</button> <button class="btn small ghost" data-used="undo">Undo all</button></div>
+    <p>Matches won: ${S.stats.wins}. Knock-outs: ${S.stats.kos}. Every question gets one go and no hints; after each answer the explanation is shown.</p>
+    ${rows ? `<table><tr><th>Question type</th><th class="n">Right</th><th class="n">Missed</th></tr>${rows}</table>` : `<p>No questions answered yet.</p>`}
+    <p>Progress is saved only in this browser on this device.</p>
+    <div class="row"><button class="btn small ghost" id="reset">Start the whole game again</button></div></details>`;
+}
+function wireParents() {
+  const keep = () => { home(); $("#parents").open = true; };
+  $("#capsave").onclick = () => { const v = Math.round(Number($("#cap").value)); if (v >= 5 && v <= 180) { S.time.cap = v; keep(); } };
+  app.querySelectorAll("[data-used]").forEach(b => b.onclick = () => {
+    const u = b.dataset.used;
+    S.time.used = u === "undo" ? 0 : u === "all" ? earnedAll() : Math.min(earnedAll(), S.time.used + Number(u));
+    keep();
+  });
+  $("#reset").onclick = () => { if (confirm("Start again from nothing? Coins, crowns, guns and Fortnite time records will all be cleared.")) { S = FRESH(); if (!PRACTICE) save(); home(); } };
+}
+
+/* ---------- the battle ---------- */
+function passageHtml(o, q) {
+  const p = PASS[o.pid];
+  let html = p.html;
+  if (q.gap) html = html.replace(`data-g="${q.gap}" class="gap"`, `data-g="${q.gap}" class="gap cur"`);
+  return `<div class="card passage"><h3>${p.title}</h3><p class="pnote">${p.note}</p>${html}</div>`;
+}
+function battle(fx) {
+  const M = S.match, o = M.opps[M.cur], st = STAGE[o.stage], k = o.boss ? { label: "Boss", icon: "👑", arena: ["arena-peaks", "arena-reef", "arena-forest"][S.n % 3], col: "#7a1f3d" } : KIND[o.kind];
+  const pend = o.pending, q = pend ? resolve(pend.ref) : null, done = pend && pend.chosen !== null;
+  const qk = q ? KIND[q.kind] : k;
+  document.documentElement.style.setProperty("--kind", qk.col);
+  const over = M.hp <= 0, won = o.dead;
+  let h = `<div class="playbar"><button class="pill" id="back" ${pend && !done ? "disabled title='Answer this shot first'" : ""}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="spacer" style="flex:1"></span>
+    <span class="pill" id="coins">${pic("coins")} ${S.coins}</span><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min today</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>
+  <div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
+    <div class="hud me"><b>You</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}</div>
+    <div class="hud foe"><b>${esc(o.name)}</b><small>${k.icon} ${o.boss ? "Boss · thinking and maths" : k.label + " opponent"}</small>${bar("ehp", o.hp, o.max)}</div>
+    <div class="fighter me${over ? " ko" : ""}" id="hero"><img src="${skin()[4]}${skin()[0]}.webp" alt="Your hero"></div>
+    <button class="fighter foe${won ? " ko" : ""}${!pend && !won && !over ? " aim" : ""}" id="enemy" ${pend || won || over ? "disabled" : ""} aria-label="Shoot at ${esc(o.name)}"><img src="art/${o.img}.webp" alt=""><span class="cross"></span></button>
+  </div>
+  <div class="actions">
+    <button class="act gun" id="shoot" style="--rar:${gun().col}" ${pend || won || over ? "disabled" : ""}>${gunPic(S.gun)}<span><b>${gun().name}</b><small>${gun().dmg} damage a hit</small></span><span class="go">Shoot</span></button>
+    <button class="act" id="usemed" style="--rar:#3fae2a" ${!S.items.med || M.hp >= MAXHP || over ? "disabled" : ""}>${pic("medkit")}<span><b>Med Kit ×${S.items.med}</b><small>+50 health</small></span></button>
+    <button class="act" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
+  </div>`;
+  const showPassage = q && q.kind === "reading";
+  h += `<div class="stage${showPassage ? " has-passage" : ""}">${showPassage ? passageHtml(o, q) : ""}<div class="card" id="qcard" data-q="${pend ? qkey(pend.ref) : ""}" data-seed="${pend && pend.ref.seed !== undefined ? pend.ref.seed : ""}">`;
+  if (!q) {
+    h += `<div class="aimhelp"><b>${esc(o.name)}</b> is in your sights.<br>Tap your gun or the enemy to take a shot. Every shot is a question.<br>
+      <small>A right answer hits for ${gun().dmg}. A wrong answer misses, and ${esc(o.name)} shoots back for ${st.dmg}.</small></div>`;
+  } else {
+    h += `<div class="qhead"><span>${qk.icon} ${qk.label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>
+      <div class="opts${q.visual ? " visual" : ""}">${q.options.map((op, i) => `<button class="opt${done ? (i === q.answer ? " right" : i === pend.chosen ? " wrong" : " dim") : ""}" data-i="${i}" ${done ? "disabled" : ""}><span class="let">${LETTERS[i]}</span><span>${op}</span></button>`).join("")}</div>`;
+    if (done) {
+      const ok = pend.chosen === q.answer;
+      h += `<div class="fb ${ok ? "good" : "miss"}"><h4>${ok ? `Hit! ${gun().dmg} damage.` : `Miss! ${esc(o.name)} shoots back: ${st.dmg} damage.`}</h4>${ok ? "" : `<p>The answer was <b>${LETTERS[q.answer]}</b>.</p>`}${q.explain}</div>
+        <div class="next"><button class="btn" id="next">${over ? "Knocked out…" : won ? (o.boss ? "Claim your crown ▶" : `${esc(o.name)} is out! Back to the island ▶`) : "Next shot ▶"}</button></div>`;
+    }
+  }
+  h += `</div></div>`;
+  app.innerHTML = h;
+  save();
+  wireCommon();
+  if (fx) {
+    const f = document.createElement("div"); f.className = "float " + (fx.hit ? "onfoe" : "onme"); f.textContent = fx.hit ? "−" + fx.dmg : "MISS! −" + fx.dmg; $(".arena").appendChild(f);
+    $(fx.hit ? "#enemy" : "#hero").classList.add("hit");
+  }
+  $("#back").onclick = () => { if (!(pend && !done)) home(); };
+  const shoot = () => { if (o.pending || o.dead || M.hp <= 0) return; nextQ(o); battle(); const c = $("#qcard"); if (c && window.innerWidth < 821) c.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  $("#shoot").onclick = shoot; $("#enemy").onclick = shoot;
+  $("#usemed").onclick = () => { if (S.items.med && M.hp < MAXHP) { S.items.med--; M.hp = Math.min(MAXHP, M.hp + 50); beep(SND.buy); battle(); } };
+  $("#useshield").onclick = () => { if (S.items.shield && M.shield < MAXSH) { S.items.shield--; M.shield = Math.min(MAXSH, M.shield + 50); beep(SND.buy); battle(); } };
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(Number(b.dataset.i)));
+  const nx = $("#next");
+  if (nx) nx.onclick = () => {
+    o.pending = null;
+    if (M.hp <= 0) return knockedOut();
+    if (o.dead) return o.boss ? victory() : home(window.scrollTo(0, 0));
+    nextQ(o); battle(); window.scrollTo(0, 0);
+  };
+}
+function answer(i) {
+  const M = S.match, o = M.opps[M.cur], pend = o.pending;
+  if (!pend || pend.chosen !== null) return;
+  const q = resolve(pend.ref), key = qkey(pend.ref), rec = S.q[key] || (S.q[key] = { r: 0, w: 0, t: 0 });
+  pend.chosen = i;
+  let fx;
+  if (i === q.answer) {
+    rec.r++; rec.t = ++S.seq; M.hits++;
+    o.hp = Math.max(0, o.hp - gun().dmg);
+    fx = { hit: true, dmg: gun().dmg }; beep(SND.hit);
+    if (o.hp <= 0) {
+      o.dead = true; S.coins += STAGE[o.stage].coins;
+      if (!o.boss && M.opps.every(x => x.dead || x.stage !== M.stage)) {
+        M.stage++;
+        M.note = M.stage === 4 ? "The storm closes to the last circle. Only the boss is left!" : `The storm is closing! Circle ${M.stage}: tougher opponents, harder questions.`;
+      }
+    }
+  } else {
+    rec.w++; rec.t = 1; M.misses++;
+    hurt(M, STAGE[o.stage].dmg);
+    fx = { hit: false, dmg: STAGE[o.stage].dmg }; beep(M.hp <= 0 ? SND.ko : SND.miss);
+  }
+  battle(fx);
+  const fb = $(".fb"); if (fb && window.innerWidth < 821) fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+function victory() {
+  const M = S.match, want = WIN_MIN + missBonus(M.misses);
+  S.coins += WIN_COINS; S.crowns++; S.stats.wins++; S.n++;
+  S.last = { hits: M.hits, misses: M.misses, got: addMinutes(want) };
+  S.match = null; beep(SND.win);
+  home(); window.scrollTo(0, 0);
+}
+function knockedOut() {
+  S.stats.kos++; S.match = null; S.last = { ko: true };
+  home(); window.scrollTo(0, 0);
+}
+
+/* In practice mode only: show any one question in a battle (used by tools/check_game3.js to look at every question). */
+if (PRACTICE) window.__preview = ref => {
+  if (!S.match) S.match = newMatch();
+  const M = S.match, q = resolve(ref), o = M.opps.find(x => !x.boss && x.kind === q.kind);
+  M.opps.forEach(x => { x.dead = false; x.hp = x.max; x.pending = null; }); M.hp = MAXHP; M.cur = M.opps.indexOf(o);
+  if (q.kind === "reading") { o.pid = q.pid; o.queue = []; }
+  o.pending = { ref, chosen: null };
+  battle();
+};
+
+/* ---------- start ---------- */
+if (S.match && S.match.cur !== null && S.match.opps[S.match.cur] && !S.match.opps[S.match.cur].dead && S.match.opps[S.match.cur].pending) battle(); else home();
+})();
+</script>
+</body>
+</html>

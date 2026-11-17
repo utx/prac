@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storm Island</title>
+<style>
+  :root {
+    --ink: #1b2a41; --ink-soft: #55627a; --line: #d8dde6; --paper: #ffffff; --field: #f3f5f8;
+    --navy: #0d1330; --sky1: #16205c; --sky2: #5b2a9d; --gold: #ffe81a; --gold-deep: #ff9d1a; --storm: #8a3ff0;
+    --good: #1e8a55; --good-bg: #e2f5ea; --bad: #c0392b; --bad-bg: #fde8e5; --kind: #0b6fa4;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--sky2); }
+  html, body { margin: 0; min-height: 100%; color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 17px; line-height: 1.5; }
+  body { background: linear-gradient(160deg, var(--sky1), var(--sky2)) fixed; }
+  button { font: inherit; cursor: pointer; color: inherit; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 14px 14px 70px; }
+  .caps { font-family: "Arial Black", Impact, sans-serif; font-style: italic; text-transform: uppercase; }
+
+  /* ---- top bar ---- */
+  .top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #fff; margin-bottom: 12px; }
+  .top h1 { font: italic 900 30px "Arial Black", Impact, sans-serif; text-transform: uppercase; margin: 0; letter-spacing: .5px; text-shadow: 0 3px 0 var(--navy); }
+  .top h1 span { color: var(--gold); }
+  .top .spacer { flex: 1; }
+  .pill { background: rgba(13,19,48,.6); border: 2px solid rgba(255,255,255,.28); color: #fff; border-radius: 999px;
+    padding: 4px 12px; font-size: 15px; font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+  .pill img { width: 24px; height: 24px; object-fit: contain; }
+  button.pill:hover { background: rgba(255,255,255,.22); }
+  .btn { background: var(--gold); color: #2a2100; border: 3px solid var(--navy); border-bottom-width: 6px; border-radius: 10px; padding: 8px 20px;
+    font: italic 900 18px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-decoration: none; display: inline-block; }
+  .btn:hover { filter: brightness(1.08); } .btn:active { transform: translateY(2px); border-bottom-width: 4px; }
+  .btn.blue { background: #3fa7ff; color: #fff; } .btn.ghost { background: #fff; color: var(--ink); } .btn.small { font-size: 14px; padding: 4px 12px; border-width: 2px; border-bottom-width: 4px; }
+  .btn:disabled { filter: grayscale(1); opacity: .6; cursor: default; }
+  .note { background: #fff8e6; border: 2px dashed var(--gold-deep); border-radius: 14px; padding: 12px 16px; margin-bottom: 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .note .txt { flex: 1 1 240px; }
+  .banner { background: var(--storm); color: #fff; border: 3px solid var(--navy); border-radius: 12px; padding: 8px 16px; margin-bottom: 12px; font-weight: 700; animation: pop .5s; }
+  @keyframes pop { 0% { transform: scale(.9); opacity: 0; } }
+
+  /* ---- Fortnite time ---- */
+  .timecard { background: var(--navy); color: #fff; border-radius: 16px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .pie { --p: 0; width: 112px; height: 112px; border-radius: 50%; flex: none; position: relative;
+    background: conic-gradient(var(--gold) calc(var(--p) * 1%), #2b3566 0); border: 5px solid #fff; box-shadow: 0 0 0 4px var(--navy), 0 0 22px rgba(255,232,26,.5); }
+  .pie::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(rgba(13,19,48,.55) 0 1.2deg, transparent 1.2deg 60deg); }
+  .timecard .txt { flex: 1 1 200px; }
+  .timecard .lab { color: var(--gold); font-size: 16px; font-weight: 700; }
+  .timecard .bigt { font: 900 34px/1.1 "Arial Black", Impact, sans-serif; }
+  .timecard .of { opacity: .88; font-size: 15px; }
+  .chest { width: 128px; height: 120px; object-fit: contain; flex: none; filter: drop-shadow(0 6px 4px rgba(0,0,0,.5)); }
+  @media (max-width: 520px) { .pie { width: 84px; height: 84px; } .chest { width: 84px; height: 80px; } .timecard .bigt { font-size: 26px; } .top h1 { font-size: 24px; } }
+
+  /* ---- the island ---- */
+  .island { position: relative; width: 100%; max-width: 640px; margin: 0 auto 14px; aspect-ratio: 1; border-radius: 18px; overflow: hidden; border: 4px solid var(--navy); background: #1d6fd0; }
+  .island svg, .island .mapimg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+  .island #stormhole { transition: r 1.4s ease-in-out; }
+  .mk { position: absolute; transform: translate(-50%, -50%); width: 68px; padding: 0; border: 0; background: none; text-align: center; color: #fff; line-height: 1.1; }
+  .mk .pic { width: 60px; height: 60px; margin: 0 auto; border-radius: 50%; border: 3px solid var(--navy); background: var(--kind); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 4px 0 rgba(13,19,48,.6); }
+  .mk .pic img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 50%; }
+  .mk .pic .em { font-size: 32px; }
+  .mk .tag { position: absolute; right: -8px; bottom: -6px; font-size: 18px; background: #fff; border: 2px solid var(--navy); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .mk .nm { display: inline-block; margin-top: 3px; font-size: 11.5px; font-weight: 800; background: rgba(13,19,48,.82); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
+  .mk .mhp { height: 6px; width: 46px; margin: 3px auto 0; background: rgba(13,19,48,.7); border-radius: 4px; overflow: hidden; }
+  .mk .mhp i { display: block; height: 100%; background: #ff5a4d; }
+  .mk.open .pic { border-color: var(--gold); animation: glow 1.6s infinite; }
+  .mk.open:hover .pic { transform: scale(1.08); }
+  .mk.later { opacity: .8; } .mk.later .pic { filter: grayscale(.7) brightness(.8); }
+  .mk.dead .pic { filter: grayscale(1) brightness(.55); } .mk.dead .nm { text-decoration: line-through; opacity: .8; }
+  .mk.boss .pic { width: 74px; height: 74px; background: #7a1f3d; } .mk.boss { width: 84px; }
+  .mk.spot .pic { background: #fff; border-radius: 14px; }
+  .mk.spot.usedup { opacity: .55; }
+  .mk:disabled { pointer-events: none; } .mk.open { z-index: 2; }
+  @keyframes glow { 50% { box-shadow: 0 0 0 7px rgba(255,232,26,.35), 0 4px 0 rgba(13,19,48,.6); } }
+  .dropin { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(13,19,48,.45); text-align: center; color: #fff; padding: 20px; }
+  .dropin .btn { font-size: 26px; padding: 12px 34px; }
+  .dropin p { margin: 0; font-weight: 700; text-shadow: 0 2px 0 var(--navy); max-width: 420px; }
+  @media (max-width: 520px) { .mk { width: 56px; } .mk .pic { width: 46px; height: 46px; } .mk.boss .pic { width: 56px; height: 56px; } .mk .nm { font-size: 10px; padding: 0 4px; } .mk .tag { width: 22px; height: 22px; font-size: 13px; } .mk .pic .em { font-size: 24px; } }
+  .legend { color: #fff; font-size: 14.5px; text-align: center; margin: -4px 0 14px; opacity: .92; }
+  .me-strip { background: rgba(13,19,48,.7); border: 2px solid rgba(255,255,255,.25); color: #fff; border-radius: 14px; padding: 8px 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .me-strip .grow { flex: 1 1 180px; }
+
+  /* ---- bars ---- */
+  .bar { position: relative; height: 18px; background: rgba(13,19,48,.75); border: 2px solid var(--navy); border-radius: 6px; overflow: hidden; margin-top: 3px; min-width: 110px; }
+  .bar i { display: block; height: 100%; transition: width .5s; }
+  .bar.hp i { background: linear-gradient(180deg, #7dff6b, #23b53a); } .bar.sh i { background: linear-gradient(180deg, #7fd4ff, #2f8fff); } .bar.ehp i { background: linear-gradient(180deg, #ff8a65, #e5484d); }
+  .bar span { position: absolute; inset: 0; text-align: center; font-size: 12px; line-height: 14px; font-weight: 800; color: #fff; text-shadow: 0 1px 0 #000; }
+  .bar.sh { height: 12px; } .bar.sh span { line-height: 8px; font-size: 10px; }
+
+  /* ---- battle ---- */
+  .playbar { display: flex; align-items: center; gap: 8px; color: #fff; margin-bottom: 10px; flex-wrap: wrap; }
+  .arena { position: relative; height: 290px; border-radius: 16px; overflow: hidden; border: 4px solid var(--navy); background: var(--navy) center bottom / cover no-repeat; margin-bottom: 10px; }
+  .hud { position: absolute; top: 8px; width: 42%; max-width: 250px; color: #fff; background: rgba(13,19,48,.78); border-radius: 10px; padding: 6px 10px 8px; font-size: 14px; }
+  .hud.me { left: 8px; } .hud.foe { right: 8px; }
+  .hud b { font: italic 900 16px "Arial Black", Impact, sans-serif; text-transform: uppercase; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hud small { display: block; opacity: .9; font-size: 12.5px; }
+  .fighter { position: absolute; bottom: 6px; width: 170px; height: 170px; padding: 0; border: 0; background: none; }
+  .fighter img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 0 rgba(0,0,0,.45)); display: block; }
+  .fighter.me { left: 6%; } .fighter.foe { right: 6%; }
+  .fighter.foe:not(:disabled):hover img { filter: drop-shadow(0 0 12px #fff) drop-shadow(0 6px 0 rgba(0,0,0,.45)); }
+  .fighter.foe:disabled { cursor: default; }
+  .fighter.foe .cross { position: absolute; left: 50%; top: 50%; width: 70px; height: 70px; margin: -35px 0 0 -35px; border: 4px solid var(--gold); border-radius: 50%; opacity: 0; pointer-events: none; }
+  .fighter.foe .cross::before, .fighter.foe .cross::after { content: ""; position: absolute; background: var(--gold); }
+  .fighter.foe .cross::before { left: 50%; top: -12px; bottom: -12px; width: 4px; margin-left: -2px; } .fighter.foe .cross::after { top: 50%; left: -12px; right: -12px; height: 4px; margin-top: -2px; }
+  .fighter.foe.aim .cross { opacity: .95; animation: aim 1.2s infinite; }
+  @keyframes aim { 50% { transform: scale(1.15); } }
+  .fighter.hit { animation: hit .55s; } .fighter.ko img { transform: rotate(80deg) translateY(30px); opacity: .5; transition: transform .6s, opacity .6s; }
+  @keyframes hit { 20% { transform: translateX(-10px) rotate(-10deg); filter: brightness(2.2); } 60% { transform: translateX(8px) rotate(6deg); } }
+  .float { position: absolute; top: 42%; font: italic 900 34px "Arial Black", Impact, sans-serif; color: var(--gold); text-shadow: 0 3px 0 var(--navy), 0 0 8px #000; pointer-events: none; animation: rise 1.5s forwards; white-space: nowrap; }
+  .float.onfoe { right: 12%; } .float.onme { left: 10%; color: #ff6b5e; }
+  @keyframes rise { 0% { transform: translateY(20px) scale(.6); opacity: 0; } 20% { opacity: 1; transform: translateY(0) scale(1.15); } 100% { transform: translateY(-60px); opacity: 0; } }
+  .actions { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .act { flex: 1 1 130px; display: flex; align-items: center; gap: 8px; text-align: left; background: linear-gradient(180deg, color-mix(in srgb, var(--rar, #5d6578) 60%, #fff), color-mix(in srgb, var(--rar, #5d6578) 92%, #000));
+    color: #fff; border: 3px solid var(--navy); border-bottom-width: 6px; border-radius: 10px; padding: 6px 10px; line-height: 1.2; min-width: 0; }
+  .act b { font: italic 900 14.5px "Arial Black", Impact, sans-serif; text-transform: uppercase; display: block; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
+  .act small { font-size: 12.5px; display: block; }
+  .gunpic { width: 76px; height: 38px; object-fit: cover; border-radius: 6px; border: 2px solid var(--navy); flex: none; display: block; }
+  .ico { width: 30px; height: 30px; object-fit: contain; flex: none; vertical-align: middle; }
+  .pill .ico { width: 24px; height: 24px; }
+  .kit { text-align: center; font-size: 14px; font-weight: 700; } .kit small { display: block; }
+  .banner { display: flex; align-items: center; gap: 10px; } .banner .ico { width: 44px; height: 44px; }
+  .dropin .bus { width: 110px; height: 110px; object-fit: contain; animation: bob 3s ease-in-out infinite; }
+  .mk.spot .pic img { object-fit: contain; border-radius: 0; padding: 5px; }
+  .act.gun { flex: 2 1 220px; } .act.gun .go { margin-left: auto; background: var(--gold); color: #2a2100; border-radius: 8px; padding: 4px 12px; font: italic 900 17px "Arial Black", Impact, sans-serif; }
+  .act:disabled { filter: grayscale(.8); opacity: .65; cursor: default; }
+  @media (max-width: 520px) { .act.gun { flex-basis: 100%; } .arena { height: 236px; } .fighter { width: 124px; height: 124px; } .fighter.me { left: 2%; } .fighter.foe { right: 2%; } .float { font-size: 26px; } }
+
+  /* ---- question ---- */
+  .stage { display: grid; gap: 12px; }
+  .stage.has-passage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  @media (max-width: 820px) { .stage.has-passage { grid-template-columns: minmax(0, 1fr); } }
+  .card { background: var(--paper); border-radius: 16px; padding: 16px 18px; min-width: 0; }
+  .passage h3 { margin: 0 0 4px; font-size: 20px; }
+  .passage .pnote { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 10px; }
+  .passage p { margin: 0 0 10px; }
+  .passage .poem { white-space: pre-line; font-size: 17px; line-height: 1.6; margin: 0 0 4px; }
+  .passage .extract { border-left: 4px solid var(--kind); padding: 2px 0 2px 12px; margin: 0 0 14px; }
+  .passage .extract b.tag { display: block; color: var(--kind); }
+  .passage .gap { white-space: nowrap; font-weight: 700; background: #eef1f6; border-radius: 4px; padding: 0 4px; }
+  .passage .gap.cur { background: var(--gold); box-shadow: 0 0 0 2px var(--navy); }
+  @media (min-width: 821px) { .passage { position: sticky; top: 10px; max-height: calc(100vh - 20px); overflow: auto; } }
+  .qhead { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--ink-soft); font-weight: 700; margin-bottom: 6px; }
+  .stem { font-size: 18px; }
+  .stem p { margin: 0 0 10px; }
+  .stem .box { background: var(--field); border-left: 4px solid var(--kind); border-radius: 6px; padding: 10px 14px; margin: 0 0 10px; }
+  .figure { margin: 10px 0; text-align: center; overflow-x: auto; }
+  .figure svg, .opt svg { max-width: 100%; height: auto; }
+  table.grid { border-collapse: collapse; margin: 8px auto; font-size: 17px; }
+  table.grid th, table.grid td { border: 1.5px solid var(--ink-soft); padding: 5px 10px; text-align: center; }
+  table.grid th { background: var(--field); }
+  table.grid td.fill { background: #fff3bf; font-weight: 800; }
+  .opts { display: grid; gap: 8px; margin-top: 12px; }
+  .opts.visual { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .opt { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--paper); border: 3px solid var(--line);
+    border-radius: 10px; padding: 9px 12px; color: var(--ink); font-size: 17px; width: 100%; min-width: 0; }
+  .opt:hover:not(:disabled) { border-color: var(--kind); background: var(--field); }
+  .opt:disabled { cursor: default; }
+  .opt .let { flex: none; width: 32px; height: 32px; border-radius: 8px; background: var(--field); border: 1.5px solid var(--line); font-weight: 800; display: flex; align-items: center; justify-content: center; transform: skewX(-6deg); }
+  .opt.right { border-color: var(--good); background: var(--good-bg); } .opt.right .let { background: var(--good); color: #fff; border-color: var(--good); }
+  .opt.wrong { border-color: var(--bad); background: var(--bad-bg); } .opt.wrong .let { background: var(--bad); color: #fff; border-color: var(--bad); }
+  .opt.dim { opacity: .55; }
+  .fb { margin-top: 14px; border-radius: 12px; padding: 12px 16px; }
+  .fb.good { background: var(--good-bg); border: 2px solid var(--good); } .fb.miss { background: var(--bad-bg); border: 2px solid var(--bad); }
+  .fb h4 { margin: 0 0 4px; font-size: 19px; }
+  .fb p { margin: 0 0 8px; } .fb p:last-child { margin: 0; }
+  .fb .why-not { color: var(--ink-soft); }
+  .next { margin-top: 14px; display: flex; justify-content: flex-end; }
+  .aimhelp { text-align: center; font-size: 18px; padding: 8px 0; }
+  .aimhelp .btn { margin-top: 8px; font-size: 22px; }
+
+  /* ---- shop, locker, results ---- */
+  .shelf { background: var(--paper); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
+  .shelf h3 { margin: 0 0 4px; font: italic 900 20px "Arial Black", Impact, sans-serif; text-transform: uppercase; }
+  .shelf p.sub { margin: 0 0 10px; color: var(--ink-soft); font-size: 15px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+  .tile { border: 3px solid var(--navy); border-bottom-width: 7px; border-radius: 10px; text-align: center; padding: 8px 6px; font-size: 13.5px; line-height: 1.3; color: #fff;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--rar) 55%, #fff), color-mix(in srgb, var(--rar) 90%, #000)); display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .tile b { font: italic 900 14px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
+  .tile img { width: 88px; height: 88px; object-fit: contain; } .tile .gunpic { width: 116px; height: 58px; } .tile .itempic { width: 64px; height: 64px; object-fit: contain; }
+  .tile .btn { margin-top: auto; }
+  .tile.off { --rar: #5d6578 !important; } .tile.off img { filter: brightness(0) opacity(.55); }
+  .tile.cur { box-shadow: 0 0 0 4px var(--gold); }
+  button.tile { cursor: pointer; }
+  .result { text-align: center; }
+  .result h2 { font: italic 900 34px "Arial Black", Impact, sans-serif; text-transform: uppercase; margin: 6px 0; }
+  .result .big img { width: 150px; height: 146px; object-fit: contain; animation: bob 2.6s ease-in-out infinite; }
+  .result .big img.vic { width: 120px; height: 100px; animation-delay: -1.2s; }
+  .result .rows { display: inline-grid; grid-template-columns: auto auto; gap: 4px 18px; text-align: left; margin: 10px auto; font-size: 18px; }
+  .result .rows b { text-align: right; }
+  @keyframes bob { 50% { transform: translateY(-7px); } }
+  details.parents { background: rgba(255,255,255,.94); border-radius: 12px; padding: 10px 16px; font-size: 15px; }
+  details.parents summary { cursor: pointer; font-weight: 700; color: var(--ink-soft); }
+  details.parents table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  details.parents td, details.parents th { border-bottom: 1px solid var(--line); padding: 5px 8px; text-align: left; }
+  details.parents td.n, details.parents th.n { text-align: right; }
+  details.parents input { font: inherit; width: 80px; padding: 4px 6px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0 14px; }
+  .legal { color: rgba(255,255,255,.78); font-size: 12.5px; line-height: 1.45; margin: 16px 4px 0; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const INK = "#1b2a41";
+const READING = [], THINKING = [], MATHS = [], GENS = [];
+/* ---------------------------------------------------------------
+   STORM ISLAND: shared drawing and option helpers for the question files.
+   Loaded first (the files are joined in name order by tools/build_game3.py).
+   --------------------------------------------------------------- */
+const LIB = (() => {
+  const T = (x, y, s, o = "") => `<text x="${x}" y="${y}" font-size="15" fill="${INK}" ${o}>${s}</text>`;
+  const fig = (svg) => `<div class="figure">${svg}</div>`;
+  const tbl = (head, rows, fill = []) => `<div class="figure"><table class="grid"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map((r, ri) => `<tr>${r.map((c, i) => i ? `<td${fill.some(f => f[0] === ri && f[1] === i) ? ' class="fill"' : ""}>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table></div>`;
+  const money = c => "$" + (c / 100).toFixed(2);
+  const clock = m => { m = ((m % 1440) + 1440) % 1440; const h = Math.floor(m / 60), mm = m % 60; return `${h % 12 === 0 ? 12 : h % 12}:${String(mm).padStart(2, "0")} ${h < 12 ? "am" : "pm"}`; };
+  const dur = m => m < 60 ? `${m} minutes` : `${Math.floor(m / 60)} h ${m % 60 ? (m % 60) + " min" : ""}`.trim();
+  const frac = (n, d) => `<sup>${n}</sup>⁄<sub>${d}</sub>`;
+
+  /* a column graph: series = [{name, color, values}], gridlines every `step` up to `max` */
+  function colGraph({ labels, series, max, step, ylabel, numbers = true, aria }) {
+    const gw = series.length * 26 + 30, W = 70 + labels.length * gw, y = v => 205 - v * (170 / max);
+    let g = "";
+    for (let v = 0; v <= max; v += step) g += `<line x1="50" x2="${W - 10}" y1="${y(v)}" y2="${y(v)}" stroke="#c5ccd8" stroke-width="1"/>` + (numbers ? T(42, y(v) + 5, v, 'text-anchor="end"') : "");
+    labels.forEach((n, i) => {
+      const x0 = 66 + i * gw;
+      series.forEach((s, k) => { g += `<rect x="${x0 + k * 26}" y="${y(s.values[i])}" width="24" height="${205 - y(s.values[i])}" fill="${s.color}" stroke="${INK}" stroke-width="1.5"/>`; });
+      g += T(x0 + series.length * 13, 224, n, 'text-anchor="middle"');
+    });
+    g += `<line x1="50" x2="50" y1="${y(max)}" y2="205" stroke="${INK}" stroke-width="2"/><line x1="50" x2="${W - 10}" y1="205" y2="205" stroke="${INK}" stroke-width="2"/>`;
+    g += `<text x="14" y="120" font-size="13" fill="${INK}" text-anchor="middle" transform="rotate(-90 14 120)">${ylabel}</text>`;
+    if (series.length > 1) series.forEach((s, k) => { g += `<rect x="${60 + k * 110}" y="236" width="14" height="12" fill="${s.color}" stroke="${INK}"/>` + T(80 + k * 110, 247, s.name); });
+    return fig(`<svg viewBox="0 0 ${W} ${series.length > 1 ? 256 : 238}" width="${W}" role="img" aria-label="${aria}">${g}</svg>`);
+  }
+  /* a picture graph: rows = [[label, symbols]] where symbols may end in .5; keyText is "" for a missing key */
+  function pictGraph({ rows, keyText, color, aria }) {
+    const sym = (x, y, half) => half ? `<path d="M${x + 13} ${y + 2}a13 13 0 0 0 0 26z" fill="${color}" stroke="${INK}" stroke-width="1.5"/>` : `<circle cx="${x + 13}" cy="${y + 15}" r="13" fill="${color}" stroke="${INK}" stroke-width="1.5"/>`;
+    const wide = Math.max(...rows.map(r => Math.ceil(r[1]))), W = 118 + wide * 32 + 10;
+    let g = "";
+    rows.forEach(([d, n], i) => {
+      const y = 10 + i * 40;
+      g += T(98, y + 21, d, 'text-anchor="end"') + `<line x1="106" x2="106" y1="${y - 5}" y2="${y + 35}" stroke="${INK}" stroke-width="2"/>`;
+      for (let k = 0; k < Math.floor(n); k++) g += sym(114 + k * 32, y);
+      if (n % 1) g += sym(114 + Math.floor(n) * 32, y, true);
+    });
+    const ky = 14 + rows.length * 40;
+    if (keyText) g += sym(114, ky) + T(148, ky + 21, "= " + keyText);
+    return fig(`<svg viewBox="0 0 ${Math.max(W, 290)} ${ky + (keyText ? 36 : 0)}" width="${Math.max(W, 290)}" role="img" aria-label="${aria}">${g}</svg>`);
+  }
+  /* a dot plot of counts for the values first..first+n-1 */
+  function dotPlot({ counts, first = 0, label, aria }) {
+    const W = 60 + counts.length * 40, top = Math.max(...counts), base = 30 + top * 22;
+    let g = `<line x1="20" x2="${W - 10}" y1="${base}" y2="${base}" stroke="${INK}" stroke-width="2"/>`;
+    counts.forEach((c, v) => {
+      const x = 45 + v * 40;
+      g += `<line x1="${x}" x2="${x}" y1="${base}" y2="${base + 6}" stroke="${INK}" stroke-width="2"/>` + T(x, base + 22, first + v, 'text-anchor="middle"');
+      for (let k = 0; k < c; k++) g += `<circle cx="${x}" cy="${base - 12 - k * 22}" r="8" fill="#ff8a65" stroke="${INK}" stroke-width="1.5"/>`;
+    });
+    g += T(W / 2, base + 42, label, 'text-anchor="middle"');
+    return fig(`<svg viewBox="0 0 ${W} ${base + 50}" width="${W}" role="img" aria-label="${aria}">${g}</svg>`);
+  }
+  /* an upright container with a scale: labels every `major` up to `max`, `minor` small steps between labels, liquid at `level` */
+  function jugSvg({ x = 0, max, major, minor, level, unit, color = "#f6c453", title = "" }) {
+    const y = v => 240 - v * (200 / max), small = major / minor;
+    let g = `<path d="M${x + 40} 30 L${x + 40} 242 Q${x + 40} 250 ${x + 48} 250 L${x + 132} 250 Q${x + 140} 250 ${x + 140} 242 L${x + 140} 30" fill="none" stroke="${INK}" stroke-width="3"/>`;
+    g += `<rect x="${x + 42}" y="${y(level)}" width="96" height="${248 - y(level)}" fill="${color}" opacity=".75"/>`;
+    for (let i = 0; i <= max / small + 1e-9; i++) {
+      const v = i * small, big = i % minor === 0;
+      g += `<line x1="${x + 40}" x2="${x + (big ? 66 : 54)}" y1="${y(v)}" y2="${y(v)}" stroke="${INK}" stroke-width="2"/>`;
+      if (big && v) g += T(x + 71, y(v) + 5, v + (unit ? " " + unit : ""), 'font-size="13"');
+    }
+    if (title) g += T(x + 90, 18, title, 'text-anchor="middle" font-weight="700"');
+    return g;
+  }
+  const jugAria = ({ max, major, minor, level, unit, title = "A container" }) => `${title}: the scale is labelled every ${major} ${unit} up to ${max} ${unit}, with ${minor - 1} small unlabelled mark${minor - 1 === 1 ? "" : "s"} between each pair of labels. The liquid reaches ${level % major === 0 ? "the " + level + " " + unit + " label" : "small mark number " + ((level % major) / (major / minor)) + " above the " + (level - level % major) + " " + unit + " label"}.`;
+
+  /* random helpers on top of a seeded random-number function */
+  const R = r => ({
+    int: (a, b) => a + Math.floor(r() * (b - a + 1)),
+    pick: a => a[Math.floor(r() * a.length)],
+    shuffle: a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; },
+    chance: p => r() < p,
+  });
+  /* Number options in order of size. `wrongs` are the values real mistakes give, most tempting first: the first two are
+     always used. The correct value is then steered to a random letter by choosing how many options sit below and above it,
+     topping up with near misses (a `step` out) where there are not enough real mistakes on that side. */
+  function opts(R, correct, wrongs, fmt = String, n = 5, step = 1) {
+    const w = []; for (const x of wrongs) if (Number.isFinite(x) && x > 0 && x !== correct && !w.includes(x)) w.push(x);
+    const must = w.slice(0, 2), room = Math.floor((correct - 1e-9) / step);            // how many near misses fit below
+    const lo = w.filter(x => x < correct), hi = w.filter(x => x > correct);
+    const tMin = must.filter(x => x < correct).length, tMax = Math.min(n - 1 - must.filter(x => x > correct).length, lo.length + room);
+    const t = tMax >= tMin ? R.int(tMin, tMax) : tMin;
+    const take = (list, need, dir) => { const out = list.slice(0, need); for (let k = 1; out.length < need && k < 60; k++) { const c = correct + dir * k * step; if (c > 0 && !out.includes(c) && !w.includes(c)) out.push(c); } return out; };
+    const below = take(lo, t, -1), above = take(hi, n - 1 - below.length, 1);
+    const vals = [...below, correct, ...above].sort((a, b) => a - b);
+    return { options: vals.map(fmt), answer: vals.indexOf(correct) };
+  }
+  const gen = (id, kind, tier, cat, fn) => GENS.push({ id, kind, tier, cat, make: r => fn(R(r)) });
+  const NAMES = ["Ava", "Ben", "Cleo", "Dev", "Esha", "Finn", "Gia", "Hugo", "Isla", "Jai", "Kira", "Leo", "Mila", "Noah", "Omar", "Pia", "Remy", "Suki", "Theo", "Uma", "Vera", "Will", "Yusuf", "Zoe"];
+  return { T, fig, tbl, money, clock, dur, frac, colGraph, pictGraph, dotPlot, jugSvg, jugAria, R, opts, gen, NAMES };
+})();
+
+/* ---------------------------------------------------------------
+   STORM ISLAND: question templates that redraw themselves with new numbers.
+   Each template takes a seeded random source and returns
+   { stem, options, answer, explain, data }. `data` holds the numbers the
+   picture was drawn from; tools/check_game3.js re-solves every question from
+   `data` with its own separate working, over many seeds.
+   Maths templates have five options (A–E); thinking templates have four.
+   --------------------------------------------------------------- */
+(() => {
+  const { T, fig, tbl, money, clock, colGraph, pictGraph, dotPlot, jugSvg, jugAria, opts, gen, NAMES } = LIB;
+  const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const B = s => `<b>${s}</b>`;
+  const sum = a => a.reduce((x, y) => x + y, 0);
+  const list = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+  const sy = n => n === 0.5 ? "half a symbol" : Number.isInteger(n) ? `${n} symbol${n === 1 ? "" : "s"}` : `${Math.floor(n)} and a half symbols`;
+
+  /* ================= MATHS, circle 1 ================= */
+
+  gen("pict", "maths", 1, "Graphs & data", R => {
+    const c = R.pick([
+      { intro: "The picture graph shows how many books a library lent each day.", rows: ["Mon", "Tue", "Wed", "Thu"], item: "books", verb: "were lent on", col: "#4dabf7" },
+      { intro: "The picture graph shows how many ice creams a kiosk sold each day.", rows: ["Fri", "Sat", "Sun", "Mon"], item: "ice creams", verb: "were sold on", col: "#f783ac" },
+      { intro: "The picture graph shows how many trees each class planted.", rows: ["Class 4A", "Class 4B", "Class 4C", "Class 4D"], item: "trees", verb: "were planted by", col: "#51cf66" },
+      { intro: "The picture graph shows how many shells each child collected.", rows: ["Mai", "Otis", "Priya", "Sam"], item: "shells", verb: "were collected by", col: "#ffa94d" },
+    ]);
+    const key = R.pick([2, 4, 6, 10, 20]);
+    let h, i, j;
+    do { h = R.shuffle([2, 3, 4, 5, 6, 7, 8, 9, 10]).slice(0, 4); [i, j] = R.shuffle([0, 1, 2, 3]); if (h[i] < h[j]) [i, j] = [j, i]; } while ((h[i] % 2 === 0 && h[j] % 2 === 0) || h[i] - h[j] < 2);
+    const rows = c.rows.map((n, k) => [n, h[k] / 2]), a = rows[i][1], b = rows[j][1], correct = (a - b) * key;
+    const o = opts(R, correct, [Math.ceil(a - b), a * key, (Math.ceil(a) - Math.ceil(b)) * key, (a + b) * key], String, 5, key / 2);
+    return { ...o, data: { rows, key, a: i, b: j },
+      stem: `<p>${c.intro}</p>${pictGraph({ rows, keyText: `${key} ${c.item}`, color: c.col, aria: `A picture graph. ${rows.map(r => `${r[0]}: ${sy(r[1])}`).join(". ")}. Key: one whole symbol = ${key} ${c.item}.` })}<p>How many ${B("more")} ${c.item} ${c.verb} ${B(rows[i][0])} than ${B(rows[j][0])}?</p>`,
+      explain: `<p>One symbol stands for ${key} ${c.item}, so half a symbol stands for ${key / 2}.</p><p>${rows[i][0]}: ${sy(a)} = ${a * key}. ${rows[j][0]}: ${sy(b)} = ${b * key}. The difference is ${a * key} − ${b * key} = ${B(correct)}.</p><p class="why-not">Counting the symbols without using the key gives a number that is far too small. Counting a half symbol as a whole one, or giving only ${rows[i][0]}’s amount (${a * key}), are the other common slips.</p>` };
+  });
+
+  gen("jug", "maths", 1, "Measurement & scales", R => {
+    const [major, minor] = R.pick([[100, 2], [100, 4], [200, 4], [100, 5], [200, 2], [500, 5]]), small = major / minor, max = major * 5;
+    const base = major * R.int(2, 4), t = R.int(1, minor - 1), level = base + t * small;
+    const p = R.pick([small, 2 * small, major, major + small].filter(v => v < level - small));
+    const who = R.pick(NAMES), liquid = R.pick(["juice", "milk", "water", "soup"]);
+    const o = opts(R, level - p, [level, base + t * 10 - p, base - p, base + major - p, level + p], v => v + " mL", 5, small);
+    const spec = { max, major, minor, level, unit: "mL", color: liquid === "milk" ? "#dfe7f5" : liquid === "water" ? "#8fd3ff" : "#f6c453" };
+    return { ...o, data: { major, minor, level, p },
+      stem: `<p>The jug shows how much ${liquid} ${who} has.</p>${fig(`<svg viewBox="0 0 200 262" width="200" role="img" aria-label="${jugAria({ ...spec, title: "A measuring jug" })}">${jugSvg(spec)}</svg>`)}<p>${who} pours out ${B(p + " mL")}. How much ${liquid} is left in the jug?</p>`,
+      explain: `<p>From one label to the next is ${major} mL, split into ${minor} equal steps, so each small step is ${major} ÷ ${minor} = ${small} mL.</p><p>The ${liquid} is ${t} small step${t === 1 ? "" : "s"} above ${base} mL: ${base} + ${t * small} = ${level} mL. After pouring: ${level} − ${p} = ${B(level - p + " mL")}.</p><p class="why-not">${level} mL is the amount before pouring. Reading only the nearest label (${base} or ${base + major}), or counting each small mark as 10 mL when it is not, gives the other wrong answers.</p>` };
+  });
+
+  gen("endtime", "maths", 1, "Time & timetables", R => {
+    const c = R.pick([["A film", "starts", "runs for", "finish"], ["A train", "leaves", "travels for", "arrive"], ["A swimming carnival", "starts", "lasts", "finish"], ["A bushwalk", "starts", "takes", "end"]]);
+    const sm = R.pick([30, 35, 40, 45, 50, 55]), start = R.int(8, 16) * 60 + sm, h = R.int(1, 2), m = R.pick([15, 20, 25, 30, 35, 40, 45, 50].filter(v => v + sm >= 65));
+    const correct = start + h * 60 + m;
+    const o = opts(R, correct, [correct - 60, start + m, start + h * 60, correct + 60], clock, 5, 10);
+    return { ...o, data: { start, h, m },
+      stem: `<p>${c[0]} ${c[1]} at ${B(clock(start))} and ${c[2]} ${B(`${h} hour${h > 1 ? "s" : ""} ${m} minutes`)}.</p><p>What time does it ${c[3]}?</p>`,
+      explain: `<p>Add the hours first: ${clock(start)} + ${h} hour${h > 1 ? "s" : ""} = ${clock(start + h * 60)}.</p><p>Then the minutes: ${60 - sm} minutes takes you to ${clock(start + h * 60 + 60 - sm)}, and the other ${m - (60 - sm)} minutes makes ${B(clock(correct))}.</p><p class="why-not">${clock(correct - 60)} forgets that the minutes go past the hour. ${clock(start + m)} forgets the hour${h > 1 ? "s" : ""}, and ${clock(start + h * 60)} forgets the minutes.</p>` };
+  });
+
+  gen("change", "maths", 1, "Money & best value", R => {
+    const shop = R.pick([["a pen", "a ruler", "a notebook"], ["a drink", "a muffin", "an apple"], ["a comic", "a sticker sheet", "a bookmark"], ["a bun", "a juice", "a yoghurt"]]);
+    const n = R.int(2, 3), who = R.pick(NAMES);
+    let prices, total, note;
+    do { prices = Array.from({ length: n }, () => R.int(24, 139) * 5); total = sum(prices); note = total < 900 ? 1000 : 2000; } while (total > 1800 || prices.some(p => p % 100 === 0) || total % 100 === 0);
+    const correct = note - total;
+    const o = opts(R, correct, [total, correct + 100, note - prices[0], correct + 10, note - total + prices[n - 1]], money, 5, 5);
+    return { ...o, data: { prices, note },
+      stem: `<p>${who} buys ${list(prices.map((p, k) => `${shop[k]} for ${B(money(p))}`))}.</p><p>${who} pays with a ${B("$" + note / 100 + " note")}. How much change does ${who} get?</p>`,
+      explain: `<p>Add the prices: ${prices.map(money).join(" + ")} = ${money(total)}.</p><p>Change: ${money(note)} − ${money(total)} = ${B(money(correct))}.</p><p class="why-not">${money(total)} is what was spent, not the change. ${money(correct + 100)} comes from a slip when taking away the dollars, and ${money(note - prices[0])} leaves out part of the shopping.</p>` };
+  });
+
+  gen("missing", "maths", 1, "Number & place value", R => {
+    const form = R.int(1, 3), a = R.int(12, 48), c = R.int(6, 25);
+    let b, correct, line, wrongs, how;
+    if (form === 1) { b = a + c + R.int(11, 40); correct = b - c - a; line = `${a} + ☐ = ${b} − ${c}`; wrongs = [b - a, b - c, b - c + a, b + c - a]; how = `The right-hand side is ${b} − ${c} = ${b - c}. So ${a} + ☐ = ${b - c}, and ☐ = ${b - c} − ${a} = ${B(correct)}.`; }
+    else if (form === 2) { b = R.int(20, 60); correct = a + b + c; line = `☐ − ${a} = ${b} + ${c}`; wrongs = [b + c - a, b + c, a + b, correct + 10]; how = `The right-hand side is ${b} + ${c} = ${b + c}. So ☐ − ${a} = ${b + c}, and ☐ = ${b + c} + ${a} = ${B(correct)}.`; }
+    else { b = a + c + R.int(11, 40); correct = b - a - c; line = `${b} − ☐ = ${a} + ${c}`; wrongs = [a + c, b + a + c, b - a, b - c]; how = `The right-hand side is ${a} + ${c} = ${a + c}. So ${b} − ☐ = ${a + c}, and ☐ = ${b} − ${a + c} = ${B(correct)}.`; }
+    const o = opts(R, correct, wrongs);
+    return { ...o, data: { form, a, b, c },
+      stem: `<p>What number goes in the box to make this true?</p><p style="text-align:center;font-size:22px;font-weight:700">${line}</p>`,
+      explain: `<p>Both sides of the equals sign must be worth the same. ${how}</p><p class="why-not">The other answers come from working out only one side, or from adding where you should subtract (or the other way round). Check by putting your number back in the box.</p>` };
+  });
+
+  gen("bar", "maths", 1, "Graphs & data", R => {
+    const c = R.pick([
+      { labels: ["Red", "Blue", "Green", "Gold"], y: "House points", q: (a, b, d) => `How many more points do ${B(a)} and ${B(b)} have ${B("together")} than ${B(d)}?`, col: "#ffa94d" },
+      { labels: ["Apple", "Pear", "Plum", "Fig"], y: "Trees in the orchard", q: (a, b, d) => `How many more ${B(a.toLowerCase())} and ${B(b.toLowerCase())} trees are there ${B("altogether")} than ${B(d.toLowerCase())} trees?`, col: "#69db7c" },
+      { labels: ["Bus", "Car", "Bike", "Train"], y: "Children", q: (a, b, d) => `How many more children travel by ${B(a.toLowerCase())} or ${B(b.toLowerCase())} than by ${B(d.toLowerCase())}?`, col: "#4dabf7" },
+    ]);
+    const step = R.pick([2, 10, 20]);
+    let v, i, j, k;
+    do { v = Array.from({ length: 4 }, () => R.int(2, 10) * step / 2); [i, j, k] = R.shuffle([0, 1, 2, 3]); } while (new Set(v).size < 4 || v[i] + v[j] - v[k] < step || (v[i] % step === 0 && v[j] % step === 0 && v[k] % step === 0));
+    const correct = v[i] + v[j] - v[k], fl = x => x - x % step;
+    const o = opts(R, correct, [v[i] + v[j], Math.abs(v[i] - v[k]), fl(v[i]) + fl(v[j]) - fl(v[k]), v[i] + v[j] + v[k]], String, 5, step / 2);
+    const say = x => x % step === 0 ? `reaches ${x}` : `is halfway between ${x - step / 2} and ${x + step / 2}`;
+    return { ...o, data: { labels: c.labels, values: v, step, pick: [i, j, k] },
+      stem: colGraph({ labels: c.labels, series: [{ name: "", color: c.col, values: v }], max: 5 * step, step, ylabel: c.y, aria: `A column graph. The scale goes up in steps of ${step} to ${5 * step}. ${c.labels.map((l, n) => `${l} ${say(v[n])}`).join(". ")}.` }) + `<p>${c.q(c.labels[i], c.labels[j], c.labels[k])}</p>`,
+      explain: `<p>The lines go up in ${step}s, so a column that stops halfway between two lines is ${step / 2} more than the lower line.</p><p>${c.labels[i]} = ${v[i]}, ${c.labels[j]} = ${v[j]}, ${c.labels[k]} = ${v[k]}. Together ${v[i]} + ${v[j]} = ${v[i] + v[j]}, and ${v[i] + v[j]} − ${v[k]} = ${B(correct)}.</p><p class="why-not">${v[i] + v[j]} is only the first step: the question asks how many <i>more</i>. Reading a halfway column as if it stopped on the line below gives a different wrong answer.</p>` };
+  });
+
+  gen("tabletotal", "maths", 1, "Graphs & data", R => {
+    const c = R.pick([{ what: "how many fiction and non-fiction books a library lent each day", cols: ["Fiction", "Non-fiction"], q: "On which day did the library lend the most books altogether?" }, { what: "how many adults and children visited a museum each day", cols: ["Adults", "Children"], q: "On which day did the museum have the most visitors altogether?" }, { what: "how many hot and cold drinks a kiosk sold each day", cols: ["Hot drinks", "Cold drinks"], q: "On which day did the kiosk sell the most drinks altogether?" }]);
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    let v, tot, best, big;
+    do { v = days.map(() => [R.int(12, 58), R.int(12, 58)]); tot = v.map(r => r[0] + r[1]); best = tot.indexOf(Math.max(...tot)); big = Math.max(...v.flat()); } while (tot.filter(t => t === tot[best]).length > 1 || v[best].includes(big) || tot.slice().sort((a, b) => b - a)[0] - tot.slice().sort((a, b) => b - a)[1] > 9);
+    const top = v.findIndex(r => r.includes(big));
+    return { options: days, answer: best, data: { rows: v },
+      stem: `<p>The table shows ${c.what}.</p>${tbl(["", ...c.cols], days.map((d, i) => [d, ...v[i]]))}<p>${c.q}</p>`,
+      explain: `<p>Add the two numbers in each row: ${days.map((d, i) => `${d} ${v[i][0]} + ${v[i][1]} = ${tot[i]}`).join(", ")}.</p><p>The biggest total is ${B(days[best])} with ${tot[best]}.</p><p class="why-not">${days[top]} has the biggest single number in the table (${big}), but its other number is small, so its total is only ${tot[top]}. “Altogether” means both columns must be added.</p>` };
+  });
+
+  /* ================= MATHS, circle 2 ================= */
+
+  gen("dot", "maths", 2, "Graphs & data", R => {
+    const c = R.pick([["goals scored in a shoot-out", "Goals scored", "scored"], ["books read in the holidays", "Books read", "read"], ["pets at home", "Number of pets", "have"], ["laps swum at the carnival", "Laps swum", "swam"]]);
+    let counts; do { counts = Array.from({ length: 7 }, () => R.int(0, 5)); } while (sum(counts) < 14 || sum(counts) > 24 || counts.filter(x => x === 0).length > 1);
+    const k = R.int(2, 4), type = R.pick(["more than", "fewer than", "at least"]);
+    const cnt = f => sum(counts.filter((_, v) => f(v)));
+    const correct = type === "more than" ? cnt(v => v > k) : type === "fewer than" ? cnt(v => v < k) : cnt(v => v >= k);
+    const slip = type === "more than" ? cnt(v => v >= k) : type === "fewer than" ? cnt(v => v <= k) : cnt(v => v > k);
+    const cols = type === "more than" ? 6 - k : type === "fewer than" ? k : 7 - k;
+    const o = opts(R, correct, [slip, counts[k], sum(counts) - correct, cols]);
+    const which = type === "more than" ? `${k + 1} or more` : type === "fewer than" ? `${k - 1} or fewer` : `${k} or more`;
+    return { ...o, data: { counts, type, k },
+      stem: `<p>Some children were asked about ${c[0]}. Each dot is one child.</p>${dotPlot({ counts, label: c[1], aria: `A dot plot. ${counts.map((n, v) => `${v}: ${n} dot${n === 1 ? "" : "s"}`).join(". ")}.` })}<p>How many children ${c[2]} ${B(type + " " + k)}?</p>`,
+      explain: `<p>“${type[0].toUpperCase() + type.slice(1)} ${k}” means ${which}. Count the dots above those numbers only: ${counts.map((n, v) => [n, v]).filter(([n, v]) => type === "more than" ? v > k : type === "fewer than" ? v < k : v >= k).map(([n]) => n).join(" + ")} = ${B(correct)}.</p><p class="why-not">${slip} ${type === "at least" ? "leaves out" : "wrongly includes"} the dots above ${k} itself. ${counts[k]} is only the dots above ${k}. ${cols} counts the numbers along the bottom, not the children.</p>` };
+  });
+
+  gen("bus", "maths", 2, "Time & timetables", R => {
+    const stops = R.pick([["Wharf", "Market", "Library", "Zoo"], ["Station", "Pool", "Museum", "Beach"], ["Depot", "School", "Park", "Harbour"]]);
+    const gaps = [R.int(7, 14), R.int(9, 18), R.int(11, 19)], t0 = R.int(8, 14) * 60 + R.pick([5, 10, 15, 20, 35, 40]);
+    const offs = [0, R.int(5, 8) * 5, 0]; offs[2] = offs[1] + R.int(6, 9) * 5;
+    const times = offs.map(o => { const r = [t0 + o]; gaps.forEach(g => r.push(r[r.length - 1] + g)); return r; });
+    const s = R.int(0, 1), d = R.int(s + 1, 3), missed = R.int(0, 1), who = R.pick(NAMES);
+    const arrive = times[missed][s] + R.int(2, 9), next = missed + 1;
+    const correct = times[next][d] - arrive, ride = times[next][d] - times[next][s], wait = times[next][s] - arrive;
+    const o = opts(R, correct, [ride, wait, times[missed][d] - arrive, correct + (times[next][s] - times[missed][s])], v => v + " minutes", 5, 5);
+    return { ...o, data: { times, s, d, arrive },
+      stem: `<p>Three buses run along the same route.</p>${tbl(["", "Bus 1", "Bus 2", "Bus 3"], stops.map((n, r) => [n, ...times.map(b => clock(b[r]))]))}<p>${who} gets to the ${B(stops[s])} stop at ${B(clock(arrive))} and takes the next bus to the ${B(stops[d])}.</p><p>How long is it from the moment ${who} reaches the stop until ${who} gets off at the ${stops[d]}?</p>`,
+      explain: `<p>Bus ${missed + 1} left the ${stops[s]} at ${clock(times[missed][s])}, before ${who} arrived. The next one is Bus ${next + 1} at ${clock(times[next][s])}, which reaches the ${stops[d]} at ${clock(times[next][d])}.</p><p>From ${clock(arrive)} to ${clock(times[next][d])} is ${wait} minutes of waiting + ${ride} minutes on the bus = ${B(correct + " minutes")}.</p><p class="why-not">${ride} minutes is only the bus ride and ${wait} minutes is only the wait. Using Bus ${missed + 1} is no good: it had already gone.</p>` };
+  });
+
+  gen("rectperim", "maths", 2, "Area, perimeter & 3D", R => {
+    const w = R.int(3, 8), l = R.int(w + 2, 12), A = w * l, thing = R.pick(["rug", "garden bed", "poster", "tabletop"]), u = thing === "garden bed" ? "m" : "cm";
+    const o = opts(R, 2 * (w + l), [l, w + l, 4 * l, 2 * l + w, A + w], v => `${v} ${u}`);
+    return { ...o, data: { A, w },
+      stem: `<p>A rectangular ${thing} has an area of ${B(`${A} ${u}²`)}. One of its sides is ${B(`${w} ${u}`)} long.</p>${fig(`<svg viewBox="0 0 260 130" width="260" role="img" aria-label="A rectangle. One short side is labelled ${w} ${u}. The inside is labelled Area = ${A} square ${u}. The long side is not labelled. Not to scale."><rect x="50" y="18" width="170" height="78" fill="#dff0d8" stroke="${INK}" stroke-width="2.4"/>${T(135, 62, `Area = ${A} ${u}²`, 'text-anchor="middle" font-weight="700"')}${T(42, 62, `${w} ${u}`, 'text-anchor="end" font-weight="700"')}<text x="135" y="118" font-size="13" text-anchor="middle" fill="#55607a">not to scale</text></svg>`)}<p>What is the ${B("perimeter")} of the ${thing}?</p>`,
+      explain: `<p>Area = length × width, so the other side is ${A} ÷ ${w} = ${l} ${u}.</p><p>The perimeter is the distance all the way round: ${l} + ${w} + ${l} + ${w} = ${B(`${2 * (w + l)} ${u}`)}.</p><p class="why-not">${l} ${u} is only the missing side. ${w + l} ${u} adds just two of the four sides, and ${4 * l} ${u} treats the shape as a square.</p>` };
+  });
+
+  gen("towers", "maths", 2, "Area, perimeter & 3D", R => {
+    let g; do { g = Array.from({ length: 9 }, () => R.int(1, 5)); } while (new Set(g).size < 3 || g.filter(x => x === Math.max(...g)).length > 2);
+    const mx = Math.max(...g), correct = sum(g.map(x => mx - x));
+    const o = opts(R, correct, [sum(g), 9 * mx, g.filter(x => x < mx).length, mx - Math.min(...g)]);
+    const rows = [0, 1, 2].map(r => g.slice(r * 3, r * 3 + 3));
+    return { ...o, data: { grid: g },
+      stem: `<p>${R.pick(NAMES)} builds nine towers of cubes on a 3 by 3 board. The plan shows the board from above. Each number tells you how many cubes are in that tower.</p><div class="figure"><table class="grid" style="font-weight:700">${rows.map(r => `<tr>${r.map(x => `<td>${x}</td>`).join("")}</tr>`).join("")}</table></div><p>How many ${B("more")} cubes are needed to make ${B("every")} tower as tall as the tallest one?</p>`,
+      explain: `<p>The tallest tower has ${mx} cubes. For each tower, work out how many it is short: ${rows.map(r => r.map(x => mx - x).join(", ")).join(" | ")}.</p><p>Add them up: ${B(correct)} more cubes.</p><p class="why-not">${sum(g)} is the number of cubes already there, and ${9 * mx} is how many there will be at the end (${9 * mx} − ${sum(g)} = ${correct}). ${g.filter(x => x < mx).length} is the number of short towers, not the number of cubes they need.</p>` };
+  });
+
+  gen("pattern", "maths", 2, "Patterns & sequences", R => {
+    const S = R.shuffle(["🔺", "🟦", "🟡", "⭐"]), block = R.pick([[0, 1, 0, 2], [0, 0, 1, 2, 1], [0, 1, 2, 0, 2], [0, 1, 1, 0, 2], [0, 2, 0, 1]]).map(i => S[i]);
+    const L = block.length, target = block[0], per = block.filter(x => x === target).length;
+    const full = R.int(4, 7), rem = R.int(1, L - 1), N = full * L + rem, extra = block.slice(0, rem).filter(x => x === target).length;
+    const correct = full * per + extra;
+    const o = opts(R, correct, [full * per, (full + 1) * per, full, N - correct]);
+    return { ...o, data: { block, N, target },
+      stem: `<p>These shapes repeat in the same order for ever:</p><p style="font-size:24px;letter-spacing:2px;text-align:center">${block.join("")}${block.join("")}${block.join("")} …</p><p>How many of the ${B("first " + N)} shapes are ${target}?</p>`,
+      explain: `<p>The repeating block is ${block.join("")}: ${L} shapes, with ${per} ${target} in it.</p><p>${N} ÷ ${L} = ${full} whole blocks with ${rem} shape${rem === 1 ? "" : "s"} left over. The whole blocks give ${full} × ${per} = ${full * per}. The leftover ${block.slice(0, rem).join("")} ${extra ? `add${rem === 1 ? "s" : ""} ${extra} more` : "add none"}: ${B(correct)}.</p><p class="why-not">${full * per} forgets the leftover shapes at the end${extra ? "" : " (here they add nothing, so check them anyway)"}. ${(full + 1) * per} counts a whole extra block that is not finished. ${full} is the number of blocks, not the number of ${target}.</p>` };
+  });
+
+  gen("unitprice", "maths", 2, "Money & best value", R => {
+    const item = R.pick([["muesli bars", "bar"], ["pencils", "pencil"], ["bread rolls", "roll"], ["tennis balls", "ball"]]);
+    let off, best, text;
+    do {
+      const ns = R.shuffle([2, 3, 4, 5, 6, 8, 10]).slice(0, 5).sort((a, b) => a - b), us = R.shuffle([45, 50, 55, 60, 65, 70, 75, 80, 85, 90]).slice(0, 5);
+      off = ns.map((n, i) => [n, n * us[i]]);
+      best = off.findIndex(o => o[1] / o[0] === Math.min(...us));
+      text = off.map(o => `${o[0]} for ${money(o[1])}`);
+    } while (best === 4 || off[best][1] === Math.min(...off.map(o => o[1])) || (text.filter(t => t.length === text[best].length).length === 1 && text[best].length === Math.max(...text.map(t => t.length))));
+    return { options: text, answer: best, data: { offers: off },
+      stem: `<p>Five shops sell the same ${item[0]} in packs of different sizes.</p><p>Which pack has the ${B(`lowest price for each ${item[1]}`)}?</p>`,
+      explain: `<p>Divide each price by the number of ${item[0]} to find the price of one:</p><p>${off.map(o => `${o[0]} for ${money(o[1])} → ${o[1] / o[0]}c each`).join("<br>")}</p><p>The lowest is ${B(text[best])}, at ${off[best][1] / off[best][0]}c each.</p><p class="why-not">The pack with the smallest price tag is not the best value: it just has fewer ${item[0]} in it. The biggest pack is not always the cheapest for each ${item[1]} either. You have to divide.</p>` };
+  });
+
+  gen("daysago", "maths", 2, "Time & timetables", R => {
+    const d = R.int(0, 6), N = R.pick([23, 25, 26, 30, 31, 33, 37, 38, 40, 44, 45, 47, 50, 52, 54, 58, 60]), back = ((d - N) % 7 + 7) % 7, fwd = (d + N) % 7;
+    const set = [back]; for (const x of [fwd, d, (back + 1) % 7, (back + 6) % 7, (back + 2) % 7, (back + 5) % 7]) if (!set.includes(x) && set.length < 5) set.push(x);
+    set.sort((a, b) => a - b);
+    const what = R.pick(["a school camp ended", "a kitten was born", "the swimming term began", "a tooth fell out"]);
+    return { options: set.map(x => DAYS[x]), answer: set.indexOf(back), data: { day: d, N },
+      stem: `<p>Today is ${B(DAYS[d])}. Exactly ${B(N + " days ago")}, ${what}.</p><p>What day of the week was that?</p>`,
+      explain: `<p>Every 7 days is the same day of the week. ${N} = ${Math.floor(N / 7)} × 7 + ${N % 7}, so ${Math.floor(N / 7) * 7} days ago was also a ${DAYS[d]}.</p><p>Now count back the other ${N % 7} day${N % 7 === 1 ? "" : "s"} from ${DAYS[d]}: ${B(DAYS[back])}.</p><p class="why-not">${DAYS[fwd]} comes from counting forwards instead of back. ${DAYS[d]} would be right only if ${N} were a multiple of 7. The other days are one step out, from counting today as the first day.</p>` };
+  });
+
+  gen("gridperim", "maths", 2, "Area, perimeter & 3D", R => {
+    let h; do { h = Array.from({ length: R.int(4, 5) }, () => R.int(1, 4)); } while (new Set(h).size < 3 || !h.some((x, i) => i > 0 && i < h.length - 1 && x < h[i - 1] && x < h[i + 1]));
+    const n = h.length, mx = Math.max(...h), correct = 2 * n + h[0] + h[n - 1] + sum(h.slice(1).map((x, i) => Math.abs(x - h[i])));
+    const u = 28, W = n * u + 20, H = mx * u + 20;
+    let g = ""; h.forEach((c, x) => { for (let k = 0; k < c; k++) g += `<rect x="${10 + x * u}" y="${H - 10 - (k + 1) * u}" width="${u}" height="${u}" fill="#c9d6f2" stroke="${INK}" stroke-width="1.5"/>`; });
+    const o = opts(R, correct, [sum(h), 2 * (n + mx), correct - 2, correct + 2, correct + 4], v => v + " cm");
+    return { ...o, data: { heights: h },
+      stem: `<p>This shape is made of small squares. Each small square has sides ${B("1 cm")} long.</p>${fig(`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="A shape made of columns of small squares standing side by side on a flat base. From left to right the columns are ${h.join(", ")} squares tall.">${g}</svg>`)}<p>What is the ${B("perimeter")} of the whole shape?</p>`,
+      explain: `<p>The perimeter is the distance round the outside. Go round the edge and count 1 cm for each side of a small square you pass.</p><p>Along the bottom: ${n}. Along the tops: ${n}. Up and down the sides and steps: ${correct - 2 * n}. Altogether ${B(correct + " cm")}.</p><p class="why-not">${sum(h)} is the number of squares (the area), not the distance round. ${2 * (n + mx)} cm is the perimeter of a plain rectangle drawn round the shape: it misses the extra up-and-down edges inside the dip.</p>` };
+  });
+
+  gen("recipe", "maths", 2, "Rates", R => {
+    const c = R.pick([["cups of flour", "muffins", "A baker uses"], ["scoops of seed", "budgies", "A bird keeper needs"], ["tins of paint", "fence panels", "A painter uses"], ["bags of soil", "flower pots", "A gardener uses"]]);
+    const u = R.int(3, 6), a = R.int(2, 4), b = a * u; let x; do { x = R.int(5, 9); } while (x === a || x === 2 * a);
+    const cc = x * u;
+    const o = opts(R, x, [cc - b + a, u, cc - b, Math.round(cc / a)]);
+    return { ...o, data: { a, b, c: cc },
+      stem: `<p>${c[2]} ${B(`${a} ${c[0]}`)} for every ${B(`${b} ${c[1]}`)}.</p><p>At the same rate, how many ${c[0]} are needed for ${B(`${cc} ${c[1]}`)}?</p>`,
+      explain: `<p>First find what one ${c[0].replace(/s? of/, " of")} does: ${b} ÷ ${a} = ${u} ${c[1]}.</p><p>Then ${cc} ÷ ${u} = ${B(x)} ${c[0]}.</p><p class="why-not">${cc - b + a} comes from adding: “${cc - b} more ${c[1]}, so ${cc - b} more ${c[0].split(" ")[0]}”. A rate works by multiplying and dividing, not by adding. ${u} is the number of ${c[1]} for one ${c[0].replace(/s? of.*/, "")}, which is only the first step.</p>` };
+  });
+
+  /* ================= MATHS, circle 3 (and the boss) ================= */
+
+  gen("twojugs", "maths", 3, "Measurement & scales", R => {
+    const [sa, sb] = R.shuffle([[100, 4], [50, 5], [100, 5], [200, 4], [100, 2], [20, 4]]).slice(0, 2);
+    const mk = ([major, minor], title, color) => { const base = major * R.int(1, 3), t = R.int(1, minor - 1); return { max: major * 4, major, minor, level: base + t * (major / minor), unit: "mL", title, color, base, t }; };
+    let A, Bj; do { A = mk(sa, "Flask A", "#8fd3ff"); Bj = mk(sb, "Flask B", "#f6c453"); } while (A.level === Bj.level);
+    const total = R.chance(.6), big = A.level > Bj.level ? A : Bj, sm = big === A ? Bj : A;
+    const correct = total ? A.level + Bj.level : big.level - sm.level;
+    const mis = (j, small) => j.base + j.t * small, sA = A.major / A.minor, sB = Bj.major / Bj.minor;
+    const other = total ? big.level - sm.level : A.level + Bj.level;
+    const o = opts(R, correct, [total ? A.level + mis(Bj, sA) : Math.abs(A.level - mis(Bj, sA)), total ? mis(A, sB) + Bj.level : Math.abs(mis(A, sB) - Bj.level), total ? A.base + Bj.base : Math.abs(A.base - Bj.base), other], v => v + " mL", 5, Math.min(sA, sB));
+    return { ...o, data: { A: { major: A.major, minor: A.minor, level: A.level }, B: { major: Bj.major, minor: Bj.minor, level: Bj.level }, total },
+      stem: `<p>Two flasks hold coloured water. Look carefully: their scales are ${B("different")}.</p>${fig(`<svg viewBox="0 0 360 262" width="360" role="img" aria-label="${jugAria(A)} ${jugAria(Bj)}">${jugSvg(A)}${jugSvg({ ...Bj, x: 175 })}</svg>`)}<p>${total ? `All the water from both flasks is poured into one bucket. How much water is in the bucket?` : `How much ${B("more")} water is in Flask ${big === A ? "A" : "B"} than in Flask ${big === A ? "B" : "A"}?`}</p>`,
+      explain: `<p>Work out each small step separately. Flask A: ${A.major} ÷ ${A.minor} = ${sA} mL a step, so it holds ${A.base} + ${A.t} × ${sA} = ${A.level} mL. Flask B: ${Bj.major} ÷ ${Bj.minor} = ${sB} mL a step, so it holds ${Bj.base} + ${Bj.t} × ${sB} = ${Bj.level} mL.</p><p>${total ? `${A.level} + ${Bj.level}` : `${big.level} − ${sm.level}`} = ${B(correct + " mL")}.</p><p class="why-not">The trap is using one flask’s step size for both. Reading only the labels and ignoring the small marks is the other slip. ${other} mL answers the wrong question (${total ? "the difference, not the total" : "the total, not the difference"}).</p>` };
+  });
+
+  gen("pictkey", "maths", 3, "Graphs & data", R => {
+    const c = R.pick([{ rows: ["Kai", "Lena", "Moss", "Nell"], item: "stickers", say: "The four friends have", col: "#b197fc" }, { rows: ["North", "South", "East", "West"], item: "tickets", say: "The four gates sold", col: "#ffa94d" }, { rows: ["Mon", "Tue", "Wed", "Thu"], item: "pies", say: "Over the four days the bakery sold", col: "#e8a05b" }]);
+    const key = R.pick([4, 6, 8, 10, 20]);
+    let h, x; do { h = R.shuffle([2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 4); x = R.int(0, 3); } while (sum(h) % 2 || h.every(v => v % 2 === 0) || h[x] === 2);
+    const rows = c.rows.map((n, i) => [n, h[i] / 2]), syms = sum(h) / 2, total = syms * key, correct = rows[x][1] * key;
+    const o = opts(R, correct, [total / 4, key, Math.ceil(rows[x][1]) * key, total - correct, Math.ceil(rows[x][1])].filter(Number.isInteger), String, 5, key / 2);
+    return { ...o, data: { rows, total, x },
+      stem: `<p>The key has been torn off this picture graph. Every whole symbol stands for the same number of ${c.item}.</p>${pictGraph({ rows, keyText: "", color: c.col, aria: `A picture graph with no key. ${rows.map(r => `${r[0]}: ${sy(r[1])}`).join(". ")}.` })}<p>${c.say} ${B(`${total} ${c.item}`)} altogether.</p><p>How many ${c.item} does the row for ${B(rows[x][0])} show?</p>`,
+      explain: `<p>Count all the symbols: ${rows.map(r => r[1]).join(" + ")} = ${syms}. They stand for ${total} ${c.item}, so one whole symbol is ${total} ÷ ${syms} = ${key}.</p><p>${rows[x][0]} has ${sy(rows[x][1])}: ${rows[x][1]} × ${key} = ${B(correct)}.</p><p class="why-not">${key} is the value of one symbol: one step too early. Sharing ${total} equally among the four rows ignores the picture. Counting a half symbol as a whole one makes the answer too big.</p>` };
+  });
+
+  gen("backwards", "maths", 3, "Number & place value", R => {
+    const a = R.int(3, 9), m = R.int(2, 5), c = R.int(2, 12), x = R.int(4, 15), r = (x + a) * m - c, who = R.pick(NAMES);
+    const o = opts(R, x, [(r + a) * m - c, x + a, (r + c) % m === 0 && (r + c - a) > 0 ? r + c - a : -1, Number.isInteger(r / m) ? r / m + c - a : -1, r + c]);
+    return { ...o, data: { a, m, c, r },
+      stem: `<p>${who} thinks of a number, ${B("adds " + a)}, ${B("multiplies the result by " + m)} and then ${B("subtracts " + c)}.</p><p>The answer is ${B(r)}. What number did ${who} start with?</p>`,
+      explain: `<p>Work backwards, undoing each step in reverse order.</p><p>Undo “subtract ${c}”: ${r} + ${c} = ${r + c}. Undo “multiply by ${m}”: ${r + c} ÷ ${m} = ${x + a}. Undo “add ${a}”: ${x + a} − ${a} = ${B(x)}.</p><p>Check: (${x} + ${a}) × ${m} − ${c} = ${r}.</p><p class="why-not">${x + a} stops one step early. ${(r + a) * m - c} does the steps forwards starting from ${r} instead of undoing them.</p>` };
+  });
+
+  gen("sumdiff", "maths", 3, "Number & place value", R => {
+    const c = R.pick([["marbles", "have", "does", "have", "has"], ["trading cards", "have", "does", "have", "has"], ["points", "scored", "did", "score", "scored"], ["laps", "ran", "did", "run", "ran"]]), [p, q] = R.shuffle(NAMES).slice(0, 2);
+    const small = R.int(9, 30), D = 2 * R.int(2, 8), S = 2 * small + D, big = small + D, askBig = R.chance(.5), correct = askBig ? big : small;
+    const o = opts(R, correct, [S / 2, askBig ? small : big, S - D, S / 2 + D, S / 2 - D].filter(Number.isInteger));
+    return { ...o, data: { S, D, askBig },
+      stem: `<p>Together ${p} and ${q} ${c[1]} ${B(`${S} ${c[0]}`)}. ${p} ${c[4]} ${B(D + " more")} than ${q}.</p><p>How many ${c[0]} ${c[2]} ${askBig ? p : q} ${c[3]}?</p>`,
+      explain: `<p>Take away the extra ${D} first: ${S} − ${D} = ${S - D}. That is two equal shares, so ${q}’s number is ${S - D} ÷ 2 = ${small} and ${p}’s is ${small} + ${D} = ${big}.</p><p>Check: ${big} + ${small} = ${S}, and ${big} − ${small} = ${D}. The answer is ${B(correct)}.</p><p class="why-not">${S / 2} just halves the total, which would make them equal. ${askBig ? small : big} is the other child’s number. ${S - D} stops before sharing into two.</p>` };
+  });
+
+  gen("tworates", "maths", 3, "Rates", R => {
+    const [p, q] = R.pick([[5, 10], [10, 15], [4, 6], [6, 9], [10, 20], [5, 15]]), a = R.int(2, 6), b = R.int(3, 9), c = R.pick([["printers", "pages", "prints"], ["bakers", "pies", "makes"], ["machines", "badges", "makes"], ["taps", "litres", "pours"]]);
+    const lcm = [p, q].reduce((x, y) => { let g = x, h = y; while (h) [g, h] = [h, g % h]; return x * y / g; }), T = lcm * R.int(2, 4);
+    const correct = T / p * a + T / q * b;
+    const o = opts(R, correct, [(a + b) * T / p, (a + b) * T / q, T / p * a, a + b, Number.isInteger(T / (p + q)) ? (a + b) * T / (p + q) : -1]);
+    const one = c[0].slice(0, -1), cap = one[0].toUpperCase() + one.slice(1);
+    return { ...o, data: { a, p, b, q, T },
+      stem: `<p>${cap} A ${c[2]} ${B(`${a} ${c[1]} every ${p} minutes`)}. ${cap} B ${c[2]} ${B(`${b} ${c[1]} every ${q} minutes`)}.</p><p>Both start together and keep going at the same rate. How many ${c[1]} do they ${c[2] === "pours" ? "pour" : c[2] === "prints" ? "print" : "make"} altogether in ${B(T + " minutes")}?</p>`,
+      explain: `<p>Work each one out for the whole ${T} minutes. A: ${T} ÷ ${p} = ${T / p} lots of ${a} = ${T / p * a}. B: ${T} ÷ ${q} = ${T / q} lots of ${b} = ${T / q * b}.</p><p>Altogether ${T / p * a} + ${T / q * b} = ${B(correct)} ${c[1]}.</p><p class="why-not">You can’t add ${a} and ${b} and use one time, because the two times (${p} and ${q} minutes) are different: that gives ${(a + b) * T / p} or ${(a + b) * T / q}. ${T / p * a} counts only ${one} A.</p>` };
+  });
+
+  gen("statements", "maths", 3, "Graphs & data", R => {
+    const c = R.pick([{ labels: ["Mon", "Tue", "Wed", "Thu", "Fri"], y: "Pies sold", n: "pies", v: "sold", col: "#e8a05b" }, { labels: ["Ali", "Bea", "Cam", "Dot", "Eve"], y: "Laps swum", n: "laps", v: "swam", col: "#4dabf7" }, { labels: ["Ash", "Bay", "Elm", "Oak", "Fir"], y: "Nests counted", n: "nests", v: "had", col: "#69db7c" }]);
+    const NAMESETS = ["1 only", "2 only", "3 only", "1 and 2 only", "1 and 3 only", "2 and 3 only", "1, 2 and 3"], label = t => t[0] && t[1] && t[2] ? "1, 2 and 3" : t.filter(Boolean).length === 2 ? `${t[0] ? 1 : 2} and ${t[2] ? 3 : 2} only` : `${t.indexOf(true) + 1} only`;
+    let v, st, truth;
+    for (;;) {
+      v = Array.from({ length: 5 }, () => R.int(2, 12));
+      const [x, y] = R.shuffle([0, 1, 2, 3, 4]), [p, q, r, s] = R.shuffle([0, 1, 2, 3, 4]), tot = sum(v), n = tot + R.pick([-6, -4, -2, 2, 4]), k = R.pick([2, 3]);
+      st = [{ t: "times", x, y, k }, { t: "pairs", p, q, r, s }, { t: "total", n }];
+      truth = [v[x] === k * v[y], v[p] + v[q] > v[r] + v[s], tot > n];
+      if (new Set(v).size >= 4 && truth.some(Boolean) && v[x] > v[y] && Math.abs(v[x] - k * v[y]) <= 2 && v[p] + v[q] !== v[r] + v[s] && Math.abs(v[p] + v[q] - v[r] - v[s]) <= 4) break;
+    }
+    const L = c.labels;
+    const text = [`The column for ${L[st[0].x]} shows exactly ${st[0].k === 2 ? "twice" : "three times"} as many ${c.n} as the column for ${L[st[0].y]}.`,
+      `${L[st[1].p]} and ${L[st[1].q]} together show more ${c.n} than ${L[st[1].r]} and ${L[st[1].s]} together.`,
+      `The five columns show more than ${st[2].n} ${c.n} altogether.`];
+    const right = label(truth), others = R.shuffle(NAMESETS.filter(n => n !== right)).slice(0, 4), options = NAMESETS.filter(n => n === right || others.includes(n));
+    const why = [`${L[st[0].x]} = ${v[st[0].x]} and ${L[st[0].y]} = ${v[st[0].y]}; ${st[0].k} × ${v[st[0].y]} = ${st[0].k * v[st[0].y]}`, `${v[st[1].p]} + ${v[st[1].q]} = ${v[st[1].p] + v[st[1].q]} and ${v[st[1].r]} + ${v[st[1].s]} = ${v[st[1].r] + v[st[1].s]}`, `the total is ${v.join(" + ")} = ${sum(v)}`];
+    return { options, answer: options.indexOf(right), data: { values: v, st },
+      stem: colGraph({ labels: L, series: [{ name: "", color: c.col, values: v }], max: 12, step: 2, ylabel: c.y, aria: `A column graph. The scale goes 0, 2, 4, 6, 8, 10, 12. ${L.map((l, i) => `${l} ${v[i] % 2 ? "is halfway between " + (v[i] - 1) + " and " + (v[i] + 1) : "reaches " + v[i]}`).join(". ")}.` }) + `<p>Here are three statements about the graph.</p><div class="box">${text.map((t, i) => `${i + 1}. ${t}`).join("<br>")}</div><p>Which statements are ${B("correct")}?</p>`,
+      explain: `<p>Read each column first (a column halfway between two lines is the odd number in between): ${L.map((l, i) => `${l} ${v[i]}`).join(", ")}.</p><p>${truth.map((t, i) => `Statement ${i + 1} is ${B(t ? "correct" : "wrong")}: ${why[i]}.`).join("<br>")}</p><p>So the answer is ${B(right)}.</p><p class="why-not">Each statement has to be tested with the real numbers. “About twice” is not “exactly twice”, and a total that is close to ${st[2].n} must still be added up carefully.</p>` };
+  });
+
+  gen("lshape", "maths", 3, "Area, perimeter & 3D", R => {
+    const W = R.int(7, 12), H = R.int(6, 10), a = R.int(2, W - 3), b = R.int(2, H - 3), top = W - a, right = H - b, correct = W * H - a * b, thing = R.pick(["playground", "courtyard", "vegetable patch", "hall floor"]);
+    const o = opts(R, correct, [W * H, top * H + W * right, top * right, 2 * (W + H), W + H + top + right], v => v + " m²");
+    const sx = 190 / 12, X = v => 40 + v * sx, Y = v => 150 - v * (120 / 10);
+    return { ...o, data: { W, H, top, right },
+      stem: `<p>The plan shows an L-shaped ${thing}. Every corner is a right angle.</p>${fig(`<svg viewBox="0 0 300 190" width="300" role="img" aria-label="An L-shaped plan with six sides. The bottom side is ${W} m and the left side is ${H} m. The top side is ${top} m and the right side is ${right} m. The two sides of the step cut out of the top right corner are not labelled. Not to scale."><path d="M${X(0)} ${Y(0)}H${X(11)}V${Y(4.5)}H${X(6.5)}V${Y(9)}H${X(0)}Z" fill="#dff0d8" stroke="${INK}" stroke-width="2.4"/>${T(X(5.5), Y(0) + 18, W + " m", 'text-anchor="middle" font-weight="700"')}${T(X(0) - 6, Y(4.5) + 5, H + " m", 'text-anchor="end" font-weight="700"')}${T(X(3.2), Y(9) - 6, top + " m", 'text-anchor="middle" font-weight="700"')}${T(X(11) + 6, Y(2.2) + 5, right + " m", 'font-weight="700"')}<text x="150" y="186" font-size="13" text-anchor="middle" fill="#55607a">not to scale</text></svg>`)}<p>What is the ${B("area")} of the ${thing}?</p>`,
+      explain: `<p>Split the L into two rectangles with a line straight down from the inside corner. The left part is ${top} m wide and ${H} m tall: ${top} × ${H} = ${top * H}. The right part is ${W} − ${top} = ${a} m wide and ${right} m tall: ${a} × ${right} = ${a * right}.</p><p>${top * H} + ${a * right} = ${B(correct + " m²")}. (Or take the missing corner from the full rectangle: ${W} × ${H} − ${a} × ${b} = ${correct}.)</p><p class="why-not">${W * H} m² is the full rectangle with nothing cut out. ${top * H + W * right} m² counts the overlapping part twice. ${2 * (W + H)} is the perimeter, not the area.</p>` };
+  });
+
+  gen("fracleft", "maths", 3, "Fractions", R => {
+    const a = R.int(3, 5), b = R.int(2, 4), k = R.int(1, 4), N = a * b * k * (a * b * k < 12 ? 2 : 1), who = R.pick(NAMES), c = R.pick(["stickers", "grapes", "marbles", "football cards"]);
+    const g1 = N / a, rest = N - g1, g2 = rest / b, correct = rest - g2, [f1, f2] = R.shuffle(["a cousin", "a neighbour", "a friend", "a brother"]).slice(0, 2);
+    const o = opts(R, correct, [N - g1 - N / b, rest, g2, g1 + g2, g1].filter(Number.isInteger));
+    const fr = d => d === 2 ? "one half" : d === 3 ? "one third" : d === 4 ? "one quarter" : "one fifth";
+    return { ...o, data: { N, a, b },
+      stem: `<p>${who} has ${B(`${N} ${c}`)}. ${who} gives ${B(fr(a))} of them to ${f1}, and then gives ${B(fr(b) + " of what is left")} to ${f2}.</p><p>How many ${c} does ${who} have now?</p>`,
+      explain: `<p>First gift: ${N} ÷ ${a} = ${g1}, leaving ${N} − ${g1} = ${rest}.</p><p>Second gift: ${fr(b)} of <i>what is left</i> is ${rest} ÷ ${b} = ${g2}, leaving ${rest} − ${g2} = ${B(correct)}.</p><p class="why-not">${rest} stops after the first gift. ${g2} is the second gift, not what ${who} keeps. ${Number.isInteger(N / b) ? `${N - g1 - N / b} takes ${fr(b)} of all ${N} instead of ${fr(b)} of the ${rest} left.` : `Taking ${fr(b)} of all ${N}, instead of the ${rest} left, is the other trap.`}</p>` };
+  });
+
+  /* ================= THINKING (four options) ================= */
+
+  gen("freeday", "thinking", 1, "Tables & timetables", R => {
+    const kids = R.shuffle(NAMES).slice(0, 4), acts = R.shuffle(["Swimming", "Chess", "Dance", "Soccer", "Choir", "Drama", "Tennis", "Art", "Judo", "Band"]);
+    const days = [0, 1, 2, 3, 4], [dc, d1, ...rest] = R.shuffle(days), X = R.int(0, 3), other = R.pick([0, 1, 2, 3].filter(k => k !== X));
+    const busy = days.map(() => [false, false, false, false]);
+    busy[dc][X] = true; busy[d1][other] = true;
+    rest.forEach((d, i) => R.shuffle([0, 1, 2, 3]).slice(0, i === 2 ? 3 : 2).forEach(k => busy[d][k] = true));
+    const act = kids.map((_, k) => acts[k]), short = DAYS.slice(0, 5);
+    const set = [dc, d1, ...R.shuffle(rest).slice(0, 2)].sort((x, y) => x - y);
+    return { options: set.map(d => short[d]), answer: set.indexOf(dc), data: { busy, cancel: [X, dc] },
+      stem: `<p>The table shows the days when four friends have an after-school activity.</p>${tbl(["", "Mon", "Tue", "Wed", "Thu", "Fri"], kids.map((n, k) => [n, ...days.map(d => busy[d][k] ? act[k] : "–")]))}<p>This week, ${B(`${kids[X]}’s ${act[X].toLowerCase()} on ${short[dc]} has been cancelled`)}.</p><p>On which day this week can ${B("all four")} friends meet after school?</p>`,
+      explain: `<p>Go down each day’s column and look for a day with no activities at all. In the table as printed, every day has at least one.</p><p>Now use the extra fact: on ${short[dc]} the only activity is ${kids[X]}’s ${act[X].toLowerCase()}, and it is cancelled. So ${B(short[dc])} is free for everyone.</p><p class="why-not">${short[d1]} also has just one activity, but it is ${kids[other]}’s, and that one is still on. The other days have two or more friends busy.</p>` };
+  });
+
+  gen("shiftcode", "thinking", 1, "Rules & codes", R => {
+    const s = R.int(2, 3), word = R.pick(["PLAY", "MAZE", "ROXY", "JUMP", "FIZZ", "KITE", "WAVY", "LYNX", "ZERO", "BOXY", "COZY", "YARD", "HAZY", "STORM", "WHIZ"]);
+    const enc = (w, k) => [...w].map(ch => String.fromCharCode((ch.charCodeAt(0) - 65 + k + 26) % 26 + 65)).join("");
+    const right = enc(word, s), i = R.int(1, word.length - 1), part = right.slice(0, i) + word[i] + right.slice(i + 1);
+    const nowrap = [...word].map(ch => { const c = ch.charCodeAt(0) - 65 + s; return c > 25 ? ch : String.fromCharCode(c + 65); }).join("");
+    const set = [right]; for (const w of [enc(word, -s), nowrap, enc(word, s === 2 ? 3 : 2), part, enc(word, 1)]) if (!set.includes(w) && set.length < 4) set.push(w);
+    const options = R.shuffle(set);
+    return { options, answer: options.indexOf(right), data: { word, s },
+      stem: `<p>In a secret code, each letter is swapped for the letter ${B(`${s === 2 ? "two" : "three"} places later`)} in the alphabet. After Z the alphabet starts again at A.</p><p>So ${B("CAB")} is written as ${B(enc("CAB", s))}.</p><p>How is ${B(word)} written in the code?</p>`,
+      explain: `<p>Move each letter ${s} places on, one letter at a time: ${[...word].map(ch => `${ch} → ${enc(ch, s)}`).join(", ")}.</p><p>${word} becomes ${B(right)}.</p><p class="why-not">${enc(word, -s)} moves the letters backwards instead of forwards. Watch the letters near the end of the alphabet: after Z you carry on from A. A code word with one letter left unchanged, or moved the wrong number of places, is also wrong.</p>` };
+  });
+
+  gen("droplow", "thinking", 2, "Tables & timetables", R => {
+    const names = R.shuffle(NAMES).slice(0, 4), c = R.pick([["a spelling contest", "round", "points"], ["a diving contest", "dive", "points"], ["a quiz", "round", "marks"]]);
+    let sc, best, tot;
+    for (;;) {
+      sc = names.map(() => [R.int(3, 10), R.int(3, 10), R.int(3, 10)]);
+      best = sc.map(r => sum(r) - Math.min(...r)); tot = sc.map(sum);
+      const w = best.indexOf(Math.max(...best)), t = tot.indexOf(Math.max(...tot));
+      if (best.filter(x => x === best[w]).length === 1 && tot.filter(x => x === tot[t]).length === 1 && w !== t) break;
+    }
+    const w = best.indexOf(Math.max(...best)), t = tot.indexOf(Math.max(...tot));
+    const cap = c[1][0].toUpperCase() + c[1].slice(1);
+    return { options: names, answer: w, data: { scores: sc },
+      stem: `<p>Four children took part in ${c[0]} with three ${c[1]}s. Each child’s ${B(`lowest ${c[1]} does not count`)}. The winner is the child with the highest total from the other two ${c[1]}s.</p>${tbl(["", `${cap} 1`, `${cap} 2`, `${cap} 3`], names.map((n, i) => [n, ...sc[i]]))}<p>Who won?</p>`,
+      explain: `<p>For each child, cross out the lowest ${c[1]} and add the other two:</p><p>${names.map((n, i) => `${n}: ${sc[i].slice().sort((x, y) => y - x).slice(0, 2).join(" + ")} = ${best[i]}`).join("<br>")}</p><p>The highest is ${B(names[w])} with ${best[w]}.</p><p class="why-not">${names[t]} has the biggest total when all three ${c[1]}s are added (${tot[t]}), but the rule throws one ${c[1]} away. Having the single best ${c[1]} is not enough either: two ${c[1]}s count.</p>` };
+  });
+
+  /* tables with totals: the same method and the same words every time */
+  const METHOD = `<p>Find a row or column with only <b>one</b> number missing. Total − the numbers you know = the missing number. Fill it in, then look again: a new row or column may now have only one gap.</p>`;
+  const CIRC = ["①", "②", "③"];
+  gen("totals2", "thinking", 2, "Tables & timetables", R => {
+    const c = R.pick([{ rows: ["Mon", "Tue", "Wed"], cols: R.shuffle(NAMES).slice(0, 3), what: "how many pages three children read on three days" }, { rows: ["Week 1", "Week 2", "Week 3"], cols: ["Cans", "Bottles", "Boxes"], what: "what a class recycled over three weeks" }, { rows: ["Red team", "Blue team", "Gold team"], cols: ["Run", "Swim", "Jump"], what: "the points three teams won in three events" }]);
+    let v, r1, r2, r3, c1;
+    do { v = [0, 1, 2].map(() => [0, 1, 2].map(() => R.int(3, 15))); [r1, r2, r3] = R.shuffle([0, 1, 2]); c1 = R.int(0, 2); } while (v[r1][c1] === v[r2][c1]);
+    const rt = v.map(sum), ct = [0, 1, 2].map(j => v[0][j] + v[1][j] + v[2][j]), g1 = v[r1][c1], g2 = v[r2][c1];
+    const cells = v.map((row, i) => [...row.map((x, j) => (j === c1 && (i === r1 || i === r2)) ? null : x), i === r2 ? null : rt[i]]);
+    const show = (fillIn) => tbl(["", ...c.cols, "Total"], [...cells.map((row, i) => [c.rows[i], ...row.map((x, j) => x !== null ? x : fillIn ? (j === 3 ? `③ ${rt[i]}` : i === r1 ? `① ${g1}` : `② ${g2}`) : "?")]), ["Total", ...ct, ""]], fillIn ? [[r1, c1 + 1], [r2, c1 + 1], [r2, 4]] : []);
+    const c2 = (c1 + 1) % 3, wrongRow = ct[c1] - v[r3][c1] - v[r1][c2];
+    const o = opts(R, g2, [g1, g1 + g2, wrongRow, ct[c1]], String, 4);
+    return { ...o, data: { cells, colTotals: ct, ask: [r2, c1] },
+      stem: `<p>The table shows ${c.what}. Some of the numbers are missing.</p>${show(false)}<p>What number belongs in the ${B(c.rows[r2])} row under ${B(c.cols[c1])}?</p>`,
+      explain: `${METHOD}<p>① The ${c.rows[r1]} row has one gap: ${rt[r1]} − ${cells[r1].slice(0, 3).filter(x => x !== null).join(" − ")} = ${g1}.<br>② Now the ${c.cols[c1]} column has only one gap: ${ct[c1]} − ${g1} − ${v[r3][c1]} = ${B(g2)}.<br>③ (The ${c.rows[r2]} total could now be filled in too: ${rt[r2]}.)</p>${show(true)}<p class="why-not">${g1} is the first number you find, but it sits in the ${c.rows[r1]} row, not the one asked for. ${g1 + g2} comes from taking away only the number that was printed in the column and stopping. ${ct[c1]} is the column’s total, not a missing number.</p>` };
+  });
+
+  gen("totals3", "thinking", 3, "Tables & timetables", R => {
+    const c = R.pick([{ rows: ["Class 4A", "Class 4B", "Class 4C", "Class 4D"], cols: ["Cats", "Dogs", "Fish"], what: "the pets owned by the children in four classes", all: "pets" }, { rows: ["Friday", "Saturday", "Sunday", "Monday"], cols: ["Apples", "Pears", "Plums"], what: "the boxes of fruit a stall sold over four days", all: "boxes" }, { rows: ["North", "South", "East", "West"], cols: ["Gold", "Silver", "Bronze"], what: "the medals four houses won at a carnival", all: "medals" }]);
+    const v = [0, 1, 2, 3].map(() => [0, 1, 2].map(() => R.int(4, 16))), rt = v.map(sum), grand = sum(rt), r = R.int(0, 3), j = R.int(0, 2), g = v[r][j];
+    const known = sum(v[r]) - g;
+    const cells = v.map((row, i) => [...row.map((x, k) => i === r && k === j ? null : x), i === r ? null : rt[i]]);
+    const show = fillIn => tbl(["", ...c.cols, "Total"], [...cells.map((row, i) => [c.rows[i], ...row.map((x, k) => x !== null ? x : fillIn ? (k === 3 ? `① ${rt[r]}` : `② ${g}`) : "?")]), ["All " + c.all, "", "", "", grand]], fillIn ? [[r, 4], [r, j + 1]] : []);
+    const others = rt.filter((_, i) => i !== r);
+    const o = opts(R, g, [rt[r], known, rt[r] + others[2] - known], String, 4);
+    return { ...o, data: { cells, grand, ask: [r, j] },
+      stem: `<p>The table shows ${c.what}. Two numbers are missing, and the bottom row shows only the grand total.</p>${show(false)}<p>What number belongs in the ${B(c.rows[r])} row under ${B(c.cols[j])}?</p>`,
+      explain: `${METHOD}<p>The ${c.rows[r]} row has <i>two</i> gaps, so start somewhere else. The Total column has only one gap, and its total is the grand total.</p><p>① ${c.rows[r]} total: ${grand} − ${others.join(" − ")} = ${rt[r]}.<br>② Now the ${c.rows[r]} row has one gap: ${rt[r]} − ${v[r].filter((_, k) => k !== j).join(" − ")} = ${B(g)}.</p>${show(true)}<p class="why-not">${rt[r]} is the row’s total: one step too early. ${known} is just the two numbers already printed in the row, added together. Leaving one of the other row totals out of the subtraction gives a number that is too big.</p>` };
+  });
+
+  gen("sessions", "thinking", 2, "Number problems", R => {
+    const club = R.pick(["Chess club", "The choir", "Robotics club", "The running group"]), ds = R.pick([["Tuesday", "Thursday"], ["Monday", "Wednesday", "Friday"], ["Monday", "Thursday"], ["Tuesday", "Wednesday", "Friday"]]), d = ds.length, W = R.int(8, 11), wk = R.int(3, W - 2);
+    const hol = ds[d - 1], correct = d * W - d - 1;
+    const o = opts(R, correct, [d * W, d * W - d, d * W - 1, d * W - 2, d * (W - 1) - d], String, 4);
+    return { ...o, data: { d, W },
+      stem: `<p>${club} meets every ${ds.slice(0, -1).join(", ")} and ${hol} during a term of ${B(W + " weeks")}.</p><p>There were no meetings at all in week ${wk} because of camp. In a different week, one ${hol} was a public holiday, so that meeting was missed too.</p><p>How many meetings were held in the term?</p>`,
+      explain: `<p>A normal term would have ${d} × ${W} = ${d * W} meetings.</p><p>Camp week takes away ${d}, and the holiday takes away 1 more: ${d * W} − ${d} − 1 = ${B(correct)}.</p><p class="why-not">${d * W} ignores both changes. ${d * W - d} forgets the public holiday, and ${d * W - 1} forgets camp week. Camp week cancels ${d} meetings, not one.</p>` };
+  });
+})();
+
+/* ---------------------------------------------------------------
+   STORM ISLAND: maths questions (hand-written). Five options (A–E).
+   These cover the topics the self-redrawing templates (generators.js) do not:
+   place value, turns and angles, mass, chance, combinations, symmetry, 3D shapes,
+   sequences, coins, fractions on a number line, dates, and the boss questions.
+   tier 1–3 = storm circle 1–3; tier 4 = the boss.
+   --------------------------------------------------------------- */
+(() => {
+  const { T, fig, frac } = LIB;
+
+  /* m201: a spinner with eight equal sections */
+  const SPINNER = (() => {
+    const cols = ["#e5484d", "#4dabf7", "#e5484d", "#51cf66", "#ffd43b", "#4dabf7", "#e5484d", "#51cf66"], names = { "#e5484d": "R", "#4dabf7": "B", "#51cf66": "G", "#ffd43b": "Y" };
+    let g = "";
+    cols.forEach((c, i) => {
+      const a0 = i * Math.PI / 4 - Math.PI / 2, a1 = a0 + Math.PI / 4, am = (a0 + a1) / 2, p = a => `${(100 + 80 * Math.cos(a)).toFixed(1)} ${(100 + 80 * Math.sin(a)).toFixed(1)}`;
+      g += `<path d="M100 100L${p(a0)}A80 80 0 0 1 ${p(a1)}Z" fill="${c}" stroke="${INK}" stroke-width="2"/>` + T((100 + 52 * Math.cos(am)).toFixed(1), (105 + 52 * Math.sin(am)).toFixed(1), names[c], 'text-anchor="middle" font-weight="700"');
+    });
+    g += `<path d="M100 100L128 62" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="100" r="7" fill="${INK}"/>`;
+    return fig(`<svg viewBox="0 0 200 200" width="200" role="img" aria-label="A spinner divided into eight equal sections: three red (R), two blue (B), two green (G) and one yellow (Y).">${g}</svg>`);
+  })();
+
+  /* m203: five capital letters drawn with straight strokes */
+  const LETTERS = (() => {
+    const L = { A: "M6 54L24 6L42 54M13 36H35", H: "M8 6V54M40 6V54M8 30H40", N: "M8 54V6L40 54V6", T: "M6 6H42M24 6V54", Z: "M8 6H40L8 54H40" };
+    return k => `<svg viewBox="0 0 48 60" width="48" height="60" role="img" aria-label="The capital letter ${k}"><path d="${L[k]}" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="square" stroke-linejoin="miter"/></svg>`;
+  })();
+
+  /* m303: six square tiles in a 2 by 3 rectangle */
+  const TILES = fig(`<svg viewBox="0 0 200 140" width="200" role="img" aria-label="Six identical square tiles joined edge to edge to make a rectangle that is three tiles long and two tiles wide.">${[0, 1, 2].map(c => [0, 1].map(r => `<rect x="${16 + c * 56}" y="${10 + r * 56}" width="56" height="56" fill="#ffe8b3" stroke="${INK}" stroke-width="2.2"/>`).join("")).join("")}</svg>`);
+
+  /* m403: a rectangle with a square cut from one corner */
+  const NOTCH = fig(`<svg viewBox="-16 0 316 200" width="316" role="img" aria-label="A rectangle 12 cm long and 8 cm wide. A small square with sides of 3 cm has been cut out of its top right corner. Not to scale."><path d="M40 30H200V75H250V160H40Z" fill="#dff0d8" stroke="${INK}" stroke-width="2.4"/><path d="M200 30H250V75" fill="none" stroke="${INK}" stroke-width="1.5" stroke-dasharray="5 4"/>${T(145, 180, "12 cm", 'text-anchor="middle" font-weight="700"')}${T(32, 100, "8 cm", 'text-anchor="end" font-weight="700"')}${T(225, 22, "3 cm", 'text-anchor="middle" font-weight="700"')}${T(256, 56, "3 cm", 'font-weight="700"')}<text x="150" y="197" font-size="13" text-anchor="middle" fill="#55607a">not to scale</text></svg>`);
+
+  MATHS.push(
+    /* ===================== circle 1 ===================== */
+    { id: "m101", tier: 1, cat: "Number & place value",
+      stem: `<p>What is <b>4 052 − 300</b>?</p>`,
+      options: ["3 752", "3 952", "4 022", "4 049", "4 352"], answer: 0,
+      explain: `<p>300 is 3 hundreds, but 4 052 has no hundreds to take them from. So break a thousand into 10 hundreds: 4 052 is 40 hundreds and 52. Then 40 hundreds − 3 hundreds = 37 hundreds, which gives <b>3 752</b>.</p><p class="why-not">4 022 takes away 30 and 4 049 takes away 3: the 3 is in the wrong place. 4 352 adds instead of subtracting. 3 952 trades the thousand but takes away only one hundred.</p>` },
+    { id: "m102", tier: 1, cat: "Fractions",
+      stem: `<p>A block of chocolate has <b>20</b> squares. Ned eats <b>one quarter</b> of the block. Then his mum eats <b>3</b> squares.</p><p>How many squares are left?</p>`,
+      options: ["10", "12", "13", "15", "17"], answer: 1,
+      explain: `<p>One quarter of 20 is 20 ÷ 4 = 5 squares. After Ned: 20 − 5 = 15. After Mum: 15 − 3 = <b>12</b>.</p><p class="why-not">15 forgets Mum’s squares and 17 forgets Ned’s. 13 treats “one quarter” as 4 squares. A quarter means the block is split into 4 equal parts, and each part is 5 squares.</p>` },
+    { id: "m103", tier: 1, cat: "Measurement & scales",
+      stem: `<p>The minute hand of a clock turns from <b>2:00 pm</b> to <b>2:45 pm</b>.</p><p>How many <b>right angles</b> does the minute hand turn through?</p>`,
+      options: ["1", "2", "3", "4", "9"], answer: 2,
+      explain: `<p>A full turn of the minute hand takes 60 minutes and is 4 right angles. So every 15 minutes is one right angle (a quarter turn). 45 minutes is 3 lots of 15: <b>3</b> right angles.</p><p class="why-not">4 would be a whole hour. 9 is the number the hand points to at the end, not the amount of turning.</p>` },
+    { id: "m104", tier: 1, cat: "Measurement & scales",
+      stem: `<p>A bag holds <b>350 g</b> of rice.</p><p>How much more rice is needed to make exactly <b>one and a half kilograms</b>?</p>`,
+      options: ["150 g", "650 g", "850 g", "1 150 g", "1 850 g"], answer: 3,
+      explain: `<p>One kilogram is 1 000 g, so one and a half kilograms is 1 500 g. 1 500 − 350 = <b>1 150 g</b>.</p><p class="why-not">650 g only reaches one kilogram and 150 g only reaches half a kilogram. 1 850 g adds the 350 g instead of taking it away.</p>` },
+
+    /* ===================== circle 2 ===================== */
+    { id: "m201", tier: 2, cat: "Chance & counting",
+      stem: `<p>This spinner has eight equal sections.</p>${SPINNER}<p>Here are three statements about one spin.</p><div class="box">1. Red is the most likely colour.<br>2. Landing on blue is just as likely as landing on green.<br>3. It is impossible for the spinner to land on yellow.</div><p>Which statements are <b>correct</b>?</p>`,
+      options: ["1 only", "2 only", "1 and 2 only", "1 and 3 only", "1, 2 and 3"], answer: 2,
+      explain: `<p>Count the sections: red 3, blue 2, green 2, yellow 1.</p><p>1 is correct: red has the most sections. 2 is correct: blue and green have 2 each. 3 is wrong: yellow is the <i>least likely</i> colour, but it has a section, so it can happen.</p><p>So the answer is <b>1 and 2 only</b>.</p><p class="why-not">“Unlikely” is not the same as “impossible”. Impossible would mean no yellow section at all.</p>` },
+    { id: "m202", tier: 2, cat: "Chance & counting",
+      stem: `<p>A lunch deal lets you pick <b>one</b> sandwich, <b>one</b> drink and <b>one</b> piece of fruit.</p><p>There are 4 kinds of sandwich, 3 kinds of drink and 2 kinds of fruit.</p><p>How many different lunches can be made?</p>`,
+      options: ["9", "12", "14", "24", "48"], answer: 3,
+      explain: `<p>Each sandwich can go with each of the 3 drinks: 4 × 3 = 12 pairs. Each pair can go with either fruit: 12 × 2 = <b>24</b>.</p><p class="why-not">9 adds the numbers instead of multiplying. 12 forgets the fruit. 14 multiplies the first two and then adds the fruit.</p>` },
+    { id: "m203", tier: 2, cat: "Area, perimeter & 3D", visual: true,
+      stem: `<p>A line of symmetry splits a shape into two halves that are mirror images of each other.</p><p>Which of these letters has exactly <b>two</b> lines of symmetry?</p>`,
+      options: ["A", "H", "N", "T", "Z"].map(k => LETTERS(k)), answer: 1,
+      explain: `<p>The letter <b>H</b> can be folded in half top to bottom, and also left to right. That is two lines of symmetry.</p><p class="why-not">A and T each have only one (a line straight down the middle). N and Z have none: they look the same after a half turn, but turning is not folding. Fold either of them and the halves do not match.</p>` },
+    { id: "m204", tier: 2, cat: "Patterns & sequences",
+      stem: `<p>In a number pattern, each number is found by <b>doubling</b> the number before it and then <b>subtracting 4</b>.</p><p>The <b>fourth</b> number in the pattern is 36.</p><p>What is the <b>first</b> number?</p>`,
+      options: ["8", "10", "12", "20", "68"], answer: 0,
+      explain: `<p>Work backwards: undo “subtract 4” by adding 4, then undo “double” by halving.</p><p>Third number: (36 + 4) ÷ 2 = 20. Second: (20 + 4) ÷ 2 = 12. First: (12 + 4) ÷ 2 = <b>8</b>.</p><p>Check forwards: 8, 12, 20, 36.</p><p class="why-not">20 and 12 stop too early (they are the third and second numbers). 68 goes forwards from 36 instead of backwards.</p>` },
+    { id: "m205", tier: 2, cat: "Area, perimeter & 3D",
+      stem: `<p>A solid shape has <b>5 faces</b>: one square and four triangles. The four triangles meet at a point.</p><p>How many <b>edges</b> does the shape have?</p>`,
+      options: ["5", "6", "8", "12", "16"], answer: 2,
+      explain: `<p>The shape is a square-based pyramid. The square base has 4 edges, and 4 more edges run from the corners of the base up to the point: 4 + 4 = <b>8</b>.</p><p class="why-not">5 is the number of faces (and also the number of corners). 16 counts 4 edges for the square and 3 for every triangle, but each edge is shared by two faces, so that counts every edge twice. 12 counts the triangles’ edges only.</p>` },
+
+    /* ===================== circle 3 ===================== */
+    { id: "m301", tier: 3, cat: "Money & best value",
+      stem: `<p>Ella has only <b>20c</b> and <b>50c</b> coins in her purse. She has <b>9 coins</b> altogether, and they are worth exactly <b>$3.00</b>.</p><p>How many 50c coins does Ella have?</p>`,
+      options: ["3", "4", "5", "6", "7"], answer: 1,
+      explain: `<p>Suppose all 9 coins were 20c: that is $1.80, which is $1.20 short. Each time a 20c coin is swapped for a 50c coin, the total goes up by 30c. $1.20 ÷ 30c = 4 swaps, so there are <b>4</b> fifty-cent coins.</p><p>Check: 4 × 50c = $2.00 and 5 × 20c = $1.00, which makes $3.00 with 9 coins.</p><p class="why-not">5 is the number of 20c coins. 6 fifty-cent coins already make $3.00, but that is only 6 coins, not 9.</p>` },
+    { id: "m302", tier: 3, cat: "Fractions",
+      stem: `<p>A frog sits at <b>0</b> on a number line. Every jump takes it exactly ${frac(3, 4)} of a unit forward.</p><p>How many jumps does the frog need to get <b>past 5</b>?</p>`,
+      options: ["5", "6", "7", "8", "9"], answer: 2,
+      explain: `<p>Four jumps make 4 × ${frac(3, 4)} = 3 whole units. Six jumps make 4${frac(1, 2)}, which is not there yet. The seventh jump lands on 5${frac(1, 4)}: <b>7</b> jumps.</p><p class="why-not">6 jumps only reach 4${frac(1, 2)}. 5 treats every jump as a whole unit. 8 is one jump more than is needed.</p>` },
+    { id: "m303", tier: 3, cat: "Area, perimeter & 3D",
+      stem: `<p>Six identical square tiles are joined to make this rectangle. The perimeter of <b>one tile</b> is <b>20 cm</b>.</p>${TILES}<p>What is the perimeter of the rectangle?</p>`,
+      options: ["25 cm", "30 cm", "50 cm", "120 cm", "150 cm"], answer: 2,
+      explain: `<p>A square has 4 equal sides, so each tile’s side is 20 ÷ 4 = 5 cm. The rectangle is 3 tiles long (15 cm) and 2 tiles wide (10 cm).</p><p>Perimeter: 15 + 10 + 15 + 10 = <b>50 cm</b>.</p><p class="why-not">120 cm is 6 × 20: it counts the sides where tiles touch, and those are inside the rectangle, not on its edge. 150 is the area in square centimetres. 25 cm adds only two of the four sides.</p>` },
+    { id: "m304", tier: 3, cat: "Time & timetables",
+      stem: `<p>School camp starts on <b>9 March</b>. Permission notes must be handed in exactly <b>three weeks</b> before camp starts.</p><p>It is not a leap year, so February has 28 days.</p><p>On what date must the notes be handed in?</p>`,
+      options: ["15 February", "16 February", "17 February", "18 February", "19 February"], answer: 1,
+      explain: `<p>Three weeks is 21 days. Going back 9 days from 9 March reaches the last day of February (28 February). There are 21 − 9 = 12 more days to go back: 28 − 12 = <b>16 February</b>.</p><p>Check: 16 February + 12 days = 28 February, + 9 more days = 9 March.</p><p class="why-not">17 February would be right in a leap year. 18 and 19 February come from giving February 30 or 31 days.</p>` },
+    { id: "m305", tier: 3, cat: "Measurement & scales",
+      stem: `<p>A full jar of honey weighs <b>900 g</b>. When exactly <b>half</b> of the honey has been used, the jar and the honey left in it weigh <b>550 g</b>.</p><p>How much does the empty jar weigh?</p>`,
+      options: ["200 g", "350 g", "450 g", "550 g", "700 g"], answer: 0,
+      explain: `<p>The weight dropped by 900 − 550 = 350 g, and that was half the honey. So all the honey weighs 700 g, and the jar weighs 900 − 700 = <b>200 g</b>.</p><p class="why-not">350 g is half the honey and 700 g is all the honey: both stop before finding the jar. 450 g just halves 900, as if the jar were made of honey too.</p>` },
+
+    /* ===================== the boss ===================== */
+    { id: "m401", tier: 4, cat: "Rates",
+      stem: `<p>At a fair, prizes are swapped for tickets.</p><div class="box">4 blue tickets are worth the same as 6 red tickets.<br>9 red tickets are worth the same as 2 gold tickets.</div><p>How many <b>blue</b> tickets are worth the same as <b>4 gold</b> tickets?</p>`,
+      options: ["12", "16", "18", "24", "27"], answer: 0,
+      explain: `<p>Go through red. 2 gold = 9 red, so 4 gold = 18 red.</p><p>6 red = 4 blue, and 18 red is 3 lots of 6 red, so it is worth 3 × 4 = <b>12</b> blue.</p><p class="why-not">18 stops at red tickets. 27 turns red into blue the wrong way round (18 red is worth fewer blue tickets, not more). 16 and 24 come from multiplying the numbers in the box without matching up the colours.</p>` },
+    { id: "m402", tier: 4, cat: "Number & place value",
+      stem: `<p>Ana is <b>4 years older</b> than Ben. Ben is <b>twice as old</b> as Cara. The three children’s ages add up to <b>34</b>.</p><p>How old is Ana?</p>`,
+      options: ["10", "12", "16", "18", "20"], answer: 2,
+      explain: `<p>Think of Cara’s age as one block. Ben is two blocks, and Ana is two blocks and 4. Together that is five blocks and 4, which equals 34. So five blocks = 30 and one block = 6.</p><p>Cara is 6, Ben is 12 and Ana is 12 + 4 = <b>16</b>. Check: 6 + 12 + 16 = 34.</p><p class="why-not">12 is Ben’s age: one step short. 10 adds the 4 to Cara’s age instead of Ben’s. 18 and 20 do not give three ages that add up to 34.</p>` },
+    { id: "m403", tier: 4, cat: "Area, perimeter & 3D",
+      stem: `<p>A rectangle is 12 cm long and 8 cm wide. A square with sides of 3 cm is cut out of one corner.</p>${NOTCH}<p>What is the <b>perimeter</b> of the shape that is left?</p>`,
+      options: ["37 cm", "40 cm", "43 cm", "46 cm", "49 cm"], answer: 1,
+      explain: `<p>The rectangle’s perimeter was 12 + 8 + 12 + 8 = 40 cm. Cutting out the corner removes 3 cm from the top edge and 3 cm from the side edge, but it adds two new 3 cm edges inside the notch. What is taken away is put straight back: the perimeter is still <b>40 cm</b>.</p><p>Go round to check: 12 + 5 + 3 + 3 + 9 + 8 = 40.</p><p class="why-not">46 cm adds the two new edges without taking off the two that were lost. 37 cm thinks a smaller shape must have a smaller perimeter. Cutting a corner changes the area (it is now 96 − 9 = 87 cm²), not the distance round.</p>` },
+    { id: "m404", tier: 4, cat: "Money & best value",
+      stem: `<p>Zed starts saving on a <b>Monday</b>. He puts <b>$2.00</b> in his money box that day. Every day after that he puts in <b>50c more</b> than he did the day before.</p><p>On which day does the total in his money box first become <b>more than $15</b>?</p>`,
+      options: ["Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], answer: 3,
+      explain: `<p>Keep a running total. Monday $2.00 (total $2.00). Tuesday $2.50 (total $4.50). Wednesday $3.00 (total $7.50). Thursday $3.50 (total $11.00). Friday $4.00 (total $15.00). Saturday $4.50 (total $19.50).</p><p>On Friday the total is exactly $15, which is not <i>more than</i> $15. It first passes $15 on <b>Saturday</b>.</p><p class="why-not">Friday is the trap: “more than $15” does not include $15 itself. The earlier days come from adding $2 every day and forgetting the amounts grow.</p>` },
+  );
+})();
+
+/* ---------------------------------------------------------------
+   STORM ISLAND: reading passages (hand-written, all original). Four options (A–D),
+   except the missing-sentences passage, where the bank of six sentences is the
+   option set for every gap. A reading opponent shows one passage and asks several
+   of its questions. tier 1–3 = storm circle 1–3.
+   All five reading formats are here: cloze ×2, story ×2, missing sentences, poem, four extracts ×2.
+   --------------------------------------------------------------- */
+(() => {
+  const G = n => `<span data-g="${n}" class="gap">(${n}) ______</span>`;
+  const gapQ = (id, n, options, answer, explain) => ({ id, gap: n, cat: "Vocabulary & idioms", stem: `<p>Which word fits <b>gap ${n}</b>?</p>`, options, answer, explain });
+  const EX = ["Extract A", "Extract B", "Extract C", "Extract D"];
+
+  /* ============ circle 1: cloze ============ */
+  READING.push({
+    id: "wheel", tier: 1, format: "cloze", title: "At the Wheel",
+    note: "Some words are missing from this piece about a first pottery lesson. Choose the word that fits each gap best.",
+    html: `<p>I had watched potters at work on television and privately decided that it looked easy. A lump of clay, a spinning wheel, a pair of wet hands: within seconds a bowl would ${G(1)} as if by magic. So when my uncle offered me a lesson in his studio, I accepted without ${G(2)}.</p>
+<p>My confidence ${G(3)} about a minute. The clay must sit in the exact centre of the wheel, and mine would not. It wobbled, lurched sideways and finally flew off, landing on the floor with a slap. My uncle said nothing. He simply handed me another lump.</p>
+<p>By the fourth attempt I had learned to keep my elbows tucked in and my hands still, letting the wheel do the work. Slowly, a wall of clay began to rise between my fingers. I was so ${G(4)} in watching it grow that I forgot to breathe. Then I pressed a fraction too hard, and the whole thing folded in on itself like a tired balloon.</p>
+<p>I expected to feel ${G(5)}. Instead I found myself laughing, and reaching for the clay again. The bowl I finally took home is thick, lopsided and far from perfect, yet I would not ${G(6)} it for the finest one in my uncle’s shop.</p>`,
+    questions: [
+      gapQ("r1a", 1, ["arrive", "emerge", "happen", "result"], 1, `<p>A bowl slowly appears out of a shapeless lump, so it would <b>emerge</b>: come into view out of something.</p><p class="why-not">A bowl does not “arrive” (it was never travelling) or “happen” (events happen, objects don’t). “Result” would need more words, such as “result from the spinning”.</p>`),
+      gapQ("r1b", 2, ["exception", "permission", "interruption", "hesitation"], 3, `<p>To accept “without <b>hesitation</b>” is to say yes at once, without stopping to think. It fits a writer who is sure the job will be easy.</p><p class="why-not">“Without exception” means “every single one”. “Without permission” and “without interruption” are real phrases, but nobody is giving permission or interrupting here.</p>`),
+      gapQ("r1c", 3, ["lasted", "stayed", "kept", "continued"], 0, `<p>Something that goes on for a length of time <b>lasts</b> that long: “My confidence lasted about a minute.”</p><p class="why-not">“Stayed” and “kept” need something after them (stayed high, kept going). “Continued” would need “for”: “continued for about a minute”.</p>`),
+      gapQ("r1d", 4, ["fascinated", "attracted", "absorbed", "delighted"], 2, `<p>The clue is the little word “in”. You are <b>absorbed in</b> something when it takes all your attention.</p><p class="why-not">The others take different words after them: fascinated <i>by</i>, attracted <i>to</i>, delighted <i>with</i> or <i>by</i>.</p>`),
+      gapQ("r1e", 5, ["crushed", "thrilled", "relieved", "amused"], 0, `<p>Read on: “Instead I found myself laughing.” The word “instead” tells us the gap is the opposite of laughing. After watching the bowl collapse, the writer expected to feel <b>crushed</b> (bitterly disappointed).</p><p class="why-not">“Thrilled”, “relieved” and “amused” are all happy feelings, so “instead” would make no sense after them. “Crushed” also echoes what has just happened to the clay.</p>`),
+      gapQ("r1f", 6, ["alter", "replace", "convert", "swap"], 3, `<p>You <b>swap</b> one thing <i>for</i> another. The writer means the wobbly bowl is worth more to them than a perfect one.</p><p class="why-not">You replace something <i>with</i> another and convert something <i>into</i> another, so “for” does not fit them. “Alter” means to change a thing a little, not to exchange it.</p>`),
+    ],
+  });
+
+  /* ============ circle 1: story ============ */
+  READING.push({
+    id: "biscuit", tier: 1, format: "story", title: "Biscuit",
+    note: "Read the story, then answer the questions.",
+    html: `<p>The dog arrived in the middle of a thunderstorm, which Mum said was typical of uninvited guests. He was small, the colour of toast, and so wet that he seemed to be made mostly of ears. Arlo found him shivering under the carport and carried him inside wrapped in a beach towel.</p>
+<p>“One night,” said Mum. “He belongs to somebody.”</p>
+<p>By the third day the dog had a name, Biscuit, a bed made from a washing basket, and a habit of sleeping across Arlo’s feet. Arlo had also put up posters, because Mum made him. He drew them himself. The dog in his drawing was rather larger and fiercer than Biscuit, and the phone number was written in the smallest writing Arlo could manage.</p>
+<p>On Saturday the phone rang anyway.</p>
+<p>The woman who came to the door was older than Arlo’s grandmother and leaned on a stick. Before she could say a word, Biscuit shot between Arlo’s ankles, skidded on the tiles and flung himself at her knees, making a noise Arlo had never heard from him: a high, wobbling song.</p>
+<p>“Pepper,” the woman said. That was all. She lowered herself onto the front step, not seeming to notice that it was still damp, and the dog climbed into her lap as if he were pouring himself into a bowl.</p>
+<p>Arlo looked at his own feet. They felt strangely light.</p>
+<p>“He likes his ears rubbed,” he said at last. “Sort of backwards. And he’s scared of the vacuum cleaner.”</p>
+<p>“He always was,” said the woman, and she smiled at Arlo for the first time. “You’ve looked after him beautifully. I can see that.” She glanced at the washing basket in the hall, then back at him. “I’m only two streets away, you know. Pepper needs walking every afternoon, and my legs aren’t what they were.”</p>
+<p>Arlo went to find the lead before she had finished the sentence.</p>`,
+    questions: [
+      { id: "r2a", cat: "Purpose of a detail", stem: `<p>On Arlo’s posters the dog was “<b>larger and fiercer than Biscuit</b>” and the phone number was in “<b>the smallest writing Arlo could manage</b>”. What do these details show?</p>`,
+        options: ["Arlo was not very good at drawing dogs.", "Arlo did not really want the owner to ring.", "Arlo wanted to finish the posters quickly.", "Arlo thought a fierce dog would be noticed."], answer: 1,
+        explain: `<p>A picture that doesn’t look like the dog and a number that is hard to read make a poster that is unlikely to work. Arlo did as he was told, but in a way that gave him the best chance of keeping Biscuit: <b>he didn’t want the owner to ring</b>.</p><p class="why-not">The tiny phone number can’t be explained by bad drawing or by hurrying: he made it small on purpose (“the smallest … he could manage”). Wanting the poster noticed is the opposite of what he was up to.</p>` },
+      { id: "r2b", cat: "Vocabulary & idioms", stem: `<p>“On Saturday the phone rang <b>anyway</b>.” What does the word “anyway” tell us?</p>`,
+        options: ["The telephone often rang on Saturdays.", "Mum had telephoned the owner herself.", "Arlo had been hoping all week that it would ring.", "The call came in spite of what Arlo had done."], answer: 3,
+        explain: `<p>“Anyway” means “even so”. Arlo had made the posters as unhelpful as he could, and the owner still found the dog: the call came <b>in spite of</b> what he had done.</p><p class="why-not">Nothing says Mum rang anyone or that Saturdays were busy. Arlo was hoping for the opposite: that the phone would stay silent.</p>` },
+      { id: "r2c", cat: "Feelings & inference", stem: `<p>“Arlo looked at his own feet. <b>They felt strangely light.</b>” Why does the writer tell us this?</p>`,
+        options: ["Arlo is relieved that the dog has found its owner.", "Arlo has been standing still for too long.", "Arlo already misses the dog that slept on them.", "Arlo wants to run after the old woman."], answer: 2,
+        explain: `<p>Earlier we were told the dog had “a habit of sleeping across Arlo’s feet”. Now the dog is in someone else’s lap, and Arlo notices the weight that is gone. The writer shows us he <b>already misses the dog</b> without saying so.</p><p class="why-not">Arlo is not relieved: he tried to stop this happening. The woman has not gone anywhere, so there is nobody to run after.</p>` },
+      { id: "r2d", cat: "Comparisons & imagery", stem: `<p>The dog climbed into the woman’s lap “<b>as if he were pouring himself into a bowl</b>”. What does this comparison suggest?</p>`,
+        options: ["He settled there easily, as if he belonged.", "He was still dripping wet from the thunderstorm.", "He was hungry and hoping to be fed.", "He was too heavy for her to hold."], answer: 0,
+        explain: `<p>Something poured into a bowl flows in and fills the space exactly. The dog fits her lap in the same easy, complete way: this is <b>where he belongs</b>.</p><p class="why-not">The storm was days ago, so he is not wet. The bowl is only a comparison: there is no food in the scene. Nothing suggests he is a burden to her.</p>` },
+      { id: "r2e", cat: "Character & structure", stem: `<p>The story ends: “Arlo went to find the lead <b>before she had finished the sentence</b>.” What does this ending show?</p>`,
+        options: ["Arlo wanted the woman to leave as quickly as possible.", "Arlo was doing only what Mum expected.", "Arlo wanted to prove the dog was his.", "Arlo understood her offer and leapt at it."], answer: 3,
+        explain: `<p>The woman never actually asks. She mentions that she lives close, that the dog needs walking and that her legs are weak, and lets Arlo work it out. He does so at once, and fetching the lead is his “yes”: he <b>understood the offer and leapt at it</b>.</p><p class="why-not">He is not sending her away: the lead is for walks he will be taking. Mum plays no part in this moment, and Arlo has already accepted that the dog is hers by telling her how to look after him.</p>` },
+    ],
+  });
+
+  /* ============ circle 1: missing sentences ============ */
+  const BOWER_BANK = [
+    "Although it is built from sticks, the bower is not a nest, and no eggs are ever laid in it.",
+    "They steal the brightest pieces and carry them home to their own displays.",
+    "This is why the female builds her nest high in a tree.",
+    "He is not fussy about where the colour comes from.",
+    "Another is that it matches the colour of the bird himself.",
+    "The female studies the whole performance closely before making up her mind.",
+  ];
+  const bowerQ = (id, n, answer, explain) => ({ id, gap: n, cat: "Sentence links", stem: `<p>Which sentence fits <b>gap ${n}</b>? (Each sentence is used once only, and one is not used at all.)</p>`, options: BOWER_BANK, answer, explain });
+  READING.push({
+    id: "bower", tier: 1, format: "missing sentences", title: "The Bird That Collects Blue", bank: true,
+    note: "Five sentences have been taken out of this article. Choose the sentence that fits each gap. There is one extra sentence that is not needed.",
+    html: `<p>In the forests of eastern Australia lives a bird with an unusual hobby. The male satin bowerbird is a collector, and what he collects is anything blue. ${G(1)} Bottle tops, pegs, drinking straws, pen lids and parrot feathers are all carried off and arranged with great care.</p>
+<p>The treasures are laid out in front of his bower, which he builds on the forest floor from hundreds of thin sticks. It has two curved walls standing side by side, with a narrow path between them. ${G(2)} It is more like a stage, built for one purpose only: to impress a visiting female.</p>
+<p>When a female arrives, she steps into the path between the walls and watches. The male picks up his best blue objects one at a time, puffs out his feathers and dances, buzzing and whirring like a faulty machine. ${G(3)} If she is not impressed, she simply flies off to inspect the bower of a rival.</p>
+<p>Competition between neighbours is fierce. A male with a fine collection must guard it, because other males will raid his bower the moment he leaves. ${G(4)} Some go further and wreck the walls as well, so the owner returns to a pile of sticks.</p>
+<p>Nobody is certain why blue is the favourite colour. One idea is that blue things are rare in the forest, so a large collection proves that its owner is clever and hard-working. ${G(5)} Not every male is blue, though. A young male is green and brown, and needs about seven years to grow the glossy blue-black feathers of an adult. Until then he practises, building clumsy bowers that fall down and watching the older birds to see how it is done.</p>`,
+    questions: [
+      bowerQ("r3a", 1, 3, `<p>The sentence after the gap lists things from very different places: bottle tops, pegs, straws, feathers. That list is the proof of “<b>He is not fussy about where the colour comes from.</b>” “The colour” points back to “anything blue”.</p><p class="why-not">The sentences about the bower, the female and the thieves have nothing to refer to yet: none of them has been mentioned.</p>`),
+      bowerQ("r3b", 2, 0, `<p>The walls and the path have just been described, and the next sentence says “It is more like a stage”. More like a stage than what? The missing sentence must say what the bower is <i>not</i>: “<b>Although it is built from sticks, the bower is not a nest…</b>”</p><p class="why-not">“This is why the female builds her nest high in a tree” is about nests too, but nothing before the gap gives a reason, and the “It” that follows would then mean her nest, not the bower.</p>`),
+      bowerQ("r3c", 3, 5, `<p>The male has just danced, and the next sentence begins “If she is not impressed”. In between, we need the female judging him: “<b>The female studies the whole performance closely before making up her mind.</b>” “The whole performance” points back to the dance.</p><p class="why-not">The sentence about stealing starts with “They”, but only one male and one female are in this paragraph.</p>`),
+      bowerQ("r3d", 4, 1, `<p>“Other males will raid his bower” needs to be followed by what the raiders do. “<b>They steal the brightest pieces…</b>” does that (“They” = the other males), and the next sentence builds on it: “Some go further and wreck the walls <i>as well</i>.”</p><p class="why-not">“As well” only makes sense if stealing has just been mentioned, so no other sentence can go here.</p>`),
+      bowerQ("r3e", 5, 4, `<p>“<i>One</i> idea is…” sets up a second idea. “<b>Another is that it matches the colour of the bird himself</b>” supplies it, and leads on to “Not every male is blue, though.”</p><p class="why-not">The sentence left over is “This is why the female builds her nest high in a tree.” It is on the right subject, but nowhere in the article is there a reason for it to follow.</p>`),
+    ],
+  });
+
+  /* ============ circle 2: poem ============ */
+  READING.push({
+    id: "scarecrow", tier: 2, format: "poem", title: "Scarecrow",
+    note: "Read the poem, then answer the questions.",
+    html: `<p class="poem">All summer he has held his arms out wide
+as though the field were something he had caught.
+His coat belonged to someone’s grandfather;
+his hat has never had a single thought.
+
+The crows were frightened for about a day.
+Now two of them are sitting on his sleeve,
+discussing, in their scratchy way, the weather,
+and whether it is time for them to leave.
+
+He does not mind. He has a painted smile
+that rain has pulled a little to one side,
+and when the wheat is cut and carted off
+he goes on guarding nothing, satisfied.
+
+The farmer will forget him until spring.
+The frost will stitch white buttons on his chest.
+And all the winter long, with patient arms,
+he’ll welcome every bird that wants a rest.</p>`,
+    questions: [
+      { id: "r4a", cat: "Comparisons & imagery", stem: `<p>The scarecrow holds his arms out “<b>as though the field were something he had caught</b>”. What does this make him seem like?</p>`,
+        options: ["someone proudly showing off a prize", "someone waving his arms for help", "someone chasing the birds away", "someone who is just about to fall over"], answer: 0,
+        explain: `<p>People spread their arms wide to show how big their catch was. The poet pretends the scarecrow’s stiff, outstretched arms are doing the same thing, as if the whole field were <b>his prize</b>.</p><p class="why-not">He is not waving or chasing: he has held the same pose “all summer”. Nothing suggests he is falling.</p>` },
+      { id: "r4b", cat: "Purpose of a detail", stem: `<p>Why does the poet say that the scarecrow’s hat “<b>has never had a single thought</b>”?</p>`,
+        options: ["to show that the hat is brand new", "to suggest the grandfather was forgetful", "to remind us there is no real head inside it", "to show the scarecrow is bored out in the field"], answer: 2,
+        explain: `<p>A hat sits on a head, and a head has thoughts. This hat never has, because there is <b>no real head under it</b>: only straw. It is a gentle joke that reminds us the scarecrow is not alive.</p><p class="why-not">The coat, not the hat, came from a grandfather, and old clothes are not “brand new”. A scarecrow with no thoughts cannot be bored.</p>` },
+      { id: "r4c", cat: "Feelings & inference", stem: `<p>In the second verse, two crows sit on the scarecrow’s sleeve “<b>discussing … the weather</b>”. What does this show?</p>`,
+        options: ["The crows are planning to steal the wheat.", "The crows are completely at ease with him.", "The crows feel sorry for the scarecrow.", "A storm is on its way to the farm."], answer: 1,
+        explain: `<p>Chatting about the weather is what you do when you are relaxed. The crows were “frightened for about a day”, and now they use him as a seat: they are <b>completely at ease</b>.</p><p class="why-not">They are talking about leaving, not stealing. The poem gives the crows no pity for him, and “the weather” is just small talk, not a warning of a storm.</p>` },
+      { id: "r4d", cat: "Comparisons & imagery", stem: `<p>“<b>The frost will stitch white buttons on his chest.</b>” What is the poet describing?</p>`,
+        options: ["The farmer will mend the old coat during the winter.", "Snow will bury the scarecrow completely.", "Someone will dress him in a new shirt.", "Small white patches of frost will form on him."], answer: 3,
+        explain: `<p>Frost can’t sew. The poet imagines it as a tailor, and the “white buttons” are the <b>small round patches of frost</b> that will appear on the front of his coat.</p><p class="why-not">The farmer “will forget him until spring”, so nobody is mending or dressing him. Buttons are small spots, not a covering of snow.</p>` },
+      { id: "r4e", cat: "Main idea", stem: `<p>Think about the whole poem. By the end, what has the scarecrow become?</p>`,
+        options: ["a failure that the farmer is ashamed of", "a frightening figure once winter arrives", "the opposite of what he was made to be", "a lonely figure who longs to leave the field"], answer: 2,
+        explain: `<p>A scarecrow is made to scare birds away. This one frightens them “for about a day”, and the poem ends with him <i>welcoming</i> “every bird that wants a rest”. He has become <b>the opposite of what he was made to be</b>, and “he does not mind”.</p><p class="why-not">The farmer forgets him, which is not the same as being ashamed. He never becomes frightening again, and “patient arms” and a smile do not suggest longing to leave.</p>` },
+    ],
+  });
+
+  /* ============ circle 2: four extracts ============ */
+  const exQ = (id, cat, what, answer, explain) => ({ id, cat, stem: `<p>Which extract ${what}?</p>`, options: EX, answer, explain });
+  READING.push({
+    id: "trees", tier: 2, format: "four extracts", title: "Trees",
+    note: "Read the four extracts about trees. For each question, choose the extract that fits best.",
+    html: `<div class="extract"><b class="tag">Extract A</b><p>The mulberry tree in our backyard was older than the house, and my sisters and I treated it as an extra room. Each of us had her own branch. Mine was the third one up, worn smooth where I sat, and from it I could see over three fences to the railway line. In November we came down with purple hands, purple mouths and purple school shirts, and my mother would sigh and reach for the lemon juice. When the tree came down in a storm, years later, we stood about on the lawn as though someone had died. In a way, someone had.</p></div>
+<div class="extract"><b class="tag">Extract B</b><p>A tree keeps a diary, although it has to be cut open before anyone can read it. In places with warm and cold seasons, a tree lays down a new layer of wood beneath its bark every year, and in a sawn trunk these layers show up as rings. Counting them gives the tree’s age. Their width tells a longer story: a broad ring records a year of good rain, while a narrow one marks a year of drought. Scientists no longer need to fell a tree to study it. They drill out a core of wood no thicker than a pencil, and the tree goes on growing.</p></div>
+<div class="extract"><b class="tag">Extract C</b><p>“Twenty-nine, thirty. Ready or not!” Somewhere below, Dominic began crashing through the garden. Wren pressed herself against the trunk of the fig and tried to breathe more quietly. She had never climbed this high. The ground looked a long way down, and rather hard. Dominic checked the shed, the water tank and the wheelie bins. He stood directly beneath her, hands on hips, and announced to nobody that she must have gone home. Wren grinned. Then she looked for the branch she had used to get up, and found that, from above, every branch looked exactly the same.</p></div>
+<div class="extract"><b class="tag">Extract D</b><p>The council plans to remove the plane trees from Station Street because their roots are lifting the footpath. I would ask the councillors to walk down that street at noon in January before they vote. Under the trees it is cool enough to stop and talk; beyond them, the pavement shimmers. A cracked footpath can be repaired in a week. A sixty-year-old tree cannot be replaced in a lifetime. By all means fix the path. But let us mend what is broken without destroying what is not.</p></div>`,
+    questions: [
+      exQ("r5a", "Feelings & inference", "shows somebody whose success leads straight to a new problem", 2, `<p>In <b>Extract C</b> Wren hides so well that Dominic gives up. She grins, and then finds she cannot tell which branch leads down. Winning the game is what has left her stuck.</p><p class="why-not">In D the problem (the footpath) has not been solved yet. The storm in A is a loss, not something caused by a success. B describes a method, not a person in trouble.</p>`),
+      exQ("r5b", "Comparisons & imagery", "compares a natural thing to a written record", 1, `<p><b>Extract B</b> begins “A tree keeps a diary” and carries the idea on: the rings can be “read” and they “tell a longer story”. The rings are being compared to writing.</p><p class="why-not">Extract A compares the tree to “an extra room”, which is a place, not a record. C and D describe their trees plainly.</p>`),
+      exQ("r5c", "Tone & attitude", "describes a loss that was felt like the loss of a person", 0, `<p>In <b>Extract A</b>, when the mulberry falls the family stands about “as though someone had died. In a way, someone had.” The tree had been part of the family.</p><p class="why-not">The writer of D fears losing trees, but they are still standing, and the argument is about shade, not grief. Nothing is lost in B or C.</p>`),
+      exQ("r5d", "Main idea", "argues that one thing can be fixed without ruining another", 3, `<p><b>Extract D</b> ends: “let us mend what is broken without destroying what is not.” The writer wants the footpath repaired <i>and</i> the trees kept.</p><p class="why-not">Extract B also mentions not harming a tree, but it is explaining what scientists do, not arguing for what should be done.</p>`),
+      exQ("r5e", "Purpose of a detail", "explains how something is now studied without being destroyed", 1, `<p><b>Extract B</b>: “Scientists no longer need to fell a tree to study it. They drill out a core of wood no thicker than a pencil, and the tree goes on growing.”</p><p class="why-not">Extract D is about saving trees too, but it is about a street, not about studying anything. A and C are a memory and a story.</p>`),
+    ],
+  });
+
+  /* ============ circle 2: cloze ============ */
+  READING.push({
+    id: "stamps", tier: 2, format: "cloze", title: "The Stamp Album",
+    note: "Some words are missing from this piece. Choose the word that fits each gap best.",
+    html: `<p>When my grandfather died he left me his stamp album, a fat green book that smelled of dust and peppermints. I am ${G(1)} to say that I was not at all grateful. I was eleven, and I had been hoping for his telescope.</p>
+<p>For months the album sat ${G(2)} on my shelf. Then, one wet Sunday, with nothing better to do, I opened it. Every page was ruled in pencil, and every stamp sat squarely in its place above a line of tiny, careful handwriting: the country, the year, and often a note about how he had ${G(3)} it. “Swapped with a sailor, 1958.” “From Aunt Vera’s letter, the one with the bad news.”</p>
+<p>I had assumed that a collection was simply a heap of things. This was a life, sorted and labelled. I turned the pages more and more slowly, ${G(4)} to reach the end.</p>
+<p>On the last page there were six empty squares, and a line in his handwriting that I have never forgotten: “For whoever comes next.” I went out the following Saturday and bought my first stamp. It was a common one, worth almost nothing, but I ruled the line beneath it as ${G(5)} as I could.</p>`,
+    questions: [
+      gapQ("r6a", 1, ["ashamed", "embarrassing", "guilty", "shy"], 0, `<p>“I am <b>ashamed</b> to say” is the set phrase for admitting something you are not proud of.</p><p class="why-not">“Embarrassing” describes a thing, not a person’s feeling: the writer would be <i>embarrassed</i>. “Guilty” and “shy” are not followed by “to say”.</p>`),
+      gapQ("r6b", 2, ["unaware", "unharmed", "untouched", "unknown"], 2, `<p>Nobody opened the album for months: it sat <b>untouched</b>.</p><p class="why-not">“Unaware” describes a person who does not know something, not a book. “Unharmed” would mean something had threatened it. “Unknown” is wrong because the writer knew exactly where it was.</p>`),
+      gapQ("r6c", 3, ["required", "acquired", "inquired", "achieved"], 1, `<p>To <b>acquire</b> something is to come to own it. The notes say how each stamp was got: swapped, or taken from a letter.</p><p class="why-not">The look-alikes mean different things: “required” is needed and “inquired” is asked. You achieve a goal, not an object.</p>`),
+      gapQ("r6d", 4, ["impatient", "resistant", "incapable", "reluctant"], 3, `<p>The writer turns the pages “more and more slowly”. You slow down when you do not want something to finish: <b>reluctant</b> to reach the end.</p><p class="why-not">“Impatient to reach the end” is good English, but an impatient reader speeds up. “Resistant” is followed by “to” and a thing (resistant to change), and “incapable” by “of”.</p>`),
+      gapQ("r6e", 5, ["quickly", "carefully", "cheaply", "boldly"], 1, `<p>Look back at how the grandfather worked: every page “ruled in pencil”, with “tiny, careful handwriting”. The writer has taken up his place (“whoever comes next”) and copies his way of doing things: as <b>carefully</b> as possible.</p><p class="why-not">The stamp was cheap, but a line can’t be ruled “cheaply”. “Quickly” and “boldly” are the opposite of the patient, exact work the album has taught the writer to admire.</p>`),
+    ],
+  });
+
+  /* ============ circle 3: story ============ */
+  READING.push({
+    id: "volcano", tier: 3, format: "story", title: "The Science Fair",
+    note: "Read the story, then answer the questions.",
+    html: `<p>Hamid had built the volcano over three weekends, and it was magnificent. It stood knee-high on its plywood base, with papier-mâché ridges, a crater ringed in orange paint, and a tiny village of matchbox houses that he privately looked forward to destroying.</p>
+<p>At the next table, Clementine Park had a row of bean plants in jam jars and a poster with a great deal of writing on it. Hamid had glanced at it once, in the way you might glance at a bus timetable for a town you never intend to visit.</p>
+<p>The judges reached him at half past two. There were three of them, with clipboards.</p>
+<p>“Whenever you’re ready,” said the tallest.</p>
+<p>Hamid tipped in the vinegar. For one glorious second the crater hissed. Then a single orange bubble rose to the rim, considered the view, and sank. Nothing else happened. The matchbox village stood unharmed in the sunshine.</p>
+<p>“Ah,” said the tallest judge, and wrote something short.</p>
+<p>Hamid kept his eyes on the plywood. He was aware of his ears, which seemed to have grown.</p>
+<p>“Is it the bicarb?” said a voice. Clementine was leaning over from her table, frowning at the crater the way a mechanic frowns at an engine. “If it gets damp it goes flat. Mine’s new. I used it for the soil test.” She was already holding out a paper cup.</p>
+<p>The judges had moved on to her beans and were waiting, pens raised. Clementine did not appear to have noticed.</p>
+<p>Hamid looked at the cup, and at the long poster she had clearly written herself, every line of it, and at the judges standing in front of an empty chair.</p>
+<p>“They’re waiting for you,” he said.</p>
+<p>“They can wait a minute,” said Clementine. “Go on. Two spoonfuls.”</p>
+<p>The eruption, when it came, was everything he had hoped for. Orange foam swallowed the village whole. But the judges had their backs to it, and Hamid found that he did not much mind. He was reading, from the top, a poster about beans.</p>`,
+    questions: [
+      { id: "r7a", cat: "Comparisons & imagery", stem: `<p>Hamid glanced at Clementine’s poster “<b>in the way you might glance at a bus timetable for a town you never intend to visit</b>”. What does this tell us?</p>`,
+        options: ["He found the poster too hard to understand.", "He thought her project had nothing to do with him.", "He was planning to read it properly later that day.", "He was worried that it was better than his."], answer: 1,
+        explain: `<p>A timetable for a town you will never visit is of no use to you, so you barely look. Hamid gives the poster the same quick, uninterested glance: he thinks her project <b>has nothing to do with him</b>.</p><p class="why-not">He doesn’t read enough of it to find it hard, and “never intend to visit” rules out coming back later. He thinks his volcano is “magnificent”, so he isn’t worried.</p>` },
+      { id: "r7b", cat: "Tone & attitude", stem: `<p>“Then a single orange bubble rose to the rim, <b>considered the view</b>, and sank.” Why does the writer describe the bubble like this?</p>`,
+        options: ["to show that the eruption was just beginning", "to suggest that Hamid was not watching closely", "to show the vinegar was the wrong colour", "to make the failure seem slow and rather comic"], answer: 3,
+        explain: `<p>The bubble is described like a person strolling up for a look and wandering off. After three weekends of work, one unhurried bubble is all Hamid gets. The joke makes the moment <b>slow and comic</b>, and shows just how little happened.</p><p class="why-not">The next sentence is “Nothing else happened”, so nothing is beginning. Hamid is watching every second. The colour of the bubble is not what goes wrong.</p>` },
+      { id: "r7c", cat: "Feelings & inference", stem: `<p>“He was aware of his ears, <b>which seemed to have grown</b>.” What is Hamid feeling?</p>`,
+        options: ["hot with embarrassment", "angry with Clementine", "proud of having tried", "eager to hear the judges"], answer: 0,
+        explain: `<p>When you are embarrassed your ears burn and feel huge, as if everyone must be staring at them. Hamid won’t look up (“kept his eyes on the plywood”): he is <b>hot with embarrassment</b>.</p><p class="why-not">Clementine has not spoken yet, so he can’t be angry with her. He is hiding from the judges, not straining to hear them, and there is no pride in this moment.</p>` },
+      { id: "r7d", cat: "Purpose of a detail", stem: `<p>The writer tells us that the judges “<b>were waiting, pens raised</b>” at Clementine’s table and that she “<b>did not appear to have noticed</b>”. Why are these details included?</p>`,
+        options: ["to show that the judges were impatient people", "to show that Clementine was nervous about being judged", "to show that helping Hamid might cost her something", "to show that she did not care about her own project"], answer: 2,
+        explain: `<p>Her own judging has begun and she is not there, because she is busy with his crater. The detail shows that her help is not free: <b>it could cost her</b> marks. That is what makes it generous.</p><p class="why-not">She did the soil test and wrote the whole poster herself, so she plainly cares about her project. Nothing shows nerves, and the judges are simply waiting, not complaining.</p>` },
+      { id: "r7e", cat: "Character & structure", stem: `<p>At the end, the judges miss the eruption, yet Hamid “<b>did not much mind. He was reading, from the top, a poster about beans.</b>” What has changed in Hamid?</p>`,
+        options: ["He has decided that volcanoes are childish.", "He has stopped caring about science altogether.", "He now thinks Clementine’s work deserves his attention.", "He wants to copy her idea for next year’s science fair."], answer: 2,
+        explain: `<p>At the start he gave her poster one bored glance. Now he reads it “from the top”: all of it, properly. Her kindness has made him see her, and her work, as <b>worth his attention</b>, and that matters more to him than being watched by the judges.</p><p class="why-not">The eruption “was everything he had hoped for”, so he still loves his volcano. Reading a science poster is the opposite of giving up on science, and nothing suggests copying.</p>` },
+    ],
+  });
+
+  /* ============ circle 3: four extracts ============ */
+  READING.push({
+    id: "snow", tier: 3, format: "four extracts", title: "Snow",
+    note: "Read the four extracts about snow. For each question, choose the extract that fits best.",
+    html: `<div class="extract"><b class="tag">Extract A</b><p>I grew up in Darwin, where winter means a dry breeze and a cardigan you never quite need. So when my aunt in Canada pulled back the curtains on my first morning there, I did not at first understand what I was looking at. The street had been rubbed out. Cars had become soft white loaves, and the fence wore a tall hat on every post. What struck me most was the quiet. I had expected snow to be cold. Nobody had warned me that it would also turn the volume of the whole world down.</p></div>
+<div class="extract"><b class="tag">Extract B</b><p>Every snowflake begins as a speck of dust high in a cloud. Water vapour freezes onto it, forming a tiny six-sided crystal, and as the crystal tumbles through the cloud its six arms grow. Because all six pass through the same patches of colder, warmer, wetter and drier air, they grow in the same way, which is why a snowflake looks so perfectly balanced. No two flakes take quite the same path, however. This is the reason usually given for the old saying that no two snowflakes are alike. In 1885 an American farmer named Wilson Bentley became the first person to photograph a single snow crystal, and he went on to capture more than five thousand of them.</p></div>
+<div class="extract"><b class="tag">Extract C</b><p>The sled had belonged to Per’s father, and to his grandfather before that, and it showed. One runner was held on with wire. “It’s faster than it looks,” Per said, which was what his father always said. Ingrid, who owned a new plastic one in a shade called Arctic Lime, was kind enough not to reply. They dragged both sleds to the top of Miller’s Hill. Halfway down, the plastic sled hit a buried root and stopped dead. The old one did not so much as shudder. It carried Per on, past the gate, past the frozen trough, and very nearly into the next farm.</p></div>
+<div class="extract"><b class="tag">Extract D</b><p>Our ski resorts now make much of their own snow, pumping water uphill and spraying it from cannons whenever the weather lets them down. I understand why. A resort without snow is a car park with a view, and whole towns depend on the visitors. But each machine swallows water and electricity in quantities that ought to trouble us, particularly in a dry country. If winters are growing shorter, the honest response is to ask what else these mountains might offer, in every season, rather than to keep painting the slopes white and hoping nobody looks too closely.</p></div>`,
+    questions: [
+      exQ("r8a", "Main idea", "describes something that proved to be better than it looked", 2, `<p>In <b>Extract C</b> the old sled is held together with wire, and the new plastic one looks far smarter. On the hill it is the old sled that sails on “very nearly into the next farm”.</p><p class="why-not">In A the snow is a surprise, but the writer never thought it looked poor. D argues that artificial snow is <i>worse</i> than it looks, which is the reverse.</p>`),
+      exQ("r8b", "Purpose of a detail", "explains why something has such a regular shape", 1, `<p><b>Extract B</b> gives the reason for a snowflake’s balance: all six arms pass through the same air, so “they grow in the same way, which is why a snowflake looks so perfectly balanced”.</p><p class="why-not">Extract A describes shapes too (loaves, hats), but only to show what the street looked like. It doesn’t explain anything.</p>`),
+      exQ("r8c", "Feelings & inference", "describes being struck by something the writer had not been told to expect", 0, `<p>In <b>Extract A</b> the writer “had expected snow to be cold”, but “Nobody had warned me” about the quiet. The silence is the surprise.</p><p class="why-not">In C the sled’s speed is exactly what Per said it would be. B and D explain and argue: neither describes a surprise.</p>`),
+      exQ("r8d", "Tone & attitude", "suggests that people are avoiding an uncomfortable truth", 3, `<p><b>Extract D</b> calls for “the honest response” and accuses resorts of “painting the slopes white and hoping nobody looks too closely”. The writer thinks they would rather cover up shorter winters than face them.</p><p class="why-not">Ingrid in C keeps quiet about the sled, but that is politeness to a friend, and she turns out to be wrong. No truth is being hidden in A or B.</p>`),
+      exQ("r8e", "Feelings & inference", "shows one person choosing not to hurt another’s feelings", 2, `<p>In <b>Extract C</b>, when Per claims his battered sled is fast, Ingrid “was kind enough not to reply”. She doesn’t believe him, and she keeps that to herself.</p><p class="why-not">The writer of D says “I understand why”, but that is being fair in an argument, not sparing someone’s feelings. The aunt in A simply opens the curtains.</p>`),
+    ],
+  });
+})();
+
+/* ---------------------------------------------------------------
+   STORM ISLAND: thinking questions (hand-written). Four options (A–D).
+   tier 1–3 = storm circle 1–3; tier 4 = the boss (hardest third of the sample papers).
+   --------------------------------------------------------------- */
+(() => {
+  const { tbl, fig } = LIB;
+  const WHO = (a, b) => [`${a} only`, `${b} only`, `Both ${a} and ${b}`, `Neither ${a} nor ${b}`];
+
+  /* a five-square tile (a 2 × 2 block with one extra square), turned or flipped. Cells are [row, col]. */
+  const norm = c => { const r0 = Math.min(...c.map(x => x[0])), c0 = Math.min(...c.map(x => x[1])); return c.map(([r, k]) => [r - r0, k - c0]); };
+  const turn = c => norm(c.map(([r, k]) => [k, -r]));            // a quarter turn clockwise
+  const flip = c => norm(c.map(([r, k]) => [r, -k]));            // turned over (mirror image)
+  const P = [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0]];
+  const tile = cells => {
+    const u = 24, W = 3 * u + 6, has = (r, k) => cells.some(c => c[0] === r && c[1] === k);
+    const desc = "A tile of five squares on a 3 by 3 grid. " + [0, 1, 2].map(r => `Row ${r + 1}: ${[0, 1, 2].map(k => has(r, k) ? "square" : "empty").join(", ")}`).join(". ") + ".";
+    return `<svg viewBox="0 0 ${W} ${W}" width="${W}" height="${W}" role="img" aria-label="${desc}">${cells.map(([r, k]) => `<rect x="${3 + k * u}" y="${3 + r * u}" width="${u}" height="${u}" fill="#b9e3c6" stroke="${INK}" stroke-width="2"/>`).join("")}</svg>`;
+  };
+  const PTILE = fig(tile(P));
+
+  /* towers of cubes seen from above, and a view of them from one side */
+  const PLAN = `<div class="figure"><div style="display:inline-flex;align-items:center;gap:10px"><div><table class="grid" style="font-weight:700;margin:0"><tr><td>1</td><td>3</td><td>1</td></tr><tr><td>2</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>2</td></tr></table><div style="font-size:14px;font-weight:700;letter-spacing:2px;margin-top:4px">▲ FRONT ▲</div></div><div style="font-size:14px;font-weight:700;text-align:left">◀ Mia stands here,<br>on the right-hand side,<br>looking at the towers</div></div></div>`;
+  const view = h => {
+    const u = 22, H = 3 * u + 6;
+    return `<svg viewBox="0 0 ${3 * u + 6} ${H}" width="${3 * u + 6}" height="${H}" role="img" aria-label="Three columns of squares side by side. From left to right they are ${h.join(", ")} squares tall.">${h.map((n, c) => Array.from({ length: n }, (_, k) => `<rect x="${3 + c * u}" y="${H - 3 - (k + 1) * u}" width="${u}" height="${u}" fill="#c9d6f2" stroke="${INK}" stroke-width="2"/>`).join("")).join("")}</svg>`;
+  };
+
+  THINKING.push(
+    /* ===================== circle 1 ===================== */
+    { id: "t101", tier: 1, cat: "Supports the claim",
+      stem: `<div class="box">Ranger Kim: “Visitors should keep to the marked track through the sand dunes. That way the dune plants will have a chance to grow back.”</div><p>Which statement, if true, best supports Ranger Kim’s claim?</p>`,
+      options: ["The marked track has the best view of the sea.", "Dune plants help to hold the sand in place during storms.", "Dune plants are easily crushed when people walk on them.", "Most visitors already carry a map that shows the track."], answer: 2,
+      explain: `<p>The claim joins two things: staying on the track, and the plants growing back. The best support explains the link. If plants are <b>crushed by feet</b>, then keeping feet on the track is what lets them grow.</p><p class="why-not">The view and the maps are about the track, not the plants. The fact about storms tells us why the plants matter, but not why staying on the track helps them.</p>` },
+    { id: "t102", tier: 1, cat: "Spot the mistake",
+      stem: `<div class="box">Sam’s mum has a red tag on her keys. In the park, Sam finds a bunch of keys with a red tag.<br>Sam: “These must be Mum’s keys.”</div><p>Which one of these shows the mistake Sam has made?</p>`,
+      options: ["Other people’s keys may have a red tag too.", "Sam’s mum may have more than one bunch of keys.", "The keys may have been in the park for a long time.", "Red may not be Sam’s mum’s favourite colour."], answer: 0,
+      explain: `<p>Sam has matched just <b>one thing</b>: the red tag. That would only prove the keys are Mum’s if nobody else had a red tag, and Sam doesn’t know that.</p><p class="why-not">How many bunches Mum owns, how long the keys have been there and which colour she likes best don’t show what is wrong with jumping from “red tag” to “Mum’s keys”.</p>` },
+    { id: "t103", tier: 1, cat: "Order & arrangement",
+      stem: `<p>Three jars stand in a row on a shelf: jam, honey and pickles.</p><p>The jam is somewhere to the left of the honey.<br>The pickles are not next to the jam.</p><p>Which jar is in the middle?</p>`,
+      options: ["the jam", "the honey", "the pickles", "It is impossible to tell."], answer: 1,
+      explain: `<p>The pickles are not next to the jam, so those two must be at the two ends, with the <b>honey</b> between them. The jam is left of the honey, so the row is jam, honey, pickles.</p><p class="why-not">If the jam or the pickles were in the middle, the pickles would be right next to the jam. There is only one row that fits, so it is possible to tell.</p>` },
+    { id: "t104", tier: 1, cat: "Rules & codes",
+      stem: `<p>Mika only eats sandwiches that have <b>cheese</b> in them but <b>no tomato</b>.</p>${tbl(["Sandwich", "Fillings"], [["1", "cheese, ham"], ["2", "cheese, tomato"], ["3", "egg, lettuce"], ["4", "cheese, lettuce, tomato"], ["5", "cheese, cucumber"]])}<p>How many of these sandwiches will Mika eat?</p>`,
+      options: ["1", "2", "3", "4"], answer: 1,
+      explain: `<p>Both parts of the rule must be true. Sandwiches 1 and 5 have cheese and no tomato, so Mika eats <b>2</b>.</p><p class="why-not">Four sandwiches have cheese, but two of those also have tomato. Three sandwiches have no tomato, but one of those (egg and lettuce) has no cheese.</p>` },
+    { id: "t105", tier: 1, cat: "Number problems",
+      stem: `<p>Leo feeds his lizard every <b>second</b> day. He feeds it on a Monday, then on the Wednesday, and so on.</p><p>On which day of the week does Leo feed the lizard for the <b>fifth</b> time?</p>`,
+      options: ["Friday", "Saturday", "Sunday", "Tuesday"], answer: 3,
+      explain: `<p>List the feeds: 1st Monday, 2nd Wednesday, 3rd Friday, 4th Sunday, 5th <b>Tuesday</b>.</p><p class="why-not">Sunday is the fourth feed: the Monday counts as the first feed, not as number zero. Friday is the third. Saturday is never a feeding day in that week.</p>` },
+    { id: "t106", tier: 1, cat: "Tables & timetables",
+      stem: `<p>The table shows four children’s marks out of 20 in two spelling tests.</p>${tbl(["", "Test 1", "Test 2"], [["Ana", 12, 17], ["Bo", 15, 19], ["Cy", 9, 16], ["Di", 18, 20]])}<p>Who <b>improved</b> the most from Test 1 to Test 2?</p>`,
+      options: ["Ana", "Bo", "Cy", "Di"], answer: 2,
+      explain: `<p>Improvement is the gain, Test 2 take away Test 1. Ana +5, Bo +4, <b>Cy +7</b>, Di +2.</p><p class="why-not">Di has the highest marks in both tests but gained the least. The question asks who went up the most, not who scored the most.</p>` },
+    { id: "t107", tier: 1, cat: "Must or cannot be true",
+      stem: `<div class="box">Every child in the Dolphins swimming group can swim 25 metres.<br>Nadia is in the Dolphins.<br>Omar can swim 25 metres.</div><p>Which one of these <b>must</b> be true?</p>`,
+      options: ["Nadia can swim 25 metres.", "Omar is in the Dolphins.", "Nadia is a faster swimmer than Omar.", "Only Dolphins can swim 25 metres."], answer: 0,
+      explain: `<p>Every Dolphin can swim 25 metres and Nadia is a Dolphin, so <b>Nadia can swim 25 metres</b>.</p><p class="why-not">Omar can swim 25 metres, but the rule never says that <i>only</i> Dolphins can, so he might be in another group. Nothing is said about speed.</p>` },
+    { id: "t108", tier: 1, cat: "Spatial",
+      stem: `<p>Jo stands facing <b>north</b>. She makes a quarter turn to her right. Then she makes a half turn.</p><p>Which way is Jo facing now?</p>`,
+      options: ["north", "east", "south", "west"], answer: 3,
+      explain: `<p>A quarter turn to the right from north takes Jo to east. A half turn then points her the opposite way: <b>west</b>.</p><p class="why-not">East is where she faces after only the first turn. South would need just one more quarter turn, not a half turn.</p>` },
+
+    /* ===================== circle 2 ===================== */
+    { id: "t201", tier: 2, cat: "Spot the mistake",
+      stem: `<div class="box">To enter the art prize, a painting must be handed in by Friday. Zane handed his painting in on Wednesday.<br>Zane: “I got mine in early, so I am sure to win a prize.”</div><p>Which one of these shows the mistake Zane has made?</p>`,
+      options: ["Zane may have painted more quickly than the other children.", "Being on time may only let Zane’s painting into the contest.", "The judges may not look at any of the paintings until the following week.", "Some children may hand in their paintings on Thursday."], answer: 1,
+      explain: `<p>Being on time is <b>needed</b> to enter, but it does not <b>guarantee</b> a prize. Every painting handed in by Friday is in the same position.</p><p class="why-not">How fast Zane painted, when the judging happens and when other children hand theirs in don’t explain why “on time” is not the same as “winner”.</p>` },
+    { id: "t202", tier: 2, cat: "Supports the claim",
+      stem: `<div class="box">Mr Diaz, the caretaker: “We should put a second bin beside the oval. Then less rubbish will be left on the grass.”</div><p>Which statement, if true, best supports Mr Diaz’s claim?</p>`,
+      options: ["Three different classes use the oval for games every lunchtime.", "Rubbish left on the grass attracts ibises.", "The school already has a bin near the canteen.", "Children say the only bin is too far away from the oval."], answer: 3,
+      explain: `<p>The claim needs a reason why a bin <i>beside the oval</i> would cut the rubbish. If children drop rubbish because the bin is <b>too far away</b>, a nearer bin fixes exactly that.</p><p class="why-not">How many classes use the oval and what the rubbish attracts show that rubbish is a problem, not that a second bin would solve it. A bin near the canteen is the far-away bin already there.</p>` },
+    { id: "t203", tier: 2, cat: "Whose reasoning",
+      stem: `<div class="box">Most of the apples in a box are green. The rest are red.</div><p>Priya: “If I take an apple from the box without looking, it will probably be green.”</p><p>Quentin: “The apple on the teacher’s desk is green, so it probably came from this box.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Priya", "Quentin"), answer: 0,
+      explain: `<p>“Most apples in the box are green” tells us about apples <i>from the box</i>. So an apple taken from it is probably green: <b>Priya</b> is right.</p><p class="why-not">Quentin turns it round. We are told nothing about where green apples usually come from. There could be thousands of green apples that were never in this box.</p>` },
+    { id: "t205", tier: 2, cat: "Order & arrangement",
+      stem: `<p>Four boats finished a race, one after another.</p><p>The red boat finished before the blue boat but after the green boat.<br>The yellow boat finished after the red boat.<br>The blue boat was not last.</p><p>Which boat came <b>third</b>?</p>`,
+      options: ["the red boat", "the yellow boat", "the blue boat", "the green boat"], answer: 2,
+      explain: `<p>Green is before red, and red is before both blue and yellow, so the race starts green, red. Blue was not last, so blue is third and yellow is fourth: green, red, <b>blue</b>, yellow.</p><p class="why-not">Yellow is tempting because it is the last boat mentioned, but the final clue pushes yellow to the back. Red and green are fixed in second and first place.</p>` },
+    { id: "t206", tier: 2, cat: "Rules & codes",
+      stem: `<p>In a word game, each letter is worth points:</p>${tbl(["A", "E", "T", "M", "S"], [["1", "2", "3", "4", "5"]]).replace("<th>1</th>", "<td>1</td>")}<p>A word’s score is the total of its letters. So <b>TEAM</b> scores 3 + 2 + 1 + 4 = 10.</p><p>Which of these words scores the most?</p>`,
+      options: ["MATES", "TASTE", "STEAM", "MESS"], answer: 3,
+      explain: `<p>Add each word: MATES = 4 + 1 + 3 + 2 + 5 = 15. TASTE = 3 + 1 + 5 + 3 + 2 = 14. STEAM = 15. <b>MESS</b> = 4 + 2 + 5 + 5 = 16.</p><p class="why-not">The longer words look as if they should win, but MESS has two letters worth 5. MATES and STEAM use the same five letters, so they tie on 15.</p>` },
+    { id: "t207", tier: 2, cat: "Tables & timetables",
+      stem: `<p>The table shows how many stickers two children have.</p>${tbl(["", "Animal", "Space", "Sport"], [["Ivy", 6, 5, 4], ["Jon", 7, 2, 8]])}<p>Ivy gives Jon <b>3 space</b> stickers. Jon gives Ivy <b>2 sport</b> stickers.</p><p>After the swap, how many <b>more</b> stickers does Jon have than Ivy?</p>`,
+      options: ["2", "3", "4", "8"], answer: 2,
+      explain: `<p>Before: Ivy 6 + 5 + 4 = 15 and Jon 7 + 2 + 8 = 17.</p><p>After: Ivy 15 − 3 + 2 = 14 and Jon 17 + 3 − 2 = 18. Jon has <b>4</b> more.</p><p class="why-not">2 is the gap before the swap. 3 changes only one child’s total: every sticker that moves makes one pile smaller <i>and</i> the other bigger. 8 stops after Ivy’s gift and forgets the stickers Jon gives back.</p>` },
+    { id: "t208", tier: 2, cat: "Number problems",
+      stem: `<p>A dentist sees patients from <b>9:00 am</b> until <b>5:00 pm</b>, with a lunch break from 12:30 pm to 1:30 pm.</p><p>Every check-up takes exactly 30 minutes, and there are no gaps between them.</p><p>How many check-ups can the dentist do in one day?</p>`,
+      options: ["7", "14", "15", "16"], answer: 1,
+      explain: `<p>Morning: 9:00 to 12:30 is 3½ hours = 7 check-ups. Afternoon: 1:30 to 5:00 is 3½ hours = 7 check-ups. Altogether <b>14</b>.</p><p class="why-not">16 forgets the lunch break (8 hours of check-ups). 15 takes off only half an hour for lunch. 7 is just the morning.</p>` },
+    { id: "t209", tier: 2, cat: "Must or cannot be true",
+      stem: `<p>Asha is taller than Ben, and Ben is taller than Col.</p><p>The three friends stand on a staircase, each on a different step. Now the tops of their heads are exactly level.</p><p>Which one of these <b>cannot</b> be true?</p>`,
+      options: ["Ben is on a higher step than Col.", "Asha is on the lowest step.", "Col is on the highest step.", "Ben is on a step between the other two."], answer: 0,
+      explain: `<p>For the heads to be level, the shortest person needs the most help from the stairs. So Col is highest, Ben is in between and Asha is lowest.</p><p>That makes “<b>Ben is on a higher step than Col</b>” impossible: Ben is taller, so on a higher step his head would be above Col’s.</p><p class="why-not">The other three statements describe exactly how they must be standing.</p>` },
+    { id: "t210", tier: 2, cat: "Spatial", visual: true,
+      stem: `<p>Here is a tile made of five squares.</p>${PTILE}<p>Three of the tiles below are this tile <b>turned round</b>. One has been <b>flipped over</b>, so it is a mirror image.</p><p>Which tile has been flipped over?</p>`,
+      options: [tile(flip(turn(P))), tile(turn(P)), tile(turn(turn(P))), tile(turn(turn(turn(P))))], answer: 0,
+      explain: `<p>Turn the first tile in your head, a quarter turn at a time. Going clockwise round the block of four, the extra square always sits just <i>after</i> the same corner. Three of the tiles keep that pattern.</p><p>In the <b>first tile (A)</b> the extra square is on the other side of the block. No amount of turning does that: the tile must have been flipped over.</p><p class="why-not">The other three are the tile after a quarter turn, a half turn and a three-quarter turn.</p>` },
+
+    /* ===================== circle 3 ===================== */
+    { id: "t301", tier: 3, cat: "Whose reasoning",
+      stem: `<div class="box">A rule in a board game: “If you roll a six, you get another turn.” The rule is always followed.</div><p>Ed: “Fay got another turn, so she must have rolled a six.”</p><p>Gus: “Hana did not get another turn, so she cannot have rolled a six.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Ed", "Gus"), answer: 1,
+      explain: `<p>The rule says what happens <i>after a six</i>. If Hana had rolled a six she would have had another turn. She didn’t, so she didn’t roll one: <b>Gus</b> is right.</p><p class="why-not">Ed runs the rule backwards. The rule does not say a six is the <i>only</i> way to get another turn. Fay might have landed on a bonus square.</p>` },
+    { id: "t302", tier: 3, cat: "Spot the mistake",
+      stem: `<div class="box">A survey found that most children at Hillside School like the new playground.<br>Mia: “My cousin goes to Hillside, so she likes the new playground.”</div><p>Which one of these shows the mistake Mia has made?</p>`,
+      options: ["The survey may have been done before the playground was finished.", "Mia may not have seen the new playground herself.", "Children at other schools may like their playgrounds more.", "Mia’s cousin may be one of the children who do not like it."], answer: 3,
+      explain: `<p>“Most” is not “all”. Some Hillside children do not like the playground, and Mia’s <b>cousin could be one of them</b>. Mia can only say her cousin <i>probably</i> likes it.</p><p class="why-not">The timing of the survey, whether Mia has seen the playground and what other schools think don’t explain what is wrong with going from “most children” to “this child”.</p>` },
+    { id: "t303", tier: 3, cat: "Supports the claim",
+      stem: `<div class="box">Dr Osei: “High schools should start lessons an hour later in the morning. Then students would learn more in their first lesson of the day.”</div><p>Which statement, if true, best supports Dr Osei’s claim?</p>`,
+      options: ["Students who are still sleepy take in less of what they are taught.", "Many high school students say they would like a later start.", "Teenagers tend to go to bed later than younger children do.", "Students who learn more in the mornings usually go on to get better marks."], answer: 0,
+      explain: `<p>The claim needs a link from “starting later” to “learning more”. If <b>sleepy students take in less</b>, then a later start (more sleep) means more is learned.</p><p class="why-not">What students would like is not about learning. Going to bed later explains why they are tired, but stops before learning. Better marks is about what happens <i>after</i> learning more, not what causes it.</p>` },
+    { id: "t304", tier: 3, cat: "Spatial", visual: true,
+      stem: `<p>Towers of cubes stand on a 3 by 3 board. This plan shows the board from <b>above</b>. Each number tells you how many cubes are in that tower.</p>${PLAN}<p>What does Mia see?</p>`,
+      options: [view([2, 3, 2]), view([3, 2, 2]), view([2, 2, 3]), view([2, 1, 1])], answer: 2,
+      explain: `<p>From the side, Mia sees one column for each <i>row</i> of the plan, and each column is as tall as the tallest tower in that row. Front row: 2. Middle row: 2. Back row: 3.</p><p>Standing on the right-hand side, the front of the board is on Mia’s left, so she sees <b>2, 2, 3</b> from left to right (C).</p><p class="why-not">2, 3, 2 is the view from the front. 3, 2, 2 is the view from the opposite side. 2, 1, 1 is only the nearest line of towers: taller towers behind them still show over the top.</p>` },
+    { id: "t305", tier: 3, cat: "Rules & codes",
+      stem: `<p>A coach must choose <b>three</b> of these five swimmers for a relay: Ada, Bo, Cy, Di and Eli.</p><div class="box">Ada and Bo will not swim in the same team.<br>If Cy is chosen, Di must be chosen too.<br>Eli must be chosen.</div><p>Which team can the coach choose?</p>`,
+      options: ["Bo, Di and Eli", "Ada, Bo and Eli", "Ada, Cy and Eli", "Bo, Cy and Di"], answer: 0,
+      explain: `<p>Test each team against all three rules. <b>Bo, Di and Eli</b>: Ada and Bo are not together, Cy is not chosen so the second rule does not matter, and Eli is in. It works.</p><p class="why-not">Ada, Bo and Eli puts Ada and Bo together. Ada, Cy and Eli has Cy without Di. Bo, Cy and Di leaves out Eli.</p>` },
+    { id: "t306", tier: 3, cat: "Tables & timetables",
+      stem: `<p>Four garden lamps are on timers.</p>${tbl(["Lamp", "Switches on", "Switches off"], [["A", "5:00 pm", "8:30 pm"], ["B", "6:15 pm", "9:00 pm"], ["C", "7:00 pm", "7:45 pm"], ["D", "8:00 pm", "10:00 pm"]])}<p>For how long altogether are <b>three</b> lamps on at the same time?</p>`,
+      options: ["30 minutes", "45 minutes", "1 hour 15 minutes", "2 hours 15 minutes"], answer: 2,
+      explain: `<p>A and B are both on from 6:15 to 8:30. During that time C joins them from 7:00 to 7:45 (45 minutes), and D joins them from 8:00 until A goes off at 8:30 (30 minutes).</p><p>45 + 30 = <b>1 hour 15 minutes</b>. (C and D are never on together, so there are never four.)</p><p class="why-not">45 minutes and 30 minutes are each only one of the two stretches. 2 hours 15 minutes is how long A and B are on together, which is only two lamps.</p>` },
+    { id: "t307", tier: 3, cat: "Must or cannot be true",
+      stem: `<div class="box">In a hockey league, a team wins a game only if it scores more goals than the other team. If the two teams score the same, the game is a draw.<br>Last Saturday the Otters scored no goals.</div><p>Which one of these <b>must</b> be true?</p>`,
+      options: ["The Otters lost on Saturday.", "The other team scored at least one goal.", "The Otters have not won a game this season.", "The Otters did not win on Saturday."], answer: 3,
+      explain: `<p>To win you must score more than the other team, and nobody can score fewer than zero. So with no goals <b>the Otters did not win</b>.</p><p class="why-not">They need not have lost: if the other team also scored nothing, it was a 0–0 draw. That is also why the other team need not have scored. One Saturday tells us nothing about the rest of the season.</p>` },
+    { id: "t308", tier: 3, cat: "Number problems",
+      stem: `<p>There are <b>24</b> children in a class. <b>15</b> play soccer and <b>12</b> play netball. <b>2</b> children play neither sport.</p><p>How many children play <b>both</b> soccer and netball?</p>`,
+      options: ["3", "5", "7", "10"], answer: 1,
+      explain: `<p>24 − 2 = 22 children play at least one sport. But 15 + 12 = 27, which is 5 too many. The extra 5 are the children who were counted twice, once for each sport: <b>5</b> play both.</p><p>Check: 10 soccer only + 5 both + 7 netball only + 2 neither = 24.</p><p class="why-not">3 is just 15 − 12. 7 is the number who play netball only, and 10 is the number who play soccer only.</p>` },
+
+    /* ===================== the boss ===================== */
+    { id: "t401", tier: 4, cat: "Whose reasoning",
+      stem: `<div class="box">A bag holds 6 lemon, 4 mint and 3 berry lollies. They are all wrapped the same, so nobody can tell them apart.</div><p>Pia: “If I take out 4 lollies, I am certain to get at least two of the same flavour.”</p><p>Raj: “If I take out 8 lollies, I am certain to get at least one berry.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Pia", "Raj"), answer: 0,
+      explain: `<p>To be <i>certain</i>, think of the unluckiest case. There are only 3 flavours, so the first 3 lollies could all be different, but the 4th must match one of them. <b>Pia</b> is right.</p><p class="why-not">Raj is wrong: there are 6 + 4 = 10 lollies that are not berry, so his 8 could all be lemon and mint. He would need 11 to be certain.</p>` },
+    { id: "t402", tier: 4, cat: "Spot the mistake",
+      stem: `<div class="box">After recess, the door of the class hamster’s cage was found open. Only Ivy and Jack were in the room during recess.<br>Ivy: “I didn’t open it, so Jack must have.”</div><p>Which one of these shows the mistake Ivy has made?</p>`,
+      options: ["Jack may like the hamster more than Ivy does.", "Ivy may have been in the room for much longer than Jack was.", "The hamster may not have left its cage.", "The door may not have been latched properly before recess."], answer: 3,
+      explain: `<p>Ivy thinks there are only two possibilities: she opened it, or Jack did. There is a third: <b>nobody opened it at recess</b>. A door that was not latched could have swung open by itself.</p><p class="why-not">Who likes the hamster, who was in the room longer and whether the hamster got out don’t point to anything wrong with her “me or Jack” thinking.</p>` },
+    { id: "t403", tier: 4, cat: "Number problems",
+      stem: `<p>A class of <b>20</b> children voted for a mascot: an owl, a fox or a frog. Every child voted for exactly <b>two</b> of the three animals.</p><p>The owl got 14 votes and the fox got 15 votes.</p><p>How many votes did the frog get?</p>`,
+      options: ["9", "11", "20", "29"], answer: 1,
+      explain: `<p>20 children with 2 votes each makes 40 votes altogether. The owl and the fox took 14 + 15 = 29 of them, so the frog got 40 − 29 = <b>11</b>.</p><p class="why-not">29 is the owl’s and fox’s votes, not the frog’s. 20 is the number of children, and each of them had two votes, not one. 9 comes from taking 29 away from the wrong total.</p>` },
+    { id: "t404", tier: 4, cat: "Spatial",
+      stem: `<p>On a dice, the numbers on opposite faces always add up to <b>7</b>.</p><p>A dice sits on a table with <b>1 on top</b>, <b>2 facing you</b> and <b>3 on the right-hand side</b>.</p><p>You tip the dice over once to the <b>right</b>, so the top face becomes the right-hand face. Then you tip it once <b>towards you</b>, so the top face becomes the face that looks at you.</p><p>Which number is on top now?</p>`,
+      options: ["2", "4", "5", "6"], answer: 2,
+      explain: `<p>Start: top 1, bottom 6, front 2, back 5, right 3, left 4.</p><p>Tip to the right: the left face comes up, so the top is 4 (front and back stay as 2 and 5).</p><p>Tip towards you: the back face comes up, so the top is <b>5</b>.</p><p class="why-not">4 stops after the first tip. 6 is opposite the 1 you started with, but the bottom never comes straight to the top in one tip. 2 is the face that started at the front; after the second tip it is underneath.</p>` },
+    { id: "t405", tier: 4, cat: "Order & arrangement",
+      stem: `<p>Five shelves are numbered 1 (bottom) to 5 (top). Each holds one thing: a globe, a clock, a vase, a lamp and a trophy.</p><div class="box">The trophy is on shelf 3.<br>The lamp is on the shelf directly above the globe.<br>The clock is higher than the vase.<br>The vase is not on the bottom shelf.</div><p>What is on shelf <b>4</b>?</p>`,
+      options: ["the clock", "the lamp", "the globe", "the vase"], answer: 3,
+      explain: `<p>With the trophy on 3, the globe and lamp (one directly above the other) must be on 1 and 2, or on 4 and 5.</p><p>If they were on 4 and 5, the vase and clock would be on 1 and 2. The vase can’t be on 1, so it would be on 2 with the clock below it. But the clock must be higher. That fails.</p><p>So the globe is on 1 and the lamp on 2. The vase and clock take 4 and 5 with the clock higher: the <b>vase</b> is on 4.</p><p class="why-not">The clock is on 5, the lamp on 2 and the globe on 1.</p>` },
+    { id: "t406", tier: 4, cat: "Whose reasoning",
+      stem: `<div class="box">The canteen sells soup <b>only</b> on days when the temperature at 9 am is below 15 degrees. On every such day, it does sell soup.</div><p>Wes: “The canteen is selling soup today, so it was below 15 degrees at 9 am.”</p><p>Xan: “It was 20 degrees at 9 am today, so there will be no soup at the canteen.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Wes", "Xan"), answer: 2,
+      explain: `<p>“Only on days below 15 degrees” means soup is never sold on a warmer day. So if soup is on sale it must have been below 15 (Wes), and on a 20-degree morning there can be no soup (Xan). <b>Both</b> are right.</p><p class="why-not">Many rules only work in one direction, which is why “only one of them” is tempting. Here the word “only” makes Wes’s and Xan’s statements two ways of saying the same thing.</p>` },
+    { id: "t407", tier: 4, cat: "Supports the claim",
+      stem: `<div class="box">Councillor Abara: “We should plant shady trees along the footpaths of Main Street. Then more people will walk to the shops in summer instead of driving.”</div><p>Which statement, if true, best supports the councillor’s claim?</p>`,
+      options: ["Streets lined with trees look more attractive to visitors.", "Many people say Main Street is too hot to walk along in summer.", "Parking spaces near the shops are very hard to find during summer.", "People who walk to the shops tend to visit more of them."], answer: 1,
+      explain: `<p>The claim is that <i>shade</i> will get people walking. That only works if <b>heat is what stops them now</b>. If people say the street is too hot to walk along, shady trees remove the reason they drive.</p><p class="why-not">Looking attractive is a different benefit of trees. Scarce parking is a reason to walk that has nothing to do with trees. More shop visits is a result of walking, not a reason that trees would cause it.</p>` },
+  );
+})();
+
+</script>
+<script>
+(() => {
+"use strict";
+const KEY = "prac3.v1";
+const LETTERS = "ABCDEF";
+const P2 = "../prac2/art/";          // pictures shared with Crown Quest
+const app = document.getElementById("app");
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ---------- the game's numbers ---------- */
+const GUNS = [
+  { id: "pistol", name: "Suppressed Pistol", rar: "Common", col: "#8a94a6", dmg: 25, cost: 0 },
+  { id: "shotgun", name: "Tactical Shotgun", rar: "Rare", col: "#2f8fff", dmg: 35, cost: 250 },
+  { id: "minigun", name: "Minigun", rar: "Legendary", col: "#ffb21a", dmg: 50, cost: 800 },
+];
+const ITEMS = [
+  { id: "med", name: "Med Kit", img: "medkit", col: "#3fae2a", cost: 30, what: "+50 health" },
+  { id: "shield", name: "Shield Potion", img: "shieldpotion", col: "#2f8fff", cost: 40, what: "+50 shield" },
+];
+const CARRY = 3, MAXHP = 100, MAXSH = 50, CAMP_HEAL = 40;
+/* storm circles: enemy health, the damage a miss costs, coins for a win, and the storm's radius (% of the map) */
+const STAGE = { 1: { hp: 60, dmg: 20, coins: 15, r: 80 }, 2: { hp: 75, dmg: 25, coins: 25, r: 37 }, 3: { hp: 90, dmg: 30, coins: 35, r: 25 }, 4: { hp: 150, dmg: 35, coins: 80, r: 13.5 } };
+const WIN_COINS = 50;
+const WIN_MIN = 8;                                   // Fortnite minutes for winning a match (the boss is beaten)
+const missBonus = m => m === 0 ? 7 : m <= 2 ? 5 : m <= 4 ? 3 : m <= 6 ? 1 : 0;   // extra minutes for few misses
+const KIND = {
+  reading: { label: "Reading", icon: "📖", arena: "arena-forest", col: "#2e7d4f" },
+  thinking: { label: "Thinking", icon: "🧩", arena: "arena-peaks", col: "#7a4bb5" },
+  maths: { label: "Maths", icon: "🔢", arena: "arena-reef", col: "#0b6fa4" },
+};
+const FOES = {
+  reading: [["lynx", "Lynx"], ["sparkle", "Sparkle Specialist"], ["ghoul", "Ghoul Trooper"]],
+  thinking: [["visitor", "The Visitor"], ["darkvoyager", "Dark Voyager"], ["carbide", "Carbide"]],
+  maths: [["rex", "Rex"], ["tomatohead", "Tomatohead"], ["beefboss", "Beef Boss"], ["meowscles", "Meowscles"]],
+};
+const BOSSES = [["omega", "Omega"], ["blackknight", "Black Knight"], ["iceking", "The Ice King"]];
+/* outfits for the hero: [picture, name, rarity colour, crowns needed, folder] */
+const SKINS = [["jonesy", "Jonesy", "#8a94a6", 0, "art/"], ["renegade", "Renegade Raider", "#2f8fff", 1, "art/"], ["britebomber", "Brite Bomber", "#2f8fff", 2, P2],
+  ["fishstick", "Fishstick", "#2f8fff", 3, P2], ["peely", "Peely", "#a34dff", 5, P2], ["raptor", "Raptor", "#ffb21a", 7, "art/"], ["cuddle", "Cuddle Team Leader", "#ffb21a", 9, P2],
+  ["drift", "Drift", "#ffb21a", 12, P2], ["crackshot", "Crackshot", "#ffb21a", 15, "art/"], ["midas", "Midas", "#ffb21a", 20, P2]];
+/* where things stand on the island (% of the map) */
+const SPOTS = { 1: [[20, 17], [75, 16], [82, 75]], 2: [[20, 58], [70, 33]], 3: [[33, 40], [69, 67]], 4: [[50, 45]] };
+const SHOP_AT = [41, 58.5], CAMP_AT = [59, 57.5], EYE = [50, 52];   // the storm closes on EYE
+const PLANS = [[["reading", "thinking"], ["maths", "thinking"]], [["thinking", "maths"], ["reading", "maths"]], [["reading", "maths"], ["thinking", "maths"]]];
+
+/* Epic's own pictures of the guns and items (see the notice at the foot of the page) */
+const gunPic = id => `<img class="gunpic" src="art/gun-${id}.webp" alt="">`;
+const pic = (name, cls = "ico") => `<img class="${cls}" src="art/${name}.webp" alt="">`;
+
+/* ---------- saved progress ---------- */
+/* Practice mode: opened from the admin page (?admin=1 after the PIN). Everything is owned and nothing is saved. */
+const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
+const FRESH = () => ({ coins: 0, crowns: 0, guns: { pistol: 1 }, gun: "pistol", items: { med: 1, shield: 0 }, skin: "jonesy", q: {}, seq: 1, n: 0, match: null, last: null,
+  time: { cap: 30, days: {}, used: 0 }, stats: { wins: 0, kos: 0 }, sound: true });
+function load() {
+  if (PRACTICE) { const s = FRESH(); s.coins = 5000; GUNS.forEach(g => s.guns[g.id] = 1); s.items = { med: 3, shield: 3 }; s.crowns = 20; return s; }
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.guns) { const f = FRESH(); return Object.assign(f, s, { time: Object.assign(f.time, s.time), stats: Object.assign(f.stats, s.stats) }); } } catch (e) {}
+  return FRESH();
+}
+let S = load();
+const save = () => { if (PRACTICE) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+const earnedToday = () => S.time.days[today()] || 0;
+const earnedAll = () => Object.values(S.time.days).reduce((a, b) => a + b, 0);
+const balance = () => Math.max(0, earnedAll() - S.time.used);
+const gun = () => GUNS.find(g => g.id === S.gun) || GUNS[0];
+const skin = () => SKINS.find(s => s[0] === S.skin) || SKINS[0];
+const rnd = n => Math.floor(Math.random() * n);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- sound ---------- */
+let AC = null;
+function beep(notes) {
+  if (!S.sound) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    let t = AC.currentTime;
+    for (const [f, d, type] of notes) {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type || "square"; o.frequency.value = f; g.gain.setValueAtTime(.06, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d); t += d * .8;
+    }
+  } catch (e) {}
+}
+const SND = { hit: [[660, .08], [990, .14]], miss: [[200, .16, "sawtooth"], [140, .22, "sawtooth"]], win: [[523, .12], [659, .12], [784, .12], [1047, .3]], ko: [[300, .2, "sawtooth"], [200, .2, "sawtooth"], [120, .4, "sawtooth"]], buy: [[880, .08], [1320, .12]] };
+
+/* ---------- questions ---------- */
+const HAND = {}, GEN = {}, PASS = {};
+for (const q of THINKING) HAND[q.id] = Object.assign(q, { kind: "thinking" });
+for (const q of MATHS) HAND[q.id] = Object.assign(q, { kind: "maths" });
+for (const p of READING) { PASS[p.id] = p; for (const q of p.questions) HAND[q.id] = Object.assign(q, { kind: "reading", pid: p.id }); }
+for (const g of GENS) GEN[g.id] = g;
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const qkey = ref => ref.t === "g" ? "g:" + ref.id : ref.id;
+function resolve(ref) {
+  if (ref.t === "g") { const g = GEN[ref.id]; return Object.assign({ id: "g:" + g.id, cat: g.cat, kind: g.kind }, g.make(rng(ref.seed))); }
+  return HAND[ref.id];
+}
+const lastUsed = k => (S.q[k] && S.q[k].t) || 0;
+/* least recently used first: questions never seen come first, then ones missed, then the oldest right answers */
+function pickQ(kind, tier, M) {
+  const hand = (kind === "thinking" ? THINKING : MATHS).filter(q => q.tier === tier).map(q => ({ t: "h", id: q.id }));
+  const gens = GENS.filter(g => g.kind === kind && (g.tier === tier || (tier === 4 && g.tier === 3))).map(g => ({ t: "g", id: g.id }));
+  let c = [...hand, ...gens];
+  const fresh = c.filter(r => !M.asked.includes(qkey(r)));
+  if (fresh.length) c = fresh;
+  c = shuffle(c).sort((a, b) => lastUsed(qkey(a)) - lastUsed(qkey(b)));
+  const ref = c[0];
+  if (ref.t === "g") ref.seed = rnd(2 ** 31);
+  return ref;
+}
+function pickPassage(tier, M, not) {
+  let c = READING.filter(p => p.tier === tier && p.id !== not);
+  const fresh = c.filter(p => !M.asked.includes("p:" + p.id));
+  if (fresh.length) c = fresh;
+  c = shuffle(c).sort((a, b) => lastUsed("p:" + a.id) - lastUsed("p:" + b.id));
+  const p = c[0], st = S.q["p:" + p.id] || (S.q["p:" + p.id] = { t: 0, start: 0 });
+  const ids = p.questions.map(q => q.id), k = (st.start || 0) % ids.length;
+  st.t = ++S.seq; M.asked.push("p:" + p.id);
+  return { pid: p.id, queue: [...ids.slice(k), ...ids.slice(0, k)] };
+}
+function nextQ(o) {
+  const M = S.match;
+  if (o.kind === "reading") {
+    if (!o.pid || !o.queue.length) Object.assign(o, pickPassage(o.tier, M, o.pid));
+    const id = o.queue.shift();
+    const st = S.q["p:" + o.pid]; st.start = (PASS[o.pid].questions.findIndex(q => q.id === id) + 1) % PASS[o.pid].questions.length;
+    o.pending = { ref: { t: "h", id }, chosen: null };
+  } else {
+    const kind = o.boss ? (o.shots % 2 ? "maths" : "thinking") : o.kind;
+    const ref = pickQ(kind, o.tier, M);
+    M.asked.push(qkey(ref));
+    o.pending = { ref, chosen: null };
+  }
+  o.shots++;
+}
+
+/* ---------- matches ---------- */
+function newMatch() {
+  const n = S.n, opps = [];
+  const used = {};
+  const foe = kind => { const list = FOES[kind]; used[kind] = (used[kind] || 0) + 1; return list[(n + used[kind]) % list.length]; };
+  const add = (kind, stage, at) => { const [img, name] = foe(kind); opps.push({ kind, tier: stage, stage, img, name, x: at[0], y: at[1], hp: STAGE[stage].hp, max: STAGE[stage].hp, dead: false, shots: 0, pending: null, pid: null, queue: [] }); };
+  shuffle(["reading", "thinking", "maths"]).forEach((k, i) => add(k, 1, SPOTS[1][i]));
+  const plan = PLANS[n % PLANS.length];
+  [2, 3].forEach(st => shuffle(plan[st - 2]).forEach((k, i) => add(k, st, SPOTS[st][i])));
+  const [bimg, bname] = BOSSES[n % BOSSES.length];
+  opps.push({ kind: "thinking", boss: true, tier: 4, stage: 4, img: bimg, name: bname, x: SPOTS[4][0][0], y: SPOTS[4][0][1], hp: STAGE[4].hp, max: STAGE[4].hp, dead: false, shots: 0, pending: null });
+  return { stage: 1, hp: MAXHP, shield: 0, misses: 0, hits: 0, opps, asked: [], camp: 0, cur: null, note: "" };
+}
+function hurt(M, dmg) { const s = Math.min(M.shield, dmg); M.shield -= s; M.hp = Math.max(0, M.hp - (dmg - s)); }
+function addMinutes(min) { const d = today(), got = Math.max(0, Math.min(min, S.time.cap - earnedToday())); S.time.days[d] = earnedToday() + got; return got; }
+
+/* ---------- drawing ---------- */
+const bar = (cls, v, max) => `<div class="bar ${cls}"><i style="width:${Math.max(0, 100 * v / max)}%"></i><span>${Math.round(v)}</span></div>`;
+const chestStage = () => { const p = 100 * earnedToday() / S.time.cap; return p <= 0 ? 0 : p >= 99.99 ? 4 : 1 + Math.min(2, Math.floor(p / 34)); };
+const mins = m => `${m} min`;
+function timeCard() {
+  const e = earnedToday(), cap = S.time.cap;
+  return `<div class="timecard" id="timecard" data-today="${e}" data-cap="${cap}" data-balance="${balance()}">
+    <div class="pie" style="--p:${Math.min(100, 100 * e / cap)}"></div>
+    <div class="txt"><div class="lab">FORTNITE TIME EARNED TODAY</div><div class="bigt">${mins(e)}</div>
+      <div class="of">of today’s limit of ${mins(cap)}${e >= cap ? " · <b>Limit reached. More tomorrow!</b>" : ""}</div>
+      <div class="of">Ready to use: <b>${mins(balance())}</b></div></div>
+    <img class="chest" src="${P2}chest${chestStage()}.webp" alt="Treasure chest"></div>`;
+}
+function topBar() {
+  return `<div class="top"><h1>Storm <span>Island</span></h1><span class="spacer"></span>
+    <span class="pill" id="crowns"><img src="${P2}crown3d.webp" alt="Crowns"> ${S.crowns}</span><span class="pill" id="coins">${pic("coins")} ${S.coins}</span>
+    <button class="pill" id="snd" title="Sound">${S.sound ? "🔊" : "🔇"}</button></div>`;
+}
+function islandSvg(M) {
+  const r = M ? STAGE[M.stage].r * 6 : 480, cx = EYE[0] * 6, cy = EYE[1] * 6;
+  return `<img class="mapimg" src="art/island.webp" alt="A map of the island">
+    <svg viewBox="0 0 600 600" role="img" aria-label="The purple storm covers everything outside the circle.">
+    <defs><mask id="storm"><rect width="600" height="600" fill="#fff"/><circle id="stormhole" cx="${cx}" cy="${cy}" style="r:${r}px" fill="#000"/></mask></defs>
+    <rect width="600" height="600" fill="#7a2fe0" opacity=".66" mask="url(#storm)"/><circle cx="${cx}" cy="${cy}" style="r:${r}px" fill="none" stroke="#f0dcff" stroke-width="4" stroke-dasharray="10 8"/></svg>`;
+}
+function marker(o, i, M) {
+  const k = o.boss ? { label: "Boss", icon: "👑", col: "#7a1f3d" } : KIND[o.kind];
+  const state = o.dead ? "dead" : o.stage === M.stage ? "open" : "later";
+  return `<button class="mk foe ${state}${o.boss ? " boss" : ""}" data-o="${i}" style="left:${o.x}%;top:${o.y}%;--kind:${k.col}" ${state === "open" ? "" : "disabled"} aria-label="${esc(o.name)}, ${k.label}${o.dead ? ", defeated" : state === "later" ? ", circle " + o.stage : ""}">
+    <span class="pic"><img src="art/${o.img}.webp" alt=""><span class="tag">${o.dead ? "✖" : k.icon}</span></span>
+    <span class="nm">${o.dead ? esc(o.name) : state === "later" ? (o.boss ? "Boss" : "Circle " + o.stage) : esc(o.name)}</span>
+    ${state === "open" && o.hp < o.max ? `<span class="mhp"><i style="width:${100 * o.hp / o.max}%"></i></span>` : ""}</button>`;
+}
+
+/* ---------- the island (home) ---------- */
+function home() {
+  const M = S.match;
+  if (M) M.cur = null;
+  const res = S.last; S.last = null;
+  let h = topBar();
+  if (PRACTICE) h += `<div class="note" id="practice-note"><div class="txt"><b>Practice mode</b><br>You own every gun and nothing you do here is saved. The real game progress is not touched.${M ? `<br>Jump to: <button class="btn small ghost" data-jump="2">Circle 2</button> <button class="btn small ghost" data-jump="3">Circle 3</button> <button class="btn small ghost" data-jump="4">Boss</button>` : ""}</div><a class="btn" href="../pracadmin/index.html">← Admin page</a></div>`;
+  if (res) h += resultCard(res);
+  h += timeCard();
+  if (M && M.note) { h += `<div class="banner">${pic("storm")} <span>${M.note}</span></div>`; M.note = ""; }
+  if (M) {
+    h += `<div class="me-strip"><img src="${skin()[4]}${skin()[0]}.webp" alt="" width="54" height="54" style="object-fit:contain">
+      <div class="grow"><b>Storm circle ${M.stage} of 4</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}</div>
+      <div class="kit">${gunPic(S.gun)}<small>${gun().name}</small></div><div class="kit">${pic("medkit")} ×${S.items.med} ${pic("shieldpotion")} ×${S.items.shield}</div></div>`;
+  }
+  h += `<div class="island" id="island">${islandSvg(M)}`;
+  if (M) {
+    h += M.opps.map((o, i) => marker(o, i, M)).join("");
+    h += `<button class="mk spot" id="shop" style="left:${SHOP_AT[0]}%;top:${SHOP_AT[1]}%"><span class="pic">${pic("coins", "")}</span><span class="nm">Shop</span></button>`;
+    h += `<button class="mk spot${M.camp >= M.stage ? " usedup" : ""}" id="camp" style="left:${CAMP_AT[0]}%;top:${CAMP_AT[1]}%" ${M.camp >= M.stage || M.hp >= MAXHP ? "disabled" : ""}><span class="pic">${pic("medkit", "")}</span><span class="nm">${M.camp >= M.stage ? "Supplies (used)" : "Supplies +" + CAMP_HEAL}</span></button>`;
+  } else {
+    h += `<div class="dropin">${pic("battlebus", "bus")}<button class="btn" id="drop">Drop in ▶</button><p>${S.n ? "Match " + (S.n + 1) + ". " : ""}Beat every opponent as the storm closes in, then face the boss in the last circle.</p></div>`;
+  }
+  h += `</div>`;
+  h += M ? `<p class="legend">Tap a glowing opponent to fight. 📖 reading · 🧩 thinking · 🔢 maths. Beat everyone in the circle and the storm closes in.</p>`
+         : `<p class="legend">Every shot is a question. A right answer is a hit. A wrong answer is a miss, and they shoot back.</p>`;
+  h += shopHtml(false) + lockerHtml() + parentsHtml();
+  h += `<p class="legal">A private, non-commercial fan project. Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.</p>`;
+  app.innerHTML = h;
+  save();
+  wireCommon();
+  const on = (sel, fn) => { const e = $(sel); if (e) e.onclick = fn; };
+  on("#drop", () => { S.match = newMatch(); home(); window.scrollTo(0, 0); });
+  on("#shop", () => { $("#shopshelf").scrollIntoView({ behavior: "smooth" }); });
+  on("#camp", () => { M.camp = M.stage; M.hp = Math.min(MAXHP, M.hp + CAMP_HEAL); M.note = `You open the supply drop: +${CAMP_HEAL} health. A new one lands in the next circle.`; beep(SND.buy); home(); });
+  app.querySelectorAll(".mk.foe.open").forEach(b => b.onclick = () => { M.cur = Number(b.dataset.o); battle(); window.scrollTo(0, 0); });
+  app.querySelectorAll("[data-jump]").forEach(b => b.onclick = () => { const st = Number(b.dataset.jump); M.opps.forEach(o => { if (o.stage < st) o.dead = true; }); M.stage = st; home(); });
+  wireShop(home);
+  app.querySelectorAll("[data-skin]").forEach(b => b.onclick = () => { S.skin = b.dataset.skin; home(); });
+  wireParents();
+}
+function wireCommon() { const s = $("#snd"); if (s) s.onclick = () => { S.sound = !S.sound; save(); s.textContent = S.sound ? "🔊" : "🔇"; }; }
+
+function shopHtml() {
+  const guns = GUNS.map(g => {
+    const own = S.guns[g.id], cur = S.gun === g.id;
+    return `<div class="tile${cur ? " cur" : ""}" style="--rar:${g.col}">${gunPic(g.id)}<b>${g.name}</b><span>${g.rar} · ${g.dmg} damage</span>
+      ${cur ? `<span>Equipped</span>` : own ? `<button class="btn small ghost" data-equip="${g.id}">Equip</button>` : `<button class="btn small" data-buy="${g.id}" ${S.coins < g.cost ? "disabled" : ""}>${g.cost} coins</button>`}</div>`;
+  }).join("");
+  const items = ITEMS.map(it => `<div class="tile" style="--rar:${it.col}">${pic(it.img, "itempic")}<b>${it.name}</b><span>${it.what} · you have ${S.items[it.id]}</span>
+      <button class="btn small" data-item="${it.id}" ${S.coins < it.cost || S.items[it.id] >= CARRY ? "disabled" : ""}>${S.items[it.id] >= CARRY ? "Full" : it.cost + " coins"}</button></div>`).join("");
+  return `<div class="shelf" id="shopshelf"><h3>Shop</h3><p class="sub">You have <b>${S.coins} coins</b>. Win fights to earn coins. A better gun does more damage with every right answer. You can carry ${CARRY} of each item.</p><div class="tiles">${guns}${items}</div></div>`;
+}
+function wireShop(again) {
+  app.querySelectorAll("[data-buy]").forEach(b => b.onclick = () => { const g = GUNS.find(x => x.id === b.dataset.buy); if (S.coins >= g.cost) { S.coins -= g.cost; S.guns[g.id] = 1; S.gun = g.id; beep(SND.buy); again(); } });
+  app.querySelectorAll("[data-equip]").forEach(b => b.onclick = () => { S.gun = b.dataset.equip; again(); });
+  app.querySelectorAll("[data-item]").forEach(b => b.onclick = () => { const it = ITEMS.find(x => x.id === b.dataset.item); if (S.coins >= it.cost && S.items[it.id] < CARRY) { S.coins -= it.cost; S.items[it.id]++; beep(SND.buy); again(); } });
+}
+function lockerHtml() {
+  return `<div class="shelf"><h3>Locker</h3><p class="sub">Every match you win gives a crown. Crowns unlock outfits. Tap one you own to wear it.</p><div class="tiles">${SKINS.map(([img, name, col, need, dir]) => {
+    const own = S.crowns >= need;
+    return `<${own ? "button" : "div"} class="tile skin${own ? "" : " off"}${S.skin === img ? " cur" : ""}" style="--rar:${col}" ${own ? `data-skin="${img}"` : ""}><img src="${dir}${img}.webp" alt=""><b>${name}</b><span>${own ? (S.skin === img ? "Wearing" : "Unlocked") : need + (need === 1 ? " crown" : " crowns")}</span></${own ? "button" : "div"}>`;
+  }).join("")}</div></div>`;
+}
+function resultCard(r) {
+  if (r.ko) return `<div class="card result" id="result" style="margin-bottom:14px"><h2>Knocked out!</h2><p>The storm takes this match, but you keep your coins, your guns and your items.<br>Read the explanations, stock up at the shop, and drop in again.</p></div>`;
+  return `<div class="card result" id="result" style="margin-bottom:14px"><div class="big">${pic("victory", "vic")}<img src="${P2}crown3d.webp" alt="Crown"></div><h2>Victory crown!</h2>
+    <div class="rows"><span>Shots on target</span><b>${r.hits} of ${r.hits + r.misses}</b><span>Coins for the win</span><b>+${WIN_COINS}</b>
+    <span>Fortnite time for winning</span><b>${mins(WIN_MIN)}</b><span>Bonus for ${r.misses === 0 ? "no misses" : r.misses + (r.misses === 1 ? " miss" : " misses")}</span><b>${mins(missBonus(r.misses))}</b>
+    <span>Added today</span><b id="gained">${mins(r.got)}</b></div>
+    ${r.got < WIN_MIN + missBonus(r.misses) ? `<p>Today’s limit of ${mins(S.time.cap)} is reached, so the rest was not added. You can still play for coins and crowns.</p>` : ""}</div>`;
+}
+
+/* ---------- for grown-ups ---------- */
+function parentsHtml() {
+  const cats = {};
+  for (const [k, v] of Object.entries(S.q)) {
+    if (k.startsWith("p:")) continue;
+    const q = k.startsWith("g:") ? GEN[k.slice(2)] : HAND[k];
+    if (!q) continue;
+    const key = (q.kind === "reading" ? "Reading" : q.kind === "thinking" ? "Thinking" : "Maths") + " · " + q.cat;
+    const c = cats[key] || (cats[key] = { r: 0, w: 0 });
+    c.r += v.r || 0; c.w += v.w || 0;
+  }
+  const rows = Object.keys(cats).sort().map(k => `<tr><td>${esc(k)}</td><td class="n">${cats[k].r}</td><td class="n">${cats[k].w}</td></tr>`).join("");
+  return `<details class="parents" id="parents"><summary>For grown-ups: Fortnite time and progress</summary>
+    <p><b>Fortnite time.</b> Each match won earns ${WIN_MIN} minutes, plus up to 7 more for few misses (no misses 7, one or two 5, three or four 3, five or six 1). Earnings stop at the daily limit. Earned so far: ${mins(earnedAll())}. Recorded as used: ${mins(S.time.used)}. <b>Ready to use: <span id="bal">${mins(balance())}</span></b>.</p>
+    <div class="row"><label for="cap">Daily limit (minutes):</label> <input id="cap" type="number" min="5" max="180" step="5" value="${S.time.cap}"> <button class="btn small ghost" id="capsave">Save</button></div>
+    <div class="row">Record time used: ${[5, 10, 15, 30].map(m => `<button class="btn small ghost" data-used="${m}">${m} min</button>`).join(" ")} <button class="btn small ghost" data-used="all">All of it</button> <button class="btn small ghost" data-used="undo">Undo all</button></div>
+    <p>Matches won: ${S.stats.wins}. Knock-outs: ${S.stats.kos}. Every question gets one go and no hints; after each answer the explanation is shown.</p>
+    ${rows ? `<table><tr><th>Question type</th><th class="n">Right</th><th class="n">Missed</th></tr>${rows}</table>` : `<p>No questions answered yet.</p>`}
+    <p>Progress is saved only in this browser on this device.</p>
+    <div class="row"><button class="btn small ghost" id="reset">Start the whole game again</button></div></details>`;
+}
+function wireParents() {
+  const keep = () => { home(); $("#parents").open = true; };
+  $("#capsave").onclick = () => { const v = Math.round(Number($("#cap").value)); if (v >= 5 && v <= 180) { S.time.cap = v; keep(); } };
+  app.querySelectorAll("[data-used]").forEach(b => b.onclick = () => {
+    const u = b.dataset.used;
+    S.time.used = u === "undo" ? 0 : u === "all" ? earnedAll() : Math.min(earnedAll(), S.time.used + Number(u));
+    keep();
+  });
+  $("#reset").onclick = () => { if (confirm("Start again from nothing? Coins, crowns, guns and Fortnite time records will all be cleared.")) { S = FRESH(); if (!PRACTICE) save(); home(); } };
+}
+
+/* ---------- the battle ---------- */
+function passageHtml(o, q) {
+  const p = PASS[o.pid];
+  let html = p.html;
+  if (q.gap) html = html.replace(`data-g="${q.gap}" class="gap"`, `data-g="${q.gap}" class="gap cur"`);
+  return `<div class="card passage"><h3>${p.title}</h3><p class="pnote">${p.note}</p>${html}</div>`;
+}
+function battle(fx) {
+  const M = S.match, o = M.opps[M.cur], st = STAGE[o.stage], k = o.boss ? { label: "Boss", icon: "👑", arena: ["arena-peaks", "arena-reef", "arena-forest"][S.n % 3], col: "#7a1f3d" } : KIND[o.kind];
+  const pend = o.pending, q = pend ? resolve(pend.ref) : null, done = pend && pend.chosen !== null;
+  const qk = q ? KIND[q.kind] : k;
+  document.documentElement.style.setProperty("--kind", qk.col);
+  const over = M.hp <= 0, won = o.dead;
+  let h = `<div class="playbar"><button class="pill" id="back" ${pend && !done ? "disabled title='Answer this shot first'" : ""}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="spacer" style="flex:1"></span>
+    <span class="pill" id="coins">${pic("coins")} ${S.coins}</span><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min today</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>
+  <div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
+    <div class="hud me"><b>You</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}</div>
+    <div class="hud foe"><b>${esc(o.name)}</b><small>${k.icon} ${o.boss ? "Boss · thinking and maths" : k.label + " opponent"}</small>${bar("ehp", o.hp, o.max)}</div>
+    <div class="fighter me${over ? " ko" : ""}" id="hero"><img src="${skin()[4]}${skin()[0]}.webp" alt="Your hero"></div>
+    <button class="fighter foe${won ? " ko" : ""}${!pend && !won && !over ? " aim" : ""}" id="enemy" ${pend || won || over ? "disabled" : ""} aria-label="Shoot at ${esc(o.name)}"><img src="art/${o.img}.webp" alt=""><span class="cross"></span></button>
+  </div>
+  <div class="actions">
+    <button class="act gun" id="shoot" style="--rar:${gun().col}" ${pend || won || over ? "disabled" : ""}>${gunPic(S.gun)}<span><b>${gun().name}</b><small>${gun().dmg} damage a hit</small></span><span class="go">Shoot</span></button>
+    <button class="act" id="usemed" style="--rar:#3fae2a" ${!S.items.med || M.hp >= MAXHP || over ? "disabled" : ""}>${pic("medkit")}<span><b>Med Kit ×${S.items.med}</b><small>+50 health</small></span></button>
+    <button class="act" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
+  </div>`;
+  const showPassage = q && q.kind === "reading";
+  h += `<div class="stage${showPassage ? " has-passage" : ""}">${showPassage ? passageHtml(o, q) : ""}<div class="card" id="qcard" data-q="${pend ? qkey(pend.ref) : ""}" data-seed="${pend && pend.ref.seed !== undefined ? pend.ref.seed : ""}">`;
+  if (!q) {
+    h += `<div class="aimhelp"><b>${esc(o.name)}</b> is in your sights.<br>Tap your gun or the enemy to take a shot. Every shot is a question.<br>
+      <small>A right answer hits for ${gun().dmg}. A wrong answer misses, and ${esc(o.name)} shoots back for ${st.dmg}.</small></div>`;
+  } else {
+    h += `<div class="qhead"><span>${qk.icon} ${qk.label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>
+      <div class="opts${q.visual ? " visual" : ""}">${q.options.map((op, i) => `<button class="opt${done ? (i === q.answer ? " right" : i === pend.chosen ? " wrong" : " dim") : ""}" data-i="${i}" ${done ? "disabled" : ""}><span class="let">${LETTERS[i]}</span><span>${op}</span></button>`).join("")}</div>`;
+    if (done) {
+      const ok = pend.chosen === q.answer;
+      h += `<div class="fb ${ok ? "good" : "miss"}"><h4>${ok ? `Hit! ${gun().dmg} damage.` : `Miss! ${esc(o.name)} shoots back: ${st.dmg} damage.`}</h4>${ok ? "" : `<p>The answer was <b>${LETTERS[q.answer]}</b>.</p>`}${q.explain}</div>
+        <div class="next"><button class="btn" id="next">${over ? "Knocked out…" : won ? (o.boss ? "Claim your crown ▶" : `${esc(o.name)} is out! Back to the island ▶`) : "Next shot ▶"}</button></div>`;
+    }
+  }
+  h += `</div></div>`;
+  app.innerHTML = h;
+  save();
+  wireCommon();
+  if (fx) {
+    const f = document.createElement("div"); f.className = "float " + (fx.hit ? "onfoe" : "onme"); f.textContent = fx.hit ? "−" + fx.dmg : "MISS! −" + fx.dmg; $(".arena").appendChild(f);
+    $(fx.hit ? "#enemy" : "#hero").classList.add("hit");
+  }
+  $("#back").onclick = () => { if (!(pend && !done)) home(); };
+  const shoot = () => { if (o.pending || o.dead || M.hp <= 0) return; nextQ(o); battle(); const c = $("#qcard"); if (c && window.innerWidth < 821) c.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  $("#shoot").onclick = shoot; $("#enemy").onclick = shoot;
+  $("#usemed").onclick = () => { if (S.items.med && M.hp < MAXHP) { S.items.med--; M.hp = Math.min(MAXHP, M.hp + 50); beep(SND.buy); battle(); } };
+  $("#useshield").onclick = () => { if (S.items.shield && M.shield < MAXSH) { S.items.shield--; M.shield = Math.min(MAXSH, M.shield + 50); beep(SND.buy); battle(); } };
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(Number(b.dataset.i)));
+  const nx = $("#next");
+  if (nx) nx.onclick = () => {
+    o.pending = null;
+    if (M.hp <= 0) return knockedOut();
+    if (o.dead) return o.boss ? victory() : home(window.scrollTo(0, 0));
+    nextQ(o); battle(); window.scrollTo(0, 0);
+  };
+}
+function answer(i) {
+  const M = S.match, o = M.opps[M.cur], pend = o.pending;
+  if (!pend || pend.chosen !== null) return;
+  const q = resolve(pend.ref), key = qkey(pend.ref), rec = S.q[key] || (S.q[key] = { r: 0, w: 0, t: 0 });
+  pend.chosen = i;
+  let fx;
+  if (i === q.answer) {
+    rec.r++; rec.t = ++S.seq; M.hits++;
+    o.hp = Math.max(0, o.hp - gun().dmg);
+    fx = { hit: true, dmg: gun().dmg }; beep(SND.hit);
+    if (o.hp <= 0) {
+      o.dead = true; S.coins += STAGE[o.stage].coins;
+      if (!o.boss && M.opps.every(x => x.dead || x.stage !== M.stage)) {
+        M.stage++;
+        M.note = M.stage === 4 ? "The storm closes to the last circle. Only the boss is left!" : `The storm is closing! Circle ${M.stage}: tougher opponents, harder questions.`;
+      }
+    }
+  } else {
+    rec.w++; rec.t = 1; M.misses++;
+    hurt(M, STAGE[o.stage].dmg);
+    fx = { hit: false, dmg: STAGE[o.stage].dmg }; beep(M.hp <= 0 ? SND.ko : SND.miss);
+  }
+  battle(fx);
+  const fb = $(".fb"); if (fb && window.innerWidth < 821) fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+function victory() {
+  const M = S.match, want = WIN_MIN + missBonus(M.misses);
+  S.coins += WIN_COINS; S.crowns++; S.stats.wins++; S.n++;
+  S.last = { hits: M.hits, misses: M.misses, got: addMinutes(want) };
+  S.match = null; beep(SND.win);
+  home(); window.scrollTo(0, 0);
+}
+function knockedOut() {
+  S.stats.kos++; S.match = null; S.last = { ko: true };
+  home(); window.scrollTo(0, 0);
+}
+
+/* In practice mode only: show any one question in a battle (used by tools/check_game3.js to look at every question). */
+if (PRACTICE) window.__preview = ref => {
+  if (!S.match) S.match = newMatch();
+  const M = S.match, q = resolve(ref), o = M.opps.find(x => !x.boss && x.kind === q.kind);
+  M.opps.forEach(x => { x.dead = false; x.hp = x.max; x.pending = null; }); M.hp = MAXHP; M.cur = M.opps.indexOf(o);
+  if (q.kind === "reading") { o.pid = q.pid; o.queue = []; }
+  o.pending = { ref, chosen: null };
+  battle();
+};
+
+/* ---------- start ---------- */
+if (S.match && S.match.cur !== null && S.match.opps[S.match.cur] && !S.match.opps[S.match.cur].dead && S.match.opps[S.match.cur].pending) battle(); else home();
+})();
+</script>
+</body>
+</html>
