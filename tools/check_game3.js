@@ -11,7 +11,7 @@
       players-left count and feed, one opponent of each kind per circle, misses, hits and headshots, the opponents' moves
       and their counters, chests and loot, 15 + 20 + 25 minutes for the three circles, the daily limit, the shop, being
       eliminated), progress survives a reload, 200 match layouts are checked (circles inside each other, everyone on
-      land), practice mode saves nothing and tests the bush and boogie bomb, and every question fits the screen.
+      land), practice mode saves nothing and tests the bush, the arena's keys and on-screen buttons (shots, headshots, walls, the boogie bomb, dodging a grenade), and every question fits the screen.
    Usage: node tools/check_game3.js [screenshot-dir] */
 const fs = require("fs"), path = require("path"), vm = require("vm");
 const ROOT = path.resolve(__dirname, "..");
@@ -248,8 +248,7 @@ if (!/id="game3-practice" href="\.\.\/prac3\/index\.html\?admin=1"/.test(fs.read
 
 /* ---- 3. browser ---- */
 const answerOf = (key, seed) => key.startsWith("g:") ? C.GENS.find(g => g.id === key.slice(2)).make(rng(Number(seed))).answer : HAND[key].answer;
-const COUNTER = { shoot: "build", grenade: "jump", heal: "rush" };
-const R = { 1: 75, 2: 38, 3: 26, 4: 15 }, STAGE_HP = { 1: 100, 2: 125, 3: 150, 4: 200 }, MISS = { 1: 15, 2: 20, 3: 25, 4: 30 }, SLIP = { 1: 10, 2: 12, 3: 15, 4: 18 };
+const R = { 1: 75, 2: 38, 3: 26, 4: 15 }, STAGE_HP = { 1: 100, 2: 125, 3: 150, 4: 200 }, MISS = { 1: 15, 2: 20, 3: 25, 4: 30 }, SHOT = { pistol: 5, shotgun: 6, minigun: 7 };
 const landAt = (x, y) => { const gx = Math.floor(x / 2.5), gy = Math.floor(y / 2.5); return gx >= 0 && gy >= 0 && gx < 40 && gy < 40 && C.LAND[gy][gx] === "1"; };
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 const aliveOf = M => 1 + M.opps.filter(o => !o.dead).length + M.bots.filter(b => b.a).length;
@@ -288,13 +287,13 @@ function checkLayout(M, where, GAP) {
     const state = () => page.evaluate(() => JSON.parse(localStorage.getItem("prac3.v1")));
     const shot = async name => { if (shots) await page.screenshot({ path: path.join(shots, `game3-${name}-${label}.png`), fullPage: true }); };
     const cur = async () => { const st = await state(); return st.match && st.match.cur !== null ? st.match.opps[st.match.cur] : null; };
-    let chests = 0, threats = 0, loot = 0, headshots = 0;
+    let chests = 0, rounds = 0, loot = 0, headshots = 0;
 
     /* take one shot from the idle battle screen; checks the damage, including headshots */
     const fire = async right => {
-      await page.click("#shoot");
+      if (!(await page.$("#qcard .opt:not([disabled])"))) await page.click("#shoot");
       await page.waitForSelector("#qcard .opt:not([disabled])");
-      const before = await state(), o0 = before.match.opps[before.match.cur], gunDmg = { pistol: 25, shotgun: 30, minigun: 35 }[before.gun];
+      const before = await state(), o0 = before.match.opps[before.match.cur];
       const { q, seed } = await page.$eval("#qcard", e => ({ q: e.dataset.q, seed: e.dataset.seed }));
       const ans = answerOf(q, seed), n = (await page.$$("#qcard .opt")).length;
       await overflow(q);
@@ -304,13 +303,13 @@ function checkLayout(M, where, GAP) {
       if (!(await page.$("#back[disabled]"))) bad(`${label}: you can walk away before pressing Next`);
       const after = await state(), o1 = after.match.opps[after.match.cur];
       if (right) {
-        const rd = o0.kind === "reading", head = !rd && (before.match.streak + 1) % 3 === 0, want = rd ? 1 : gunDmg * (head ? 2 : 1);
-        if (head) headshots++;
-        if (o1.hp !== Math.max(0, o0.hp - want)) bad(`${label}: a ${rd ? "reading hit" : head ? "headshot" : "hit"} should do ${want} damage (${o0.hp} → ${o1.hp})`);
+        /* a right answer loads the gun (thinking and maths) or knocks off one bar (reading); the damage comes in the arena */
+        const rd = o0.kind === "reading" && !o0.boss, want = rd ? o0.hp - 1 : o0.hp;
+        if (o1.hp !== want) bad(`${label}: a right answer should ${rd ? "knock off one bar" : "only load the gun"} (${o0.hp} → ${o1.hp})`);
+        if (rd && o1.hp === 0 && o1.dead) bad(`${label}: the last reading bar should leave the opponent knocked, to finish in the showdown`);
       } else {
         const want = before.match.bush ? 0 : Math.min(MISS[o0.stage], before.match.hp + before.match.shield), lost = before.match.hp + before.match.shield - after.match.hp - after.match.shield;
         if (lost !== want) bad(`${label}: a miss in circle ${o0.stage} should cost ${want}, not ${lost}`);
-        if (after.match.streak !== 0) bad(`${label}: a miss should end the headshot streak`);
       }
       await overflow(q + " explanation");
       return q;
@@ -342,18 +341,24 @@ function checkLayout(M, where, GAP) {
           } else if (await page.$("#loot")) bad(`${label}: a wrong chest answer gave loot`);
           continue;
         }
-        if (await page.$("[data-counter]")) {
-          threats++;
-          if (!(await page.$("#back[disabled]"))) bad(`${label}: you can walk away from an opponent's move`);
-          const mv = await page.$eval("#threat", e => e.dataset.move);
-          const b = await state(), bo = b.match.opps[b.match.cur];
-          await page.click(`[data-counter="${opt.wrong ? (COUNTER[mv] === "build" ? "jump" : "build") : COUNTER[mv]}"]`);
-          const a = await state(), ao = a.match.opps[a.match.cur], lost = b.match.hp + b.match.shield - a.match.hp - a.match.shield;
-          if (opt.wrong) {
-            opt.wrong = false;
-            if (mv === "heal" ? ao.hp !== (bo.kind === "reading" ? bo.hp + 1 : Math.min(bo.max, bo.hp + 20)) : lost !== SLIP[bo.stage]) bad(`${label}: the wrong move against "${mv}" had the wrong effect`);
-            await shot("wrongmove");
-          } else if (lost !== 0 || (mv === "heal" && ao.hp !== (bo.kind === "reading" ? bo.hp : Math.max(0, bo.hp - 15)))) bad(`${label}: the right move against "${mv}" had the wrong effect`);
+        if (await page.$("#pix")) {
+          rounds++;
+          if (!(await page.$("#back[disabled]"))) bad(`${label}: you can walk away in the middle of a round`);
+          const b = await state(), bo = b.match.opps[b.match.cur], r = bo.round, A = await page.evaluate(() => window.__arena.get());
+          if (!A || A.kind !== r.kind || A.ammo !== r.ammo) bad(`${label}: the arena did not start with the loaded round (${JSON.stringify(r)} / ${JSON.stringify(A)})`);
+          const heads = opt.heads || (rounds % 3 === 0 ? 1 : 0);
+          await page.evaluate(h => window.__arena.sim(h), heads);
+          await page.waitForSelector("#roundover");
+          const a = await state(), ao = a.match.opps[a.match.cur], stats = await page.$eval("#roundover", e => ({ hits: Number(e.dataset.hits), heads: Number(e.dataset.heads) }));
+          if (r.kind === "fight") {
+            const want = Math.max(0, bo.hp - SHOT[b.gun] * (r.ammo + Math.min(heads, r.ammo)));
+            if (ao.hp !== want && !(want === 0 && ao.dead)) bad(`${label}: ${r.ammo} hits (${heads} headshot) should leave ${want} health, not ${ao.hp}`);
+            if (stats.heads) headshots += stats.heads;
+          } else if (r.kind === "finish") { if (!ao.dead) bad(`${label}: a knocked reading opponent was not finished off`); }
+          else if (ao.hp !== bo.hp || ao.dead) bad(`${label}: a reading showdown changed the bars (${bo.hp} → ${ao.hp})`);
+          else if (a.match.shield !== Math.min(50, b.match.shield + 3 * (r.ammo - Math.min(heads, r.ammo)) + 6 * Math.min(heads, r.ammo))) bad(`${label}: showdown hits should charge your shield`);
+          if (bo.kind === "reading" && !bo.boss && bo.hp > 0 && r.ammo !== Math.max(2, 2 * (bo.passRight || 0))) bad(`${label}: a reading showdown should load 2 shots for every right answer`);
+          if (bo.kind === "reading" && !bo.boss && bo.queue.length) bad(`${label}: a reading showdown came before the passage was finished`);
           continue;
         }
         break;
@@ -372,14 +377,14 @@ function checkLayout(M, where, GAP) {
         if (shots === 1 && o.kind === "reading") { const o2 = await cur(); rd = { fresh: o.shots === 0, len: C.READING.find(p => p.id === o2.pid).questions.length }; }
         await settle();
       }
-      bad(`${label}: an opponent took more than 40 shots`);
+      bad(`${label}: an opponent took more than 40 questions`);
     };
     const clearCircle = async () => {
       const s0 = (await state()).match.stage;
       for (let n = 0; n < 4; n++) {
         const st = await state();
         if (!st.match || st.match.stage !== s0) return;
-        await page.click(".mk.foe.open"); await beat();
+        await page.$eval(".mk.foe.open", e => e.click()); await beat();   // two names on the map can overlap a little; either opens a fight
       }
       bad(`${label}: circle ${s0} did not clear`);
     };
@@ -406,15 +411,18 @@ function checkLayout(M, where, GAP) {
     if ((await page.$$(".botdot")).length !== st.match.bots.filter(b => b.a).length) bad(`${label}: the map should show every other player still in the game`);
     await overflow("island"); await shot("island");
 
-    /* circle 1, first opponent: a miss, a hit, a wrong move, a med kit */
-    await page.click(".mk.foe.open");
+    /* circle 1, first opponent: a miss (2 shots), a hit (5 shots), a med kit */
+    for (let n = 0; n < 3; n++) { await (await page.$$(".mk.foe.open"))[n].click(); const o = await cur(); if (o.kind !== "reading") break; await page.click("#back"); }
     await fire(false); await shot("miss");
     await page.click("#next");
-    if (await page.$("#threat") || await page.$("#chestopen")) bad(`${label}: a miss should not lead to a move or a chest`);
+    { const A = await page.evaluate(() => window.__arena && window.__arena.get()); if (!A || A.ammo !== 2 || A.walls !== 1) bad(`${label}: a wrong answer should load 2 shots and 1 wall (${JSON.stringify(A)})`); }
+    if (await page.$("#chestopen")) bad(`${label}: a miss should not lead to a chest`);
+    await shot("round");
+    await settle();
     await fire(true); await shot("hit");
-    await settle({ wrong: true });
-    st = await state();
-    if (st.match.streak !== 1) bad(`${label}: the headshot streak should be 1`);
+    await page.click("#next");
+    { const A = await page.evaluate(() => window.__arena && window.__arena.get()); if (!A || A.ammo !== 5 || A.walls !== 3) bad(`${label}: a right answer should load 5 shots and 3 walls (${JSON.stringify(A)})`); }
+    await settle();
     if (st.match.hp < 100 && st.items.med) { await page.click("#usemed"); const s2 = await state(); if (s2.match.hp !== Math.min(100, st.match.hp + 50) || s2.items.med !== 0) bad(`${label}: the med kit did not heal`); }
     await beat();
     await clearCircle();   // the other two
@@ -443,7 +451,7 @@ function checkLayout(M, where, GAP) {
     if (!/Victory Royale/.test(await page.$eval("#result", e => e.textContent))) bad(`${label}: no Victory Royale card`);
     if (st.coins !== 3 * 15 + 3 * 25 + 3 * 35 + 80 + 50 + st.stats.lootCoins) bad(`${label}: coins after a win should be ${355 + st.stats.lootCoins}, not ${st.coins}`);
     if (Object.values(st.time.days)[0] !== 60) bad(`${label}: the boss should not add Fortnite time beyond the hour`);
-    if (!chests || !threats || !loot || !headshots) bad(`${label}: a whole match should include chests, moves, loot and headshots (${chests}, ${threats}, ${loot}, ${headshots})`);
+    if (!chests || !rounds || !loot || !headshots) bad(`${label}: a whole match should include chests, rounds, loot and headshots (${chests}, ${rounds}, ${loot}, ${headshots})`);
     await shot("victory"); await overflow("victory");
 
     /* shop, then a second match with a raised daily limit (70): circle 1 only adds 10 */
@@ -467,7 +475,7 @@ function checkLayout(M, where, GAP) {
     /* eliminated: wrong answers until health runs out; coins, guns and minutes earned are kept */
     const keep = st.coins;
     await page.click("#drop"); await page.click("#jump"); await page.click(".mk.foe.open");
-    for (let n = 0; n < 7; n++) { await fire(false); await page.click("#next"); }   // 7 misses of 15 knock out 100 health
+    for (let n = 0; n < 15 && !(await page.$("#result")); n++) { await fire(false); await settle(); }   // misses of 15 knock out 100 health (the arena never can; showdown hits add a little shield)
     st = await state();
     if (st.match !== null || st.stats.kos !== 1 || st.coins !== keep || st.gun !== "shotgun") bad(`${label}: being eliminated should end the match and keep coins and guns`);
     if (!/Eliminated![\s\S]*#\d+ of 100/.test(await page.$eval("#result", e => e.textContent))) bad(`${label}: no eliminated card with a placing`);
@@ -480,7 +488,7 @@ function checkLayout(M, where, GAP) {
     if (broken.length) bad(`${label}: pictures did not load: ${broken}`);
     await overflow("lobby after play");
     errors.forEach(e => bad(`${label}: page error: ${e}`));
-    console.log(`${label}: 3 matches played (${chests} chests, ${threats} opponent moves, ${headshots} headshots)`);
+    console.log(`${label}: 3 matches played (${chests} chests, ${rounds} arena rounds, ${headshots} headshots)`);
     await ctx.close();
   }
 
@@ -500,7 +508,8 @@ function checkLayout(M, where, GAP) {
       ms.forEach((M, i) => checkLayout(M, `match layout ${i}`, GAP));
     }
     const S = () => page.evaluate(() => JSON.parse(JSON.stringify(window.__debug.state())));
-    await page.click("#drop"); await page.click("#jump"); await page.click(".mk.foe.open");
+    await page.click("#drop"); await page.click("#jump");
+    for (let n = 0; n < 3; n++) { await (await page.$$(".mk.foe.open"))[n].click(); const m = (await S()).match; if (m.opps[m.cur].kind !== "reading") break; await page.click("#back"); }
     await page.click("#usebush");
     let s = await S();
     if (!s.match.bush || s.items.bush !== 2) bad("practice mode: the bush did not hide you");
@@ -509,16 +518,49 @@ function checkLayout(M, where, GAP) {
     await page.click(`#qcard .opt[data-i="${(answerOf(k.q, k.seed) + 1) % (await page.$$("#qcard .opt")).length}"]`);
     s = await S();
     if (s.match.hp !== 100 || s.match.bush) bad("practice mode: a miss from a bush should cost nothing and use up the bush");
-    await page.click("#next"); await page.click("#shoot");
+    await page.click("#next"); await page.evaluate(() => window.__arena.sim(0)); await page.waitForSelector("#roundover"); await page.click("#next");
+    if (await page.$("#chestopen")) await page.click("#chestleave");
+    await page.waitForSelector("#qcard .opt:not([disabled])");
     k = await page.$eval("#qcard", e => ({ q: e.dataset.q, seed: e.dataset.seed }));
     await page.click(`#qcard .opt[data-i="${answerOf(k.q, k.seed)}"]`); await page.click("#next");
-    if (await page.$("#chestopen")) await page.click("#chestleave");
-    const before = await S(), bo = before.match.opps[before.match.cur];
-    await page.click('[data-counter="boogie"]');
-    s = await S();
-    const so = s.match.opps[s.match.cur];
-    if (s.items.boogie !== 2 || s.match.hp !== before.match.hp || so.hp !== bo.hp || !/dancing/.test(await page.$eval("#threat", e => e.textContent))) bad("practice mode: the boogie bomb should cancel the opponent's move");
-    await page.click("#next");
+    /* the arena itself, played with the keys (desktop) or the on-screen buttons (phone), one frame at a time */
+    await page.waitForSelector("#pix");
+    const A = (f, ...a) => page.evaluate(([f, a]) => window.__arena[f](...a), [f, a]);
+    const foeHp = async () => { const m = (await S()).match; return m.opps[m.cur].hp; };
+    const press = async key => {
+      if (label === "desktop") { await page.keyboard.down(key); await A("step", 1); await page.keyboard.up(key); }
+      else { const pad = `[data-pad="${{ j: "shoot", k: "build", b: "boogie", ArrowUp: "jump" }[key]}"]`; await page.dispatchEvent(pad, "pointerdown"); await A("step", 1); await page.dispatchEvent(pad, "pointerup"); }
+    };
+    await A("manual", true); await A("step", 80); await A("foe", "hold");
+    const hp0 = await foeHp();
+    await A("phase", false); await press("j"); await A("step", 40);
+    let g = await A("get");
+    if (g.stats.hits !== 1 || g.stats.heads !== 0 || (await foeHp()) !== hp0 - 5) bad(`practice ${label}: a body shot should hit for 5 (${JSON.stringify(g.stats)}, ${hp0} → ${await foeHp()})`);
+    await A("phase", true); await press("j"); await A("step", 40);
+    g = await A("get");
+    if (g.stats.heads !== 1 || (await foeHp()) !== hp0 - 15) bad(`practice ${label}: a shot while the crosshair is on the head should be a headshot for 10 (${JSON.stringify(g.stats)})`);
+    await press("k"); g = await A("get");
+    if (!g.wallsUp.some(w => w.who === "p") || g.walls !== 2) bad(`practice ${label}: K should build a wall`);
+    await A("foe", "aim"); await A("step", 100); g = await A("get");
+    if (!g.stats.blocked || g.stats.taken) bad(`practice ${label}: the wall should block the opponent's shot (${JSON.stringify(g.stats)})`);
+    await A("walls"); await page.evaluate(() => { const M = window.__debug.state().match; M.hp = 3; M.shield = 0; });
+    await A("foe", "aim"); await A("step", 100); s = await S();
+    if (s.match.hp !== 1) bad(`practice ${label}: the arena should never knock you out (health ${s.match.hp})`);
+    await page.evaluate(() => { window.__debug.state().match.hp = 100; });
+    await press("b"); g = await A("get"); s = await S();
+    if (g.F.state !== "dance" || s.items.boogie !== 2) bad(`practice ${label}: B should throw a Boogie Bomb`);
+    await A("foe", "throw"); await A("step", 130); g = await A("get");
+    const hit = g.stats.taken;
+    if (!hit) bad(`practice ${label}: standing on a grenade should hurt`);
+    await A("foe", "throw");
+    for (let n = 0; n < 200; n++) { await A("step", 1); g = await A("get"); if (g.nades.length && g.nades[0].fuse > 0 && g.nades[0].fuse <= 10) break; }
+    await press("ArrowUp"); await A("step", 40); g = await A("get");
+    if (g.stats.taken !== hit || !g.stats.dodged) bad(`practice ${label}: jumping should dodge the grenade (${JSON.stringify(g.stats)})`);
+    await A("foe", "hold"); await A("walls"); await A("step", 40); await A("phase", false);
+    for (let n = 0; n < 3; n++) { await A("phase", false); await press("j"); await A("step", 30); }   // aim each time: above the head is a miss
+    const last = await A("get");
+    await A("step", 120);
+    if (!(await page.$("#roundover")) || await page.$eval("#roundover", e => e.dataset.hits) !== "5") bad(`practice ${label}: the round should end when the shots run out, with 5 hits (${JSON.stringify(last)})`);
     await page.click("#back");
     await page.click('[data-jump="4"]'); await page.click(".mk.foe.open"); await page.click("#shoot");
     if (!(await page.$(".opt"))) bad("practice mode: could not jump to the boss");
