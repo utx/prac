@@ -20,6 +20,42 @@ const ARENA = (() => {
   };
   const heroLook = c => ({ type: "hoodie", main: c, trim: "#ffe81a", skin: "#f2c39b", visor: "#7fd7ff", gun: "#2b2f3a" });
   let R = null, acc = 0, last = 0;
+  /* our own 3D fighters, rendered in Blender (game3/art/fighters.py) and packed 8 x 5 into one sheet each */
+  const FRAME = { w: 144, h: 192, cols: 8, fx: 62, fy: 172, body: 122 };
+  const ANIM = { idle: [0, 4], run: [4, 8], jump: [12, 3], shoot: [15, 3], hit: [18, 2], build: [20, 3], heal: [23, 4], dance: [27, 8], knocked: [35, 4], ko: [39, 1] };
+  const SPRITE = { reading: "ranger", thinking: "knight", maths: "robot", boss: "king" };
+  const HERO = { "#8a94a6": "hero-common", "#2f8fff": "hero-rare", "#a34dff": "hero-epic", "#ffb21a": "hero-legendary" };
+  const IMG = {};
+  const img = src => { if (!IMG[src]) { const im = new Image(); im.src = src; IMG[src] = im; } return IMG[src]; };
+  const ready = im => im && im.complete && im.naturalWidth > 0;
+  function frameOf(f) {
+    let a = "idle", k = 0;
+    if (f.state === "ko") a = "ko";
+    else if (f.state === "knocked") { a = "knocked"; k = Math.floor(f.t / 12); }
+    else if (f.state === "dance") { a = "dance"; k = Math.floor(f.t / 6); }
+    else if (f.state === "heal") { a = "heal"; k = Math.floor(f.t / 12); }
+    else if (f.hitT > 0) { a = "hit"; k = f.hitT > 7 ? 0 : 1; }
+    else if (!f.ground) { a = "jump"; k = f.vy < -2 ? 0 : f.vy < 2 ? 1 : 2; }
+    else if (f.buildT > 0) { a = "build"; k = 2 - Math.min(2, Math.floor(f.buildT / 6)); }
+    else if (f.recoil > 0) { a = "shoot"; k = f.recoil > 4 ? 0 : f.recoil > 2 ? 1 : 2; }
+    else if (Math.abs(f.vx) > 0.2) { a = "run"; k = Math.floor(f.t / 4); }
+    else k = Math.floor(f.t / 14);
+    const [start, n] = ANIM[a];
+    return start + (k % n);
+  }
+  function sprite(ctx, f) {
+    const sh = img(`art/fighter-${f.sheet}.webp`);
+    if (!ready(sh)) return false;
+    const i = frameOf(f), sx = (i % FRAME.cols) * FRAME.w, sy = Math.floor(i / FRAME.cols) * FRAME.h, k = 48 * f.scale / FRAME.body;
+    ctx.save();
+    ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.beginPath(); ctx.ellipse(f.x, GROUND + 1, 22 * f.scale, 4 * f.scale, 0, 0, 7); ctx.fill();   // shadow
+    ctx.translate(Math.round(f.x), Math.round(f.y)); if (f.dir < 0) ctx.scale(-1, 1);
+    if (f.flash > 0 && f.flash % 4 < 2) ctx.filter = "brightness(2.2)";
+    ctx.drawImage(sh, sx, sy, FRAME.w, FRAME.h, -FRAME.fx * k, -FRAME.fy * k, FRAME.w * k, FRAME.h * k);
+    ctx.restore();
+    if (f.muzzle > 0) { const mx = f.x + f.dir * 27 * f.scale, my = f.y - 34 * f.scale; ctx.fillStyle = "#fff3a0"; ctx.beginPath(); ctx.arc(mx, my, 5 + f.muzzle, 0, 7); ctx.fill(); ctx.fillStyle = "#ffb703"; ctx.beginPath(); ctx.arc(mx + f.dir * 4, my, 3 + f.muzzle / 2, 0, 7); ctx.fill(); }
+    return true;
+  }
 
   /* ---------- drawing ---------- */
   function rect(ctx, f, x, y, w, h, col) {   // sprite pixels, feet at (0,0), x mirrored when facing left
@@ -27,6 +63,7 @@ const ARENA = (() => {
     ctx.fillStyle = col; ctx.fillRect(Math.round(f.x + X * u), Math.round(f.y + y * u), Math.ceil(w * u), Math.ceil(h * u));
   }
   function fighter(ctx, f) {
+    if (sprite(ctx, f)) return;          // the pixel drawing below is only a fallback while the pictures load
     const L = f.look, p = (x, y, w, h, c) => rect(ctx, f, x, y, w, h, c), dark = shade(L.main, -0.4), light = shade(L.main, 0.35), t = f.t;
     if (f.flash > 0 && f.flash % 4 < 2) { ctx.globalAlpha = 0.45; }
     if (f.state === "ko" || f.state === "knocked") {          // lying down / crawling
@@ -75,6 +112,15 @@ const ARENA = (() => {
   const box = f => { const h = 48 * f.scale, w = 11 * f.scale; return { l: f.x - w, r: f.x + w, top: f.y - h, bot: f.y, head: f.y - h + 13 * f.scale, h }; };
 
   function scene(ctx) {
+    const bd = img(`../prac2/art/${R.bg}.webp`);
+    if (ready(bd)) {
+      const sc = H / bd.naturalHeight, w = bd.naturalWidth * sc;
+      ctx.drawImage(bd, (W - w) / 2, 0, w, H);
+      const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "rgba(13,19,48,.35)"); g.addColorStop(0.25, "rgba(13,19,48,0)"); g.addColorStop(1, "rgba(13,19,48,.25)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      for (let y = 0; y < H; y += 6) { const w2 = 14 + Math.round(6 * Math.sin(y / 14 + R.t / 18)); ctx.fillStyle = y % 12 ? "rgba(150,70,255,.5)" : "rgba(200,140,255,.55)"; ctx.fillRect(W - w2, y, w2, 6); }
+      return;
+    }
     const sky = { reading: ["#0f4c5c", "#5fb49c"], thinking: ["#3c1a6e", "#c86bba"], maths: ["#0b3d6b", "#47b5e6"], boss: ["#3a0d18", "#b33a3a"] }[R.k];
     const g = ctx.createLinearGradient(0, 0, 0, GROUND); g.addColorStop(0, sky[0]); g.addColorStop(1, sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = "rgba(255,255,255,.7)"; for (let i = 0; i < 18; i++) { const x = (i * 97 + R.t * 0.05 * (1 + i % 3)) % W, y = (i * 53) % 120; ctx.fillRect(Math.round(x), y, 2, 2); }
@@ -118,13 +164,13 @@ const ARENA = (() => {
   }
   function draw() {
     const cv = document.getElementById("pix"); if (!cv || !R) return;
-    const ctx = cv.getContext("2d"); ctx.imageSmoothingEnabled = false;
+    const ctx = cv.getContext("2d"); ctx.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
     ctx.save(); if (R.shake > 0) ctx.translate(Math.round((Math.random() - 0.5) * R.shake), Math.round((Math.random() - 0.5) * R.shake));
     scene(ctx);
     R.wallsUp.forEach(w => wallDraw(ctx, w));
     /* the opponent's aim line */
     const F = R.F, P = R.P;
-    if (F.state === "aim") { const a = F.st / F.aimLen; ctx.strokeStyle = `rgba(255,40,40,${0.35 + 0.5 * a})`; ctx.lineWidth = 2; ctx.setLineDash([6, 4]); ctx.beginPath(); ctx.moveTo(F.x - 26 * F.scale, F.y - 27 * F.scale); ctx.lineTo(0, F.lockY); ctx.stroke(); ctx.setLineDash([]);
+    if (F.state === "aim") { const a = F.st / F.aimLen; ctx.strokeStyle = `rgba(255,40,40,${0.35 + 0.5 * a})`; ctx.lineWidth = 2; ctx.setLineDash([6, 4]); ctx.beginPath(); ctx.moveTo(F.x - 27 * F.scale, F.y - 34 * F.scale); ctx.lineTo(0, F.lockY); ctx.stroke(); ctx.setLineDash([]);
       text(ctx, "!", F.x, F.y - 58 * F.scale, 18, "#ff4d4d"); }
     if (F.state === "throw") text(ctx, "!", F.x, F.y - 58 * F.scale, 18, "#ffa94d");
     R.nades.forEach(g => { ctx.fillStyle = "#2f3b2f"; ctx.fillRect(Math.round(g.x - 4), Math.round(g.y - 4), 8, 8); ctx.fillStyle = g.fuse > 0 && g.fuse % 8 < 4 ? "#ff4d4d" : "#9be15d"; ctx.fillRect(Math.round(g.x - 1), Math.round(g.y - 6), 3, 3); });
@@ -160,12 +206,12 @@ const ARENA = (() => {
     if (d <= 0) { float("0", x, y, "#fff"); return; }
     const sh = Math.min(M.shield, d); M.shield -= sh; M.hp -= d - sh; R.stats.taken += d;
     if (sh) float("−" + sh, x - 8, y, "#74c0fc"); if (d - sh) float("−" + (d - sh), x + 8, y - 10, "#ff6b6b");
-    R.P.flash = 24; beep([[220, .08, "sawtooth"]]);
+    R.P.flash = 24; R.P.hitT = 14; beep([[220, .08, "sawtooth"]]);
   }
   function hitFoe(head, x, y) {
     const o = R.o, F = R.F, st = R.stats;
     st.hits++; if (head) st.heads++;
-    F.flash = 16; F.vx += 2.2; burst(x, y, head ? "#ffe066" : "#ffffff", head ? 14 : 8); if (head) R.shake = 8;
+    F.flash = 16; F.hitT = 14; F.vx += 2.2; burst(x, y, head ? "#ffe066" : "#ffffff", head ? 14 : 8); if (head) R.shake = 8;
     if (F.state === "heal") { F.state = "move"; F.st = 0; F.cd = 40; float("INTERRUPTED!", F.x, F.y - 80, "#69db7c", 12); }
     if (R.kind === "finish") { o.hp = 0; float("ELIMINATED!", F.x, F.y - 70, "#ffe066", 16); return down(); }
     if (R.kind === "skirm") {                                     // reading: the bars come only from right answers; hits charge your shield
@@ -187,7 +233,7 @@ const ARENA = (() => {
     if (P.cd > 0 || (R.ammo <= 0 && R.kind !== "finish") || F.state === "ko") return;
     if (R.kind !== "finish") R.ammo--;
     R.stats.shots++; P.cd = fireGap(); P.muzzle = 5; P.recoil = 6;
-    const sx = P.x + 34 * P.scale, sy = P.y - 27 * P.scale, ty = aimY(), head = inHead(ty), dx = F.x - sx, dy = ty - sy, n = Math.hypot(dx, dy) || 1;
+    const sx = P.x + 27 * P.scale, sy = P.y - 34 * P.scale, ty = aimY(), head = inHead(ty), dx = F.x - sx, dy = ty - sy, n = Math.hypot(dx, dy) || 1;
     R.bullets.push({ who: "p", x: sx, y: sy, vx: 10 * dx / n, vy: 10 * dy / n, head });
     beep([[S.gun === "shotgun" ? 180 : 520, .04, "square"]]);
   }
@@ -198,7 +244,7 @@ const ARENA = (() => {
     const x = isP ? f.x + 34 : f.x - 30 * f.scale;
     if (isP && x > R.F.x - 30) return;
     if (isP) R.walls--; else R.foeWalls--;
-    R.wallsUp.push({ who, x, hp: 3 }); burst(x, GROUND - 30, "#c98a4b", 10); beep([[330, .05], [440, .05]]);
+    f.buildT = 18; R.wallsUp.push({ who, x, hp: 3 }); burst(x, GROUND - 30, "#c98a4b", 10); beep([[330, .05], [440, .05]]);
   }
   function boogie() {
     const F = R.F;
@@ -215,7 +261,7 @@ const ARENA = (() => {
     if (F.state === "aim") {
       F.vx = 0; if (++F.st >= F.aimLen) {
         F.state = "move"; F.cd = 90 - 10 * s + rnd(60); F.muzzle = 5;
-        const sx = F.x - 26 * F.scale, sy = F.y - 27 * F.scale, n = Math.hypot(sx - P.x, sy - F.lockY) || 1;
+        const sx = F.x - 27 * F.scale, sy = F.y - 34 * F.scale, n = Math.hypot(sx - P.x, sy - F.lockY) || 1;
         R.bullets.push({ who: "f", x: sx, y: sy, vx: -8 * (sx - P.x) / n, vy: -8 * (sy - F.lockY) / n }); beep([[300, .05, "square"]]);
       } return;
     }
@@ -243,7 +289,7 @@ const ARENA = (() => {
   function physics(f) {
     f.vy += GRAV; f.x += f.vx; f.y += f.vy;
     if (f.y >= GROUND) { f.y = GROUND; f.vy = 0; f.ground = true; }
-    f.t++; if (f.flash > 0) f.flash--; if (f.cd > 0 && f === R.P) f.cd--; if (f.muzzle > 0) f.muzzle--; if (f.recoil > 0) f.recoil--;
+    f.t++; if (f.flash > 0) f.flash--; if (f.hitT > 0) f.hitT--; if (f.buildT > 0) f.buildT--; if (f.cd > 0 && f === R.P) f.cd--; if (f.muzzle > 0) f.muzzle--; if (f.recoil > 0) f.recoil--;
   }
   function tick() {
     const P = R.P, F = R.F, M = S.match, s = R.o.stage;
@@ -329,9 +375,10 @@ const ARENA = (() => {
   function start(o, round, onEnd) {
     if (R) { cancelAnimationFrame(R.raf); unhook(); }
     const k = o.boss ? "boss" : o.kind, sc = o.boss ? 1.75 : 1.4;
-    R = { o, k, kind: round.kind, ammo: round.kind === "finish" ? 0 : round.ammo, walls: round.walls, foeWalls: 1 + Math.min(2, o.stage - 1), onEnd, t: 0, phase: Math.PI * 0.2,
-      P: { x: 90, y: GROUND, vx: 0, vy: 0, ground: true, dir: 1, scale: 1.4, look: heroLook(skin()[2]), t: 0, flash: 0, cd: 0, muzzle: 0, recoil: 0, state: "move" },
-      F: { x: 360, y: GROUND, vx: 0, vy: 0, ground: true, dir: -1, scale: sc, look: LOOK[k], t: 0, flash: 0, cd: 80, muzzle: 0, recoil: 0, state: round.kind === "finish" ? "knocked" : "move", tx: 380, st: 0, aimLen: 50, lockY: 0 },
+    const bg = o.boss ? ["arena-peaks", "arena-reef", "arena-forest"][S.n % 3] : { reading: "arena-forest", thinking: "arena-peaks", maths: "arena-reef" }[o.kind];
+    R = { o, k, bg, kind: round.kind, ammo: round.kind === "finish" ? 0 : round.ammo, walls: round.walls, foeWalls: 1 + Math.min(2, o.stage - 1), onEnd, t: 0, phase: Math.PI * 0.2,
+      P: { x: 90, y: GROUND, vx: 0, vy: 0, ground: true, dir: 1, scale: 1.4, look: heroLook(skin()[2]), sheet: HERO[skin()[2]] || "hero-common", hitT: 0, buildT: 0, t: 0, flash: 0, cd: 0, muzzle: 0, recoil: 0, state: "move" },
+      F: { x: 360, y: GROUND, vx: 0, vy: 0, ground: true, dir: -1, scale: sc, look: LOOK[k], sheet: SPRITE[k], hitT: 0, buildT: 0, t: 0, flash: 0, cd: 80, muzzle: 0, recoil: 0, state: round.kind === "finish" ? "knocked" : "move", tx: 380, st: 0, aimLen: 50, lockY: 0 },
       bullets: [], nades: [], wallsUp: [], parts: [], floats: [], banner: { s: round.kind === "finish" ? "FINISH THEM!" : "READY?", size: 30, c: "#fff", until: 40 },
       shake: 0, stats: { shots: 0, hits: 0, heads: 0, dmg: 0, missed: 0, taken: 0, blocked: 0, dodged: 0, siphon: 0 }, manual: false, done: false };
     acc = 0; last = 0; hook(); pads();
@@ -341,11 +388,12 @@ const ARENA = (() => {
   /* for tools/check_game3.js only (the browser is driven by Playwright): step frames by hand, read the state, or play a round out instantly */
   if (navigator.webdriver) window.__arena = {
     on: () => !!R, manual: on => { if (R) R.manual = on; }, step: n => { for (let i = 0; i < n && R && !R.done; i++) { tick(); } if (R) draw(); },
-    get: () => R && { kind: R.kind, ammo: R.ammo, walls: R.walls, t: R.t, P: { x: R.P.x, y: R.P.y }, F: { x: R.F.x, y: R.F.y, state: R.F.state }, wallsUp: R.wallsUp.map(w => ({ who: w.who, hp: w.hp })), stats: Object.assign({}, R.stats), head: inHead(aimY()), bullets: R.bullets.length, nades: R.nades.map(g => ({ x: g.x, fuse: g.fuse })) },
+    get: () => R && { sprites: ready(img(`art/fighter-${R.P.sheet}.webp`)) && ready(img(`art/fighter-${R.F.sheet}.webp`)) && ready(img(`../prac2/art/${R.bg}.webp`)), kind: R.kind, ammo: R.ammo, walls: R.walls, t: R.t, P: { x: R.P.x, y: R.P.y }, F: { x: R.F.x, y: R.F.y, state: R.F.state }, wallsUp: R.wallsUp.map(w => ({ who: w.who, hp: w.hp })), stats: Object.assign({}, R.stats), head: inHead(aimY()), bullets: R.bullets.length, nades: R.nades.map(g => ({ x: g.x, fuse: g.fuse })) },
     walls: () => { if (R) R.wallsUp = []; },
     phase: head => { if (!R) return; const b = box(R.F), ok = []; for (let i = 0; i < SWEEP; i++) { R.phase = 2 * Math.PI * i / SWEEP; const y = aimY(); if (head ? inHead(y) : y > b.head + 8 && y < b.bot - 8) ok.push(i); } R.phase = 2 * Math.PI * ok[Math.floor(ok.length / 2)] / SWEEP; },
     foe: (state, extra = {}) => { if (!R) return; Object.assign(R.F, { state, st: 0, vx: 0, cd: 9999 }, extra); if (state === "aim") { R.F.aimLen = 40; R.F.lockY = R.P.y - 26 * R.P.scale; } },
     sim: (heads = 0) => { if (!R) return; while (R && !R.done) { if (R.F.state === "ko") { finish(); break; } if (R.kind !== "finish" && R.ammo <= 0) { finish(); break; } if (R.kind !== "finish") R.ammo--; R.stats.shots++; hitFoe(R.stats.heads < heads, R.F.x, R.F.y - 30); } },
   };
-  return { start, running, LOOK };
+  const preload = () => { Object.values(SPRITE).concat(Object.values(HERO)).forEach(n => img(`art/fighter-${n}.webp`)); ["arena-forest", "arena-peaks", "arena-reef"].forEach(n => img(`../prac2/art/${n}.webp`)); };
+  return { start, running, LOOK, preload, SHEETS: [...Object.values(SPRITE), ...new Set(Object.values(HERO))] };
 })();

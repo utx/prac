@@ -240,7 +240,9 @@ if (!/not endorsed by Epic/.test(html)) bad("the Epic fan-content notice is miss
 if (/setTimeout|setInterval|countdown|timer/i.test(html.replace(/on timers|timetable/gi, ""))) bad("the game must not use timers or speed modes");
 for (const m of html.matchAll(/["`(](?:art\/)?([a-z0-9-]+)\.webp/g)) void m;
 const need = new Set([...html.matchAll(/\[\s*"([a-z0-9]+)",\s*"[A-Z][^"]*"(?:,\s*"#[0-9a-f]{6}",\s*\d+,\s*(P2|"art\/"))?\s*\]/g)].map(m => (m[2] === "P2" ? "prac2/art/" : "prac3/art/") + m[1]));
-for (const n of ["island", "gun-pistol", "gun-shotgun", "gun-minigun", "medkit", "shieldpotion", "coins", "storm", "battlebus", "victory", "chest", "llama", "chugjug", "grenade", "boogie", "slurp", "bush"]) need.add("prac3/art/" + n);
+for (const n of ["island", "gun-pistol", "gun-shotgun", "gun-minigun", "medkit", "shieldpotion", "coins", "storm", "battlebus", "victory", "chest", "llama", "chugjug", "grenade", "boogie", "slurp", "bush",
+  /* our own 3D arena fighters (game3/art/fighters.py, packed by pack_fighters.py) */
+  "fighter-hero-common", "fighter-hero-rare", "fighter-hero-epic", "fighter-hero-legendary", "fighter-ranger", "fighter-knight", "fighter-robot", "fighter-king"]) need.add("prac3/art/" + n);
 for (const n of ["crown3d", "chest0", "chest1", "chest2", "chest3", "chest4", "arena-forest", "arena-peaks", "arena-reef"]) need.add("prac2/art/" + n);
 for (const n of need) if (!fs.existsSync(path.join(ROOT, n + ".webp"))) bad(`missing picture ${n}.webp`);
 
@@ -532,6 +534,7 @@ function checkLayout(M, where, GAP) {
       else { const pad = `[data-pad="${{ j: "shoot", k: "build", b: "boogie", ArrowUp: "jump" }[key]}"]`; await page.dispatchEvent(pad, "pointerdown"); await A("step", 1); await page.dispatchEvent(pad, "pointerup"); }
     };
     await A("manual", true); await A("step", 80); await A("foe", "hold");
+    await page.waitForFunction(() => window.__arena.get().sprites, null, { timeout: 5000 }).catch(() => bad(`practice ${label}: the 3D fighter pictures or the arena backdrop did not load`));
     const hp0 = await foeHp();
     await A("phase", false); await press("j"); await A("step", 40);
     let g = await A("get");

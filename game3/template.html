@@ -240,7 +240,7 @@
   .float.head { color: #ff4dd8; font-size: 30px; } .float.heal { color: #7dff6b; } .float.safe { color: #7dff6b; }
   /* ---- the pixel arena (game3/arena.js) ---- */
   .arena.pixarena { height: auto; aspect-ratio: 16 / 9; background: #0d1330; }
-  .arena.pixarena canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+  .arena.pixarena canvas { width: 100%; height: 100%; display: block; }
   .pads { display: flex; gap: 6px; margin: -2px 0 10px; flex-wrap: wrap; }
   .pads button { flex: 1 1 56px; min-height: 46px; border: 3px solid var(--navy); border-bottom-width: 6px; border-radius: 10px; background: #e9ecf5; font: italic 900 15px "Arial Black", Impact, sans-serif; text-transform: uppercase; touch-action: none; user-select: none; }
   .pads .pads-shoot { flex: 2 1 110px; background: var(--gold); } .pads .padb { background: #f0c08a; }
@@ -581,6 +581,7 @@ function foeDown(o) {
 }
 
 /*__ARENA__*/
+ARENA.preload();
 
 /* ---------- drawing ---------- */
 const bar = (cls, v, max, label = null) => `<div class="bar ${cls}"><i style="width:${Math.max(0, 100 * v / max)}%"></i><span>${label === null ? Math.round(v) : label}</span></div>`;
@@ -780,7 +781,7 @@ function battle(fx) {
   let h = `<div class="playbar"><button class="pill" id="back" ${canLeave ? "" : "disabled title='Finish this first'"}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="pill" id="alive" data-n="${alive(M)}">👥 ${alive(M)} left</span><span class="spacer" style="flex:1"></span>
     <button class="pill" id="coins">${pic("coins")} ${S.coins}</button><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>`;
   if (fighting) {
-    h += `<div class="arena pixarena"><canvas id="pix" width="480" height="270" role="img" aria-label="The showdown with ${esc(o.name)}"></canvas></div>
+    h += `<div class="arena pixarena"><canvas id="pix" width="960" height="540" role="img" aria-label="The showdown with ${esc(o.name)}"></canvas></div>
     <div class="pads"><button data-pad="left" aria-label="Move left">◀</button><button data-pad="right" aria-label="Move right">▶</button><button data-pad="jump" aria-label="Jump">▲ Jump</button>
       <button data-pad="build" class="padb" aria-label="Build a wall">🧱 Build</button><button data-pad="shoot" class="pads-shoot" aria-label="Shoot">🔫 Shoot</button>${S.items.boogie ? `<button data-pad="boogie" aria-label="Boogie bomb">💃 ×${S.items.boogie}</button>` : ""}</div>`;
   } else {
