@@ -109,7 +109,7 @@ const ARENA = (() => {
     }
     ctx.globalAlpha = 1;
   }
-  const box = f => { const h = 48 * f.scale, w = 11 * f.scale; return { l: f.x - w, r: f.x + w, top: f.y - h, bot: f.y, head: f.y - h + 13 * f.scale, h }; };
+  const box = f => { const h = 48 * f.scale * (f.state === "heal" ? 0.8 : f.state === "knocked" || f.state === "ko" ? 0.4 : 1), w = 11 * f.scale * (f.state === "knocked" || f.state === "ko" ? 2.2 : 1); return { l: f.x - w, r: f.x + w, top: f.y - h, bot: f.y, head: f.y - h + Math.min(13 * f.scale, h * 0.35), h }; };
 
   function scene(ctx) {
     const bd = img(`../prac2/art/${R.bg}.webp`);
@@ -305,12 +305,12 @@ const ARENA = (() => {
       if (KEYS.build) { build("p"); KEYS.build = false; }
       if (KEYS.boogie) { boogie(); KEYS.boogie = false; }
     }
-    physics(P); P.x = Math.max(26, Math.min(P.x, F.x - 100));
+    physics(P); P.x = Math.max(30, Math.min(P.x, F.x - 120));
     const myWall = R.wallsUp.find(w => w.who === "p"); if (myWall && P.x > myWall.x - 18) P.x = myWall.x - 18;
     /* the opponent */
     if (live) foeThink(); else if (F.state !== "ko") F.vx = 0;
     if (F.state === "ko") F.vx *= 0.9;
-    physics(F); F.x = Math.max(P.x + 100, Math.min(F.x, 448));
+    physics(F); F.x = Math.max(P.x + 120, Math.min(F.x, 444));
     /* bullets */
     for (const b of R.bullets) {
       b.x += b.vx; b.y += b.vy;
@@ -374,10 +374,10 @@ const ARENA = (() => {
   /* ---------- start a round ---------- */
   function start(o, round, onEnd) {
     if (R) { cancelAnimationFrame(R.raf); unhook(); }
-    const k = o.boss ? "boss" : o.kind, sc = o.boss ? 1.75 : 1.4;
+    const k = o.boss ? "boss" : o.kind, sc = o.boss ? 2.1 : 1.75;
     const bg = o.boss ? ["arena-peaks", "arena-reef", "arena-forest"][S.n % 3] : { reading: "arena-forest", thinking: "arena-peaks", maths: "arena-reef" }[o.kind];
     R = { o, k, bg, kind: round.kind, ammo: round.kind === "finish" ? 0 : round.ammo, walls: round.walls, foeWalls: 1 + Math.min(2, o.stage - 1), onEnd, t: 0, phase: Math.PI * 0.2,
-      P: { x: 90, y: GROUND, vx: 0, vy: 0, ground: true, dir: 1, scale: 1.4, look: heroLook(skin()[2]), sheet: HERO[skin()[2]] || "hero-common", hitT: 0, buildT: 0, t: 0, flash: 0, cd: 0, muzzle: 0, recoil: 0, state: "move" },
+      P: { x: 90, y: GROUND, vx: 0, vy: 0, ground: true, dir: 1, scale: 1.75, look: heroLook(skin()[2]), sheet: HERO[skin()[2]] || "hero-common", hitT: 0, buildT: 0, t: 0, flash: 0, cd: 0, muzzle: 0, recoil: 0, state: "move" },
       F: { x: 360, y: GROUND, vx: 0, vy: 0, ground: true, dir: -1, scale: sc, look: LOOK[k], sheet: SPRITE[k], hitT: 0, buildT: 0, t: 0, flash: 0, cd: 80, muzzle: 0, recoil: 0, state: round.kind === "finish" ? "knocked" : "move", tx: 380, st: 0, aimLen: 50, lockY: 0 },
       bullets: [], nades: [], wallsUp: [], parts: [], floats: [], banner: { s: round.kind === "finish" ? "FINISH THEM!" : "READY?", size: 30, c: "#fff", until: 40 },
       shake: 0, stats: { shots: 0, hits: 0, heads: 0, dmg: 0, missed: 0, taken: 0, blocked: 0, dodged: 0, siphon: 0 }, manual: false, done: false };
