@@ -25,7 +25,7 @@ const ARENA = (() => {
   const ANIM = { idle: [0, 4], run: [4, 8], jump: [12, 3], shoot: [15, 3], hit: [18, 2], build: [20, 3], heal: [23, 4], dance: [27, 8], knocked: [35, 4], ko: [39, 1],
     robot: [40, 6], runman: [46, 6], disco: [52, 6], jacks: [58, 6], spin: [64, 6] };
   /* emotes (David, Nov 2026): classic everyday dance moves; keys 1 to 5, or E for a random one */
-  const EMOTES = [["robot", "The Robot"], ["runman", "Running Man"], ["disco", "Disco Point"], ["jacks", "Star Jumps"], ["spin", "Spin & Pose"]];
+  const EMOTES = [{ id: "robot", name: "The Robot" }, { id: "runman", name: "Running Man" }, { id: "disco", name: "Disco Point" }, { id: "jacks", name: "Star Jumps" }, { id: "spin", name: "Spin & Pose" }];
   const SPRITE = { reading: "ranger", thinking: "knight", maths: "robot", boss: "king" };
   const HERO = { "#8a94a6": "hero-common", "#2f8fff": "hero-rare", "#a34dff": "hero-epic", "#ffb21a": "hero-legendary" };
   const IMG = {};
@@ -253,8 +253,8 @@ const ARENA = (() => {
   }
   function emote(f, which) {
     const i = which === "r" ? rnd(EMOTES.length) : Math.max(0, Math.min(EMOTES.length - 1, which - 1));
-    f.emote = EMOTES[i][0]; f.emoteT = 150; f.t = 0;
-    float(EMOTES[i][1] + "!", f.x, f.y - 92 * f.scale / 1.75, "#ff8cc6", 13); beep([[659, .07], [784, .07], [988, .1]]);
+    f.emote = EMOTES[i].id; f.emoteT = 150; f.t = 0;
+    float(EMOTES[i].name + "!", f.x, f.y - 92 * f.scale / 1.75, "#ff8cc6", 13); beep([[659, .07], [784, .07], [988, .1]]);
   }
   function boogie() {
     const F = R.F;
@@ -294,7 +294,7 @@ const ARENA = (() => {
       if (r < 0.45) { F.state = "aim"; F.st = 0; F.aimLen = 60 - 6 * s; F.lockY = P.y - 26 * P.scale; }
       else if (r < 0.72) { F.state = "throw"; F.st = 0; }
       else if (r < 0.86 && canHeal && R.kind === "fight") { F.state = "heal"; F.st = 0; }
-      else if (r < 0.96) { const e = EMOTES[rnd(EMOTES.length)]; F.state = "emote"; F.emote = e[0]; F.st = 0; F.t = 0; float(e[1] + "!", F.x, F.y - 92 * F.scale / 1.75, "#ff8cc6", 13); }   // a taunt: a free shot for you
+      else if (r < 0.96) { const e = EMOTES[rnd(EMOTES.length)]; F.state = "emote"; F.emote = e.id; F.st = 0; F.t = 0; float(e.name + "!", F.x, F.y - 92 * F.scale / 1.75, "#ff8cc6", 13); }   // a taunt: a free shot for you
       else F.cd = 40;
     }
   }
