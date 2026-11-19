@@ -1,0 +1,58 @@
+/* ---------------------------------------------------------------
+   STORM ISLAND: fourth set of thinking questions (Nov 2026, David's refresh). Four options (A–D).
+   Fresh contexts for the critical-thinking types that win the most marks, plus logic in the style of
+   the maths he flagged (statements about groups, rules run backwards, worst cases).
+   --------------------------------------------------------------- */
+(() => {
+  const WHO = (a, b) => [`${a} only`, `${b} only`, `Both ${a} and ${b}`, `Neither ${a} nor ${b}`];
+  THINKING.push(
+    { id: "y101", tier: 1, cat: "Spot the mistake",
+      stem: `<div class="box">Every player in the under-10 team is younger than ten. Jas is eight.<br>Jas: “So I must be in the under-10 team.”</div><p>Which one of these shows the mistake Jas has made?</p>`,
+      options: ["Jas may not have joined the team at all.", "Some players may turn ten during the season.", "The team may play on Saturday mornings.", "Jas may be the youngest child in the class."], answer: 0,
+      explain: `<p>Being younger than ten is <b>needed</b> to be in the team, but it doesn’t <b>put</b> you in it. Jas has run the rule backwards: lots of eight-year-olds <b>aren’t</b> in the team.</p><p class="why-not">Birthdays during the season, when the team plays, and Jas’s age in the class don’t change the mistake.</p>` },
+    { id: "y102", tier: 1, cat: "Supports the claim",
+      stem: `<div class="box">Mr Kahn: “We should put a water fountain next to the oval. Then children will drink more water at lunchtime.”</div><p>Which statement, if true, best supports Mr Kahn’s claim?</p>`,
+      options: ["Many children say the only fountain is too far from where they play.", "Drinking water is much better for children than drinking sugary drinks.", "The school has enough money to buy a fountain.", "The oval is the most popular place at lunchtime."], answer: 0,
+      explain: `<p>The claim links a fountain <b>near the oval</b> to <b>drinking more</b>. If children don’t drink because the fountain is too far away, a closer one should make them drink more.</p><p class="why-not">Water being healthy, the school having money, and the oval being popular are all true-sounding, but none shows children would actually drink more.</p>` },
+    { id: "y103", tier: 2, cat: "Whose reasoning",
+      stem: `<div class="box">At the pool, everyone who swims in the deep end has a green wristband. Some people with green wristbands are under 12.</div><p>Ana: “So some people under 12 swim in the deep end.”</p><p>Ben: “Anyone without a green wristband can’t swim in the deep end.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Ana", "Ben"), answer: 1,
+      explain: `<p>Everyone in the deep end has a wristband, so if you don’t have one, you can’t be there: <b>Ben</b> is right.</p><p class="why-not">The rule only goes one way: deep-end swimmers have wristbands, but not everyone with a wristband swims in the deep end. The under-12s with wristbands might all stay in the shallow end, so Ana can’t be sure.</p>` },
+    { id: "y104", tier: 2, cat: "Spot the mistake",
+      stem: `<div class="box">Last term, the class that read the most books also had the best spelling results.<br>Ms Rua: “So reading more books made that class better at spelling.”</div><p>Which one of these shows the mistake Ms Rua has made?</p>`,
+      options: ["That class may also have had extra spelling lessons.", "Some books may be longer than others.", "Other classes may read a lot more books next term than this term.", "Some children may prefer reading comics."], answer: 0,
+      explain: `<p>Two things happening together doesn’t show one caused the other. Ms Rua has ignored <b>another possible cause</b>: extra spelling lessons would also explain the results.</p><p class="why-not">Book lengths, next term and comics don’t give another explanation for this class’s spelling.</p>` },
+    { id: "y105", tier: 2, cat: "Must or cannot be true",
+      stem: `<div class="box">A box has 6 red, 4 blue and 2 white counters. Zac takes some out without looking.</div><p>What is the <b>smallest</b> number Zac must take out to be <b>certain</b> he has at least one blue counter?</p>`,
+      options: ["1", "5", "8", "9"], answer: 3,
+      explain: `<p>Think of the unluckiest case: he takes all 6 red and both white first. That is 8 counters with no blue. The <b>9th</b> must be blue.</p><p class="why-not">8 still might be all red and white. 5 is the number of colours plus one, which works for “two the same colour”, not “one blue”. 1 is only a chance, not certain.</p>` },
+    { id: "y106", tier: 2, cat: "Supports the claim",
+      stem: `<div class="box">Coach Lee: “If we practise penalty shots every training session, we will score more goals in matches.”</div><p>Which statement, if true, best supports Coach Lee’s claim?</p>`,
+      options: ["Most of the shots our team misses are penalty shots.", "Our team enjoys practising penalty shots.", "Other teams practise penalty shots too.", "Our goalkeeper is the best goalkeeper in the whole league this year."], answer: 0,
+      explain: `<p>If <b>most missed goals are penalties</b>, getting better at penalties is exactly what would add goals.</p><p class="why-not">Enjoying practice, what other teams do, and having a good goalkeeper (who stops goals rather than scoring them) don’t show the team would score more.</p>` },
+    { id: "y107", tier: 3, cat: "Whose reasoning",
+      stem: `<div class="box">A café gives a free drink to anyone who buys two meals. The rule is always followed.</div><p>Ana: “Tom got a free drink, so he must have bought two meals.”</p><p>Ben: “Mia bought two meals, so she must have got a free drink.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Ana", "Ben"), answer: 1,
+      explain: `<p>The rule says two meals always gets a free drink, so Mia must have got one: <b>Ben</b> is right.</p><p class="why-not">The rule doesn’t say two meals is the <b>only</b> way to get a free drink. Tom might have had a voucher, so Ana has run the rule backwards.</p>` },
+    { id: "y108", tier: 3, cat: "Must or cannot be true",
+      stem: `<div class="box">Every member of the art club is in Year 4 or Year 5.<br>No Year 5 student is in the choir.<br>Lily is in the art club and the choir.</div><p>Which one of these <b>must</b> be true?</p>`,
+      options: ["Lily is in Year 4.", "Lily is in Year 5.", "Everyone in the choir is in Year 4.", "Some Year 5 students are in the choir."], answer: 0,
+      explain: `<p>Lily is in the art club, so she is in Year 4 or Year 5. She is in the choir, so she can’t be in Year 5. So she <b>must be in Year 4</b>.</p><p class="why-not">The rules don’t say who else is in the choir: Year 3 or Year 6 children might be. No Year 5 student is in the choir at all.</p>` },
+    { id: "y109", tier: 3, cat: "Spot the mistake",
+      stem: `<div class="box">Jenna’s school got the highest test results in the town. Jenna: “So every child at my school must be better at maths than every child at the other schools.”</div><p>Which one of these shows the mistake Jenna has made?</p>`,
+      options: ["Some children at other schools may be better than some at hers.", "The test may have been held on a hot day.", "Jenna may not have sat the test.", "Schools in other towns may have even higher results than her school."], answer: 0,
+      explain: `<p>The best results <b>overall</b> don’t mean <b>every</b> child is better. Some children at other schools may still beat some children at Jenna’s.</p><p class="why-not">The weather, whether Jenna sat it, and other towns don’t touch the step from “the school did best” to “every child is better”.</p>` },
+    { id: "y110", tier: 3, cat: "Number problems",
+      stem: `<div class="box">Three friends share some stickers. Ava has twice as many as Ben. Ben has 3 more than Cal. Together they have 41.</div><p>How many stickers does Ava have?</p>`,
+      options: ["11", "14", "19", "22"], answer: 3,
+      explain: `<p>Try Cal = 8: Ben 11, Ava 22, total 41 ✓. Or with bars: Cal is one bar, Ben one bar + 3, Ava two bars + 6. Four bars + 9 = 41, so a bar is 8 and Ava has <b>22</b>.</p><p class="why-not">11 is Ben. 14 and 19 come from sharing 41 without using the “3 more” and “twice as many” properly.</p>` },
+    { id: "y111", tier: 4, cat: "Whose reasoning",
+      stem: `<div class="box">In a quiz, every question is worth either 2 points or 5 points. Rani answered some questions right and scored 11 points altogether.</div><p>Ana: “Rani must have got at least one 5-point question right.”</p><p>Ben: “Rani must have got exactly three questions right.”</p><p>Whose reasoning is correct?</p>`,
+      options: WHO("Ana", "Ben"), answer: 0,
+      explain: `<p>11 is odd, and 2-point questions only ever add up to even numbers, so she needs at least one 5: <b>Ana</b> is right. In fact the only way is one 5 and three 2s (5 + 2 + 2 + 2 = 11), because three 5s would already be 15.</p><p class="why-not">That makes <b>four</b> questions, not three, so Ben is wrong. He may have counted only the 2-point questions.</p>` },
+    { id: "y112", tier: 4, cat: "Must or cannot be true",
+      stem: `<div class="box">Abe, Bea, Cy and Dee each picked a different number from 1 to 4.<br>Abe’s number is bigger than Bea’s.<br>Cy’s number is odd.<br>Dee’s number is 1 more than Cy’s.</div><p>Which one of these <b>cannot</b> be true?</p>`,
+      options: ["Abe picked 4.", "Bea picked 2.", "Cy picked 3.", "Dee picked 2."], answer: 1,
+      explain: `<p>Cy is 1 or 3, so Dee is 2 or 4. If Cy is 1 and Dee is 2, then Abe and Bea have 3 and 4: Abe 4, Bea 3. If Cy is 3 and Dee is 4, then Abe 2, Bea 1. Bea is always 3 or 1, so <b>“Bea picked 2” cannot be true</b>.</p><p class="why-not">Abe picking 4, Cy picking 3 and Dee picking 2 each happen in one of the two ways the clues can work.</p>` },
+  );
+})();
