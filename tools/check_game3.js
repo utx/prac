@@ -172,6 +172,28 @@ const SOLVE = {
     const sq = n => `${Math.abs(n)} square${Math.abs(n) === 1 ? "" : "s"}`; const p = [y > 0 ? sq(y) + " north" : y < 0 ? sq(y) + " south" : "", x > 0 ? sq(x) + " east" : x < 0 ? sq(x) + " west" : ""].filter(Boolean);
     return p.length ? p.join(" and ") + " of the start" : "Back where it started"; },
   mirrorclock: d => { const t = 12 * 60 - (d.h * 60 + d.m), h = Math.floor(t / 60); return `${h}:${String(t % 60).padStart(2, "0")}`; },
+  /* fourth set (generators4.js) */
+  lastgroup: d => d.ask === "which" ? Math.ceil(d.N / d.k) : d.ask === "full" ? Math.floor(d.N / d.k) : (d.k - d.N % d.k) % d.k,
+  swaprate: d => d.back ? d.N / d.a * d.b / d.c * d.d : d.N / d.d * d.c / d.b * d.a,
+  shadematch: d => d.n * d.n * d.s / d.p - d.q,
+  dotarea: d => d.c * d.d * d.u,
+  oddscale: d => d.m * d.j,
+  mapruler: d => (d.p1 - d.p0) / 10 * d.s,
+  numchain: d => { const c = d.a + d.b, e = c - d.d, g = e * d.f; return d.back ? d.a : d.mid ? e : g - d.h; },
+  closest: d => { const v = d.list.map(([w, n, den]) => Math.abs(w + n / den - d.w)), t = d.far ? Math.max(...v) : Math.min(...v); return v.filter(x => Math.abs(x - t) < 1e-9).length === 1 ? v.findIndex(x => Math.abs(x - t) < 1e-9) : -1; },
+  regroup: d => d.th * 1000 + d.h * 100 + d.t * 10 + d.o,
+  estchange: d => (d.note - d.p.reduce((s, x) => s + 100 * Math.round(x / 100), 0)) / 100,
+  cubepack: d => Math.floor(d.k * d.x * d.y * d.z / d.s),
+  waterrise: d => d.L + d.m * (d.L - d.S) / d.k,
+  rulesteps: d => { const f = [x => x % 2 ? x + 1 : x / 2, x => x % 2 ? x - 1 : x / 2, x => x % 2 ? x + 5 : x / 2, x => x % 3 ? x + 2 : x / 3][d.ri]; let x = d.x0; for (let i = 0; i < d.n; i++) x = f(x); return x; },
+  tallstack: d => d.dims.reduce((s, b) => s + (d.tall ? Math.max(...b) : Math.min(...b)), 0),
+  hiddencards: d => { let best = d.ask === "max" ? -1 : 99, pairs = 0; for (let x = 1; x < d.H; x++) { const y = d.H - x, diff = Math.abs(x - y); if (d.ask === "max") best = Math.max(best, diff); else if (d.ask === "min") best = Math.min(best, diff); else if (x < y) pairs++; } return d.ask === "pairs" ? pairs : best; },
+  undo: d => { const x = brute(v => (v + d.a) * d.b - d.c === d.F); return d.twist === "digits" ? String(x).split("").reduce((s, c) => s + Number(c), 0) : d.twist === "start" ? x : d.twist === "double" ? 2 * x : Math.floor(x / 10); },
+  bagpack: d => { const per = Math.floor(d.Lk * 1000 / d.g); let bags = 0, left = d.n; while (left > 0) { left -= per; bags++; } return bags; },
+  roundrobin: d => { let m = 0; for (let i = 0; i < d.n; i++) for (let j = i + 1; j < d.n; j++) m++; return d.ask === "matches" ? m : d.ask === "cards" ? 2 * m : d.n; },
+  giveequal: d => { for (let y = 1; y < d.tot; y++) { const x = d.tot - y; if (x - d.g === y + d.g) return d.askBig ? x : y; } return NaN; },
+  balance: d => { const L = d.left.reduce((a, b) => a + b, 0), Rr = d.right.reduce((a, b) => a + b, 0), ok = d.methods.map(m => L + (m.left || 0) === Rr + (m.right || 0)).map((v, i) => v ? i + 1 : 0).filter(Boolean);
+    return ok.length === 1 ? `method ${ok[0]} only` : ok.length === 2 ? `methods ${ok[0]} and ${ok[1]} only` : "none"; },
   sessions: d => { let n = 0; for (let w = 1; w <= d.W; w++) for (let k = 0; k < d.d; k++) if (w !== 2) n++; return n - 1; },
 };
 /* is the picture drawn from the same numbers? (heights of columns, dots, symbols, liquid levels, table cells) */
@@ -194,6 +216,11 @@ const DRAWN = {
   netopp: (d, s) => (s.match(/<rect/g) || []).length === 6 && d.labels.every(l => s.includes(`>${l}</text>`)),
   pyramid: (d, s) => [d.a, d.c, d.top].every(v => s.includes(`>${v}</text>`)) && s.includes(">?</text>"),
   mirrorclock: (d, s) => s.includes("seem to show " + d.h + ":" + String(d.m).padStart(2, "0")),
+  oddscale: (d, s) => (s.match(/class="tick"/g) || []).length === d.n + 1 && s.includes(`>${d.m * d.n} mL</text>`),
+  mapruler: (d, s) => s.includes(`at the ${d.p0} mm mark`) && s.includes(`at the ${d.p1} mm mark`),
+  shadematch: (d, s) => (s.match(/class="cell on"/g) || []).length === d.q && (s.match(/class="part on"/g) || []).length === d.s && (s.match(/class="cell/g) || []).length === d.n * d.n,
+  balance: (d, s) => s.includes(`The left pan holds ${d.left.join(" kg and ")} kg. The right pan holds ${d.right[0]} kg.`),
+  dotarea: (d, s) => s.includes(`data-w="${d.a}" data-h="${d.b}"`) && s.includes(`data-w="${d.c}" data-h="${d.d}"`),
   tabletotal: (d, s) => (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.rows.flat().join(),
   droplow: (d, s) => (s.match(/<td>\d+<\/td>/g) || []).map(num).join() === d.scores.flat().join(),
   totals2: (d, s) => (s.match(/<td>(\d+|\?)<\/td>/g) || []).map(x => /\?/.test(x) ? null : num(x)).join() === [...d.cells.flat(), ...d.colTotals].join(),
@@ -215,9 +242,9 @@ for (const g of C.GENS) {
     if (!/why-not/.test(q.explain)) no(`the explanation must say why the traps are wrong`);
     longest(q, `template ${g.id} seed ${seed}`);
     const mine = SOLVE[g.id](q.data), shown = text(q.options[q.answer]);
-    const same = typeof mine === "number" ? (["droplow", "isnet"].includes(g.id) ? mine === q.answer : near(mine, num(shown))) : mine === shown;
+    const same = typeof mine === "number" ? (["droplow", "isnet", "closest"].includes(g.id) ? mine === q.answer : near(mine, num(shown))) : mine === shown;
     if (!same) no(`seed ${seed}: the marked answer is "${shown}" but working it out separately gives "${mine}"`);
-    if (typeof mine === "number" && !["droplow", "isnet"].includes(g.id) && q.options.filter(o => near(num(text(o)), mine)).length !== 1) no(`seed ${seed}: not exactly one correct option`);
+    if (typeof mine === "number" && !["droplow", "isnet", "closest"].includes(g.id) && q.options.filter(o => near(num(text(o)), mine)).length !== 1) no(`seed ${seed}: not exactly one correct option`);
     if (DRAWN[g.id] && !DRAWN[g.id](q.data, q.stem)) no(`seed ${seed}: the picture does not match the numbers`);
     if (g.id === "isnet" && !q.options.every(o => (o.match(/<rect/g) || []).length === 6)) no(`seed ${seed}: every shape must have six squares`);
     const again = g.make(rng(seed * 7919));
