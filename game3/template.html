@@ -805,7 +805,7 @@ function battle(fx) {
   if (fighting) {
     h += `<div class="arena pixarena"><canvas id="pix" width="960" height="540" role="img" aria-label="The showdown with ${esc(o.name)}"></canvas></div>
     <div class="pads"><button data-pad="left" aria-label="Move left">◀</button><button data-pad="right" aria-label="Move right">▶</button><button data-pad="jump" aria-label="Jump">▲ Jump</button>
-      <button data-pad="build" class="padb" aria-label="Build a wall">🧱 Build</button><button data-pad="shoot" class="pads-shoot" aria-label="Shoot">🔫 Shoot</button>${S.items.boogie ? `<button data-pad="boogie" aria-label="Boogie bomb">💃 ×${S.items.boogie}</button>` : ""}</div>`;
+      <button data-pad="build" class="padb" aria-label="Build a wall">🧱 Build</button><button data-pad="shoot" class="pads-shoot" aria-label="Shoot">🔫 Shoot</button><button data-pad="emote" aria-label="Dance">🕺 Dance</button>${S.items.boogie ? `<button data-pad="boogie" aria-label="Boogie bomb">💃 ×${S.items.boogie}</button>` : ""}</div>`;
   } else {
     h += `<div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
     <div class="hud me"><b>You${M.bush ? " 🌿" : ""}</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}<small>Right answers load your gun</small></div>
@@ -842,7 +842,7 @@ function battle(fx) {
   } else if (mode === "round") {
     const r = o.round;
     h += `<div class="card" id="roundcard" data-kind="${r.kind}"><h3 class="caps">${r.kind === "finish" ? `${esc(o.name)} is knocked: finish them!` : r.kind === "skirm" ? "Showdown!" : "Fight!"}</h3>
-      <p class="keys"><kbd>←</kbd><kbd>→</kbd> move &nbsp; <kbd>↑</kbd> jump &nbsp; <kbd>J</kbd> shoot &nbsp; <kbd>K</kbd> build a wall${S.items.boogie ? " &nbsp; <kbd>B</kbd> Boogie Bomb" : ""}</p>
+      <p class="keys"><kbd>←</kbd><kbd>→</kbd> move &nbsp; <kbd>↑</kbd> jump &nbsp; <kbd>J</kbd> shoot &nbsp; <kbd>K</kbd> build a wall &nbsp; <kbd>1</kbd>–<kbd>5</kbd> or <kbd>E</kbd> dance${S.items.boogie ? " &nbsp; <kbd>B</kbd> Boogie Bomb" : ""}</p>
       <p class="tip">The crosshair sweeps up and down. Shoot when it turns <b style="color:#e03131">red</b> over the head for a <b>headshot</b>: double damage. A red line means ${esc(o.name)} is aiming: jump or build. A grenade? Move or jump clear.${r.kind === "skirm" ? " In a reading showdown the bars only come off with right answers, but every hit charges your shield." : ""} The showdown can’t knock you out: only wrong answers can.</p></div>`;
   } else if (mode === "roundover") {
     const r = o.roundOut, label = o.dead ? (o.boss ? "Victory Royale ▶" : o.chestDue ? "Something’s glowing… ▶" : "Back to the island ▶") : o.chestDue ? "Something’s glowing… ▶" : "Next question ▶";

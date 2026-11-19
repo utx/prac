@@ -2,7 +2,7 @@
 
     python pack_fighters.py RENDER_DIR
 
-Each sheet (prac3/art/fighter-NAME.webp) is 8 frames across and 5 down, every frame 144 x 192,
+Each sheet (prac3/art/fighter-NAME.webp) is 8 frames across and 9 down (70 frames), every frame 144 x 192,
 in the order of ANIMS in fighters.py. game3/arena.js reads them in that order; the feet of a
 standing fighter sit at (62, 172) in its frame.
 """
@@ -11,7 +11,7 @@ from PIL import Image
 
 SRC = sys.argv[1]
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-FW, FH, COLS, N = 144, 192, 8, 40
+FW, FH, COLS, N = 144, 192, 8, 70
 NAMES = ["hero-common", "hero-rare", "hero-epic", "hero-legendary", "ranger", "knight", "robot", "king"]
 
 for name in NAMES:

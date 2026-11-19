@@ -17,7 +17,9 @@ from mathutils import Vector
 OUT = sys.argv[1]
 W, H = 192, 256
 CAM_Z, ORTHO = 1.30, 3.3          # camera centre height and how many units fit top to bottom
-ANIMS = [("idle", 4), ("run", 8), ("jump", 3), ("shoot", 3), ("hit", 2), ("build", 3), ("heal", 4), ("dance", 8), ("knocked", 4), ("ko", 1)]
+ANIMS = [("idle", 4), ("run", 8), ("jump", 3), ("shoot", 3), ("hit", 2), ("build", 3), ("heal", 4), ("dance", 8), ("knocked", 4), ("ko", 1),
+         # emotes (David, Nov 2026): classic everyday dance moves, not any game's own dances
+         ("robot", 6), ("runman", 6), ("disco", 6), ("jacks", 6), ("spin", 6)]
 
 
 def lin(hexcol):
@@ -198,10 +200,10 @@ def build(L):
     J["kit"] = kit
     # the gun, in the right hand, along the forearm
     g = J["elR"]
-    blob((0.0, -0.29, 0.66), (0.13, 0.11, 0.40), gunm, g, round_=0.2)
-    tube((0.0, -0.29, 0.40), 0.035, 0.14, mat("#111318", 0.3, 0.6), g)
-    blob((-0.08, -0.29, 0.74), (0.10, 0.09, 0.16), gunm, g, round_=0.2)               # grip
-    blob((0.05, -0.29, 0.62), (0.03, 0.115, 0.24), trim, g, round_=0.3)               # stripe
+    J["gun"] = [blob((0.0, -0.29, 0.66), (0.13, 0.11, 0.40), gunm, g, round_=0.2),
+                tube((0.0, -0.29, 0.40), 0.035, 0.14, mat("#111318", 0.3, 0.6), g),
+                blob((-0.08, -0.29, 0.74), (0.10, 0.09, 0.16), gunm, g, round_=0.2),               # grip
+                blob((0.05, -0.29, 0.62), (0.03, 0.115, 0.24), trim, g, round_=0.3)]               # stripe
     # head
     hc = (0.03, 0, 1.86)
     if t == "robot":
@@ -265,7 +267,7 @@ def pose(J, p, base_rot=-22):
         J[k].rotation_euler = (0, 0, 0)
     J["hips"].rotation_euler = (0, 0, 0)
     J["root"].location = (0, 0, p.get("up", 0))
-    J["root"].rotation_euler = (0, -math.radians(p.get("lay", 0)), math.radians(base_rot))
+    J["root"].rotation_euler = (0, -math.radians(p.get("lay", 0)), math.radians(base_rot + p.get("turn", 0)))
     swing("spine", p.get("lean", 0)); swing("neck", p.get("nod", 0))
     for k in ("hipL", "hipR", "shL", "shR"):
         swing(k, p.get(k, 0))
@@ -275,7 +277,9 @@ def pose(J, p, base_rot=-22):
         swing(k, abs(p.get(k, 0)))             # elbows only bend forwards
     J["hips"].rotation_euler[0] = math.radians(p.get("sway", 0))
     J["shL"].rotation_euler[0] = math.radians(p.get("liftL", 0)); J["shR"].rotation_euler[0] = -math.radians(p.get("liftR", 0))
+    J["hipL"].rotation_euler[0] = math.radians(p.get("spread", 0)); J["hipR"].rotation_euler[0] = -math.radians(p.get("spread", 0))
     for o in J["kit"]: o.hide_render = not p.get("kit")
+    for o in J["gun"]: o.hide_render = bool(p.get("emote"))      # the gun is put away while dancing
     if p.get("lay"): centre(J)
 
 
@@ -311,6 +315,27 @@ def frames():
         a = i / 4 * 2 * math.pi
         out.append(dict(lay=84, up=0.22, nod=-60, shL=150 + 20 * math.sin(a), elL=20, shR=150 - 20 * math.sin(a), elR=20, hipL=15 * math.sin(a), hipR=-15 * math.sin(a), kneeL=30, kneeR=30))
     out.append(dict(lay=-88, up=0.25, nod=10, shL=170, shR=150, hipL=5, hipR=-8))          # ko: flat on the back
+    # ---- emotes: everyday dance moves ----
+    robot = [dict(shL=90, elL=90), dict(shL=90, elL=0), dict(shL=90, elL=0, shR=90, elR=0), dict(shR=90, elR=90), dict(shR=90, elR=0), dict(nod=-12)]
+    for i, r in enumerate(robot):                          # The Robot: stiff, jerky arms and a tilted head
+        out.append(dict(r, lean=0, kneeL=4, kneeR=4, nod=r.get("nod", 8 if i % 2 else -6), turn=-10 if i < 3 else 10))
+    for i in range(6):                                     # Running Man: legs slide on the spot, arms pump
+        a = i / 6 * 2 * math.pi
+        out.append(dict(up=0.04 * abs(math.sin(a)), lean=8, hipL=35 * math.sin(a), hipR=-35 * math.sin(a), kneeL=10 + 50 * max(0, math.sin(a)), kneeR=10 + 50 * max(0, -math.sin(a)),
+                        shL=-30 * math.sin(a) + 20, elL=90, shR=30 * math.sin(a) + 20, elR=90, nod=4))
+    for i in range(6):                                     # Disco Point: one finger up high, then down across
+        up = i % 3 != 2
+        out.append(dict(shR=160 if up else -10, liftR=25 if up else -15, elR=0, shL=20, elL=95, liftL=20, sway=10 if i < 3 else -10, hipL=10 if up else -5, kneeL=12, kneeR=4, nod=-10 if up else 10, up=0.02))
+    for i in range(6):                                     # Star Jumps: arms and legs out, then in
+        k = abs(math.sin(i / 6 * math.pi * 2))
+        out.append(dict(up=0.14 * k, liftL=15 + 150 * k, liftR=15 + 150 * k, spread=4 + 22 * k, kneeL=8, kneeR=8, nod=-6 * k))
+    for i in range(6):                                     # Spin and Pose: a full turn with arms out
+        out.append(dict(turn=i * 60, liftL=80, liftR=80, up=0.04, kneeL=10, kneeR=10, nod=-5))
+    start = {}; k = 0
+    for name, n in ANIMS: start[name] = (k, n); k += n
+    for name in ("dance", "robot", "runman", "disco", "jacks", "spin"):
+        a, n = start[name]
+        for f in out[a:a + n]: f["emote"] = True
     assert len(out) == sum(n for _, n in ANIMS), len(out)
     return out
 

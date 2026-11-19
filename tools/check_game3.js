@@ -580,6 +580,15 @@ function checkLayout(M, where, GAP) {
     await page.evaluate(() => { window.__debug.state().match.hp = 100; });
     await press("b"); g = await A("get"); s = await S();
     if (g.F.state !== "dance" || s.items.boogie !== 2) bad(`practice ${label}: B should throw a Boogie Bomb`);
+    /* emotes: a key (desktop) or the Dance button (phone) starts a dance; moving stops it; the opponent can taunt too */
+    if (label === "desktop") { await page.keyboard.down("3"); await A("step", 1); await page.keyboard.up("3"); }
+    else { await page.dispatchEvent('[data-pad="emote"]', "pointerdown"); await A("step", 1); await page.dispatchEvent('[data-pad="emote"]', "pointerup"); }
+    g = await A("get");
+    if (!g.P.emote || (label === "desktop" && g.P.emote !== "disco")) bad(`practice ${label}: the dance key should start an emote (${JSON.stringify(g.P)})`);
+    await page.keyboard.down("ArrowLeft"); await A("step", 2); await page.keyboard.up("ArrowLeft"); g = await A("get");
+    if (g.P.emote) bad(`practice ${label}: moving should stop the emote`);
+    await A("foe", "emote", { emote: "spin" }); await A("step", 2); g = await A("get");
+    if (g.F.state !== "emote" || g.F.emote !== "spin") bad(`practice ${label}: the opponent should be able to dance`);
     await A("foe", "throw"); await A("step", 130); g = await A("get");
     const hit = g.stats.taken;
     if (!hit) bad(`practice ${label}: standing on a grenade should hurt`);
