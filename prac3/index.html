@@ -238,6 +238,17 @@
   @keyframes tracer { 0% { opacity: 1; transform: scaleX(0); } 100% { opacity: 0; transform: scaleX(1); } }
   .bushhide { position: absolute; left: 4%; bottom: 0; width: 120px; z-index: 2; opacity: .92; pointer-events: none; }
   .float.head { color: #ff4dd8; font-size: 30px; } .float.heal { color: #7dff6b; } .float.safe { color: #7dff6b; }
+  /* ---- the pixel arena (game3/arena.js) ---- */
+  .arena.pixarena { height: auto; aspect-ratio: 16 / 9; background: #0d1330; }
+  .arena.pixarena canvas { width: 100%; height: 100%; display: block; }
+  .pads { display: flex; gap: 6px; margin: -2px 0 10px; flex-wrap: wrap; }
+  .pads button { flex: 1 1 56px; min-height: 46px; border: 3px solid var(--navy); border-bottom-width: 6px; border-radius: 10px; background: #e9ecf5; font: italic 900 15px "Arial Black", Impact, sans-serif; text-transform: uppercase; touch-action: none; user-select: none; }
+  .pads .pads-shoot { flex: 2 1 110px; background: var(--gold); } .pads .padb { background: #f0c08a; }
+  .pads button:active { transform: translateY(3px); border-bottom-width: 3px; }
+  #roundcard .keys { font-size: 16px; } #roundcard .tip { color: var(--ink-soft); font-size: 15px; margin-bottom: 0; }
+  kbd { display: inline-block; min-width: 26px; text-align: center; padding: 1px 6px; border: 2px solid var(--navy); border-bottom-width: 4px; border-radius: 6px; background: #f3f5f8; font: 800 14px "Segoe UI", Arial, sans-serif; }
+  .rstats { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 4px; } .rstats span { background: #eef1f6; border-radius: 8px; padding: 4px 10px; font-size: 15px; }
+  .float.load { color: #ffe066; }
   .threat { border: 4px solid #ff5a4d; }
   .threat .cue { display: flex; gap: 12px; align-items: center; font-size: 20px; font-weight: 800; }
   .threat .cue svg, .threat .cue .cuepic { width: 60px; height: 60px; flex: none; object-fit: contain; animation: pop .5s; }
@@ -2768,7 +2779,7 @@ const HOLD = {
   bush: ["Bush", "Bushes", "Tap the Bush button before you shoot: if you then miss, they can’t find you and you take no damage."],
   boogie: ["Boogie Bomb", "Boogie Bombs", "Save it for a fight: when an opponent makes a move, a Boogie Bomb button appears. Throw it and they dance instead of attacking."],
 };
-const CARRY = 3, MAXHP = 100, MAXSH = 50, SUPPLY_HEAL = 40, RUSH_DMG = 15, FOE_HEAL = 20;
+const CARRY = 3, MAXHP = 100, MAXSH = 50, SUPPLY_HEAL = 40;
 /* storm circles: opponent health (thinking and maths; a reading opponent has one bar for each question on its passage), damage of a miss, damage of a wrong move, coins for an elimination,
    Fortnite minutes for clearing the circle, and the circle's radius (% of the map) */
 const STAGE = {
@@ -2805,25 +2816,6 @@ const BOT_NAMES = ["Peely", "Fishstick", "Raven", "Drift", "Brite Bomber", "Cudd
   "Ruckus", "Toona Fish", "Guff", "Penny", "Kymera", "The Scientist", "Agent Peely", "Bullseye", "Nog Ops", "Teknique", "Valor", "Whiplash", "Wukong", "Chomp Sr.", "Moisty Merman",
   "Love Ranger", "Burnout", "Grill Sergeant", "Sgt. Winter", "Cozy Chomps", "Carbon Commando", "Vendetta", "Shadow Ops", "Snorkel Ops", "Beach Bomber", "Sushi Master"];
 const WEAPONS = ["with a Pump Shotgun", "with an Assault Rifle", "with a Sniper Rifle", "with an SMG", "with a grenade", "with a Tactical Shotgun", "with a pickaxe", "with a Minigun"];
-/* the opponent's moves after each hit, and the counter that beats each one */
-const MOVES = {
-  shoot: { counter: "build", says: ["{n} raises a rifle and takes aim at you.", "{n} lines up a shot.", "{n} peeks out and points a weapon your way.", "{n} steadies the scope on you."],
-    good: "Your wall soaks up every bullet. No damage!", bad: { jump: "You jump, but bullets are faster than you.", rush: "You charge straight into the shots." } },
-  grenade: { counter: "jump", says: ["{n} pulls the pin on a grenade!", "{n} winds up to throw something.", "Something round and heavy comes flying at you from {n}!", "{n} lobs an explosive towards you."],
-    good: "You jump clear just as it goes off. No damage!", bad: { build: "It sails over your wall and goes off behind it.", rush: "You run straight into the blast." } },
-  heal: { counter: "rush", says: ["{n} ducks behind a rock and opens a med kit.", "{n} turns away to drink a shield potion.", "{n} stops shooting and starts patching up.", "{n} hides to heal."],
-    good: "You catch {n} healing: {d} damage!", bad: { build: "You build while {n} heals up.", jump: "You jump about while {n} heals up." } },
-};
-const COUNTERS = [{ id: "build", name: "Build a wall" }, { id: "jump", name: "Jump clear" }, { id: "rush", name: "Rush in" }];
-/* our own simple icons for the three moves */
-const ICON = {
-  build: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="6" width="38" height="36" rx="3" fill="#c98a4b" stroke="#0d1330" stroke-width="3"/><path d="M5 18H43M5 30H43M17 6V18M31 18V30M17 30V42" stroke="#0d1330" stroke-width="2.5"/></svg>`,
-  jump: `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3L41 22H30V40H18V22H7Z" fill="#3fa7ff" stroke="#0d1330" stroke-width="3" stroke-linejoin="round"/><path d="M12 45H36" stroke="#0d1330" stroke-width="3"/></svg>`,
-  rush: `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M20 9L40 24L20 39V30H9V18H20Z" fill="#ff7a1a" stroke="#0d1330" stroke-width="3" stroke-linejoin="round"/><path d="M1 14H11M1 34H11M3 24H7" stroke="#0d1330" stroke-width="3"/></svg>`,
-  aim: `<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15" fill="none" stroke="#e5484d" stroke-width="4"/><circle cx="24" cy="24" r="3" fill="#e5484d"/><path d="M24 2V14M24 34V46M2 24H14M34 24H46" stroke="#e5484d" stroke-width="4"/></svg>`,
-};
-const CUEPIC = { shoot: ICON.aim, grenade: pic("grenade", "cuepic"), heal: pic("medkit", "cuepic") };
-
 /* ---------- saved progress ---------- */
 /* Practice mode: opened from the admin page (?admin=1 after the PIN). Everything is owned and nothing is saved. */
 const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
@@ -2837,6 +2829,7 @@ function load() {
       const f = FRESH(), out = Object.assign(f, s, { time: Object.assign(f.time, s.time), stats: Object.assign(f.stats, s.stats), items: Object.assign(f.items, s.items) });
       if (!out.time.capSet) out.time.cap = 60;                       // the daily limit became 60 minutes (Nov 2026) unless a grown-up has chosen one
       if (out.match && out.match.v !== 2) out.match = null;          // a match saved by the first version of the game can't continue
+      if (out.match) out.match.opps.forEach(o => { if (o.threat) { delete o.threat; } });   // the old text moves became the arena (Nov 2026)
       return out;
     }
   } catch (e) {}
@@ -2964,14 +2957,14 @@ function tryMatch() {
       pts.push(p);
       const [img, name] = foe(kind);
       const hp = kind === "reading" ? 5 : STAGE[s].hp;
-      opps.push({ kind, tier: s, stage: s, img, name, x: p[0], y: p[1], hp, max: hp, dead: false, shots: 0, pending: null, pid: null, queue: [], threat: null });
+      opps.push({ kind, tier: s, stage: s, img, name, x: p[0], y: p[1], hp, max: hp, dead: false, shots: 0, pending: null, pid: null, queue: [] });
     }
     supply[s] = landNear(c[s], STAGE[s].r * 0.72, pts, GAP[s]); if (!supply[s]) return null;
   }
   const bp = landNear(c[4], 4); if (!bp) return null;
   supply[4] = landNear(c[4], STAGE[4].r * 0.95, [bp], GAP[4]); if (!supply[4]) return null;
   const [bimg, bname] = BOSSES[n % BOSSES.length];
-  opps.push({ kind: "thinking", boss: true, tier: 4, stage: 4, img: bimg, name: bname, x: bp[0], y: bp[1], hp: STAGE[4].hp, max: STAGE[4].hp, dead: false, shots: 0, pending: null, threat: null });
+  opps.push({ kind: "thinking", boss: true, tier: 4, stage: 4, img: bimg, name: bname, x: bp[0], y: bp[1], hp: STAGE[4].hp, max: STAGE[4].hp, dead: false, shots: 0, pending: null });
   const taken = new Set(opps.map(o => o.name)), names = shuffle(BOT_NAMES.filter(x => !taken.has(x))), bots = [];
   for (let i = 0; i < START - 1 - opps.length; i++) {
     const z = ZONES[rnd(ZONES.length)], p = landNear([z[1], z[2]], 7) || landNear([50, 50], 40);
@@ -3032,6 +3025,408 @@ function foeDown(o) {
   feed(`You eliminated ${o.name}`, "me"); M.fx.killed.push([o.x, o.y]);
   if (!o.boss && M.opps.every(x => x.dead || x.stage !== M.stage)) closeStorm();
 }
+
+/* ---------- the arena: a short side-on showdown after each answer (David, Nov 2026) ----------
+   Questions are the ammo: a right answer loads 5 shots and 3 walls, a wrong one 2 shots and 1 wall
+   (and the opponent has already shot back). A whole reading passage loads one bigger round.
+   Keys: ← → (or A D) move, ↑ / W / Space jump, J (or X) shoot, K (or C) build a wall, B boogie bomb.
+   The crosshair sweeps up and down the opponent: fire while it is red, on the head, for a headshot (double).
+   The opponent strafes, jumps your shots, builds, aims (a red line: jump or build), throws grenades
+   (move or jump) and stops to heal (hit them to interrupt). Its shots are small and can never knock you
+   out: only wrong answers can. The fighters are our own pixel drawings. No clock of any kind. */
+const ARENA = (() => {
+  const W = 480, H = 270, GROUND = 236, GRAV = 0.34;
+  const KEYS = {}, MAP = { ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right", ArrowUp: "jump", w: "jump", W: "jump", " ": "jump",
+    j: "shoot", J: "shoot", x: "shoot", X: "shoot", k: "build", K: "build", c: "build", C: "build", b: "boogie", B: "boogie" };
+  const shade = (hex, f) => { const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(f < 0 ? v * (1 + f) : v + (255 - v) * f)); return "#" + c.map(v => v.toString(16).padStart(2, "0")).join(""); };
+  /* our own fighter designs, one per kind of opponent */
+  const LOOK = {
+    reading: { type: "hood", main: "#2e9e5b", trim: "#e3c16f", skin: "#d99a6c", cape: "#1d5e38", gun: "#5b3a1e" },
+    thinking: { type: "helmet", main: "#8b5cd6", trim: "#ffd43b", skin: "#f0c49c", visor: "#22d3ee", gun: "#3a3f52" },
+    maths: { type: "bot", main: "#3b8fd6", trim: "#ff922b", skin: "#b9c6d6", eye: "#ff4d4d", gun: "#3a3f52" },
+    boss: { type: "king", main: "#b8322a", trim: "#ffd700", skin: "#e0a77f", cape: "#5b1a7a", gun: "#2a2a2a" },
+  };
+  const heroLook = c => ({ type: "hoodie", main: c, trim: "#ffe81a", skin: "#f2c39b", visor: "#7fd7ff", gun: "#2b2f3a" });
+  let R = null, acc = 0, last = 0;
+  /* our own 3D fighters, rendered in Blender (game3/art/fighters.py) and packed 8 x 5 into one sheet each */
+  const FRAME = { w: 144, h: 192, cols: 8, fx: 62, fy: 172, body: 122 };
+  const ANIM = { idle: [0, 4], run: [4, 8], jump: [12, 3], shoot: [15, 3], hit: [18, 2], build: [20, 3], heal: [23, 4], dance: [27, 8], knocked: [35, 4], ko: [39, 1] };
+  const SPRITE = { reading: "ranger", thinking: "knight", maths: "robot", boss: "king" };
+  const HERO = { "#8a94a6": "hero-common", "#2f8fff": "hero-rare", "#a34dff": "hero-epic", "#ffb21a": "hero-legendary" };
+  const IMG = {};
+  const img = src => { if (!IMG[src]) { const im = new Image(); im.src = src; IMG[src] = im; } return IMG[src]; };
+  const ready = im => im && im.complete && im.naturalWidth > 0;
+  function frameOf(f) {
+    let a = "idle", k = 0;
+    if (f.state === "ko") a = "ko";
+    else if (f.state === "knocked") { a = "knocked"; k = Math.floor(f.t / 12); }
+    else if (f.state === "dance") { a = "dance"; k = Math.floor(f.t / 6); }
+    else if (f.state === "heal") { a = "heal"; k = Math.floor(f.t / 12); }
+    else if (f.hitT > 0) { a = "hit"; k = f.hitT > 7 ? 0 : 1; }
+    else if (!f.ground) { a = "jump"; k = f.vy < -2 ? 0 : f.vy < 2 ? 1 : 2; }
+    else if (f.buildT > 0) { a = "build"; k = 2 - Math.min(2, Math.floor(f.buildT / 6)); }
+    else if (f.recoil > 0) { a = "shoot"; k = f.recoil > 4 ? 0 : f.recoil > 2 ? 1 : 2; }
+    else if (Math.abs(f.vx) > 0.2) { a = "run"; k = Math.floor(f.t / 4); }
+    else k = Math.floor(f.t / 14);
+    const [start, n] = ANIM[a];
+    return start + (k % n);
+  }
+  function sprite(ctx, f) {
+    const sh = img(`art/fighter-${f.sheet}.webp`);
+    if (!ready(sh)) return false;
+    const i = frameOf(f), sx = (i % FRAME.cols) * FRAME.w, sy = Math.floor(i / FRAME.cols) * FRAME.h, k = 48 * f.scale / FRAME.body;
+    ctx.save();
+    ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.beginPath(); ctx.ellipse(f.x, GROUND + 1, 22 * f.scale, 4 * f.scale, 0, 0, 7); ctx.fill();   // shadow
+    ctx.translate(Math.round(f.x), Math.round(f.y)); if (f.dir < 0) ctx.scale(-1, 1);
+    if (f.flash > 0 && f.flash % 4 < 2) ctx.filter = "brightness(2.2)";
+    ctx.drawImage(sh, sx, sy, FRAME.w, FRAME.h, -FRAME.fx * k, -FRAME.fy * k, FRAME.w * k, FRAME.h * k);
+    ctx.restore();
+    if (f.muzzle > 0) { const mx = f.x + f.dir * 27 * f.scale, my = f.y - 34 * f.scale; ctx.fillStyle = "#fff3a0"; ctx.beginPath(); ctx.arc(mx, my, 5 + f.muzzle, 0, 7); ctx.fill(); ctx.fillStyle = "#ffb703"; ctx.beginPath(); ctx.arc(mx + f.dir * 4, my, 3 + f.muzzle / 2, 0, 7); ctx.fill(); }
+    return true;
+  }
+
+  /* ---------- drawing ---------- */
+  function rect(ctx, f, x, y, w, h, col) {   // sprite pixels, feet at (0,0), x mirrored when facing left
+    const u = 2 * f.scale, X = f.dir > 0 ? x : -(x + w);
+    ctx.fillStyle = col; ctx.fillRect(Math.round(f.x + X * u), Math.round(f.y + y * u), Math.ceil(w * u), Math.ceil(h * u));
+  }
+  function fighter(ctx, f) {
+    if (sprite(ctx, f)) return;          // the pixel drawing below is only a fallback while the pictures load
+    const L = f.look, p = (x, y, w, h, c) => rect(ctx, f, x, y, w, h, c), dark = shade(L.main, -0.4), light = shade(L.main, 0.35), t = f.t;
+    if (f.flash > 0 && f.flash % 4 < 2) { ctx.globalAlpha = 0.45; }
+    if (f.state === "ko" || f.state === "knocked") {          // lying down / crawling
+      const o = f.state === "knocked" ? Math.floor(t / 16) % 2 : 0;
+      p(-12, -6 - o, 16, 6, L.main); p(4, -7 - o, 7, 7, L.skin); p(-16, -4, 5, 4, dark); if (L.type !== "bot") p(4, -8 - o, 7, 2, L.type === "king" ? L.trim : dark);
+      ctx.globalAlpha = 1; return;
+    }
+    const air = !f.ground, run = Math.abs(f.vx) > 0.2 && f.ground, step = run ? Math.floor(t / 6) % 2 : 0;
+    const bob = !run && !air && f.state !== "dance" ? Math.floor(t / 24) % 2 : 0, dance = f.state === "dance" ? Math.floor(t / 10) % 4 : -1;
+    if (L.cape) p(-6, -16 + bob, 4, 12 - bob, L.cape);
+    if (L.type === "hoodie") p(-7, -15 + bob, 3, 7, dark);                       // backpack
+    /* legs and boots */
+    const lA = air ? -2 : step ? -1 : 0, lB = air ? 0 : step ? 0 : -1;
+    p(-4, -8 + (lA < 0 ? -1 : 0), 3, 7, dark); p(1, -8 + (lB < 0 ? -1 : 0), 3, 7, dark);
+    p(-5 + (step ? -1 : 0), -2 + (lA < 0 ? -1 : 0), 4, 2, "#1c1c24"); p(1 + (step ? 1 : 0), -2 + (lB < 0 ? -1 : 0), 4, 2, "#1c1c24");
+    /* body */
+    p(-5, -16 + bob, 10, 9, L.main); p(-5, -9 + bob, 10, 1, L.trim);
+    if (L.type === "hoodie") { p(-1, -15 + bob, 2, 5, light); }
+    if (L.type === "helmet" || L.type === "king") { p(-5, -16 + bob, 10, 2, light); }
+    if (L.type === "bot") { p(-2, -14 + bob, 4, 3, L.trim); }
+    /* arms: a dance waves them, healing holds a kit, otherwise the gun points forward */
+    if (dance >= 0) {
+      const up = dance % 2 === 0; p(-8, up ? -22 + bob : -14, 3, 7, L.main); p(5, up ? -14 : -22 + bob, 3, 7, L.main);
+    } else if (f.state === "heal") {
+      p(3, -13 + bob, 5, 3, L.main); p(6, -15 + bob, 5, 5, "#f8f9fa"); p(8, -14 + bob, 1, 3, "#e03131"); p(7, -13 + bob, 3, 1, "#e03131");
+    } else {
+      const kick = f.recoil > 0 ? -1 : 0;
+      p(-7, -14 + bob, 3, 6, dark); p(3 + kick, -13 + bob, 6, 3, L.main); p(8 + kick, -14 + bob, 7, 3, L.gun); p(9 + kick, -11 + bob, 2, 2, L.gun);
+      if (f.muzzle > 0) { p(15 + kick, -15 + bob, 3, 5, "#fff3a0"); p(18 + kick, -14 + bob, 2, 3, "#ffb703"); }
+    }
+    /* head */
+    const hy = -24 + bob;
+    if (L.type === "bot") {
+      p(-4, hy, 9, 8, L.skin); p(-4, hy, 9, 2, shade(L.skin, 0.4)); p(-3, hy + 3, 7, 3, "#10151f"); p(0, hy + 4, 2, 1, L.eye); p(3, hy + 4, 1, 1, L.eye);
+      p(0, hy - 3, 1, 3, "#868e96"); p(-1, hy - 4, 3, 1, L.trim);
+    } else {
+      p(-4, hy + 1, 8, 7, L.skin);
+      if (L.type === "hood") { p(-5, hy - 1, 10, 3, L.main); p(-5, hy, 3, 8, L.main); p(3, hy + 3, 2, 1, "#10151f"); p(0, hy + 3, 1, 1, "#10151f"); p(-1, hy + 6, 4, 1, shade(L.skin, -0.25)); }
+      if (L.type === "helmet") { p(-5, hy - 1, 10, 4, L.main); p(-5, hy - 1, 3, 9, L.main); p(-1, hy + 3, 6, 2, L.visor); p(-1, hy - 1, 2, 2, L.trim); }
+      if (L.type === "hoodie") { p(-5, hy - 1, 9, 3, L.main); p(-5, hy, 3, 7, L.main); p(-1, hy + 2, 6, 2, L.visor); p(-1, hy + 2, 6, 1, shade(L.visor, 0.5)); p(0, hy + 6, 3, 1, "#b5654a"); }
+      if (L.type === "king") { p(-4, hy - 1, 8, 2, "#5c3a21"); p(-4, hy - 4, 8, 3, L.trim); p(-4, hy - 5, 1, 1, L.trim); p(-1, hy - 5, 2, 1, L.trim); p(3, hy - 5, 1, 1, L.trim); p(-1, hy - 3, 2, 1, "#e03131");
+        p(1, hy + 3, 1, 1, "#10151f"); p(3, hy + 3, 1, 1, "#10151f"); p(-1, hy + 6, 5, 2, "#5c3a21"); }
+    }
+    ctx.globalAlpha = 1;
+  }
+  const box = f => { const h = 48 * f.scale * (f.state === "heal" ? 0.8 : f.state === "knocked" || f.state === "ko" ? 0.4 : 1), w = 11 * f.scale * (f.state === "knocked" || f.state === "ko" ? 2.2 : 1); return { l: f.x - w, r: f.x + w, top: f.y - h, bot: f.y, head: f.y - h + Math.min(13 * f.scale, h * 0.35), h }; };
+
+  function scene(ctx) {
+    const bd = img(`../prac2/art/${R.bg}.webp`);
+    if (ready(bd)) {
+      const sc = H / bd.naturalHeight, w = bd.naturalWidth * sc;
+      ctx.drawImage(bd, (W - w) / 2, 0, w, H);
+      const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "rgba(13,19,48,.35)"); g.addColorStop(0.25, "rgba(13,19,48,0)"); g.addColorStop(1, "rgba(13,19,48,.25)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      for (let y = 0; y < H; y += 6) { const w2 = 14 + Math.round(6 * Math.sin(y / 14 + R.t / 18)); ctx.fillStyle = y % 12 ? "rgba(150,70,255,.5)" : "rgba(200,140,255,.55)"; ctx.fillRect(W - w2, y, w2, 6); }
+      return;
+    }
+    const sky = { reading: ["#0f4c5c", "#5fb49c"], thinking: ["#3c1a6e", "#c86bba"], maths: ["#0b3d6b", "#47b5e6"], boss: ["#3a0d18", "#b33a3a"] }[R.k];
+    const g = ctx.createLinearGradient(0, 0, 0, GROUND); g.addColorStop(0, sky[0]); g.addColorStop(1, sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "rgba(255,255,255,.7)"; for (let i = 0; i < 18; i++) { const x = (i * 97 + R.t * 0.05 * (1 + i % 3)) % W, y = (i * 53) % 120; ctx.fillRect(Math.round(x), y, 2, 2); }
+    ctx.fillStyle = shade(sky[0], 0.15);                                                     // far hills, in big pixel steps
+    for (let x = 0; x < W; x += 8) { const h = 40 + Math.round(18 * Math.sin(x / 47) + 10 * Math.sin(x / 19)); ctx.fillRect(x, GROUND - h, 8, h); }
+    ctx.fillStyle = shade(sky[1], -0.35);
+    for (let x = 0; x < W; x += 8) { const h = 18 + Math.round(10 * Math.sin(x / 31 + 2)); ctx.fillRect(x, GROUND - h, 8, h); }
+    /* the storm wall creeping in at the right edge */
+    for (let y = 0; y < GROUND; y += 6) { const w = 16 + Math.round(6 * Math.sin(y / 14 + R.t / 18)); ctx.fillStyle = y % 12 ? "rgba(150,70,255,.55)" : "rgba(200,140,255,.6)"; ctx.fillRect(W - w, y, w, 6); }
+    /* ground */
+    ctx.fillStyle = { reading: "#3f8f3a", thinking: "#6a5a8a", maths: "#d6b46b", boss: "#5a3a3a" }[R.k]; ctx.fillRect(0, GROUND, W, H - GROUND);
+    ctx.fillStyle = "rgba(0,0,0,.18)"; for (let x = 0; x < W; x += 16) ctx.fillRect(x + ((x / 16) % 2) * 8, GROUND + 6, 8, 4);
+    ctx.fillStyle = "rgba(255,255,255,.18)"; ctx.fillRect(0, GROUND, W, 2);
+  }
+  function wallDraw(ctx, w) {
+    const x = Math.round(w.x - 6), top = GROUND - 76;
+    ctx.fillStyle = "#a8692f"; ctx.fillRect(x, top, 12, 76);
+    ctx.fillStyle = "#7a4a1f"; for (let y = top + 10; y < GROUND; y += 12) ctx.fillRect(x, y, 12, 2); ctx.fillRect(x + 5, top, 2, 76);
+    if (w.hp < 3) { ctx.fillStyle = "#2b1a0c"; ctx.fillRect(x + 2, top + 14, 3, 8); ctx.fillRect(x + 7, top + 34, 3, 6); }
+    if (w.hp < 2) { ctx.fillRect(x + 1, top + 4, 4, 4); ctx.fillRect(x + 6, top + 22, 4, 10); }
+    ctx.strokeStyle = "#2b1a0c"; ctx.lineWidth = 2; ctx.strokeRect(x, top, 12, 76);
+  }
+  function text(ctx, s, x, y, size, col, align = "center") {
+    ctx.font = `900 ${size}px "Arial Black", Impact, monospace`; ctx.textAlign = align; ctx.lineWidth = Math.max(3, size / 4); ctx.strokeStyle = "#0d1330";
+    ctx.strokeText(s, x, y); ctx.fillStyle = col; ctx.fillText(s, x, y);
+  }
+  function hud(ctx) {
+    const M = S.match, o = R.o;
+    const barAt = (x, y, w, v, max, col) => { ctx.fillStyle = "#0d1330"; ctx.fillRect(x - 2, y - 2, w + 4, 12); ctx.fillStyle = "#3a3f52"; ctx.fillRect(x, y, w, 8); ctx.fillStyle = col; ctx.fillRect(x, y, Math.round(w * Math.max(0, v) / max), 8); };
+    text(ctx, "YOU", 10, 16, 11, "#fff", "left");
+    barAt(10, 22, 120, M.hp, MAXHP, "#40c057"); if (M.shield > 0) barAt(10, 34, 120 * MAXSH / MAXHP, M.shield, MAXSH, "#4dabf7");
+    for (let i = 0; i < Math.min(R.ammo, 12); i++) { ctx.fillStyle = "#ffd43b"; ctx.fillRect(12 + i * 9, 48, 5, 9); ctx.fillStyle = "#e67700"; ctx.fillRect(12 + i * 9, 48, 5, 3); }
+    if (R.kind === "finish") text(ctx, "∞", 14, 58, 12, "#ffd43b", "left");
+    for (let i = 0; i < R.walls; i++) { ctx.fillStyle = "#a8692f"; ctx.fillRect(12 + i * 12, 62, 9, 9); ctx.fillStyle = "#7a4a1f"; ctx.fillRect(12 + i * 12, 66, 9, 1); }
+    text(ctx, o.name.toUpperCase().slice(0, 20), W - 10, 16, 11, "#fff", "right");
+    if (o.kind === "reading" && !o.boss) {
+      if (R.kind === "finish" || o.dead) text(ctx, o.dead ? "ELIMINATED" : "KNOCKED!", W - 10, 34, 12, "#ff6b6b", "right");
+      else { for (let i = 0; i < o.max; i++) { ctx.fillStyle = "#0d1330"; ctx.fillRect(W - 12 - (o.max - i) * 16, 22, 14, 10); ctx.fillStyle = i < o.hp ? "#ff6b6b" : "#3a3f52"; ctx.fillRect(W - 11 - (o.max - i) * 16, 23, 12, 8); }
+        text(ctx, "Hits give you shield", W - 10, 46, 9, "#9fe7ff", "right"); }
+    } else barAt(W - 130, 22, 120, o.hp, o.max, "#ff6b6b");
+  }
+  function draw() {
+    const cv = document.getElementById("pix"); if (!cv || !R) return;
+    const ctx = cv.getContext("2d"); ctx.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+    ctx.save(); if (R.shake > 0) ctx.translate(Math.round((Math.random() - 0.5) * R.shake), Math.round((Math.random() - 0.5) * R.shake));
+    scene(ctx);
+    R.wallsUp.forEach(w => wallDraw(ctx, w));
+    /* the opponent's aim line */
+    const F = R.F, P = R.P;
+    if (F.state === "aim") { const a = F.st / F.aimLen; ctx.strokeStyle = `rgba(255,40,40,${0.35 + 0.5 * a})`; ctx.lineWidth = 2; ctx.setLineDash([6, 4]); ctx.beginPath(); ctx.moveTo(F.x - 27 * F.scale, F.y - 34 * F.scale); ctx.lineTo(0, F.lockY); ctx.stroke(); ctx.setLineDash([]);
+      text(ctx, "!", F.x, F.y - 58 * F.scale, 18, "#ff4d4d"); }
+    if (F.state === "throw") text(ctx, "!", F.x, F.y - 58 * F.scale, 18, "#ffa94d");
+    R.nades.forEach(g => { ctx.fillStyle = "#2f3b2f"; ctx.fillRect(Math.round(g.x - 4), Math.round(g.y - 4), 8, 8); ctx.fillStyle = g.fuse > 0 && g.fuse % 8 < 4 ? "#ff4d4d" : "#9be15d"; ctx.fillRect(Math.round(g.x - 1), Math.round(g.y - 6), 3, 3); });
+    fighter(ctx, P); fighter(ctx, F);
+    if (F.state === "dance") text(ctx, "♪", F.x + 18, F.y - 60 * F.scale - (R.t % 30) / 3, 16, "#ff8cc6");
+    if (F.state === "heal") { const k = F.st / 100; ctx.fillStyle = "#0d1330"; ctx.fillRect(F.x - 20, F.y - 64 * F.scale, 40, 6); ctx.fillStyle = "#69db7c"; ctx.fillRect(F.x - 19, F.y - 63 * F.scale, Math.round(38 * k), 4); }
+    R.bullets.forEach(b => { ctx.fillStyle = b.who === "p" ? (b.head ? "#ffe066" : "#fff3bf") : "#ff8787"; ctx.fillRect(Math.round(b.x - 4), Math.round(b.y - 1), 8, 3); });
+    R.parts.forEach(q => { ctx.fillStyle = q.c; ctx.fillRect(Math.round(q.x), Math.round(q.y), q.s, q.s); });
+    /* the crosshair: it sweeps up and down; red means it is on the head */
+    if (R.ammo > 0 || R.kind === "finish") if (!["ko"].includes(F.state)) {
+      const y = aimY(), head = inHead(y), c = head ? "#ff3b3b" : "#ffffff", x = F.x;
+      ctx.strokeStyle = "#0d1330"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x, y, 8, 0, 7); ctx.stroke();
+      ctx.strokeStyle = c; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 8, 0, 7); ctx.stroke();
+      ctx.fillStyle = c; ctx.fillRect(x - 13, y - 1, 6, 2); ctx.fillRect(x + 7, y - 1, 6, 2); ctx.fillRect(x - 1, y - 13, 2, 6); ctx.fillRect(x - 1, y + 7, 2, 6);
+    }
+    R.floats.forEach(f => text(ctx, f.s, f.x, f.y, f.size, f.c));
+    ctx.restore();
+    hud(ctx);
+    if (R.banner) text(ctx, R.banner.s, W / 2, 120, R.banner.size || 34, R.banner.c || "#ffe81a");
+    if (R.t < 260 && !R.banner) text(ctx, "← → move   ↑ jump   J shoot   K build" + (S.items.boogie ? "   B boogie" : ""), W / 2, H - 10, 10, "#fff");
+  }
+
+  /* ---------- the fight ---------- */
+  const SWEEP = 100;
+  function aimY() { const b = box(R.F), top = b.top - 12, span = b.h + 12; return top + span * (1 + Math.sin(R.phase)) / 2; }
+  function inHead(y) { const b = box(R.F); return y >= b.top && y <= b.head; }
+  const shotDmg = () => Math.round(gun().dmg / 5);
+  const fireGap = () => ({ pistol: 18, shotgun: 26, minigun: 9 }[S.gun] || 18);
+  function float(s, x, y, c, size = 14) { R.floats.push({ s, x, y, c, size, life: 60 }); }
+  function burst(x, y, c, n = 8, sp = 2.5) { for (let i = 0; i < n; i++) R.parts.push({ x, y, vx: (Math.random() - 0.5) * sp * 2, vy: -Math.random() * sp * 1.6, life: 22 + rnd(14), c, s: 2 + rnd(2) }); }
+  function meHurt(d, x, y) {
+    const M = S.match; d = Math.min(d, M.hp + M.shield - 1);     // the arena can hurt, but never knock you out: only wrong answers can
+    if (d <= 0) { float("0", x, y, "#fff"); return; }
+    const sh = Math.min(M.shield, d); M.shield -= sh; M.hp -= d - sh; R.stats.taken += d;
+    if (sh) float("−" + sh, x - 8, y, "#74c0fc"); if (d - sh) float("−" + (d - sh), x + 8, y - 10, "#ff6b6b");
+    R.P.flash = 24; R.P.hitT = 14; beep([[220, .08, "sawtooth"]]);
+  }
+  function hitFoe(head, x, y) {
+    const o = R.o, F = R.F, st = R.stats;
+    st.hits++; if (head) st.heads++;
+    F.flash = 16; F.hitT = 14; F.vx += 2.2; burst(x, y, head ? "#ffe066" : "#ffffff", head ? 14 : 8); if (head) R.shake = 8;
+    if (F.state === "heal") { F.state = "move"; F.st = 0; F.cd = 40; float("INTERRUPTED!", F.x, F.y - 80, "#69db7c", 12); }
+    if (R.kind === "finish") { o.hp = 0; float("ELIMINATED!", F.x, F.y - 70, "#ffe066", 16); return down(); }
+    if (R.kind === "skirm") {                                     // reading: the bars come only from right answers; hits charge your shield
+      const add = Math.min(MAXSH - S.match.shield, head ? 6 : 3); S.match.shield += add; st.siphon += add;
+      float(head ? "HEADSHOT!" : "HIT!", F.x, F.y - 70, head ? "#ffe066" : "#fff", head ? 16 : 13); if (add) float("+" + add + " shield", R.P.x, R.P.y - 70, "#74c0fc", 11);
+      beep(head ? SND.head : SND.hit); return;
+    }
+    const d = shotDmg() * (head ? 2 : 1); st.dmg += Math.min(d, o.hp); o.hp = Math.max(0, o.hp - d);
+    float((head ? "HEADSHOT " : "") + d, F.x + (head ? 0 : rnd(16) - 8), (head ? F.y - 80 : F.y - 60), head ? "#ffe066" : "#ffffff", head ? 18 : 15);
+    beep(head ? SND.head : SND.hit);
+    if (o.hp <= 0) down();
+  }
+  function down() {
+    const o = R.o; foeDown(o); R.F.state = "ko"; R.F.vx = 3; R.koAt = R.t; R.P.state = "dance"; R.shake = 12; R.banner = { s: o.boss ? "VICTORY!" : "ELIMINATED!", size: 32 };
+    burst(R.F.x, R.F.y - 30, "#ffe066", 30, 4); beep(SND.win);
+  }
+  function shoot() {
+    const P = R.P, F = R.F;
+    if (P.cd > 0 || (R.ammo <= 0 && R.kind !== "finish") || F.state === "ko") return;
+    if (R.kind !== "finish") R.ammo--;
+    R.stats.shots++; P.cd = fireGap(); P.muzzle = 5; P.recoil = 6;
+    const sx = P.x + 27 * P.scale, sy = P.y - 34 * P.scale, ty = aimY(), head = inHead(ty), dx = F.x - sx, dy = ty - sy, n = Math.hypot(dx, dy) || 1;
+    R.bullets.push({ who: "p", x: sx, y: sy, vx: 10 * dx / n, vy: 10 * dy / n, head });
+    beep([[S.gun === "shotgun" ? 180 : 520, .04, "square"]]);
+  }
+  function build(who) {
+    const isP = who === "p", f = isP ? R.P : R.F;
+    if (isP ? R.walls <= 0 : R.foeWalls <= 0) return;
+    if (R.wallsUp.some(w => w.who === who)) return;
+    const x = isP ? f.x + 34 : f.x - 30 * f.scale;
+    if (isP && x > R.F.x - 30) return;
+    if (isP) R.walls--; else R.foeWalls--;
+    f.buildT = 18; R.wallsUp.push({ who, x, hp: 3 }); burst(x, GROUND - 30, "#c98a4b", 10); beep([[330, .05], [440, .05]]);
+  }
+  function boogie() {
+    const F = R.F;
+    if (!S.items.boogie || F.state === "dance" || F.state === "ko" || R.kind === "finish") return;
+    S.items.boogie--; F.state = "dance"; F.st = 180; F.vx = 0; float("BOOGIE!", F.x, F.y - 80, "#ff8cc6", 16); beep([[523, .08], [659, .08], [784, .08], [659, .08]]);
+  }
+  function foeThink() {
+    const F = R.F, P = R.P, s = R.o.stage, o = R.o;
+    if (F.state === "ko") return;
+    if (F.state === "hold") { F.vx = 0; return; }   // only used by the checks
+    if (F.state === "knocked") { F.vx = F.x < 440 ? 0.25 : 0; return; }
+    if (F.state === "dance") { F.vx = 0; if (--F.st <= 0) { F.state = "move"; F.cd = 30; } return; }
+    if (F.state === "heal") { F.vx = 0; if (++F.st >= 100) { const h = Math.min(10, o.max - o.hp); o.hp += h; F.state = "move"; F.cd = 60; float("+" + h, F.x, F.y - 70, "#69db7c", 15); } return; }
+    if (F.state === "aim") {
+      F.vx = 0; if (++F.st >= F.aimLen) {
+        F.state = "move"; F.cd = 90 - 10 * s + rnd(60); F.muzzle = 5;
+        const sx = F.x - 27 * F.scale, sy = F.y - 34 * F.scale, n = Math.hypot(sx - P.x, sy - F.lockY) || 1;
+        R.bullets.push({ who: "f", x: sx, y: sy, vx: -8 * (sx - P.x) / n, vy: -8 * (sy - F.lockY) / n }); beep([[300, .05, "square"]]);
+      } return;
+    }
+    if (F.state === "throw") {
+      F.vx = 0; if (++F.st >= 22) {
+        const sx = F.x - 10, sy = F.y - 40 * F.scale, tx = P.x + (Math.random() - 0.5) * 30, fly = 40;
+        R.nades.push({ x: sx, y: sy, vx: (tx - sx) / fly, vy: (GROUND - 4 - sy) / fly - GRAV * fly / 2, fuse: -1 });
+        F.state = "move"; F.cd = 90 - 10 * s + rnd(60);
+      } return;
+    }
+    /* moving: strafe, dodge incoming shots, build when under fire, then pick the next move */
+    if (Math.abs(F.x - F.tx) < 4) F.tx = 250 + rnd(200);
+    F.vx = Math.sign(F.tx - F.x) * (1 + 0.15 * s);
+    const incoming = R.bullets.some(b => b.who === "p" && b.x > F.x - 150 && b.x < F.x);
+    if (incoming && F.ground && Math.random() < 0.012 * s) { F.vy = -6.2; F.ground = false; }
+    if (incoming && Math.random() < 0.006 * s) build("f");
+    if (--F.cd <= 0) {
+      const r = Math.random(), canHeal = o.kind !== "reading" && !o.boss ? o.hp < o.max : o.boss && o.hp < o.max;
+      if (r < 0.5) { F.state = "aim"; F.st = 0; F.aimLen = 60 - 6 * s; F.lockY = P.y - 26 * P.scale; }
+      else if (r < 0.8) { F.state = "throw"; F.st = 0; }
+      else if (canHeal && R.kind === "fight") { F.state = "heal"; F.st = 0; }
+      else F.cd = 40;
+    }
+  }
+  function physics(f) {
+    f.vy += GRAV; f.x += f.vx; f.y += f.vy;
+    if (f.y >= GROUND) { f.y = GROUND; f.vy = 0; f.ground = true; }
+    f.t++; if (f.flash > 0) f.flash--; if (f.hitT > 0) f.hitT--; if (f.buildT > 0) f.buildT--; if (f.cd > 0 && f === R.P) f.cd--; if (f.muzzle > 0) f.muzzle--; if (f.recoil > 0) f.recoil--;
+  }
+  function tick() {
+    const P = R.P, F = R.F, M = S.match, s = R.o.stage;
+    R.t++; R.phase += 2 * Math.PI / SWEEP; if (R.shake > 0) R.shake -= 0.5;
+    if (R.banner && R.banner.until && R.t >= R.banner.until) R.banner = R.banner.s === "READY?" ? { s: "FIGHT!", size: 38, until: 75 } : null;
+    const live = R.t > 70 && F.state !== "ko";
+    /* you */
+    P.vx = 0;
+    if (live) {
+      if (KEYS.left) P.vx = -2.4; if (KEYS.right) P.vx = 2.4;
+      if (KEYS.jump && P.ground) { P.vy = -6.8; P.ground = false; }
+      if (KEYS.shoot) shoot();
+      if (KEYS.build) { build("p"); KEYS.build = false; }
+      if (KEYS.boogie) { boogie(); KEYS.boogie = false; }
+    }
+    physics(P); P.x = Math.max(30, Math.min(P.x, F.x - 120));
+    const myWall = R.wallsUp.find(w => w.who === "p"); if (myWall && P.x > myWall.x - 18) P.x = myWall.x - 18;
+    /* the opponent */
+    if (live) foeThink(); else if (F.state !== "ko") F.vx = 0;
+    if (F.state === "ko") F.vx *= 0.9;
+    physics(F); F.x = Math.max(P.x + 120, Math.min(F.x, 444));
+    /* bullets */
+    for (const b of R.bullets) {
+      b.x += b.vx; b.y += b.vy;
+      const w = R.wallsUp.find(w => w.who !== b.who && Math.abs(b.x - w.x) < 7 && b.y > GROUND - 76);
+      if (w) { b.dead = true; w.hp--; burst(b.x, b.y, "#c98a4b", 5); if (w.who === "p") { R.stats.blocked++; float("BLOCKED", w.x, GROUND - 84, "#ffd8a8", 10); } continue; }
+      if (b.who === "p") {
+        const bx = box(F);
+        if (F.state !== "ko" && b.x >= bx.l && b.x <= bx.r + 10 && b.y >= bx.top - 2 && b.y <= bx.bot) { b.dead = true; hitFoe(b.head && b.y <= bx.head + 3, b.x, b.y); }
+      } else {
+        const bx = box(P);
+        if (b.x >= bx.l - 6 && b.x <= bx.r && b.y >= bx.top && b.y <= bx.bot) { b.dead = true; meHurt(3 + s, P.x, P.y - 80); }
+      }
+      if (b.x < -10 || b.x > W + 10 || b.y > GROUND + 4 || b.y < -40) { if (b.who === "p" && !b.dead) R.stats.missed++; b.dead = true; }
+    }
+    R.bullets = R.bullets.filter(b => !b.dead);
+    R.wallsUp = R.wallsUp.filter(w => { if (w.hp <= 0) burst(w.x, GROUND - 30, "#a8692f", 14, 3); return w.hp > 0; });
+    /* grenades: fly, sit fizzing, then blow up (jump or move away) */
+    for (const g of R.nades) {
+      if (g.fuse < 0) { g.vy += GRAV; g.x += g.vx; g.y += g.vy; if (g.y >= GROUND - 4) { g.y = GROUND - 4; g.fuse = 28; } }
+      else if (--g.fuse <= 0) {
+        g.dead = true; R.shake = 10; burst(g.x, g.y, "#ffa94d", 24, 3.5); burst(g.x, g.y, "#ffe066", 12, 2.5); beep([[90, .25, "sawtooth"]]);
+        R.wallsUp.forEach(w => { if (Math.abs(w.x - g.x) < 46) w.hp = 0; });
+        if (Math.abs(P.x - g.x) < 46 && P.y > GROUND - 20) meHurt(5 + s, P.x, P.y - 60); else if (Math.abs(P.x - g.x) < 70) { R.stats.dodged++; float("DODGED!", P.x, P.y - 70, "#9be15d", 11); }
+      }
+    }
+    R.nades = R.nades.filter(g => !g.dead);
+    R.parts.forEach(q => { q.x += q.vx; q.y += q.vy; q.vy += 0.15; q.life--; }); R.parts = R.parts.filter(q => q.life > 0);
+    R.floats.forEach(f => { f.y -= 0.6; f.life--; }); R.floats = R.floats.filter(f => f.life > 0);
+    KEYS.shoot = KEYS.shoot && KEYS.hold;
+    /* the round ends when your shots are used up (or the opponent is down) */
+    if (F.state === "ko") { if (R.t - R.koAt > 110) finish(); }
+    else if (R.kind !== "finish" && R.ammo <= 0 && !R.bullets.some(b => b.who === "p")) { R.outAt = R.outAt || R.t; if (R.t - R.outAt === 1) R.banner = { s: "RELOAD!", size: 30, c: "#fff", until: R.t + 60 }; if (R.t - R.outAt > 50) finish(); }
+  }
+  function frame(ts) {
+    if (!R) return;
+    if (!R.manual) { acc += Math.min(100, ts - (last || ts)); last = ts; while (acc >= 1000 / 60 && R && !R.done) { tick(); acc -= 1000 / 60; } }
+    if (!R) return;
+    draw(); R.raf = requestAnimationFrame(frame);
+  }
+  function finish() {
+    if (!R || R.done) return;
+    const out = Object.assign({}, R.stats, { kind: R.kind, killed: R.o.dead }), cb = R.onEnd;
+    R.done = true; cancelAnimationFrame(R.raf); unhook(); R = null;
+    cb(out);
+  }
+  /* ---------- keys and buttons ---------- */
+  function onKey(e) {
+    const k = MAP[e.key]; if (!k || !R) return;
+    e.preventDefault();
+    if (e.type === "keydown") { if (k === "shoot") { KEYS.shoot = true; KEYS.hold = true; } else KEYS[k] = true; }
+    else { if (k === "shoot") KEYS.hold = false; else KEYS[k] = false; }
+  }
+  function hook() { window.addEventListener("keydown", onKey); window.addEventListener("keyup", onKey); if (document.activeElement) document.activeElement.blur(); }
+  function unhook() { window.removeEventListener("keydown", onKey); window.removeEventListener("keyup", onKey); for (const k in KEYS) KEYS[k] = false; }
+  function pads() {
+    document.querySelectorAll("[data-pad]").forEach(b => {
+      const k = b.dataset.pad, on = e => { e.preventDefault(); if (k === "shoot") { KEYS.shoot = true; KEYS.hold = true; } else KEYS[k] = true; }, off = e => { e.preventDefault(); if (k === "shoot") KEYS.hold = false; else if (k !== "build" && k !== "boogie") KEYS[k] = false; };
+      b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointerleave", off);
+    });
+  }
+  /* ---------- start a round ---------- */
+  function start(o, round, onEnd) {
+    if (R) { cancelAnimationFrame(R.raf); unhook(); }
+    const k = o.boss ? "boss" : o.kind, sc = o.boss ? 2.1 : 1.75;
+    const bg = o.boss ? ["arena-peaks", "arena-reef", "arena-forest"][S.n % 3] : { reading: "arena-forest", thinking: "arena-peaks", maths: "arena-reef" }[o.kind];
+    R = { o, k, bg, kind: round.kind, ammo: round.kind === "finish" ? 0 : round.ammo, walls: round.walls, foeWalls: 1 + Math.min(2, o.stage - 1), onEnd, t: 0, phase: Math.PI * 0.2,
+      P: { x: 90, y: GROUND, vx: 0, vy: 0, ground: true, dir: 1, scale: 1.75, look: heroLook(skin()[2]), sheet: HERO[skin()[2]] || "hero-common", hitT: 0, buildT: 0, t: 0, flash: 0, cd: 0, muzzle: 0, recoil: 0, state: "move" },
+      F: { x: 360, y: GROUND, vx: 0, vy: 0, ground: true, dir: -1, scale: sc, look: LOOK[k], sheet: SPRITE[k], hitT: 0, buildT: 0, t: 0, flash: 0, cd: 80, muzzle: 0, recoil: 0, state: round.kind === "finish" ? "knocked" : "move", tx: 380, st: 0, aimLen: 50, lockY: 0 },
+      bullets: [], nades: [], wallsUp: [], parts: [], floats: [], banner: { s: round.kind === "finish" ? "FINISH THEM!" : "READY?", size: 30, c: "#fff", until: 40 },
+      shake: 0, stats: { shots: 0, hits: 0, heads: 0, dmg: 0, missed: 0, taken: 0, blocked: 0, dodged: 0, siphon: 0 }, manual: false, done: false };
+    acc = 0; last = 0; hook(); pads();
+    R.raf = requestAnimationFrame(frame);
+  }
+  const running = () => !!R;
+  /* for tools/check_game3.js only (the browser is driven by Playwright): step frames by hand, read the state, or play a round out instantly */
+  if (navigator.webdriver) window.__arena = {
+    on: () => !!R, manual: on => { if (R) R.manual = on; }, step: n => { for (let i = 0; i < n && R && !R.done; i++) { tick(); } if (R) draw(); },
+    get: () => R && { sprites: ready(img(`art/fighter-${R.P.sheet}.webp`)) && ready(img(`art/fighter-${R.F.sheet}.webp`)) && ready(img(`../prac2/art/${R.bg}.webp`)), kind: R.kind, ammo: R.ammo, walls: R.walls, t: R.t, P: { x: R.P.x, y: R.P.y }, F: { x: R.F.x, y: R.F.y, state: R.F.state }, wallsUp: R.wallsUp.map(w => ({ who: w.who, hp: w.hp })), stats: Object.assign({}, R.stats), head: inHead(aimY()), bullets: R.bullets.length, nades: R.nades.map(g => ({ x: g.x, fuse: g.fuse })) },
+    walls: () => { if (R) R.wallsUp = []; },
+    phase: head => { if (!R) return; const b = box(R.F), ok = []; for (let i = 0; i < SWEEP; i++) { R.phase = 2 * Math.PI * i / SWEEP; const y = aimY(); if (head ? inHead(y) : y > b.head + 8 && y < b.bot - 8) ok.push(i); } R.phase = 2 * Math.PI * ok[Math.floor(ok.length / 2)] / SWEEP; },
+    foe: (state, extra = {}) => { if (!R) return; Object.assign(R.F, { state, st: 0, vx: 0, cd: 9999 }, extra); if (state === "aim") { R.F.aimLen = 40; R.F.lockY = R.P.y - 26 * R.P.scale; } },
+    sim: (heads = 0) => { if (!R) return; while (R && !R.done) { if (R.F.state === "ko") { finish(); break; } if (R.kind !== "finish" && R.ammo <= 0) { finish(); break; } if (R.kind !== "finish") R.ammo--; R.stats.shots++; hitFoe(R.stats.heads < heads, R.F.x, R.F.y - 30); } },
+  };
+  const preload = () => { Object.values(SPRITE).concat(Object.values(HERO)).forEach(n => img(`art/fighter-${n}.webp`)); ["arena-forest", "arena-peaks", "arena-reef"].forEach(n => img(`../prac2/art/${n}.webp`)); };
+  return { start, running, LOOK, preload, SHEETS: [...Object.values(SPRITE), ...new Set(Object.values(HERO))] };
+})();
+
+ARENA.preload();
 
 /* ---------- drawing ---------- */
 const bar = (cls, v, max, label = null) => `<div class="bar ${cls}"><i style="width:${Math.max(0, 100 * v / max)}%"></i><span>${label === null ? Math.round(v) : label}</span></div>`;
@@ -3205,7 +3600,7 @@ function wireParents() {
 }
 
 /* ---------- the battle ---------- */
-function busy() { const M = S.match, o = M && M.cur !== null ? M.opps[M.cur] : null; return !!(o && (o.pending || o.threat || M.chest)); }
+function busy() { const M = S.match, o = M && M.cur !== null ? M.opps[M.cur] : null; return !!(o && (o.pending || o.round || o.roundOut || M.chest)); }
 function passageHtml(o, q) {
   const p = PASS[o.pid];
   let html = p.html;
@@ -3216,50 +3611,68 @@ function optsHtml(q, chosen) {
   const done = chosen !== null;
   return `<div class="opts${q.visual ? " visual" : ""}">${q.options.map((op, i) => `<button class="opt${done ? (i === q.answer ? " right" : i === chosen ? " wrong" : " dim") : ""}" data-i="${i}" ${done ? "disabled" : ""}><span class="let">${LETTERS[i]}</span><span>${op}</span></button>`).join("")}</div>`;
 }
+const shotDmg = () => Math.round(gun().dmg / 5);
+const roundLabel = r => r.kind === "finish" ? "FINISH THEM! ▶" : r.kind === "skirm" ? `SHOWDOWN! ${r.ammo} shots ▶` : `FIGHT! ${r.ammo} shots ▶`;
 function battle(fx) {
   const M = S.match, o = M.opps[M.cur], st = STAGE[o.stage];
   const k = o.boss ? { label: "Boss", icon: "👑", arena: ["arena-peaks", "arena-reef", "arena-forest"][S.n % 3], col: "#7a1f3d" } : KIND[o.kind];
-  const pend = o.pending, ch = !pend ? M.chest : null, th = !pend && !ch ? o.threat : null;
-  const mode = pend ? "q" : ch ? (ch.phase === "offer" ? "offer" : "chestq") : th ? "threat" : "idle";
-  const over = M.hp <= 0, idle = mode === "idle" && !o.dead && !over;
+  const pend = o.pending, ch = !pend && !o.round && !o.roundOut ? M.chest : null;
+  const mode = pend ? "q" : o.round ? "round" : o.roundOut ? "roundover" : ch ? (ch.phase === "offer" ? "offer" : "chestq") : "idle";
+  const over = M.hp <= 0, idle = mode === "idle" && !o.dead && !over, rd = o.kind === "reading" && !o.boss;
   const q = mode === "q" ? resolve(pend.ref) : mode === "chestq" ? resolve(ch.ref) : null;
   document.documentElement.style.setProperty("--kind", q ? KIND[q.kind].col : k.col);
-  const headReady = M.streak % 3 === 2;
   const fresh = id => mode === "chestq" && ch.chosen !== null && ch.glow === id ? " fresh" : "";
-  let h = `<div class="playbar"><button class="pill" id="back" ${idle ? "" : "disabled title='Finish this first'"}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="pill" id="alive" data-n="${alive(M)}">👥 ${alive(M)} left</span><span class="spacer" style="flex:1"></span>
-    <button class="pill" id="coins">${pic("coins")} ${S.coins}</button><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>
-  <div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
-    <div class="hud me"><b>You${M.bush ? " 🌿" : ""}</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}<small class="pips" title="Every third right answer in a row is a headshot">${[0, 1, 2].map(i => `<i class="${i < M.streak % 3 ? "on" : ""}"></i>`).join("")} ${headReady ? "Headshot ready!" : "Headshot streak"}</small></div>
-    <div class="hud foe"><b>${esc(o.name)}</b><small>${k.icon} ${o.boss ? "Boss · thinking and maths" : k.label + " opponent"}</small>${bar("ehp", o.hp, o.max, o.kind === "reading" ? o.hp + " to go" : null)}</div>
-    <div class="fighter me${over ? " ko" : ""}${fx && fx.anim === "jump" ? " jumping" : ""}${fx && fx.anim === "rush" ? " rushing" : ""}" id="hero"><img src="${skin()[4]}${skin()[0]}.webp" alt="Your hero"></div>
+  const fighting = mode === "round", canLeave = idle || (mode === "roundover" && !o.dead && !over);
+  let h = `<div class="playbar"><button class="pill" id="back" ${canLeave ? "" : "disabled title='Finish this first'"}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="pill" id="alive" data-n="${alive(M)}">👥 ${alive(M)} left</span><span class="spacer" style="flex:1"></span>
+    <button class="pill" id="coins">${pic("coins")} ${S.coins}</button><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>`;
+  if (fighting) {
+    h += `<div class="arena pixarena"><canvas id="pix" width="960" height="540" role="img" aria-label="The showdown with ${esc(o.name)}"></canvas></div>
+    <div class="pads"><button data-pad="left" aria-label="Move left">◀</button><button data-pad="right" aria-label="Move right">▶</button><button data-pad="jump" aria-label="Jump">▲ Jump</button>
+      <button data-pad="build" class="padb" aria-label="Build a wall">🧱 Build</button><button data-pad="shoot" class="pads-shoot" aria-label="Shoot">🔫 Shoot</button>${S.items.boogie ? `<button data-pad="boogie" aria-label="Boogie bomb">💃 ×${S.items.boogie}</button>` : ""}</div>`;
+  } else {
+    h += `<div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
+    <div class="hud me"><b>You${M.bush ? " 🌿" : ""}</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}<small>Right answers load your gun</small></div>
+    <div class="hud foe"><b>${esc(o.name)}</b><small>${k.icon} ${o.boss ? "Boss · thinking and maths" : k.label + " opponent"}</small>${bar("ehp", o.hp, o.max, rd ? (o.hp ? o.hp + " to go" : "Knocked!") : null)}</div>
+    <div class="fighter me${over ? " ko" : ""}" id="hero"><img src="${skin()[4]}${skin()[0]}.webp" alt="Your hero"></div>
     ${M.bush ? `<img class="bushhide" src="art/bush.webp" alt="">` : ""}
-    ${fx && fx.anim === "build" ? `<div class="wall">${ICON.build}</div>` : ""}
-    <button class="fighter foe${o.dead ? " ko" : ""}${idle ? " aim" : ""}${fx && fx.anim === "dance" ? " dancing" : ""}" id="enemy" ${idle ? "" : "disabled"} aria-label="Shoot at ${esc(o.name)}"><img src="art/${o.img}.webp" alt=""><span class="cross"></span></button>
-    ${fx && fx.move === "shoot" && fx.anim !== "dance" ? `<div class="tracer"></div><div class="tracer t2"></div>` : ""}
-    ${fx && fx.move === "grenade" && fx.anim !== "dance" ? `<div class="boom${fx.anim === "jump" ? " missed" : ""}"></div>` : ""}
+    <button class="fighter foe${o.dead ? " ko" : ""}${idle ? " aim" : ""}" id="enemy" ${idle ? "" : "disabled"} aria-label="Take on ${esc(o.name)}"><img src="art/${o.img}.webp" alt=""><span class="cross"></span></button>
     <div class="afeed">${feedHtml(M, 2)}</div>
-  </div>
-  <div class="actions">
-    <button class="act gun" id="shoot" style="--rar:${gun().col}" ${idle ? "" : "disabled"}>${gunPic(S.gun)}<span><b>${gun().name}</b><small>${gun().dmg} damage a hit${headReady ? " · next one ×2!" : ""}</small></span><span class="go">Shoot</span></button>
-    <button class="act${fresh("med")}" id="usemed" style="--rar:#3fae2a" ${!S.items.med || M.hp >= MAXHP || over ? "disabled" : ""}>${pic("medkit")}<span><b>Med Kit ×${S.items.med}</b><small>+50 health</small></span></button>
-    <button class="act${fresh("shield")}" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
+  </div>`;
+  }
+  h += `<div class="actions">
+    <button class="act gun" id="shoot" style="--rar:${gun().col}" ${idle ? "" : "disabled"}>${gunPic(S.gun)}<span><b>${gun().name}</b><small>${shotDmg()} damage a hit · headshots ×2</small></span><span class="go">Go!</span></button>
+    <button class="act${fresh("med")}" id="usemed" style="--rar:#3fae2a" ${!S.items.med || M.hp >= MAXHP || over || fighting ? "disabled" : ""}>${pic("medkit")}<span><b>Med Kit ×${S.items.med}</b><small>+50 health</small></span></button>
+    <button class="act${fresh("shield")}" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over || fighting ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
     <button class="act${fresh("bush")}" id="usebush" style="--rar:#3fae2a" ${!S.items.bush || M.bush || !idle ? "disabled" : ""}>${pic("bush")}<span><b>Bush ×${S.items.bush}</b><small>${M.bush ? "Hiding!" : "Hide: a miss costs nothing"}</small></span></button>
   </div>`;
   const showPassage = mode === "q" && q.kind === "reading";
   h += `<div class="stage${showPassage ? " has-passage" : ""}">${showPassage ? passageHtml(o, q) : ""}`;
   if (mode === "idle") {
-    h += `<div class="card" id="qcard" data-q="" data-seed=""><div class="aimhelp"><b>${esc(o.name)}</b> is in your sights.<br>Tap your gun or the enemy to take a shot. Every shot is a question.<br>
-      <small>${o.kind === "reading" ? `Answer every question on the passage: each right answer knocks off one bar (${o.shots ? o.hp + " to go" : "one bar for each question"}).` : `A right answer hits for ${gun().dmg}${headReady ? " (a headshot: double!)" : ""}.`} A wrong answer misses, and ${esc(o.name)} shoots back for ${st.dmg}.</small></div></div>`;
+    h += `<div class="card" id="qcard" data-q="" data-seed=""><div class="aimhelp"><b>${esc(o.name)}</b> is in your sights. Press <b>Go!</b> for your first question.<br>
+      <small>${rd ? `Answer the whole passage: each right answer knocks off one bar (${o.shots ? o.hp + " to go" : "one bar for each question"}). Then comes a showdown: 2 shots for every right answer. Knock off every bar and you can finish ${esc(o.name)} in the showdown.`
+        : `A right answer loads 5 shots, a wrong one only 2 (and ${esc(o.name)} shoots back for ${st.dmg}). Then you fight it out: every hit does ${shotDmg()}, a headshot double.`}</small></div></div>`;
   } else if (mode === "q") {
     h += `<div class="card" id="qcard" data-q="${qkey(pend.ref)}" data-seed="${pend.ref.seed !== undefined ? pend.ref.seed : ""}"><div class="qhead"><span>${KIND[q.kind].icon} ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, pend.chosen)}`;
     if (pend.chosen !== null) {
-      const ok = pend.chosen === q.answer, out = pend.out || {};
-      const head = ok ? (o.kind === "reading" ? (o.dead ? `Hit! That was the last bar: ${esc(o.name)} is eliminated!` : `Hit! One bar down, ${o.hp} to go.`) : (out.head ? `HEADSHOT! ${out.dmg} damage.` : `Hit! ${out.dmg} damage.`) + (o.dead ? ` ${esc(o.name)} is eliminated!` : ""))
-        : out.bush ? `Miss! But you were hiding in a bush, so ${esc(o.name)} couldn’t find you. No damage.` : `Miss! ${esc(o.name)} shoots back: ${out.dmg} damage.`;
-      const label = over ? "Eliminated ▶" : o.dead && o.boss ? "Victory Royale ▶" : pend.chest ? "Something’s glowing… ▶" : pend.threat ? `Watch ${esc(o.name)}! ▶` : o.dead ? "Back to the island ▶" : "Next shot ▶";
+      const ok = pend.chosen === q.answer, out = pend.out || {}, r = pend.round;
+      const head = ok ? (rd ? (o.hp ? `Right! One bar down, ${o.hp} to go.` : `Right! That was the last bar: ${esc(o.name)} is knocked!`) : `Right! Your gun is loaded: ${r.ammo} shots.`)
+        : (out.bush ? `Miss! But you were hiding in a bush, so ${esc(o.name)} couldn’t find you. No damage.` : `Miss! ${esc(o.name)} shoots back: ${out.dmg} damage.`) + (r && r.kind === "fight" ? ` You only get ${r.ammo} shots.` : "");
+      const label = over ? "Eliminated ▶" : r ? roundLabel(r) : "Next question ▶";
       h += `<div class="fb ${ok ? "good" : "miss"}"><h4>${head}</h4>${ok ? "" : `<p>The answer was <b>${LETTERS[q.answer]}</b>.</p>`}${q.explain}</div><div class="next"><button class="btn" id="next">${label}</button></div>`;
     }
     h += `</div>`;
+  } else if (mode === "round") {
+    const r = o.round;
+    h += `<div class="card" id="roundcard" data-kind="${r.kind}"><h3 class="caps">${r.kind === "finish" ? `${esc(o.name)} is knocked: finish them!` : r.kind === "skirm" ? "Showdown!" : "Fight!"}</h3>
+      <p class="keys"><kbd>←</kbd><kbd>→</kbd> move &nbsp; <kbd>↑</kbd> jump &nbsp; <kbd>J</kbd> shoot &nbsp; <kbd>K</kbd> build a wall${S.items.boogie ? " &nbsp; <kbd>B</kbd> Boogie Bomb" : ""}</p>
+      <p class="tip">The crosshair sweeps up and down. Shoot when it turns <b style="color:#e03131">red</b> over the head for a <b>headshot</b>: double damage. A red line means ${esc(o.name)} is aiming: jump or build. A grenade? Move or jump clear.${r.kind === "skirm" ? " In a reading showdown the bars only come off with right answers, but every hit charges your shield." : ""} The showdown can’t knock you out: only wrong answers can.</p></div>`;
+  } else if (mode === "roundover") {
+    const r = o.roundOut, label = o.dead ? (o.boss ? "Victory Royale ▶" : o.chestDue ? "Something’s glowing… ▶" : "Back to the island ▶") : o.chestDue ? "Something’s glowing… ▶" : "Next question ▶";
+    const acc = r.shots ? Math.round(100 * r.hits / r.shots) : 0;
+    h += `<div class="card" id="roundover" data-hits="${r.hits}" data-heads="${r.heads}"><h3 class="caps">${o.dead ? `${esc(o.name)} is eliminated!` : r.kind === "skirm" ? "Showdown over" : "Reload!"}</h3>
+      <div class="rstats"><span><b>${r.hits}/${r.shots}</b> hits (${acc}%)</span><span><b>${r.heads}</b> headshot${r.heads === 1 ? "" : "s"}</span>${r.kind === "fight" ? `<span><b>${r.dmg}</b> damage</span>` : ""}${r.siphon ? `<span><b>+${r.siphon}</b> shield</span>` : ""}${r.blocked ? `<span><b>${r.blocked}</b> blocked</span>` : ""}${r.taken ? `<span><b>−${r.taken}</b> taken</span>` : ""}</div>
+      <p>${o.dead ? (o.boss ? "You beat the boss!" : "Great fighting.") : rd ? `${o.hp} bar${o.hp === 1 ? "" : "s"} still to knock off: a new passage is coming.` : `${esc(o.name)} has ${o.hp} health left. Answer the next question to reload.`}</p>
+      <div class="next"><button class="btn" id="next">${label}</button></div></div>`;
   } else if (mode === "offer") {
     h += `<div class="card chestcard" id="chest"><img class="chestimg" src="art/chest.webp" alt="A treasure chest"><h3 class="caps">You found a chest!</h3>
       <p>To open it, answer one <b>${KIND[ch.kind].label.toLowerCase()}</b> question. Get it right for a Fortnite power-up. Get it wrong and the lock holds, but nothing else happens.</p>
@@ -3270,19 +3683,10 @@ function battle(fx) {
     if (won) h += `<div class="lootreveal" style="--rar:${lt.col}" id="loot" data-loot="${lt.id}"><div class="got">The chest bursts open! You got:</div>${pic(lt.img, "")}<span class="rarity">${lt.rar}</span><b class="nm">${lt.name}</b><div class="what">${ch.got || lt.what}</div></div>`;
     h += `<div class="qhead"><span>🎁 Chest · ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, ch.chosen)}`;
     if (ch.chosen !== null) {
-      const ok = ch.chosen === q.answer, l = LOOT.find(x => x.id === ch.loot);
+      const ok = ch.chosen === q.answer;
       h += ok ? `<div class="fb good"><h4>Right! That’s how the chest opened.</h4>${q.explain}</div>`
         : `<div class="fb miss"><h4>The lock holds. No loot this time.</h4><p>The answer was <b>${LETTERS[q.answer]}</b>.</p>${q.explain}</div>`;
       h += `<div class="next"><button class="btn" id="next">${o.dead ? (o.boss ? "Victory Royale ▶" : "Back to the island ▶") : "Back to the fight ▶"}</button></div>`;
-    }
-    h += `</div>`;
-  } else if (mode === "threat") {
-    h += `<div class="card threat" id="threat" data-move="${th.move}"><div class="cue">${CUEPIC[th.move]}<span>${esc(th.text)}</span></div>`;
-    if (!th.chosen) {
-      h += `<p class="sub">What do you do?</p><div class="counters">${COUNTERS.map(({ id, name }) => `<button class="counter" data-counter="${id}">${ICON[id]}<span>${name}</span></button>`).join("")}${S.items.boogie ? `<button class="counter boog" data-counter="boogie">${pic("boogie", "")}<span>Boogie Bomb ×${S.items.boogie}</span></button>` : ""}</div>`;
-    } else {
-      h += `<div class="fb ${th.good ? "good" : "miss"}"><h4>${th.good ? "Nice move!" : "Ouch!"}</h4><p>${th.res}</p>${th.good ? "" : `<p class="why-not">Tip: build a wall against shots, jump clear of grenades, and rush in when they stop to heal.</p>`}</div>
-        <div class="next"><button class="btn" id="next">${over ? "Eliminated ▶" : o.dead ? (o.boss ? "Victory Royale ▶" : `${esc(o.name)} is eliminated! Back to the island ▶`) : "Shoot again ▶"}</button></div>`;
     }
     h += `</div>`;
   }
@@ -3291,46 +3695,47 @@ function battle(fx) {
   M.fx = { killed: [] }; M.feedNew = 0;
   save();
   wireCommon();
-  if (fx) {
+  if (fx && !fighting) {
     const add = (txt, cls) => { const f = document.createElement("div"); f.className = "float " + cls; f.textContent = txt; $(".arena").appendChild(f); };
-    if (fx.hit) { add((fx.head ? "HEADSHOT! −" : "−") + fx.dmg, "onfoe" + (fx.head ? " head" : "")); $("#enemy").classList.add("hit"); }
-    if (fx.hit === false && fx.dmg) { add((fx.miss ? "MISS! −" : "−") + fx.dmg, "onme"); $("#hero").classList.add("hit"); }
+    if (fx.hit && fx.load) add("+" + fx.load + " shots", "onme load");
+    if (fx.hit && fx.bar) { add("−1 bar", "onfoe"); $("#enemy").classList.add("hit"); }
+    if (fx.hit === false && fx.dmg) { add("MISS! −" + fx.dmg, "onme"); $("#hero").classList.add("hit"); }
     if (fx.hit === false && !fx.dmg && fx.bush) add("Hidden!", "onme safe");
-    if (fx.heal) add("+" + fx.heal, "onfoe heal");
-    if (fx.anim === "dance") add("Boogie!", "onfoe safe");
     if (fx.loot) add("+ " + fx.loot + "!", "onme loot");
   }
-  $("#back").onclick = () => { if (mode === "idle") home(); };
-  const shoot = () => { if (!(mode === "idle" && !o.dead && M.hp > 0)) return; nextQ(o); battle(); const c = $("#qcard"); if (c && window.innerWidth < 821) c.scrollIntoView({ behavior: "smooth", block: "start" }); };
-  $("#shoot").onclick = shoot; $("#enemy").onclick = shoot;
-  $("#usemed").onclick = () => { if (S.items.med && M.hp < MAXHP && M.hp > 0) { S.items.med--; M.hp = Math.min(MAXHP, M.hp + 50); beep(SND.buy); battle(); } };
-  $("#useshield").onclick = () => { if (S.items.shield && M.shield < MAXSH && M.hp > 0) { S.items.shield--; M.shield = Math.min(MAXSH, M.shield + 50); beep(SND.buy); battle(); } };
+  $("#back").onclick = () => { if (!canLeave) return; o.roundOut = null; o.chestDue = false; home(); };
+  const go = () => { if (!(mode === "idle" && !o.dead && M.hp > 0)) return; nextQ(o); battle(); const c = $("#qcard"); if (c && window.innerWidth < 821) c.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  $("#shoot").onclick = go; const en = $("#enemy"); if (en) en.onclick = go;
+  $("#usemed").onclick = () => { if (S.items.med && M.hp < MAXHP && M.hp > 0 && !o.round) { S.items.med--; M.hp = Math.min(MAXHP, M.hp + 50); beep(SND.buy); battle(); } };
+  $("#useshield").onclick = () => { if (S.items.shield && M.shield < MAXSH && M.hp > 0 && !o.round) { S.items.shield--; M.shield = Math.min(MAXSH, M.shield + 50); beep(SND.buy); battle(); } };
   $("#usebush").onclick = () => { if (S.items.bush && !M.bush && mode === "idle") { S.items.bush--; M.bush = true; beep(SND.buy); battle(); } };
   if (mode === "q") app.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(Number(b.dataset.i)));
   if (mode === "chestq") app.querySelectorAll(".opt").forEach(b => b.onclick = () => chestAnswer(Number(b.dataset.i)));
-  app.querySelectorAll("[data-counter]").forEach(b => b.onclick = () => counter(b.dataset.counter));
   const on = (sel, fn) => { const e = $(sel); if (e) e.onclick = fn; };
   on("#chestopen", () => { M.chest.phase = "q"; M.chest.ref = pickQ(M.chest.kind, Math.min(M.stage, 4), M); M.chest.chosen = null; beep(SND.chest); battle(); });
   on("#chestleave", () => { M.chest = null; proceed(); });
   on("#next", next);
+  if (fighting) {
+    const cv = $("#pix"); if (cv) cv.scrollIntoView({ block: "nearest" });
+    ARENA.start(o, o.round, out => { o.round = null; o.roundOut = out; if (!o.dead) others(rnd(2)); save(); battle(); const c = $("#roundover"); if (c && window.innerWidth < 821) c.scrollIntoView({ block: "center" }); });
+  }
 }
 function answer(i) {
   const M = S.match, o = M.opps[M.cur], pend = o.pending;
   if (!pend || pend.chosen !== null) return;
-  const q = resolve(pend.ref), ok = i === q.answer;
+  const q = resolve(pend.ref), ok = i === q.answer, rd = o.kind === "reading" && !o.boss;
   record(pend.ref, ok);
   pend.chosen = i;
   let fx;
   if (ok) {
     M.hits++; M.streak++;
-    const rd = o.kind === "reading", head = !rd && M.streak % 3 === 0, dmg = rd ? 1 : gun().dmg * (head ? 2 : 1);   // reading: one bar for each right answer
-    o.hp = Math.max(0, o.hp - dmg); fx = { hit: true, dmg, head }; beep(head ? SND.head : SND.hit);
+    if (rd) { o.hp = Math.max(0, o.hp - 1); o.passRight = (o.passRight || 0) + 1; fx = { hit: true, bar: true }; }   // reading: one bar for each right answer
+    else fx = { hit: true, load: 5 };
+    beep(SND.hit);
     others(rnd(3));
-    if (o.hp <= 0) foeDown(o);
     M.sinceChest++;
-    pend.chest = !(o.dead && o.boss) && Math.random() < Math.min(1, 0.12 * M.sinceChest);   // more likely the longer it has been since the last chest
+    pend.chest = Math.random() < Math.min(1, 0.12 * M.sinceChest);   // more likely the longer it has been since the last chest
     if (pend.chest) M.sinceChest = 0;
-    if (!o.dead) { const mv = ["shoot", "grenade", "heal"][rnd(3)], says = MOVES[mv].says; pend.threat = { move: mv, text: says[rnd(says.length)].replace("{n}", o.name), chosen: null }; }
   } else {
     M.misses++; M.streak = 0;
     if (M.bush) { M.bush = false; fx = { hit: false, dmg: 0, bush: true, miss: true }; }
@@ -3338,37 +3743,12 @@ function answer(i) {
     others(rnd(2));
     beep(M.hp <= 0 ? SND.ko : SND.miss);
   }
-  pend.out = { dmg: fx.dmg, head: fx.head, bush: fx.bush };
+  /* what the answer loads: a fight round after every thinking or maths question; one showdown after a whole reading passage */
+  pend.round = rd ? (o.queue.length ? null : o.hp <= 0 ? { kind: "finish", ammo: 0, walls: 3 } : { kind: "skirm", ammo: Math.max(2, 2 * (o.passRight || 0)), walls: 3 })
+    : { kind: "fight", ammo: ok ? 5 : 2, walls: ok ? 3 : 1 };
+  pend.out = { dmg: fx.dmg, bush: fx.bush };
   battle(fx);
   const fb = $(".fb"); if (fb && window.innerWidth < 821) fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
-}
-function counter(c) {
-  const M = S.match, o = M.opps[M.cur], th = o.threat;
-  if (!th || th.chosen) return;
-  if (c === "boogie" && !S.items.boogie) return;
-  th.chosen = c;
-  const mv = MOVES[th.move], fx = { anim: c, move: th.move };
-  if (c === "boogie") {
-    S.items.boogie--; th.good = true; fx.anim = "dance";
-    th.res = `You throw a Boogie Bomb. ${esc(o.name)} can’t stop dancing, so the move never happens!`;
-  } else if (c === mv.counter) {
-    th.good = true;
-    if (th.move === "heal" && o.kind === "reading") th.res = `You rush in and stop ${esc(o.name)} healing!`;   // a reading fight always needs every question
-    else if (th.move === "heal") {
-      o.hp = Math.max(0, o.hp - RUSH_DMG); fx.hit = true; fx.dmg = RUSH_DMG;
-      th.res = mv.good.replace("{n}", esc(o.name)).replace("{d}", RUSH_DMG);
-      if (o.hp <= 0) foeDown(o);
-    } else th.res = mv.good;
-    beep(SND.hit);
-  } else {
-    th.good = false;
-    if (th.move === "heal" && o.kind === "reading") { o.hp++; o.max = Math.max(o.max, o.hp); fx.heal = 1; th.res = `${mv.bad[c].replace("{n}", esc(o.name))} ${esc(o.name)} gets a bar back: one more question to answer.`; }
-    else if (th.move === "heal") { o.hp = Math.min(o.max, o.hp + FOE_HEAL); fx.heal = FOE_HEAL; th.res = `${mv.bad[c].replace("{n}", esc(o.name))} +${FOE_HEAL} health for ${esc(o.name)}.`; }
-    else { const d = STAGE[o.stage].slip; hurt(M, d); fx.hit = false; fx.dmg = d; th.res = `${mv.bad[c]} −${d} health.`; }
-    beep(M.hp <= 0 ? SND.ko : SND.miss);
-  }
-  others(rnd(2));
-  battle(fx);
 }
 function rollLoot() { let r = rnd(100); for (const l of LOOT) { if (r < l.w) return l; r -= l.w; } return LOOT[0]; }
 function chestAnswer(i) {
@@ -3399,16 +3779,19 @@ function next() {
   if (o.pending && o.pending.chosen !== null) {
     const p = o.pending; o.pending = null;
     if (M.hp <= 0) return knockedOut();
-    if (p.chest) M.chest = { phase: "offer", kind: chestKind(o) };
-    if (p.threat) o.threat = p.threat;
+    if (p.chest) o.chestDue = true;
+    if (p.round) { o.round = p.round; if (o.kind === "reading") o.passRight = 0; return battle(); }
+  } else if (o.roundOut) {
+    o.roundOut = null;
+    if (o.chestDue) { o.chestDue = false; if (!(o.dead && o.boss)) M.chest = { phase: "offer", kind: chestKind(o) }; }
   } else if (M.chest && M.chest.phase === "q" && M.chest.chosen !== null) M.chest = null;
-  else if (o.threat && o.threat.chosen) { o.threat = null; if (M.hp <= 0) return knockedOut(); }
   proceed();
 }
 function proceed() {
   const M = S.match, o = M.opps[M.cur];
   window.scrollTo(0, 0);
-  if (M.chest || o.threat || !o.dead) return battle();
+  if (M.chest || o.round || o.roundOut) return battle();
+  if (!o.dead) { if (!o.pending) nextQ(o); return battle(); }   // straight on to the next question
   if (o.boss) return victory();
   home();
 }
@@ -3432,7 +3815,7 @@ if (PRACTICE) {
     const M = S.match;
     if (M.phase === "bus") land(landNear([50, 50], 40));
     const q = resolve(ref), o = M.opps.find(x => !x.boss && x.kind === q.kind);
-    M.opps.forEach(x => { x.dead = false; x.hp = x.max; x.pending = null; x.threat = null; }); M.chest = null; M.hp = MAXHP; M.cur = M.opps.indexOf(o);
+    M.opps.forEach(x => { x.dead = false; x.hp = x.max; x.pending = null; x.round = null; x.roundOut = null; }); M.chest = null; M.hp = MAXHP; M.cur = M.opps.indexOf(o);
     if (q.kind === "reading") { o.pid = q.pid; o.queue = []; }
     o.pending = { ref, chosen: null };
     battle();

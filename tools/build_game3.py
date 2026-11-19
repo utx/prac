@@ -2,6 +2,7 @@
 """Build the battle game (Storm Island) at prac3/index.html.
 
 game3/template.html is the engine (island map, storm circles, battles, shop, Fortnite time);
+game3/arena.js is the side-on showdown after each answer;
 game3/content/*.js hold the questions: 00_lib.js (drawing helpers), generators.js (templates
 that redraw themselves with new numbers) and reading.js, thinking.js, maths.js (hand-written).
 Never hand-edit prac3/index.html: change the sources and run this (tools/build.py runs it too).
@@ -16,7 +17,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 def main():
     files = sorted((ROOT / "game3" / "content").glob("*.js"))   # 00_lib.js sorts first
     content = "\n".join(p.read_text(encoding="utf-8") for p in files)
-    page = (ROOT / "game3" / "template.html").read_text(encoding="utf-8").replace("/*__CONTENT__*/", content)
+    page = (ROOT / "game3" / "template.html").read_text(encoding="utf-8").replace("/*__CONTENT__*/", content).replace("/*__ARENA__*/", (ROOT / "game3" / "arena.js").read_text(encoding="utf-8"))
     dest = ROOT / "prac3" / "index.html"
     dest.parent.mkdir(exist_ok=True)
     dest.write_text(page, encoding="utf-8")
