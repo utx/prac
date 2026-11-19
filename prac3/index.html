@@ -3446,8 +3446,13 @@ const WEAPONS = ["with a Pump Shotgun", "with an Assault Rifle", "with a Sniper 
 const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
 const FRESH = () => ({ coins: 0, crowns: 0, guns: { pistol: 1 }, gun: "pistol", items: { med: 1, shield: 0, boogie: 0, bush: 0 }, skin: "jonesy", q: {}, seq: 1, n: 0, match: null, last: null,
   time: { cap: 60, capSet: false, days: {}, used: 0 }, stats: { wins: 0, kos: 0, elims: 0, lootCoins: 0 }, sound: true });
+const PKEY = "prac3.practice.seen";
 function load() {
-  if (PRACTICE) { const s = FRESH(); s.coins = 5000; GUNS.forEach(g => s.guns[g.id] = 1); s.items = { med: 3, shield: 3, boogie: 3, bush: 3 }; s.crowns = 20; return s; }
+  if (PRACTICE) {
+    const s = FRESH(); s.coins = 5000; GUNS.forEach(g => s.guns[g.id] = 1); s.items = { med: 3, shield: 3, boogie: 3, bush: 3 }; s.crowns = 20;
+    try { const p = JSON.parse(localStorage.getItem(PKEY)); if (p && p.q) { s.q = p.q; s.seq = p.seq || 1; } } catch (e) {}   // practice remembers only which questions were seen
+    return s;
+  }
   try {
     const s = JSON.parse(localStorage.getItem(KEY));
     if (s && s.guns) {
@@ -3461,7 +3466,7 @@ function load() {
   return FRESH();
 }
 let S = load();
-const save = () => { if (PRACTICE) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const save = () => { try { if (PRACTICE) localStorage.setItem(PKEY, JSON.stringify({ q: S.q, seq: S.seq })); else localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 const earnedToday = () => S.time.days[today()] || 0;
 const earnedAll = () => Object.values(S.time.days).reduce((a, b) => a + b, 0);
@@ -3513,32 +3518,42 @@ function resolve(ref) {
   if (ref.t === "g") { const g = GEN[ref.id]; return Object.assign({ id: "g:" + g.id, cat: g.cat, kind: g.kind }, g.make(rng(ref.seed))); }
   return HAND[ref.id];
 }
-const lastUsed = k => (S.q[k] && S.q[k].t) || 0;
-/* least recently used first: questions never seen come first, then ones missed, then the oldest right answers */
+/* Seen = done (David, Nov 2026: "flag a question as done and don't repeat it"). A question (or a template, or a reading passage)
+   is marked the moment it is shown, answered or not, and isn't asked again while anything unseen is left: first in its own
+   storm circle, then in the circles next to it. Only when every one has been seen do they come round again, the one seen
+   longest ago first, templates first (they come back with new numbers). Older saves only have answer times: those count as seen. */
+const seenAt = k => { const r = S.q[k]; return !r ? 0 : r.s || r.t || (r.r || r.w ? 1 : 0); };
+function markSeen(k) { const r = S.q[k] || (S.q[k] = { r: 0, w: 0, t: 0 }); r.s = ++S.seq; save(); }
+const NEAR = { 1: [1, 2], 2: [2, 1, 3], 3: [3, 2, 4], 4: [4, 3] };
+const qpool = (kind, tier) => [...(kind === "thinking" ? THINKING : MATHS).filter(q => q.tier === tier).map(q => ({ t: "h", id: q.id })),
+  ...GENS.filter(g => g.kind === kind && (g.tier === tier || (tier === 4 && g.tier === 3))).map(g => ({ t: "g", id: g.id }))];
+const unseenQ = (kind, tier) => qpool(kind, tier).filter(r => !seenAt(qkey(r)));
 function pickQ(kind, tier, M) {
-  const hand = (kind === "thinking" ? THINKING : MATHS).filter(q => q.tier === tier).map(q => ({ t: "h", id: q.id }));
-  const gens = GENS.filter(g => g.kind === kind && (g.tier === tier || (tier === 4 && g.tier === 3))).map(g => ({ t: "g", id: g.id }));
-  let c = [...hand, ...gens];
-  const fresh = c.filter(r => !M.asked.includes(qkey(r)));
-  if (fresh.length) c = fresh;
-  c = shuffle(c).sort((a, b) => lastUsed(qkey(a)) - lastUsed(qkey(b)));
+  let c = null;
+  for (const t of NEAR[tier]) { const f = unseenQ(kind, t).filter(r => !M.asked.includes(qkey(r))); if (f.length) { c = shuffle(f); break; } }
+  if (!c) {   // everything has been seen: the ones seen longest ago come round again
+    c = qpool(kind, tier); const f = c.filter(r => !M.asked.includes(qkey(r))); if (f.length) c = f;
+    c = shuffle(c).sort((a, b) => (a.t === "g" ? 0 : 1) - (b.t === "g" ? 0 : 1) || seenAt(qkey(a)) - seenAt(qkey(b))).slice(0, 6);
+  }
   /* variety: don't ask the same type of question twice in a row if another type is waiting */
   const catOf = r => r.t === "g" ? (GENS.find(g => g.id === r.id) || {}).cat : (HAND[r.id] || {}).cat;
   M.lastCat = M.lastCat || {};
   const ref = c.find(r => catOf(r) !== M.lastCat[kind]) || c[0];
   M.lastCat[kind] = catOf(ref);
   if (ref.t === "g") ref.seed = rnd(2 ** 31);
-  M.asked.push(qkey(ref));
+  M.asked.push(qkey(ref)); markSeen(qkey(ref));
   return ref;
 }
 function pickPassage(tier, M, not) {
-  let c = READING.filter(p => p.tier === tier && p.id !== not);
-  const fresh = c.filter(p => !M.asked.includes("p:" + p.id));
-  if (fresh.length) c = fresh;
-  c = shuffle(c).sort((a, b) => lastUsed("p:" + a.id) - lastUsed("p:" + b.id));
+  let c = null;
+  for (const t of NEAR[Math.min(tier, 3)].filter(t => t < 4)) { const f = READING.filter(p => p.tier === t && p.id !== not && !seenAt("p:" + p.id) && !M.asked.includes("p:" + p.id)); if (f.length) { c = shuffle(f); break; } }
+  if (!c) {
+    c = READING.filter(p => p.tier === tier && p.id !== not); const f = c.filter(p => !M.asked.includes("p:" + p.id)); if (f.length) c = f;
+    c = shuffle(c).sort((a, b) => seenAt("p:" + a.id) - seenAt("p:" + b.id));
+  }
   const p = c[0], st = S.q["p:" + p.id] || (S.q["p:" + p.id] = { t: 0, start: 0 });
   const ids = p.questions.map(q => q.id), k = (st.start || 0) % ids.length;
-  st.t = ++S.seq; M.asked.push("p:" + p.id);
+  st.t = ++S.seq; M.asked.push("p:" + p.id); markSeen("p:" + p.id);
   return { pid: p.id, queue: [...ids.slice(k), ...ids.slice(0, k)] };
 }
 function nextQ(o) {
@@ -3561,7 +3576,8 @@ function nextQ(o) {
 }
 function record(ref, ok) {
   const key = qkey(ref), rec = S.q[key] || (S.q[key] = { r: 0, w: 0, t: 0 });
-  if (ok) { rec.r++; rec.t = ++S.seq; } else { rec.w++; rec.t = 1; }
+  if (ok) rec.r++; else rec.w++;
+  rec.t = ++S.seq;
 }
 /* a chest always asks a different kind of question from the opponent's (thinking or maths: a reading question needs a whole passage) */
 const chestKind = o => o.boss ? (o.lastKind === "maths" ? "thinking" : "maths") : o.kind === "reading" ? (rnd(2) ? "thinking" : "maths") : o.kind === "thinking" ? "maths" : "thinking";
@@ -4223,11 +4239,14 @@ function parentsHtml() {
     c.r += v.r || 0; c.w += v.w || 0;
   }
   const rows = Object.keys(cats).sort().map(k => `<tr><td>${esc(k)}</td><td class="n">${cats[k].r}</td><td class="n">${cats[k].w}</td></tr>`).join("");
+  const left = kind => { let n = 0, all = 0; for (const t of [1, 2, 3, 4]) { all += qpool(kind, t).length; n += unseenQ(kind, t).length; } return `${n} of ${all}`; };
+  const pleft = `${READING.filter(p => !seenAt("p:" + p.id)).length} of ${READING.length}`;
   return `<details class="parents" id="parents"><summary>For grown-ups: Fortnite time and progress</summary>
     <p><b>Fortnite time.</b> Each storm circle cleared earns time: 15 minutes for circle 1, 20 for circle 2 and 25 for circle 3, so reaching the boss earns the full hour. Beating the boss earns a crown and coins, not more time. Earnings stop at the daily limit. Earned so far: ${mins(earnedAll())}. Recorded as used: ${mins(S.time.used)}. <b>Ready to use: <span id="bal">${mins(balance())}</span></b>.</p>
     <div class="row"><label for="cap">Daily limit (minutes):</label> <input id="cap" type="number" min="5" max="180" step="5" value="${S.time.cap}"> <button class="btn small ghost" id="capsave">Save</button></div>
     <div class="row">Record time used: ${[5, 10, 15, 30].map(m => `<button class="btn small ghost" data-used="${m}">${m} min</button>`).join(" ")} <button class="btn small ghost" data-used="all">All of it</button> <button class="btn small ghost" data-used="undo">Undo all</button></div>
     <p>Victory Royales: ${S.stats.wins}. Times eliminated: ${S.stats.kos}. Every question gets one go and no hints; after each answer the explanation is shown. Chests ask a thinking or maths question, never the same kind as the opponent.</p>
+    <p id="newleft"><b>Questions not seen yet:</b> thinking ${left("thinking")}, maths ${left("maths")}, reading passages ${pleft}. A question counts as done the first time it is shown and is not asked again until every one has been seen; a template counts once, though it comes with new numbers each time.</p>
     ${rows ? `<table><tr><th>Question type</th><th class="n">Right</th><th class="n">Missed</th></tr>${rows}</table>` : `<p>No questions answered yet.</p>`}
     <p>Progress is saved only in this browser on this device.</p>
     <div class="row"><button class="btn small ghost" id="reset">Start the whole game again</button></div></details>`;
@@ -4467,7 +4486,9 @@ if (PRACTICE) {
     o.pending = { ref, chosen: null };
     battle();
   };
-  window.__debug = { newMatch, landAt, STAGE, BOTS_AFTER, START, GAP, state: () => S };
+  window.__debug = { newMatch, landAt, STAGE, BOTS_AFTER, START, GAP, state: () => S,
+    pick: (kind, tier) => qkey(pickQ(kind, tier, { asked: [] })), unseen: (kind, tier) => unseenQ(kind, tier).length,
+    pickP: tier => pickPassage(tier, { asked: [] }).pid, unseenP: tier => READING.filter(p => p.tier === tier && !seenAt("p:" + p.id)).length };
 }
 
 /* ---------- start ---------- */

@@ -616,6 +616,18 @@ function checkLayout(M, where, GAP) {
       if (ref.t === "h" && q.gap && !(await page.$(".gap.cur"))) bad(`${label}: ${ref.id} does not highlight its gap`);
       if (shots && (ref.t === "g" ? ref.seed === 11 : /svg|table/.test(q.stem + q.options.join("")) || /^r\d[a]$/.test(ref.id))) await page.screenshot({ path: path.join(shots, `game3-q-${ref.id}-${label}.png`), fullPage: true });
     }
+    /* seen = done (David, Nov 2026): no question, template or passage comes back while an unseen one is left, even in a new match, and the list survives a reload */
+    if (label === "desktop") {
+      const r = await page.evaluate(() => { const D = window.__debug, out = {};
+        for (const kind of ["thinking", "maths"]) { const n = D.unseen(kind, 1) + D.unseen(kind, 2), keys = []; for (let i = 0; i < n; i++) keys.push(D.pick(kind, 1)); out[kind] = { n, uniq: new Set(keys).size, left: D.unseen(kind, 1) + D.unseen(kind, 2), again: D.pick(kind, 1) }; }
+        const n = D.unseenP(1) + D.unseenP(2), ps = []; for (let i = 0; i < n; i++) ps.push(D.pickP(1)); out.reading = { n, uniq: new Set(ps).size, left: D.unseenP(1) + D.unseenP(2) };
+        return out; });
+      for (const [k, v] of Object.entries(r)) if (!v.n || v.uniq !== v.n || v.left) bad(`seen questions: ${k} repeated before every unseen one was used (${JSON.stringify(v)})`);
+      await page.reload();
+      if (await page.evaluate(() => window.__debug.unseen("thinking", 1))) bad("seen questions: the list of seen questions was lost on reload");
+      await page.click("#parents summary").catch(() => {});
+      if (!(await page.$("#newleft"))) bad("the grown-ups panel should say how many questions are not seen yet");
+    }
     if (await page.evaluate(() => localStorage.getItem("prac3.v1")) !== real) bad("practice mode changed the saved progress");
     errors.forEach(e => bad(`practice ${label}: page error: ${e}`));
     await ctx.close();
