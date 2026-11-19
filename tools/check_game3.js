@@ -280,6 +280,7 @@ function checkLayout(M, where, GAP) {
   for (const [label, width, height] of [["desktop", 1200, 900], ["phone", 390, 800]]) {
     const ctx = await browser.newContext({ viewport: { width, height } });
     const page = await ctx.newPage();
+    await page.clock.setFixedTime(new Date("2026-11-18T10:00:00"));   // one calendar day for the whole run, even across midnight (the daily Fortnite limit)
     const errors = [];
     page.on("pageerror", e => errors.push(String(e)));
     page.on("console", m => { if (m.type() === "error") errors.push(m.text()); });
