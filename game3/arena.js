@@ -22,7 +22,10 @@ const ARENA = (() => {
   let R = null, acc = 0, last = 0;
   /* our own 3D fighters, rendered in Blender (game3/art/fighters.py) and packed 8 x 5 into one sheet each */
   const FRAME = { w: 144, h: 192, cols: 8, fx: 62, fy: 172, body: 122 };
-  const ANIM = { idle: [0, 4], run: [4, 8], jump: [12, 3], shoot: [15, 3], hit: [18, 2], build: [20, 3], heal: [23, 4], dance: [27, 8], knocked: [35, 4], ko: [39, 1] };
+  const ANIM = { idle: [0, 4], run: [4, 8], jump: [12, 3], shoot: [15, 3], hit: [18, 2], build: [20, 3], heal: [23, 4], dance: [27, 8], knocked: [35, 4], ko: [39, 1],
+    robot: [40, 6], runman: [46, 6], disco: [52, 6], jacks: [58, 6], spin: [64, 6] };
+  /* emotes (David, Nov 2026): classic everyday dance moves; keys 1 to 5, or E for a random one */
+  const EMOTES = [["robot", "The Robot"], ["runman", "Running Man"], ["disco", "Disco Point"], ["jacks", "Star Jumps"], ["spin", "Spin & Pose"]];
   const SPRITE = { reading: "ranger", thinking: "knight", maths: "robot", boss: "king" };
   const HERO = { "#8a94a6": "hero-common", "#2f8fff": "hero-rare", "#a34dff": "hero-epic", "#ffb21a": "hero-legendary" };
   const IMG = {};
@@ -33,6 +36,7 @@ const ARENA = (() => {
     if (f.state === "ko") a = "ko";
     else if (f.state === "knocked") { a = "knocked"; k = Math.floor(f.t / 12); }
     else if (f.state === "dance") { a = "dance"; k = Math.floor(f.t / 6); }
+    else if (f.state === "emote" || f.emoteT > 0) { a = f.emote; k = Math.floor(f.t / 7); }
     else if (f.state === "heal") { a = "heal"; k = Math.floor(f.t / 12); }
     else if (f.hitT > 0) { a = "hit"; k = f.hitT > 7 ? 0 : 1; }
     else if (!f.ground) { a = "jump"; k = f.vy < -2 ? 0 : f.vy < 2 ? 1 : 2; }
@@ -175,7 +179,8 @@ const ARENA = (() => {
     if (F.state === "throw") text(ctx, "!", F.x, F.y - 58 * F.scale, 18, "#ffa94d");
     R.nades.forEach(g => { ctx.fillStyle = "#2f3b2f"; ctx.fillRect(Math.round(g.x - 4), Math.round(g.y - 4), 8, 8); ctx.fillStyle = g.fuse > 0 && g.fuse % 8 < 4 ? "#ff4d4d" : "#9be15d"; ctx.fillRect(Math.round(g.x - 1), Math.round(g.y - 6), 3, 3); });
     fighter(ctx, P); fighter(ctx, F);
-    if (F.state === "dance") text(ctx, "♪", F.x + 18, F.y - 60 * F.scale - (R.t % 30) / 3, 16, "#ff8cc6");
+    if (F.state === "dance" || F.state === "emote") text(ctx, "♪", F.x + 18, F.y - 60 * F.scale - (R.t % 30) / 3, 16, "#ff8cc6");
+    if (P.emoteT > 0) text(ctx, "♪", P.x - 18, P.y - 60 * P.scale - (R.t % 30) / 3, 16, "#ff8cc6");
     if (F.state === "heal") { const k = F.st / 100; ctx.fillStyle = "#0d1330"; ctx.fillRect(F.x - 20, F.y - 64 * F.scale, 40, 6); ctx.fillStyle = "#69db7c"; ctx.fillRect(F.x - 19, F.y - 63 * F.scale, Math.round(38 * k), 4); }
     R.bullets.forEach(b => { ctx.fillStyle = b.who === "p" ? (b.head ? "#ffe066" : "#fff3bf") : "#ff8787"; ctx.fillRect(Math.round(b.x - 4), Math.round(b.y - 1), 8, 3); });
     R.parts.forEach(q => { ctx.fillStyle = q.c; ctx.fillRect(Math.round(q.x), Math.round(q.y), q.s, q.s); });
@@ -190,7 +195,7 @@ const ARENA = (() => {
     ctx.restore();
     hud(ctx);
     if (R.banner) text(ctx, R.banner.s, W / 2, 120, R.banner.size || 34, R.banner.c || "#ffe81a");
-    if (R.t < 260 && !R.banner) text(ctx, "← → move   ↑ jump   J shoot   K build" + (S.items.boogie ? "   B boogie" : ""), W / 2, H - 10, 10, "#fff");
+    if (R.t < 260 && !R.banner) text(ctx, "← → move   ↑ jump   J shoot   K build   1–5 dance" + (S.items.boogie ? "   B boogie" : ""), W / 2, H - 10, 10, "#fff");
   }
 
   /* ---------- the fight ---------- */
@@ -246,6 +251,11 @@ const ARENA = (() => {
     if (isP) R.walls--; else R.foeWalls--;
     f.buildT = 18; R.wallsUp.push({ who, x, hp: 3 }); burst(x, GROUND - 30, "#c98a4b", 10); beep([[330, .05], [440, .05]]);
   }
+  function emote(f, which) {
+    const i = which === "r" ? rnd(EMOTES.length) : Math.max(0, Math.min(EMOTES.length - 1, which - 1));
+    f.emote = EMOTES[i][0]; f.emoteT = 150; f.t = 0;
+    float(EMOTES[i][1] + "!", f.x, f.y - 92 * f.scale / 1.75, "#ff8cc6", 13); beep([[659, .07], [784, .07], [988, .1]]);
+  }
   function boogie() {
     const F = R.F;
     if (!S.items.boogie || F.state === "dance" || F.state === "ko" || R.kind === "finish") return;
@@ -257,6 +267,7 @@ const ARENA = (() => {
     if (F.state === "hold") { F.vx = 0; return; }   // only used by the checks
     if (F.state === "knocked") { F.vx = F.x < 440 ? 0.25 : 0; return; }
     if (F.state === "dance") { F.vx = 0; if (--F.st <= 0) { F.state = "move"; F.cd = 30; } return; }
+    if (F.state === "emote") { F.vx = 0; if (++F.st >= 110) { F.state = "move"; F.cd = 40; } return; }
     if (F.state === "heal") { F.vx = 0; if (++F.st >= 100) { const h = Math.min(10, o.max - o.hp); o.hp += h; F.state = "move"; F.cd = 60; float("+" + h, F.x, F.y - 70, "#69db7c", 15); } return; }
     if (F.state === "aim") {
       F.vx = 0; if (++F.st >= F.aimLen) {
@@ -280,9 +291,10 @@ const ARENA = (() => {
     if (incoming && Math.random() < 0.006 * s) build("f");
     if (--F.cd <= 0) {
       const r = Math.random(), canHeal = o.kind !== "reading" && !o.boss ? o.hp < o.max : o.boss && o.hp < o.max;
-      if (r < 0.5) { F.state = "aim"; F.st = 0; F.aimLen = 60 - 6 * s; F.lockY = P.y - 26 * P.scale; }
-      else if (r < 0.8) { F.state = "throw"; F.st = 0; }
-      else if (canHeal && R.kind === "fight") { F.state = "heal"; F.st = 0; }
+      if (r < 0.45) { F.state = "aim"; F.st = 0; F.aimLen = 60 - 6 * s; F.lockY = P.y - 26 * P.scale; }
+      else if (r < 0.72) { F.state = "throw"; F.st = 0; }
+      else if (r < 0.86 && canHeal && R.kind === "fight") { F.state = "heal"; F.st = 0; }
+      else if (r < 0.96) { const e = EMOTES[rnd(EMOTES.length)]; F.state = "emote"; F.emote = e[0]; F.st = 0; F.t = 0; float(e[1] + "!", F.x, F.y - 92 * F.scale / 1.75, "#ff8cc6", 13); }   // a taunt: a free shot for you
       else F.cd = 40;
     }
   }
@@ -299,10 +311,15 @@ const ARENA = (() => {
     /* you */
     P.vx = 0;
     if (live) {
-      if (KEYS.left) P.vx = -2.4; if (KEYS.right) P.vx = 2.4;
-      if (KEYS.jump && P.ground) { P.vy = -6.8; P.ground = false; }
-      if (KEYS.shoot) shoot();
-      if (KEYS.build) { build("p"); KEYS.build = false; }
+      if (KEYS.emote) { if (P.ground) emote(P, KEYS.emote); KEYS.emote = false; }
+      if (P.emoteT > 0 && (KEYS.left || KEYS.right || KEYS.jump || KEYS.shoot || KEYS.build)) P.emoteT = 0;   // moving or shooting stops the dance
+      if (P.emoteT > 0) P.emoteT--;
+      else {
+        if (KEYS.left) P.vx = -2.4; if (KEYS.right) P.vx = 2.4;
+        if (KEYS.jump && P.ground) { P.vy = -6.8; P.ground = false; }
+        if (KEYS.shoot) shoot();
+        if (KEYS.build) { build("p"); KEYS.build = false; }
+      }
       if (KEYS.boogie) { boogie(); KEYS.boogie = false; }
     }
     physics(P); P.x = Math.max(30, Math.min(P.x, F.x - 120));
@@ -358,6 +375,7 @@ const ARENA = (() => {
   }
   /* ---------- keys and buttons ---------- */
   function onKey(e) {
+    if (R && e.type === "keydown" && /^[1-5eE]$/.test(e.key)) { e.preventDefault(); KEYS.emote = /[eE]/.test(e.key) ? "r" : Number(e.key); return; }
     const k = MAP[e.key]; if (!k || !R) return;
     e.preventDefault();
     if (e.type === "keydown") { if (k === "shoot") { KEYS.shoot = true; KEYS.hold = true; } else KEYS[k] = true; }
@@ -367,7 +385,7 @@ const ARENA = (() => {
   function unhook() { window.removeEventListener("keydown", onKey); window.removeEventListener("keyup", onKey); for (const k in KEYS) KEYS[k] = false; }
   function pads() {
     document.querySelectorAll("[data-pad]").forEach(b => {
-      const k = b.dataset.pad, on = e => { e.preventDefault(); if (k === "shoot") { KEYS.shoot = true; KEYS.hold = true; } else KEYS[k] = true; }, off = e => { e.preventDefault(); if (k === "shoot") KEYS.hold = false; else if (k !== "build" && k !== "boogie") KEYS[k] = false; };
+      const k = b.dataset.pad, on = e => { e.preventDefault(); if (k === "shoot") { KEYS.shoot = true; KEYS.hold = true; } else if (k === "emote") KEYS.emote = "r"; else KEYS[k] = true; }, off = e => { e.preventDefault(); if (k === "shoot") KEYS.hold = false; else if (k !== "build" && k !== "boogie" && k !== "emote") KEYS[k] = false; };
       b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointerleave", off);
     });
   }
@@ -388,7 +406,7 @@ const ARENA = (() => {
   /* for tools/check_game3.js only (the browser is driven by Playwright): step frames by hand, read the state, or play a round out instantly */
   if (navigator.webdriver) window.__arena = {
     on: () => !!R, manual: on => { if (R) R.manual = on; }, step: n => { for (let i = 0; i < n && R && !R.done; i++) { tick(); } if (R) draw(); },
-    get: () => R && { sprites: ready(img(`art/fighter-${R.P.sheet}.webp`)) && ready(img(`art/fighter-${R.F.sheet}.webp`)) && ready(img(`../prac2/art/${R.bg}.webp`)), kind: R.kind, ammo: R.ammo, walls: R.walls, t: R.t, P: { x: R.P.x, y: R.P.y }, F: { x: R.F.x, y: R.F.y, state: R.F.state }, wallsUp: R.wallsUp.map(w => ({ who: w.who, hp: w.hp })), stats: Object.assign({}, R.stats), head: inHead(aimY()), bullets: R.bullets.length, nades: R.nades.map(g => ({ x: g.x, fuse: g.fuse })) },
+    get: () => R && { sprites: ready(img(`art/fighter-${R.P.sheet}.webp`)) && ready(img(`art/fighter-${R.F.sheet}.webp`)) && ready(img(`../prac2/art/${R.bg}.webp`)), kind: R.kind, ammo: R.ammo, walls: R.walls, t: R.t, P: { x: R.P.x, y: R.P.y, emote: R.P.emoteT > 0 ? R.P.emote : null }, F: { x: R.F.x, y: R.F.y, state: R.F.state, emote: R.F.state === "emote" ? R.F.emote : null }, wallsUp: R.wallsUp.map(w => ({ who: w.who, hp: w.hp })), stats: Object.assign({}, R.stats), head: inHead(aimY()), bullets: R.bullets.length, nades: R.nades.map(g => ({ x: g.x, fuse: g.fuse })) },
     walls: () => { if (R) R.wallsUp = []; },
     phase: head => { if (!R) return; const b = box(R.F), ok = []; for (let i = 0; i < SWEEP; i++) { R.phase = 2 * Math.PI * i / SWEEP; const y = aimY(); if (head ? inHead(y) : y > b.head + 8 && y < b.bot - 8) ok.push(i); } R.phase = 2 * Math.PI * ok[Math.floor(ok.length / 2)] / SWEEP; },
     foe: (state, extra = {}) => { if (!R) return; Object.assign(R.F, { state, st: 0, vx: 0, cd: 9999 }, extra); if (state === "aim") { R.F.aimLen = 40; R.F.lockY = R.P.y - 26 * R.P.scale; } },
