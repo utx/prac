@@ -126,6 +126,22 @@
 
   /* ---- question ---- */
   .stage { display: grid; gap: 12px; }
+  /* wide screens (laptops and monitors, David Nov 2026: "lots of unused space at the sides"): the arena and items sit in a
+     column beside the question, so a question and its answers fit without scrolling */
+  @media (min-width: 1100px) {
+    .wrap.wide { max-width: 1520px; }
+    .battle { display: grid; grid-template-columns: minmax(400px, 5fr) minmax(0, 7fr); gap: 0 16px; align-items: start; }
+    .battle > .playbar { grid-column: 1 / -1; }
+    .battle > .side { position: sticky; top: 10px; }
+    .battle .side .actions .act { flex-basis: 45%; }
+    .battle .side .act.gun { flex-basis: 100%; }
+    .battle.reading { grid-template-columns: minmax(340px, 4fr) minmax(0, 9fr); }
+    .battle.reading .side .arena { height: 230px; }
+    /* the showdown: a big canvas that still fits the screen's height, the round card beside it */
+    .battle.fighting { grid-template-columns: minmax(0, 1fr) minmax(260px, 330px); }
+    .battle.fighting .arena.pixarena { width: min(100%, calc((100vh - 200px) * 16 / 9)); margin-left: auto; margin-right: auto; }
+  }
+  @media (min-width: 1100px) and (max-width: 1399px) { .battle .stage.has-passage { grid-template-columns: minmax(0, 1fr); } .battle .stage.has-passage .passage { position: static; max-height: none; } }
   .stage.has-passage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   @media (max-width: 820px) { .stage.has-passage { grid-template-columns: minmax(0, 1fr); } }
   .card { background: var(--paper); border-radius: 16px; padding: 16px 18px; min-width: 0; }
@@ -4083,6 +4099,7 @@ function marker(o, i) {
 
 /* ---------- the island (home) ---------- */
 function home() {
+  app.classList.remove("wide");
   const M = S.match;
   if (M) M.cur = null;
   const res = S.last; S.last = null;
@@ -4232,8 +4249,9 @@ function battle(fx) {
   document.documentElement.style.setProperty("--kind", q ? KIND[q.kind].col : k.col);
   const fresh = id => mode === "chestq" && ch.chosen !== null && ch.glow === id ? " fresh" : "";
   const fighting = mode === "round", canLeave = idle || (mode === "roundover" && !o.dead && !over);
-  let h = `<div class="playbar"><button class="pill" id="back" ${canLeave ? "" : "disabled title='Finish this first'"}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="pill" id="alive" data-n="${alive(M)}">👥 ${alive(M)} left</span><span class="spacer" style="flex:1"></span>
+  let h = `<div class="battle${fighting ? " fighting" : ""}${mode === "q" && q.kind === "reading" ? " reading" : ""}"><div class="playbar"><button class="pill" id="back" ${canLeave ? "" : "disabled title='Finish this first'"}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="pill" id="alive" data-n="${alive(M)}">👥 ${alive(M)} left</span><span class="spacer" style="flex:1"></span>
     <button class="pill" id="coins">${pic("coins")} ${S.coins}</button><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>`;
+  h += `<div class="side">`;
   if (fighting) {
     h += `<div class="arena pixarena"><canvas id="pix" width="960" height="540" role="img" aria-label="The showdown with ${esc(o.name)}"></canvas></div>
     <div class="pads"><button data-pad="left" aria-label="Move left">◀</button><button data-pad="right" aria-label="Move right">▶</button><button data-pad="jump" aria-label="Jump">▲ Jump</button>
@@ -4254,6 +4272,7 @@ function battle(fx) {
     <button class="act${fresh("shield")}" id="useshield" style="--rar:#2f8fff" ${!S.items.shield || M.shield >= MAXSH || over || fighting ? "disabled" : ""}>${pic("shieldpotion")}<span><b>Shield ×${S.items.shield}</b><small>+50 shield</small></span></button>
     <button class="act${fresh("bush")}" id="usebush" style="--rar:#3fae2a" ${!S.items.bush || M.bush || !idle ? "disabled" : ""}>${pic("bush")}<span><b>Bush ×${S.items.bush}</b><small>${M.bush ? "Hiding!" : "Hide: a miss costs nothing"}</small></span></button>
   </div>`;
+  h += `</div>`;   // end of the side column
   const showPassage = mode === "q" && q.kind === "reading";
   h += `<div class="stage${showPassage ? " has-passage" : ""}">${showPassage ? passageHtml(o, q) : ""}`;
   if (mode === "idle") {
@@ -4299,7 +4318,8 @@ function battle(fx) {
     }
     h += `</div>`;
   }
-  h += `</div>`;
+  h += `</div></div>`;   // end of the stage and of .battle
+  app.classList.add("wide");
   app.innerHTML = h;
   M.fx = { killed: [] }; M.feedNew = 0;
   save();
