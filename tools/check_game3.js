@@ -536,6 +536,13 @@ function checkLayout(M, where, GAP) {
     if (label === "desktop") {
       const { ms, GAP } = await page.evaluate(() => ({ ms: Array.from({ length: 200 }, () => window.__debug.newMatch()), GAP: window.__debug.GAP }));
       ms.forEach((M, i) => checkLayout(M, `match layout ${i}`, GAP));
+      /* the kinds of round: every circle has one gunfight and two others, each new kind twice a match, the boss a gunfight */
+      ms.forEach((M, i) => {
+        const count = {}; M.opps.forEach(o => count[o.mode] = (count[o.mode] || 0) + 1);
+        const circles = [1, 2, 3].map(s => M.opps.filter(o => o.stage === s && !o.boss).map(o => o.mode));
+        if (count.snipe !== 2 || count.lob !== 2 || count.quad !== 2 || count.gun !== 4 || M.opps.find(o => o.boss).mode !== "gun" || circles.some(c => c.filter(m => m === "gun").length !== 1 || new Set(c).size !== 3))
+          bad(`match layout ${i}: the kinds of round are not shared out right (${JSON.stringify(circles)})`);
+      });
     }
     const S = () => page.evaluate(() => JSON.parse(JSON.stringify(window.__debug.state())));
     await page.click("#drop"); await page.click("#jump");
@@ -552,6 +559,7 @@ function checkLayout(M, where, GAP) {
     if (await page.$("#chestopen")) await page.click("#chestleave");
     await page.waitForSelector("#qcard .opt:not([disabled])");
     k = await page.$eval("#qcard", e => ({ q: e.dataset.q, seed: e.dataset.seed }));
+    await page.evaluate(() => window.__arena.force("gun"));
     await page.click(`#qcard .opt[data-i="${answerOf(k.q, k.seed)}"]`); await page.click("#next");
     /* the arena itself, played with the keys (desktop) or the on-screen buttons (phone), one frame at a time */
     await page.waitForSelector("#pix");
@@ -601,6 +609,59 @@ function checkLayout(M, where, GAP) {
     const last = await A("get");
     await A("step", 120);
     if (!(await page.$("#roundover")) || await page.$eval("#roundover", e => e.dataset.hits) !== "5") bad(`practice ${label}: the round should end when the shots run out, with 5 hits (${JSON.stringify(last)})`);
+    /* the other kinds of round (Sniper Ridge, Grenade Lob, Quad Chase), with the keys (desktop) or the on-screen buttons (phone) */
+    const padOf = { j: "shoot", k: "duck", ArrowUp: "jump", ArrowDown: "down" };
+    const hold = async (key, n) => {
+      if (label === "desktop") { await page.keyboard.down(key); await A("step", n); await page.keyboard.up(key); }
+      else { const pad = `[data-pad="${padOf[key]}"]`; await page.dispatchEvent(pad, "pointerdown"); await A("step", n); await page.dispatchEvent(pad, "pointerup"); }
+    };
+    const nextRound = async m => {
+      await page.evaluate(m => { window.__arena.force(m); const M = window.__debug.state().match; M.opps[M.cur].hp = M.opps[M.cur].max = 999; }, m);   // so the tests don't eliminate the opponent
+      await page.click("#next");
+      if (await page.$("#chestleave")) await page.click("#chestleave");
+      await page.waitForSelector("#qcard .opt:not([disabled])");
+      const k2 = await page.$eval("#qcard", e => ({ q: e.dataset.q, seed: e.dataset.seed }));
+      await page.click(`#qcard .opt[data-i="${answerOf(k2.q, k2.seed)}"]`); await page.click("#next");
+      await page.waitForSelector("#pix"); await A("manual", true); await A("step", 80);
+      if (await page.$eval("#roundcard", e => e.dataset.mode) !== m || !(await page.$(`.pads[data-mode="${m}"]`))) bad(`practice ${label}: the ${m} round did not start with its own card and buttons`);
+    };
+    const endRound = async m => {
+      await A("sim"); await page.waitForSelector("#roundover");
+      if (!(await page.$eval("#roundover", e => e.textContent)).includes(m === "lob" ? "direct hit" : m === "quad" ? "bullseye ram" : "headshot")) bad(`practice ${label}: the ${m} summary should name its best hit`);
+    };
+    /* Sniper Ridge: a body shot, a headshot, a rock in the way, ducking a shot, and not ducking */
+    await nextRound("snipe");
+    await A("foe", "look", { x: 180, hold: 1e9 });
+    await A("scope", "body"); await hold("j", 1); await A("step", 40); g = await A("get");
+    if (g.stats.hits !== 1 || g.stats.heads !== 0) bad(`sniper ${label}: a shot on the body should hit (${JSON.stringify(g.stats)})`);
+    await A("scope", "head"); await hold("j", 1); await A("step", 40); g = await A("get");
+    if (g.stats.hits !== 2 || g.stats.heads !== 1) bad(`sniper ${label}: a shot on the head should be a headshot (${JSON.stringify(g.stats)})`);
+    await A("foe", "hide", { x: 120, hold: 1e9 }); await A("scope", "rock"); await hold("j", 1); await A("step", 40); g = await A("get");
+    if (g.stats.hits !== 2 || g.stats.missed !== 1) bad(`sniper ${label}: a rock should stop the shot (${JSON.stringify(g.stats)})`);
+    await A("foe", "aim", { x: 300 }); await hold("k", 90); g = await A("get");
+    if (!g.stats.dodged || g.stats.taken) bad(`sniper ${label}: holding duck should dodge the shot (${JSON.stringify(g.stats)})`);
+    await A("foe", "aim", { x: 300 }); await A("step", 90); g = await A("get");
+    if (!g.stats.taken) bad(`sniper ${label}: not ducking should get you hit`);
+    await endRound("snipe");
+    /* Grenade Lob: a throw onto the opponent, and one that hits the wall */
+    await nextRound("lob");
+    await A("walls"); await A("foe", "hold", { x: 392 });
+    const nHold = await A("lobHold", 45);
+    await hold("j", nHold); await A("step", 120); g = await A("get");
+    if (g.stats.hits !== 1) bad(`lob ${label}: a throw that lands on the opponent should hit (held ${nHold} frames, ${JSON.stringify(g.stats)})`);
+    await A("wall", 300); await A("lobHold", 15); await hold("j", 50); await A("step", 120); g = await A("get");
+    if (g.stats.hits !== 1 || g.stats.missed !== 1) bad(`lob ${label}: a grenade on the wall should do no damage (${JSON.stringify(g.stats)})`);
+    await endRound("lob");
+    /* Quad Chase: steering, a bullseye ram, and a miss in the wrong lane */
+    await nextRound("quad");
+    await A("foe", "hold", { x: 360, y: 160 }); await A("lane", 216);
+    await hold("ArrowUp", 23); let md = await A("mode");
+    if (Math.abs(md.P.y - 160) > 3) bad(`quad ${label}: up should steer up a lane (${md.P.y})`);
+    await A("lane", 160); await hold("j", 1); await A("step", 80); g = await A("get");
+    if (g.stats.hits !== 1 || g.stats.heads !== 1) bad(`quad ${label}: a ram dead centre should be a bullseye (${JSON.stringify(g.stats)})`);
+    await A("step", 120); await A("foe", "hold", { x: 360, y: 104 }); await A("lane", 216); await hold("j", 1); await A("step", 80); g = await A("get");
+    if (g.stats.hits !== 1 || g.stats.missed !== 1) bad(`quad ${label}: a ram in the wrong lane should miss (${JSON.stringify(g.stats)})`);
+    await endRound("quad");
     await page.click("#back");
     await page.click('[data-jump="4"]'); await page.click(".mk.foe.open"); await page.click("#shoot");
     if (!(await page.$(".opt"))) bad("practice mode: could not jump to the boss");

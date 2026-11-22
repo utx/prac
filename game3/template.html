@@ -540,21 +540,23 @@ function tryMatch() {
   c[3] = landNear(c[2], STAGE[2].r - STAGE[3].r - 3); if (!c[3]) return null;
   c[4] = landNear(c[3], STAGE[3].r - STAGE[4].r - 3); if (!c[4]) return null;
   const opps = [], supply = {};
+  /* the kind of round after each answer (David, Nov 2026): every circle has one gunfight and two of Sniper Ridge, Grenade Lob and Quad Chase */
+  const extra = (() => { for (;;) { const l = shuffle(["snipe", "lob", "quad", "snipe", "lob", "quad"]); if ([0, 2, 4].every(i => l[i] !== l[i + 1])) return l; } })();
   for (const s of [1, 2, 3]) {
-    const pts = [];
+    const pts = [], modes = shuffle(["gun", extra[2 * s - 2], extra[2 * s - 1]]);
     for (const kind of shuffle(["reading", "thinking", "maths"])) {   // every circle has one opponent of each kind
       const p = landNear(c[s], STAGE[s].r * (s === 1 ? 0.62 : 0.72), pts, GAP[s]); if (!p) return null;
       pts.push(p);
       const [img, name] = foe(kind);
       const hp = kind === "reading" ? 5 : STAGE[s].hp;
-      opps.push({ kind, tier: s, stage: s, img, name, x: p[0], y: p[1], hp, max: hp, dead: false, shots: 0, pending: null, pid: null, queue: [] });
+      opps.push({ kind, tier: s, stage: s, img, name, x: p[0], y: p[1], hp, max: hp, dead: false, shots: 0, pending: null, pid: null, queue: [], mode: modes[pts.length - 1] });
     }
     supply[s] = landNear(c[s], STAGE[s].r * 0.72, pts, GAP[s]); if (!supply[s]) return null;
   }
   const bp = landNear(c[4], 4); if (!bp) return null;
   supply[4] = landNear(c[4], STAGE[4].r * 0.95, [bp], GAP[4]); if (!supply[4]) return null;
   const [bimg, bname] = BOSSES[n % BOSSES.length];
-  opps.push({ kind: "thinking", boss: true, tier: 4, stage: 4, img: bimg, name: bname, x: bp[0], y: bp[1], hp: STAGE[4].hp, max: STAGE[4].hp, dead: false, shots: 0, pending: null });
+  opps.push({ kind: "thinking", boss: true, tier: 4, stage: 4, img: bimg, name: bname, x: bp[0], y: bp[1], hp: STAGE[4].hp, max: STAGE[4].hp, dead: false, shots: 0, pending: null, mode: "gun" });
   const taken = new Set(opps.map(o => o.name)), names = shuffle(BOT_NAMES.filter(x => !taken.has(x))), bots = [];
   for (let i = 0; i < START - 1 - opps.length; i++) {
     const z = ZONES[rnd(ZONES.length)], p = landNear([z[1], z[2]], 7) || landNear([50, 50], 40);
@@ -807,6 +809,7 @@ function optsHtml(q, chosen) {
   return `<div class="opts${q.visual ? " visual" : ""}">${q.options.map((op, i) => `<button class="opt${done ? (i === q.answer ? " right" : i === chosen ? " wrong" : " dim") : ""}" data-i="${i}" ${done ? "disabled" : ""}><span class="let">${LETTERS[i]}</span><span>${op}</span></button>`).join("")}</div>`;
 }
 const shotDmg = () => Math.round(gun().dmg / 5);
+const PADNAME = { left: "Move left", right: "Move right", jump: "Up", down: "Down", build: "Build a wall", duck: "Duck", shoot: "Fire", emote: "Dance" };
 const roundLabel = r => r.kind === "finish" ? "FINISH THEM! ▶" : r.kind === "skirm" ? `SHOWDOWN! ${r.ammo} shots ▶` : `FIGHT! ${r.ammo} shots ▶`;
 function battle(fx) {
   const M = S.match, o = M.opps[M.cur], st = STAGE[o.stage];
@@ -818,13 +821,13 @@ function battle(fx) {
   document.documentElement.style.setProperty("--kind", q ? KIND[q.kind].col : k.col);
   const fresh = id => mode === "chestq" && ch.chosen !== null && ch.glow === id ? " fresh" : "";
   const fighting = mode === "round", canLeave = idle || (mode === "roundover" && !o.dead && !over);
+  const md = ARENA.MODES[ARENA.modeOf(o)], gunRound = ARENA.modeOf(o) === "gun";
   let h = `<div class="battle${fighting ? " fighting" : ""}${mode === "q" && q.kind === "reading" ? " reading" : ""}"><div class="playbar"><button class="pill" id="back" ${canLeave ? "" : "disabled title='Finish this first'"}>◀ Island</button><span class="pill">Circle ${M.stage} of 4</span><span class="pill" id="alive" data-n="${alive(M)}">👥 ${alive(M)} left</span><span class="spacer" style="flex:1"></span>
     <button class="pill" id="coins">${pic("coins")} ${S.coins}</button><span class="pill">⏱ ${earnedToday()}/${S.time.cap} min</span><button class="pill" id="snd">${S.sound ? "🔊" : "🔇"}</button></div>`;
   h += `<div class="side">`;
   if (fighting) {
     h += `<div class="arena pixarena"><canvas id="pix" width="960" height="540" role="img" aria-label="The showdown with ${esc(o.name)}"></canvas></div>
-    <div class="pads"><button data-pad="left" aria-label="Move left">◀</button><button data-pad="right" aria-label="Move right">▶</button><button data-pad="jump" aria-label="Jump">▲ Jump</button>
-      <button data-pad="build" class="padb" aria-label="Build a wall">🧱 Build</button><button data-pad="shoot" class="pads-shoot" aria-label="Shoot">🔫 Shoot</button><button data-pad="emote" aria-label="Dance">🕺 Dance</button>${S.items.boogie ? `<button data-pad="boogie" aria-label="Boogie bomb">💃 ×${S.items.boogie}</button>` : ""}</div>`;
+    <div class="pads" data-mode="${ARENA.modeOf(o)}">${md.pads.map(([k, l, c]) => `<button data-pad="${k}"${c ? ` class="${c}"` : ""} aria-label="${PADNAME[k]}">${l}</button>`).join("")}${gunRound && S.items.boogie ? `<button data-pad="boogie" aria-label="Boogie bomb">💃 ×${S.items.boogie}</button>` : ""}</div>`;
   } else {
     h += `<div class="arena" style="background-image:url(${P2}${k.arena}.webp)">
     <div class="hud me"><b>You${M.bush ? " 🌿" : ""}</b>${bar("hp", M.hp, MAXHP)}${bar("sh", M.shield, MAXSH)}<small>Right answers load your gun</small></div>
@@ -847,7 +850,7 @@ function battle(fx) {
   if (mode === "idle") {
     h += `<div class="card" id="qcard" data-q="" data-seed=""><div class="aimhelp"><b>${esc(o.name)}</b> is in your sights. Press <b>Go!</b> for your first question.<br>
       <small>${rd ? `Answer the whole passage: each right answer knocks off one bar (${o.shots ? o.hp + " to go" : "one bar for each question"}). Then comes a showdown: 2 shots for every right answer. Knock off every bar and you can finish ${esc(o.name)} in the showdown.`
-        : `A right answer loads 5 shots, a wrong one only 2 (and ${esc(o.name)} shoots back for ${st.dmg}). Then you fight it out: every hit does ${shotDmg()}, a headshot double.`}</small></div></div>`;
+        : `A right answer loads 5 shots, a wrong one only 2 (and ${esc(o.name)} shoots back for ${st.dmg}). Then you fight it out: every hit does ${shotDmg()}, a ${md.head} double.`}<br>Showdown: <b id="modename">${md.name}</b></small></div></div>`;
   } else if (mode === "q") {
     h += `<div class="card" id="qcard" data-q="${qkey(pend.ref)}" data-seed="${pend.ref.seed !== undefined ? pend.ref.seed : ""}"><div class="qhead"><span>${KIND[q.kind].icon} ${KIND[q.kind].label} · ${esc(q.cat)}</span><span>One go, no hints</span></div><div class="stem">${q.stem}</div>${optsHtml(q, pend.chosen)}`;
     if (pend.chosen !== null) {
@@ -860,14 +863,14 @@ function battle(fx) {
     h += `</div>`;
   } else if (mode === "round") {
     const r = o.round;
-    h += `<div class="card" id="roundcard" data-kind="${r.kind}"><h3 class="caps">${r.kind === "finish" ? `${esc(o.name)} is knocked: finish them!` : r.kind === "skirm" ? "Showdown!" : "Fight!"}</h3>
-      <p class="keys"><kbd>←</kbd><kbd>→</kbd> move &nbsp; <kbd>↑</kbd> jump &nbsp; <kbd>J</kbd> shoot &nbsp; <kbd>K</kbd> build a wall &nbsp; <kbd>1</kbd>–<kbd>5</kbd> or <kbd>E</kbd> dance${S.items.boogie ? " &nbsp; <kbd>B</kbd> Boogie Bomb" : ""}</p>
-      <p class="tip">The crosshair sweeps up and down. Shoot when it turns <b style="color:#e03131">red</b> over the head for a <b>headshot</b>: double damage. A red line means ${esc(o.name)} is aiming: jump or build. A grenade? Move or jump clear.${r.kind === "skirm" ? " In a reading showdown the bars only come off with right answers, but every hit charges your shield." : ""} The showdown can’t knock you out: only wrong answers can.</p></div>`;
+    h += `<div class="card" id="roundcard" data-kind="${r.kind}" data-mode="${ARENA.modeOf(o)}"><h3 class="caps">${r.kind === "finish" ? `${esc(o.name)} is knocked: finish them!` : `${md.name}!`}</h3>
+      <p class="keys">${md.keys}${gunRound && S.items.boogie ? " &nbsp; <kbd>B</kbd> Boogie Bomb" : ""}</p>
+      <p class="tip">${md.tip(esc(o.name))}${r.kind === "skirm" ? " In a reading showdown the bars only come off with right answers, but every hit charges your shield." : r.kind === "finish" ? " Any hit finishes them." : ""} The showdown can’t knock you out: only wrong answers can.</p></div>`;
   } else if (mode === "roundover") {
     const r = o.roundOut, label = o.dead ? (o.boss ? "Victory Royale ▶" : o.chestDue ? "Something’s glowing… ▶" : "Back to the island ▶") : o.chestDue ? "Something’s glowing… ▶" : "Next question ▶";
     const acc = r.shots ? Math.round(100 * r.hits / r.shots) : 0;
     h += `<div class="card" id="roundover" data-hits="${r.hits}" data-heads="${r.heads}"><h3 class="caps">${o.dead ? `${esc(o.name)} is eliminated!` : r.kind === "skirm" ? "Showdown over" : "Reload!"}</h3>
-      <div class="rstats"><span><b>${r.hits}/${r.shots}</b> hits (${acc}%)</span><span><b>${r.heads}</b> headshot${r.heads === 1 ? "" : "s"}</span>${r.kind === "fight" ? `<span><b>${r.dmg}</b> damage</span>` : ""}${r.siphon ? `<span><b>+${r.siphon}</b> shield</span>` : ""}${r.blocked ? `<span><b>${r.blocked}</b> blocked</span>` : ""}${r.taken ? `<span><b>−${r.taken}</b> taken</span>` : ""}</div>
+      <div class="rstats"><span><b>${r.hits}/${r.shots}</b> hits (${acc}%)</span><span><b>${r.heads}</b> ${ARENA.MODES[r.mode || "gun"].head}${r.heads === 1 ? "" : "s"}</span>${r.kind === "fight" ? `<span><b>${r.dmg}</b> damage</span>` : ""}${r.siphon ? `<span><b>+${r.siphon}</b> shield</span>` : ""}${r.blocked ? `<span><b>${r.blocked}</b> blocked</span>` : ""}${r.taken ? `<span><b>−${r.taken}</b> taken</span>` : ""}</div>
       <p>${o.dead ? (o.boss ? "You beat the boss!" : "Great fighting.") : rd ? `${o.hp} bar${o.hp === 1 ? "" : "s"} still to knock off: a new passage is coming.` : `${esc(o.name)} has ${o.hp} health left. Answer the next question to reload.`}</p>
       <div class="next"><button class="btn" id="next">${label}</button></div></div>`;
   } else if (mode === "offer") {
