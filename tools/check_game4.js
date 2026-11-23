@@ -236,6 +236,9 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   if (!(await p.evaluate(() => __rr.PF.hook.state().scope))) bad("E at a nest should open the scope");
   const before = await p.evaluate(() => __rr.PF.hook.nests()[0].alive);
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "head")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(100);
+  const fx = await p.evaluate(() => __rr.PF.hook.fx());
+  if (!fx.includes("mark-head") || !fx.includes("pop") || !fx.includes("helmet")) bad(`a headshot should show a red hit marker, pop-up words and a flying helmet (${fx.join(", ")})`);
+  if (shots) { await p.waitForTimeout(150); await p.screenshot({ path: path.join(shots, "rr-hit.png") }); }
   const after = await p.evaluate(() => __rr.PF.hook.nests()[0].alive); if (after !== before - 1) bad(`a shot on a sentry should knock it out (${before} → ${after})`);
   if (shots) await p.screenshot({ path: path.join(shots, "rr-scope.png") });
   /* gold bullets: every level has more than enough for its sentries, and grabbing one adds a sniper round */
