@@ -110,7 +110,7 @@ aside#coach .ladder li.cur { font-weight: 800; } aside#coach .ladder li.cur::mar
 .tag { display: inline-block; border-radius: 4px; padding: 0 6px; font-size: 12px; font-weight: 800; color: #fff; }
 .tag.maths { background: #e8590c; } .tag.thinking { background: #1c7ed6; } .tag.reading { background: #7048e8; }
 .adminbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
-details.grown { margin-top: 16px; } details.grown summary { cursor: pointer; color: var(--muted); }
+ol.climb { margin: 4px 0 10px; } details.grown { margin-top: 16px; } details.grown summary { cursor: pointer; color: var(--muted); }
 table.prog { border-collapse: collapse; font-size: 13px; width: 100%; } table.prog th, table.prog td { border: 1px solid #3a4170; padding: 4px 6px; text-align: left; }
 footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
 @media (max-width: 640px) { table.grid th, table.grid td { padding: 5px 6px; min-width: 36px; } .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
@@ -2439,14 +2439,14 @@ const PF = (() => {
 const ORDER = ["frac", "flaw", "infer", "data", "claim", "word", "time", "rule", "link", "scale", "order", "same", "back", "space", "shape"];
 const TR = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 const WORLDS = [
-  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", sub: "Step 1 of every skill: the building blocks." },
-  { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", sub: "Step 2: the skills start to join together. Your scope now has drop dots for range." },
-  { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", sub: "Step 3: two-step thinking. Night falls, and wind pushes your shots." },
-  { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", sub: "Step 4: the hardest third of the sample papers." }];
+  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", sub: "Every level climbs: four questions on one skill, from a warm-up to test level. One sniper nest after another." },
+  { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", sub: "Every skill again, with new questions. Your scope now has drop dots for range." },
+  { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", sub: "New questions again. Night falls, and wind pushes your shots." },
+  { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", sub: "The last round of new questions, and the hardest levels and ridges." }];
 const hash = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };
 const LEVELS = [];
 for (const W of WORLDS) {
-  ORDER.forEach((t, k) => LEVELS.push({ id: `${W.n}-${t}`, world: W.n, k, track: t, rung: W.n, seed: hash(`${W.n}-${t}`) }));
+  ORDER.forEach((t, k) => LEVELS.push({ id: `${W.n}-${t}`, world: W.n, k, track: t, seed: hash(`${W.n}-${t}`) }));
   LEVELS.push({ id: `${W.n}-boss`, world: W.n, k: ORDER.length, boss: true, seed: hash(`${W.n}-boss`) });
 }
 const LV = Object.fromEntries(LEVELS.map(l => [l.id, l]));
@@ -2486,13 +2486,13 @@ function briefing(L) {
   const out = [], ids = [];
   const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); out.push(Object.assign({}, q, { role })); } };
   if (L.boss) {
+    /* the boss mixes six skills (2 maths, 2 thinking, 2 reading), still climbing: steps 1, 2, 3, 3, 4, 4 */
     const bySub = s => ORDER.filter(t => TR[t].subject === s).sort(() => Math.random() - .5).slice(0, 2);
     const ts = [...bySub("maths"), ...bySub("thinking"), ...bySub("reading")].sort(() => Math.random() - .5);
-    ts.forEach(t => add(t, L.world, "boss"));
+    ts.forEach((t, i) => add(t, [1, 2, 3, 3, 4, 4][i], "boss"));
   } else {
-    if (L.k > 0) { const j = Math.floor(Math.random() * L.k); add(ORDER[j], L.world, "review"); }
-    else if (L.world > 1) add(ORDER[Math.floor(Math.random() * ORDER.length)], L.world - 1, "review");
-    while (out.length < QN.normal) { const before = out.length; add(L.track, L.rung, "focus"); if (out.length === before) add(L.track, L.rung, "focus"); if (out.length === before) break; }
+    /* one skill, climbing inside the level: step 1 (warm-up) -> step 2 -> step 3 -> step 4 (test level) */
+    for (let r = 1; r <= QN.normal; r++) add(L.track, r, "focus");
   }
   return out;
 }
@@ -2530,14 +2530,14 @@ function levelCard(L) {
   const rec = S.levels[L.id] || {};
   if (L.boss) return `<h3 class="px">WORLD ${L.world} BOSS: THE WARDEN</h3><p>A mixed briefing of ${QN.boss} questions from this world's skills, then a run to the Warden's ridge and a sniper duel. Read the drop dots and the wind!</p>
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
-  const t = TR[L.track], r = t.rungs[L.rung - 1];
-  return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(t.name.toUpperCase())}</h3><p><span class="tag ${t.subject}">${t.subject}</span> Step ${L.rung} of 4: <b>${esc(r.title)}</b></p><p>${esc(r.builds)}</p>
+  const t = TR[L.track];
+  return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(t.name.toUpperCase())}</h3><p><span class="tag ${t.subject}">${t.subject}</span> Four questions that climb, from a warm-up to test level:</p><ol class="climb">${t.rungs.map(r => `<li><b>${esc(r.title)}</b></li>`).join("")}</ol>
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.normal} · ${stars(rec.stars || 0)}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
 }
 function grownUps() {
   const rows = ORDER.map(t => { const tr = TR[t]; return `<tr><td>${esc(tr.name)}</td>${WORLDS.map(w => { const r = S.levels[`${w.n}-${t}`]; return `<td>${r ? `${r.cleared ? "✔ " : ""}${r.best}/${QN.normal}` : "–"}</td>`; }).join("")}</tr>`; }).join("");
-  return `<details class="grown"><summary>For grown-ups: best briefing scores by skill</summary><div class="panel" style="margin-top:8px"><p>Each skill is built in four steps, one per world. The score is the best briefing (questions right before the level).</p>
-    <table class="prog"><tr><th>Skill</th>${WORLDS.map(w => `<th>Step ${w.n}</th>`).join("")}</tr>${rows}</table></div></details>`;
+  return `<details class="grown"><summary>For grown-ups: best briefing scores by skill</summary><div class="panel" style="margin-top:8px"><p>Every level's briefing climbs through the skill's four steps. Each world brings the skill back with new questions. The score is the best briefing (questions right before the level).</p>
+    <table class="prog"><tr><th>Skill</th>${WORLDS.map(w => `<th>World ${w.n}</th>`).join("")}</tr>${rows}</table></div></details>`;
 }
 
 /* ================= briefing ================= */
@@ -2551,7 +2551,7 @@ function renderQ() {
   const q = B.qs[B.i], t = TR[q.track], letters = "ABCDE";
   S.seen[q.gen || q.id] = S.seed++; save();
   const visual = q.visual || q.options.some(o => /<svg/.test(o));
-  const role = q.role === "review" ? "Warm-up from an earlier level" : q.role === "boss" ? "Boss briefing" : `Step ${q.rung} of 4`;
+  const role = (q.role === "boss" ? "Boss briefing · " : "") + `Step ${q.rung} of 4${q.rung === 1 ? " (warm-up)" : q.rung === 4 ? " (test level)" : ""}`;
   $("#scr-brief").innerHTML = `<div class="qcard"><div class="qhead"><span class="px">BRIEFING · ${B.L.boss ? `WORLD ${B.L.world} BOSS` : `LEVEL ${B.L.k + 1}`} · QUESTION ${B.i + 1} OF ${B.qs.length}</span>
       <span class="dots">${B.qs.map((x, i) => `<span class="${B.res[i] === true ? "ok" : B.res[i] === false ? "no" : i === B.i ? "cur" : ""}"></span>`).join("")}</span></div>
     <p class="note"><span class="tag ${t.subject}">${t.subject}</span> ${esc(t.name)} · ${role}</p>
@@ -2641,20 +2641,20 @@ function done(res) {
 
 /* ================= coach sidebar (practice mode only) ================= */
 function samplesHtml(t, rung) {
-  return `<ul>${t.samples.map(s => { const now = s.rungs.includes(rung); return `<li class="${now ? "" : "later"}"><span class="${now ? "now" : ""}">${esc(s.ref)}</span>: ${esc(s.what)}${now ? "" : ` <i>(step${s.rungs.length > 1 ? "s" : ""} ${s.rungs.join(", ")})</i>`}</li>`; }).join("")}</ul>`;
+  return `<ul>${t.samples.map(s => { const now = !rung || s.rungs.includes(rung); return `<li class="${now ? "" : "later"}"><span class="${now ? "now" : ""}">${esc(s.ref)}</span>: ${esc(s.what)}${now ? "" : ` <i>(step${s.rungs.length > 1 ? "s" : ""} ${s.rungs.join(", ")})</i>`}</li>`; }).join("")}</ul>`;
 }
 function ladderHtml(t, rung) { return `<ol class="ladder">${t.rungs.map((r, i) => `<li class="${i + 1 === rung ? "cur" : ""}"><b>${esc(r.title)}</b>: ${esc(r.builds)}</li>`).join("")}</ol>`; }
 function coachLevel(L) {
   if (!PRACTICE) return;
   const el = $("#coach-body");
   if (!L) { el.innerHTML = `<h2 class="px">COACH NOTES (ADMIN ONLY)</h2><p>Pick a level to see which sample-paper questions its skill builds toward, and how the four steps of that skill climb from building blocks to the hardest questions.</p>
-    <h3>How the game is built</h3><ul><li>15 skills (6 maths, 5 thinking, 4 reading), each in 4 steps.</li><li>World n = step n of every skill, so the whole game climbs from easy to hard.</li><li>Each briefing: 3 questions on the level's step + 1 warm-up from an earlier level. Bosses mix 6 skills (2 per subject) as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
+    <h3>How the game is built</h3><ul><li>15 skills (6 maths, 5 thinking, 4 reading), each in 4 steps.</li><li>Every briefing climbs: 4 questions on one skill, step 1 (warm-up) to step 4 (test level).</li><li>Each world brings every skill back with new questions; the platforming and sniping get harder world by world.</li><li>Bosses mix 6 skills (2 per subject), still climbing (steps 1, 2, 3, 3, 4, 4), as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
   if (L.boss) { el.innerHTML = `<h2 class="px">COACH NOTES · WORLD ${L.world} BOSS</h2><p>The boss briefing mixes ${QN.boss} questions: 2 maths, 2 thinking and 2 reading skills, all at step ${L.world}. Coming without warning, mixed together like the real test, they check that each skill transfers when the topic isn't announced.</p>`; return; }
   const t = TR[L.track];
-  el.innerHTML = `<h2 class="px">COACH NOTES · ${esc(t.name.toUpperCase())}</h2><p><span class="tag ${t.subject}">${t.subject}</span> Step ${L.rung} of 4</p>
-    <h3>Sample questions this skill prepares for</h3>${samplesHtml(t, L.rung)}
+  el.innerHTML = `<h2 class="px">COACH NOTES · ${esc(t.name.toUpperCase())}</h2><p><span class="tag ${t.subject}">${t.subject}</span> World ${L.world}: the briefing climbs through all four steps (question 1 = step 1 … question 4 = step 4), with new questions in each world.</p>
+    <h3>Sample questions this skill prepares for</h3>${samplesHtml(t, 0)}
     <h3>The underlying skill</h3><ul>${t.ideas.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
-    <h3>The four steps</h3>${ladderHtml(t, L.rung)}
+    <h3>The four steps</h3>${ladderHtml(t, 0)}
     <h3>Same method, same words</h3><p>${esc(t.method)}</p><h3>Transfer</h3><p>${esc(t.transfer)}</p>`;
 }
 function coachQ(q) {
@@ -2663,7 +2663,7 @@ function coachQ(q) {
   const prev = t.rungs[q.rung - 2], next = t.rungs[q.rung];
   const traps = Object.entries(q.traps || {}).map(([i, x]) => `<li><b>${letters[i]}</b>: ${esc(x)}</li>`).join("");
   $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · QUESTION ${B.i + 1}</h2>
-    <p><span class="tag ${t.subject}">${t.subject}</span> <b>${esc(t.name)}</b>, step ${q.rung} of 4: ${esc(r.title)}${q.role === "review" ? " <i>(a warm-up from an earlier level, so the skill doesn't fade)</i>" : q.role === "boss" ? " <i>(boss: mixed skills, a transfer check)</i>" : ""}.
+    <p><span class="tag ${t.subject}">${t.subject}</span> <b>${esc(t.name)}</b>, step ${q.rung} of 4: ${esc(r.title)}${q.role === "boss" ? " <i>(boss: mixed skills, still climbing, a transfer check)</i>" : ` <i>(question ${B.i + 1} of the climb)</i>`}.
       Answer: <b>${letters[q.answer]}</b>.${q.gen ? ` A template (<code>${esc(q.gen)}</code>, form: ${esc(q.form || "")}): new numbers and context every play.` : ` Hand-written (<code>${esc(q.id)}</code>).`}</p>
     <h3>Sample questions it builds toward</h3>${samplesHtml(t, q.rung)}
     <h3>The underlying skill</h3><ul>${t.ideas.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
@@ -2677,7 +2677,7 @@ function coachQ(q) {
 }
 function coachKit() {
   if (!PRACTICE) return;
-  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · RESULTS</h2><p>${B.right} of ${B.qs.length} right.</p><ul>${B.qs.map((q, i) => `<li>${B.res[i] ? "✔" : "✘"} ${esc(TR[q.track].name)} (step ${q.rung})${q.role === "review" ? ", warm-up" : ""}</li>`).join("")}</ul>
+  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · RESULTS</h2><p>${B.right} of ${B.qs.length} right.</p><ul>${B.qs.map((q, i) => `<li>${B.res[i] ? "✔" : "✘"} ${esc(TR[q.track].name)} (step ${q.rung})</li>`).join("")}</ul>
     <p>The kit scales with the score, so the questions stay the thing that matters: more right answers = more hearts, ammo and gear.</p>`;
 }
 
