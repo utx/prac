@@ -325,7 +325,10 @@ function render() {
     <a class="btn primary" id="game-practice" href="../prac2/index.html?admin=1">Practice</a></div>
   <div class="card"><h2>Storm Island (the battle game)</h2>
     <p class="sub">The game lives at <a href="../prac3/index.html">prac3/</a>. “Practice” opens it with every gun and 3 of each item owned, and buttons to jump to any storm circle or the boss. Nothing is saved, so the real game progress on this device is not touched. The daily Fortnite-time limit is set inside the game, under “For grown-ups”.</p>
-    <a class="btn primary" id="game3-practice" href="../prac3/index.html?admin=1">Practice</a></div>`;
+    <a class="btn primary" id="game3-practice" href="../prac3/index.html?admin=1">Practice</a></div>
+  <div class="card"><h2>Ridge Runner (the platform game)</h2>
+    <p class="sub">The game lives at <a href="../prac4/index.html">prac4/</a>. Each level is a short briefing of questions (more right answers = better kit), then a pixel platform level with sniper nests. “Practice” opens every level and shows a coach sidebar for each question: the sample-paper questions it builds toward, the underlying skill, how this step builds it, and the traps. Nothing is saved.</p>
+    <a class="btn primary" id="game4-practice" href="../prac4/index.html?admin=1">Practice</a></div>`;
   const testsTable = `<div class="card"><h2>All tests</h2><p class="sub">“Practice” opens a test without recording anything. You can also mark tests done or not done here.</p>
     <div class="tw"><table class="t"><tr><th>Test</th><th>Reading</th><th>Status</th><th>First score</th><th>R / T / M</th><th>Time</th>${reviewRows ? "<th>Your review</th>" : ""}<th></th></tr>
     ${[...MENU].reverse().map(t => {

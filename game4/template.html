@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ridge Runner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #14172b; --panel: #1f2440; --panel2: #262c4f; --ink: #1b2a41; --paper: #fbfaf6; --text: #eef0ff; --muted: #a9b0d6; --gold: #ffd43b; --green: #51cf66; --red: #ff6b6b; --blue: #74c0fc;
+  --m: #ff922b; --t: #4dabf7; --r: #b197fc; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.px { font-family: "Press Start 2P", "Courier New", monospace; letter-spacing: .5px; }
+header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #0d1022; border-bottom: 3px solid #000; position: sticky; top: 0; z-index: 5; flex-wrap: wrap; }
+header h1 { margin: 0; font-size: 16px; color: var(--gold); text-shadow: 2px 2px 0 #000; }
+header .sp { flex: 1; }
+.chip { background: var(--panel); border: 2px solid #000; padding: 4px 10px; border-radius: 6px; font-size: 13px; }
+button { font: inherit; cursor: pointer; }
+.btn { background: var(--gold); color: #1b1b2f; border: 3px solid #000; box-shadow: 0 4px 0 #000; padding: 10px 18px; border-radius: 8px; font-weight: 800; }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #000; }
+.btn.alt { background: #dee2ff; } .btn.grn { background: var(--green); } .btn.red { background: var(--red); } .btn.sm { padding: 6px 10px; font-size: 14px; }
+.btn[disabled] { opacity: .45; cursor: default; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; max-width: 1180px; margin: 0 auto; padding: 16px; }
+body.practice .layout { grid-template-columns: minmax(0, 1fr) 380px; }
+@media (max-width: 1000px) { body.practice .layout { grid-template-columns: minmax(0, 1fr); } }
+main { min-width: 0; }
+.panel { background: var(--panel); border: 3px solid #000; border-radius: 12px; padding: 16px; box-shadow: 0 6px 0 #000; }
+.hidden { display: none !important; }
+/* map */
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.tab { border: 3px solid #000; border-radius: 8px; padding: 8px 12px; background: var(--panel2); color: var(--text); font-size: 11px; }
+.tab.on { background: var(--gold); color: #111; }
+.tab.lock { opacity: .5; }
+.world { border-radius: 12px; padding: 14px; border: 3px solid #000; }
+.world h2 { margin: 0 0 4px; font-size: 14px; } .world p.sub { margin: 0 0 12px; color: #dfe3ff; font-size: 14px; }
+.path { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.node { position: relative; text-align: left; border: 3px solid #000; border-radius: 10px; padding: 8px; background: #f8f9fa; color: #111; min-height: 92px; box-shadow: 0 4px 0 #000; }
+.node .n { font-size: 10px; } .node .ic { font-size: 22px; line-height: 1.1; }
+.node .nm { font-size: 12.5px; font-weight: 700; line-height: 1.2; }
+.node .st { font-size: 13px; color: #e67700; letter-spacing: 1px; }
+.node.maths { border-left: 10px solid var(--m); } .node.thinking { border-left: 10px solid var(--t); } .node.reading { border-left: 10px solid var(--r); }
+.node.boss { background: #ffe066; border-left: 10px solid #e03131; }
+.node.lock { opacity: .45; filter: grayscale(.8); cursor: not-allowed; }
+.node.sel { outline: 4px solid var(--gold); }
+.node.done::after { content: "✔"; position: absolute; right: 8px; top: 6px; color: #2b8a3e; font-weight: 900; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border: 2px solid #000; margin-right: 4px; vertical-align: -1px; }
+.lvcard { margin-top: 14px; }
+.lvcard h3 { margin: 0 0 6px; font-size: 13px; color: var(--gold); }
+/* question card */
+.qcard { background: var(--paper); color: var(--ink); border: 3px solid #000; border-radius: 12px; padding: 18px; box-shadow: 0 6px 0 #000; }
+.qhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.qhead .px { font-size: 10px; color: #444; }
+.dots { display: flex; gap: 6px; } .dots span { width: 14px; height: 14px; border: 2px solid #000; border-radius: 3px; background: #dee2e6; } .dots .ok { background: var(--green); } .dots .no { background: var(--red); } .dots .cur { background: var(--gold); }
+.passage { background: #fff; border: 2px solid #d3d9e3; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; max-height: 46vh; overflow: auto; }
+.extracts p { margin: 0 0 10px; }
+.figure { margin: 10px 0; overflow-x: auto; } .figure svg { max-width: 100%; height: auto; }
+table.grid { border-collapse: collapse; background: #fff; } table.grid th, table.grid td { border: 2px solid var(--ink); padding: 6px 10px; text-align: center; min-width: 46px; } table.grid th { background: #eef1f6; } table.grid td.gap { background: #fff3bf; }
+.opts { display: grid; gap: 8px; margin-top: 12px; }
+.opt { display: flex; gap: 10px; align-items: center; text-align: left; background: #fff; color: var(--ink); border: 3px solid var(--ink); border-radius: 10px; padding: 9px 12px; box-shadow: 0 3px 0 var(--ink); }
+.opt b.l { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 6px; background: var(--ink); color: #fff; }
+.opt:hover:not([disabled]) { background: #fff9db; }
+.opt.right { background: #d3f9d8; } .opt.wrong { background: #ffe3e3; }
+.opts.visual { grid-template-columns: repeat(2, minmax(0, 1fr)); } .opts.visual .opt { justify-content: center; }
+.fr sup, .fr sub { font-size: .75em; }
+.big { font-size: 22px; font-weight: 700; } .note { color: #555; font-size: 14px; } .quote { font-style: italic; font-size: 18px; }
+.box { border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; background: #f1f3f5; }
+.blank { display: inline-block; min-width: 90px; border-bottom: 2px solid var(--ink); }
+ul.clues, ol.sts { margin: 6px 0; } .gapline { font-size: 17px; }
+.explain { margin-top: 14px; border-top: 3px dashed #adb5bd; padding-top: 10px; }
+.explain .method { background: #e7f5ff; border-left: 5px solid #339af0; padding: 6px 10px; border-radius: 4px; }
+.explain .why-not { background: #fff4e6; border-left: 5px solid #fd7e14; padding: 6px 10px; border-radius: 4px; }
+.verdict { font-weight: 800; font-size: 18px; } .verdict.ok { color: #2b8a3e; } .verdict.no { color: #c92a2a; }
+.next { margin-top: 12px; text-align: right; }
+/* kit */
+.kitgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 12px 0; }
+.kit { background: var(--panel2); border: 3px solid #000; border-radius: 10px; padding: 10px; }
+.kit .v { font-size: 22px; font-weight: 800; color: var(--gold); } .kit.off { opacity: .5; } .kit small { color: var(--muted); display: block; }
+/* play */
+.stage { position: relative; background: #000; border: 3px solid #000; border-radius: 10px; overflow: hidden; }
+canvas#cv { display: block; width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; aspect-ratio: 16 / 9; }
+.pads { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; flex-wrap: wrap; user-select: none; -webkit-user-select: none; }
+.pads .grp { display: flex; gap: 8px; }
+.pad { width: 58px; height: 54px; border: 3px solid #000; border-radius: 10px; background: #dee2ff; color: #111; font-size: 20px; box-shadow: 0 3px 0 #000; touch-action: none; }
+.pad.wide { width: auto; padding: 0 12px; font-size: 14px; font-weight: 800; }
+.keys { color: var(--muted); font-size: 13px; margin-top: 8px; }
+.keys kbd { background: #fff; color: #111; border: 2px solid #000; border-radius: 4px; padding: 0 5px; font-size: 12px; }
+/* coach sidebar */
+aside#coach { display: none; }
+body.practice aside#coach { display: block; }
+aside#coach .panel { position: sticky; top: 70px; max-height: calc(100vh - 90px); overflow: auto; background: #fff; color: var(--ink); font-size: 14px; }
+aside#coach h2 { font-size: 11px; margin: 0 0 8px; color: #c92a2a; }
+aside#coach h3 { font-size: 14px; margin: 14px 0 4px; border-bottom: 2px solid #e9ecef; padding-bottom: 2px; }
+aside#coach ul { margin: 4px 0; padding-left: 18px; } aside#coach li { margin: 3px 0; }
+aside#coach .now { background: #fff3bf; border-radius: 4px; padding: 0 3px; font-weight: 700; }
+aside#coach .later { color: #868e96; }
+aside#coach .ladder li.cur { font-weight: 800; } aside#coach .ladder li.cur::marker { content: "▶ "; }
+.tag { display: inline-block; border-radius: 4px; padding: 0 6px; font-size: 12px; font-weight: 800; color: #fff; }
+.tag.maths { background: #e8590c; } .tag.thinking { background: #1c7ed6; } .tag.reading { background: #7048e8; }
+.adminbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+details.grown { margin-top: 16px; } details.grown summary { cursor: pointer; color: var(--muted); }
+table.prog { border-collapse: collapse; font-size: 13px; width: 100%; } table.prog th, table.prog td { border: 1px solid #3a4170; padding: 4px 6px; text-align: left; }
+footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+@media (max-width: 640px) { .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1 class="px">RIDGE RUNNER</h1>
+  <span class="chip" id="hdr-stars">★ 0</span><span class="chip" id="hdr-coins">● 0</span>
+  <span class="sp"></span>
+  <span class="chip hidden" id="hdr-practice">Practice: nothing is saved</span>
+  <button class="btn sm alt" id="btn-map">Map</button>
+  <button class="btn sm alt" id="btn-sound">Sound: on</button>
+</header>
+<div class="layout">
+<main>
+  <section id="scr-map"></section>
+  <section id="scr-brief" class="hidden"></section>
+  <section id="scr-kit" class="hidden"></section>
+  <section id="scr-play" class="hidden">
+    <div class="stage"><canvas id="cv" width="480" height="270" tabindex="0" aria-label="the platform level"></canvas></div>
+    <div class="pads" id="pads">
+      <div class="grp"><button class="pad" data-k="left" aria-label="left">◀</button><button class="pad" data-k="right" aria-label="right">▶</button><button class="pad" data-k="down" aria-label="down or use">▼</button></div>
+      <div class="grp"><button class="pad wide" data-k="duck">DUCK</button><button class="pad wide" data-k="use">SCOPE</button><button class="pad" data-k="fire" aria-label="fire">✦</button><button class="pad" data-k="jump" aria-label="jump">▲</button></div>
+    </div>
+    <p class="keys"><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd> run · <kbd>↑</kbd>/<kbd>W</kbd>/<kbd>Space</kbd> jump (hold for higher) · <kbd>J</kbd> blaster · at a nest <kbd>↓</kbd>/<kbd>E</kbd> scope · in the scope: arrows aim, <kbd>J</kbd> fire, hold <kbd>K</kbd> duck, <kbd>E</kbd> leave</p>
+    <div class="adminbar hidden" id="play-admin"><button class="btn sm grn" id="adm-win">Win this level</button><button class="btn sm alt" id="adm-inv">Invincible: off</button><button class="btn sm red" id="adm-quit">Quit to map</button></div>
+  </section>
+  <section id="scr-result" class="hidden"></section>
+</main>
+<aside id="coach"><div class="panel" id="coach-body"></div></aside>
+</div>
+<footer>Ridge Runner · a practice game · all art and questions made for this site</footer>
+<script>
+const INK = "#1b2a41";
+const GENS = [], HAND = [];
+/*__CONTENT__*/
+</script>
+<script>
+/*__PLATFORM__*/
+</script>
+<script>
+"use strict";
+/* ================= levels ================= */
+const ORDER = ["frac", "flaw", "infer", "data", "claim", "word", "time", "rule", "link", "scale", "order", "same", "back", "space", "shape"];
+const TR = Object.fromEntries(TRACKS.map(t => [t.id, t]));
+const WORLDS = [
+  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", sub: "Step 1 of every skill: the building blocks." },
+  { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", sub: "Step 2: the skills start to join together. Your scope now has drop dots for range." },
+  { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", sub: "Step 3: two-step thinking. Night falls, and wind pushes your shots." },
+  { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", sub: "Step 4: the hardest third of the sample papers." }];
+const hash = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };
+const LEVELS = [];
+for (const W of WORLDS) {
+  ORDER.forEach((t, k) => LEVELS.push({ id: `${W.n}-${t}`, world: W.n, k, track: t, rung: W.n, seed: hash(`${W.n}-${t}`) }));
+  LEVELS.push({ id: `${W.n}-boss`, world: W.n, k: ORDER.length, boss: true, seed: hash(`${W.n}-boss`) });
+}
+const LV = Object.fromEntries(LEVELS.map(l => [l.id, l]));
+const QN = { boss: 6, normal: 4 };
+
+/* ================= saved progress ================= */
+const KEY = "prac4.v1", PKEY = "prac4.practice.seen";
+const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
+const FRESH = () => ({ v: 1, levels: {}, seen: {}, seed: 1, coins: 0, sound: true, world: 1, log: [] });
+function load() {
+  if (PRACTICE) { const s = FRESH(); try { const p = JSON.parse(localStorage.getItem(PKEY)); if (p && p.seen) { s.seen = p.seen; s.seed = p.seed || 1; } } catch (e) {} return s; }
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return Object.assign(FRESH(), s); } catch (e) {}
+  return FRESH();
+}
+let S = load();
+const save = () => { try { if (PRACTICE) localStorage.setItem(PKEY, JSON.stringify({ seen: S.seen, seed: S.seed })); else localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const cleared = id => !!(S.levels[id] && S.levels[id].cleared);
+const unlocked = l => { if (PRACTICE) return true; const i = LEVELS.indexOf(l); return i === 0 || cleared(LEVELS[i - 1].id); };
+const totalStars = () => Object.values(S.levels).reduce((a, x) => a + (x.stars || 0), 0);
+
+/* ================= picking questions ================= */
+function makeGen(g) { for (let k = 0; k < 80; k++) { const q = g.make(S.seed++ * 7919 + hash(g.id) % 1000); if (q) return q; } return null; }
+function pick(track, rung, avoid) {
+  const gens = GENS.filter(g => g.track === track && g.rung === rung);
+  if (gens.length) {
+    /* a template: least recently used template for this step, then fresh numbers */
+    const g = gens.slice().sort((a, b) => (S.seen[a.id] || 0) - (S.seen[b.id] || 0))[0];
+    return makeGen(g);
+  }
+  const pool = HAND.filter(q => q.track === track && q.rung === rung && !avoid.includes(q.id));
+  if (!pool.length) return null;
+  const unseen = pool.filter(q => !S.seen[q.id]);
+  if (unseen.length) return unseen[Math.floor(Math.random() * unseen.length)];
+  return pool.slice().sort((a, b) => S.seen[a.id] - S.seen[b.id])[0];
+}
+function briefing(L) {
+  const out = [], ids = [];
+  const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); out.push(Object.assign({}, q, { role })); } };
+  if (L.boss) {
+    const bySub = s => ORDER.filter(t => TR[t].subject === s).sort(() => Math.random() - .5).slice(0, 2);
+    const ts = [...bySub("maths"), ...bySub("thinking"), ...bySub("reading")].sort(() => Math.random() - .5);
+    ts.forEach(t => add(t, L.world, "boss"));
+  } else {
+    if (L.k > 0) { const j = Math.floor(Math.random() * L.k); add(ORDER[j], L.world, "review"); }
+    else if (L.world > 1) add(ORDER[Math.floor(Math.random() * ORDER.length)], L.world - 1, "review");
+    while (out.length < QN.normal) { const before = out.length; add(L.track, L.rung, "focus"); if (out.length === before) add(L.track, L.rung, "focus"); if (out.length === before) break; }
+  }
+  return out;
+}
+
+/* ================= screens ================= */
+const $ = s => document.querySelector(s);
+const SCR = ["map", "brief", "kit", "play", "result"];
+function show(name) { SCR.forEach(n => $("#scr-" + n).classList.toggle("hidden", n !== name)); if (name !== "play") PF.stop(); window.scrollTo(0, 0); hdr(); }
+function hdr() { $("#hdr-stars").textContent = "★ " + totalStars(); $("#hdr-coins").textContent = "● " + S.coins; $("#btn-sound").textContent = "Sound: " + (S.sound ? "on" : "off"); }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const stars = n => "★".repeat(n) + "☆".repeat(3 - n);
+let SEL = null;
+function renderMap() {
+  const W = WORLDS[S.world - 1];
+  const tabs = WORLDS.map(w => { const first = LEVELS.find(l => l.world === w.n); return `<button class="tab px ${w.n === S.world ? "on" : ""} ${unlocked(first) ? "" : "lock"}" data-w="${w.n}">${w.n}. ${w.name.toUpperCase()}</button>`; }).join("");
+  const nodes = LEVELS.filter(l => l.world === W.n).map(l => {
+    const t = l.boss ? null : TR[l.track], rec = S.levels[l.id] || {};
+    const cls = l.boss ? "boss" : t.subject;
+    return `<button class="node ${cls} ${unlocked(l) ? "" : "lock"} ${rec.cleared ? "done" : ""} ${SEL === l.id ? "sel" : ""}" data-l="${l.id}" ${unlocked(l) ? "" : 'aria-disabled="true"'}>
+      <div class="n px">${l.boss ? "BOSS" : `LEVEL ${l.k + 1}`}</div><div class="ic">${l.boss ? "♛" : t.icon}</div>
+      <div class="nm">${l.boss ? "The Warden" : esc(t.name)}</div><div class="st">${rec.cleared ? stars(rec.stars || 1) : ""}</div></button>`;
+  }).join("");
+  const L = SEL && LV[SEL];
+  const card = L ? levelCard(L) : `<p class="sub">Pick a level. Each one starts with a short briefing: the more questions you get right, the better your kit for the level.</p>`;
+  $("#scr-map").innerHTML = `<div class="tabs">${tabs}</div>
+    <div class="world" style="background:${W.col}"><h2 class="px">WORLD ${W.n}: ${W.name.toUpperCase()} <small>(${W.rar})</small></h2><p class="sub">${W.sub}</p><div class="path">${nodes}</div>
+    <div class="legend"><span><i style="background:var(--m)"></i>Maths</span><span><i style="background:var(--t)"></i>Thinking</span><span><i style="background:var(--r)"></i>Reading</span><span><i style="background:#ffe066"></i>Boss: mixed questions</span></div></div>
+    <div class="panel lvcard" id="lvcard">${card}</div>${grownUps()}`;
+  document.querySelectorAll(".tab").forEach(b => b.onclick = () => { S.world = +b.dataset.w; SEL = null; save(); renderMap(); coachLevel(null); });
+  document.querySelectorAll(".node").forEach(b => b.onclick = () => { const l = LV[b.dataset.l]; if (!unlocked(l)) return; SEL = l.id; renderMap(); coachLevel(l); $("#lvcard").scrollIntoView({ block: "nearest" }); });
+  const go = $("#btn-go"); if (go) go.onclick = () => startBrief(LV[SEL]);
+  hdr();
+}
+function levelCard(L) {
+  const rec = S.levels[L.id] || {};
+  if (L.boss) return `<h3 class="px">WORLD ${L.world} BOSS: THE WARDEN</h3><p>A mixed briefing of ${QN.boss} questions from this world's skills, then a run to the Warden's ridge and a sniper duel. Read the drop dots and the wind!</p>
+    ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
+  const t = TR[L.track], r = t.rungs[L.rung - 1];
+  return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(t.name.toUpperCase())}</h3><p><span class="tag ${t.subject}">${t.subject}</span> Step ${L.rung} of 4: <b>${esc(r.title)}</b></p><p>${esc(r.builds)}</p>
+    ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.normal} · ${stars(rec.stars || 0)}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
+}
+function grownUps() {
+  const rows = ORDER.map(t => { const tr = TR[t]; return `<tr><td>${esc(tr.name)}</td>${WORLDS.map(w => { const r = S.levels[`${w.n}-${t}`]; return `<td>${r ? `${r.cleared ? "✔ " : ""}${r.best}/${QN.normal}` : "–"}</td>`; }).join("")}</tr>`; }).join("");
+  return `<details class="grown"><summary>For grown-ups: best briefing scores by skill</summary><div class="panel" style="margin-top:8px"><p>Each skill is built in four steps, one per world. The score is the best briefing (questions right before the level).</p>
+    <table class="prog"><tr><th>Skill</th>${WORLDS.map(w => `<th>Step ${w.n}</th>`).join("")}</tr>${rows}</table></div></details>`;
+}
+
+/* ================= briefing ================= */
+let B = null;
+function startBrief(L) {
+  const qs = briefing(L);
+  B = { L, qs, i: 0, right: 0, res: [] };
+  renderQ();
+}
+function renderQ() {
+  const q = B.qs[B.i], t = TR[q.track], letters = "ABCDE";
+  S.seen[q.gen || q.id] = S.seed++; save();
+  const visual = q.visual || q.options.some(o => /<svg/.test(o));
+  const role = q.role === "review" ? "Warm-up from an earlier level" : q.role === "boss" ? "Boss briefing" : `Step ${q.rung} of 4`;
+  $("#scr-brief").innerHTML = `<div class="qcard"><div class="qhead"><span class="px">BRIEFING · ${B.L.boss ? `WORLD ${B.L.world} BOSS` : `LEVEL ${B.L.k + 1}`} · QUESTION ${B.i + 1} OF ${B.qs.length}</span>
+      <span class="dots">${B.qs.map((x, i) => `<span class="${B.res[i] === true ? "ok" : B.res[i] === false ? "no" : i === B.i ? "cur" : ""}"></span>`).join("")}</span></div>
+    <p class="note"><span class="tag ${t.subject}">${t.subject}</span> ${esc(t.name)} · ${role}</p>
+    ${q.passage || ""}<div class="stem">${q.stem}</div>
+    <div class="opts ${visual ? "visual" : ""}">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><b class="l">${letters[i]}</b><span>${o}</span></button>`).join("")}</div>
+    <div class="explain hidden" id="explain"></div></div>`;
+  document.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.i));
+  coachQ(q);
+  show("brief");
+}
+function answer(i) {
+  const q = B.qs[B.i]; if (B.res[B.i] !== undefined) return;
+  const ok = i === q.answer; B.res[B.i] = ok; if (ok) B.right++;
+  document.querySelectorAll(".opt").forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add("right"); else if (k === i) b.classList.add("wrong"); });
+  const last = B.i === B.qs.length - 1;
+  const ex = $("#explain"); ex.classList.remove("hidden");
+  ex.innerHTML = `<p class="verdict ${ok ? "ok" : "no"}">${ok ? "✔ Right! Kit upgraded." : `✘ Not this time: the answer is ${"ABCDE"[q.answer]}.`}</p>${q.explain}<div class="next"><button class="btn" id="btn-next">${last ? "See your kit" : "Next question"}</button></div>`;
+  $("#btn-next").onclick = () => { if (last) showKit(); else { B.i++; renderQ(); } };
+  S.log.push([q.track, q.rung, ok ? 1 : 0]); if (S.log.length > 400) S.log.shift(); save();
+}
+
+/* ================= kit ================= */
+function kitFor(right, n, boss) {
+  const f = right / n;
+  return { hearts: 2 + Math.round(4 * f), ammo: 4 + Math.round(12 * f), rounds: (boss ? 4 : 2) + Math.round((boss ? 8 : 6) * f), steady: f >= 0.5, boots: f >= 0.75, shield: right === n };
+}
+function showKit() {
+  const n = B.qs.length, k = kitFor(B.right, n, B.L.boss), best = kitFor(n, n, B.L.boss);
+  B.kit = k; B.retries = 1;
+  const rec = S.levels[B.L.id] || (S.levels[B.L.id] = {}); rec.best = Math.max(rec.best || 0, B.right); rec.last = B.right; save();
+  const item = (name, v, desc, on = true) => `<div class="kit ${on ? "" : "off"}"><div>${name}</div><div class="v">${v}</div><small>${desc}</small></div>`;
+  $("#scr-kit").innerHTML = `<div class="panel"><h2 class="px" style="font-size:14px;color:var(--gold)">YOUR KIT: ${B.right} OF ${n} RIGHT</h2>
+    <p>Every right answer made your kit better. ${B.right < n ? `With all ${n} right you would have had ${best.hearts} hearts, ${best.ammo} blaster shots, ${best.rounds} sniper rounds, boots and a shield.` : "A perfect briefing: you have everything!"}</p>
+    <div class="kitgrid">${item("❤ Hearts", k.hearts, "hits you can take")}${item("✦ Blaster", k.ammo, "shots for crawler bots and drones")}${item("◎ Sniper rounds", k.rounds, "for the sentries at each nest")}
+      ${item("〰 Steady scope", k.steady ? "YES" : "no", "less sway (half right or better)", k.steady)}${item("⤒ Double-jump boots", k.boots ? "YES" : "no", "jump again in the air (¾ right or better)", k.boots)}${item("◆ Shield", k.shield ? "YES" : "no", "blocks one hit (all right)", k.shield)}</div>
+    <button class="btn grn" id="btn-play">Start the level ▶</button></div>`;
+  $("#btn-play").onclick = () => play();
+  coachKit();
+  show("kit");
+}
+
+/* ================= play ================= */
+let INV = false;
+function play() {
+  show("play");
+  $("#play-admin").classList.toggle("hidden", !PRACTICE);
+  PF.start({ canvas: $("#cv"), level: { world: B.L.world, boss: !!B.L.boss, seed: B.L.seed }, kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done });
+  $("#cv").focus();
+}
+function done(res) {
+  S.coins += res.coins;
+  const L = B.L, rec = S.levels[L.id] || (S.levels[L.id] = {}), n = B.qs.length;
+  if (res.win) {
+    const st = 1 + (B.right >= Math.ceil(n * 0.75) ? 1 : 0) + (B.right === n ? 1 : 0);
+    rec.cleared = true; rec.stars = Math.max(rec.stars || 0, st); save();
+    const i = LEVELS.indexOf(L), next = LEVELS[i + 1];
+    $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">${L.boss ? "BOSS DEFEATED!" : "LEVEL CLEAR!"}</h2>
+      <p style="font-size:28px;color:var(--gold)">${stars(st)}</p><p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
+      <p class="note" style="color:var(--muted)">★ for clearing the level, ★ for ¾ of the briefing right, ★ for a perfect briefing.</p>
+      ${next ? `<button class="btn grn" id="btn-nextlv">Next: ${next.boss ? "the Warden" : esc(TR[next.track].name)} ▶</button>` : `<p class="px" style="color:var(--gold)">YOU BEAT ALL FOUR WORLDS!</p>`}
+      <button class="btn alt" id="btn-tomap">Map</button></div>`;
+    if (next) $("#btn-nextlv").onclick = () => { S.world = next.world; SEL = next.id; save(); startBrief(next); };
+  } else {
+    save();
+    $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--red);font-size:16px">OUT OF HEARTS</h2>
+      <p>The kit comes from the briefing. A new briefing means new questions and a new kit.</p>
+      ${B.retries > 0 ? `<button class="btn" id="btn-retry">Try again with this kit (${B.retries} left)</button>` : ""}
+      <button class="btn grn" id="btn-rebrief">New briefing</button> <button class="btn alt" id="btn-tomap">Map</button></div>`;
+    if (B.retries > 0) $("#btn-retry").onclick = () => { B.retries--; play(); };
+    $("#btn-rebrief").onclick = () => startBrief(B.L);
+  }
+  $("#btn-tomap").onclick = () => { renderMap(); show("map"); };
+  show("result");
+}
+
+/* ================= coach sidebar (practice mode only) ================= */
+function samplesHtml(t, rung) {
+  return `<ul>${t.samples.map(s => { const now = s.rungs.includes(rung); return `<li class="${now ? "" : "later"}"><span class="${now ? "now" : ""}">${esc(s.ref)}</span>: ${esc(s.what)}${now ? "" : ` <i>(step${s.rungs.length > 1 ? "s" : ""} ${s.rungs.join(", ")})</i>`}</li>`; }).join("")}</ul>`;
+}
+function ladderHtml(t, rung) { return `<ol class="ladder">${t.rungs.map((r, i) => `<li class="${i + 1 === rung ? "cur" : ""}"><b>${esc(r.title)}</b>: ${esc(r.builds)}</li>`).join("")}</ol>`; }
+function coachLevel(L) {
+  if (!PRACTICE) return;
+  const el = $("#coach-body");
+  if (!L) { el.innerHTML = `<h2 class="px">COACH NOTES (ADMIN ONLY)</h2><p>Pick a level to see which sample-paper questions its skill builds toward, and how the four steps of that skill climb from building blocks to the hardest questions.</p>
+    <h3>How the game is built</h3><ul><li>15 skills (6 maths, 5 thinking, 4 reading), each in 4 steps.</li><li>World n = step n of every skill, so the whole game climbs from easy to hard.</li><li>Each briefing: 3 questions on the level's step + 1 warm-up from an earlier level. Bosses mix 6 skills (2 per subject) as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
+  if (L.boss) { el.innerHTML = `<h2 class="px">COACH NOTES · WORLD ${L.world} BOSS</h2><p>The boss briefing mixes ${QN.boss} questions: 2 maths, 2 thinking and 2 reading skills, all at step ${L.world}. Coming without warning, mixed together like the real test, they check that each skill transfers when the topic isn't announced.</p>`; return; }
+  const t = TR[L.track];
+  el.innerHTML = `<h2 class="px">COACH NOTES · ${esc(t.name.toUpperCase())}</h2><p><span class="tag ${t.subject}">${t.subject}</span> Step ${L.rung} of 4</p>
+    <h3>Sample questions this skill prepares for</h3>${samplesHtml(t, L.rung)}
+    <h3>The underlying skill</h3><ul>${t.ideas.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
+    <h3>The four steps</h3>${ladderHtml(t, L.rung)}
+    <h3>Same method, same words</h3><p>${esc(t.method)}</p><h3>Transfer</h3><p>${esc(t.transfer)}</p>`;
+}
+function coachQ(q) {
+  if (!PRACTICE) return;
+  const t = TR[q.track], r = t.rungs[q.rung - 1], letters = "ABCDE";
+  const prev = t.rungs[q.rung - 2], next = t.rungs[q.rung];
+  const traps = Object.entries(q.traps || {}).map(([i, x]) => `<li><b>${letters[i]}</b>: ${esc(x)}</li>`).join("");
+  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · QUESTION ${B.i + 1}</h2>
+    <p><span class="tag ${t.subject}">${t.subject}</span> <b>${esc(t.name)}</b>, step ${q.rung} of 4: ${esc(r.title)}${q.role === "review" ? " <i>(a warm-up from an earlier level, so the skill doesn't fade)</i>" : q.role === "boss" ? " <i>(boss: mixed skills, a transfer check)</i>" : ""}.
+      Answer: <b>${letters[q.answer]}</b>.${q.gen ? ` A template (<code>${esc(q.gen)}</code>, form: ${esc(q.form || "")}): new numbers and context every play.` : ` Hand-written (<code>${esc(q.id)}</code>).`}</p>
+    <h3>Sample questions it builds toward</h3>${samplesHtml(t, q.rung)}
+    <h3>The underlying skill</h3><ul>${t.ideas.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
+    <h3>How this step builds it</h3><p>${esc(r.builds)}</p>
+    ${prev ? `<p><b>Before:</b> step ${q.rung - 1}, ${esc(prev.title)}.</p>` : `<p><b>This is the first step:</b> the building block.</p>`}
+    ${next ? `<p><b>Next:</b> step ${q.rung + 1}, ${esc(next.title)}: ${esc(next.builds)}</p>` : `<p><b>This is the top step:</b> the level of the hardest third of the papers.</p>`}
+    <h3>Traps in this question (real mistakes)</h3><ul>${traps}</ul><p><b>Traps this step trains:</b> ${esc(r.traps)}</p>
+    <h3>Same method, same words</h3><p>${esc(t.method)}</p>
+    <h3>Why it transfers</h3><p>${esc(t.transfer)}</p>
+    <h3>All four steps</h3>${ladderHtml(t, q.rung)}`;
+}
+function coachKit() {
+  if (!PRACTICE) return;
+  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · RESULTS</h2><p>${B.right} of ${B.qs.length} right.</p><ul>${B.qs.map((q, i) => `<li>${B.res[i] ? "✔" : "✘"} ${esc(TR[q.track].name)} (step ${q.rung})${q.role === "review" ? ", warm-up" : ""}</li>`).join("")}</ul>
+    <p>The kit scales with the score, so the questions stay the thing that matters: more right answers = more hearts, ammo and gear.</p>`;
+}
+
+/* ================= wiring ================= */
+$("#btn-map").onclick = () => { renderMap(); show("map"); };
+$("#btn-sound").onclick = () => { S.sound = !S.sound; save(); hdr(); };
+document.querySelectorAll("#pads .pad").forEach(b => {
+  const k = b.dataset.k, on = e => { e.preventDefault(); PF.hook.key(k, true); }, off = e => { e.preventDefault(); PF.hook.key(k, false); };
+  b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointerleave", off); b.addEventListener("pointercancel", off);
+});
+$("#adm-win").onclick = () => PF.hook.win();
+$("#adm-inv").onclick = () => { INV = !INV; $("#adm-inv").textContent = "Invincible: " + (INV ? "on" : "off"); };
+$("#adm-quit").onclick = () => { PF.stop(); renderMap(); show("map"); };
+if (PRACTICE) { document.body.classList.add("practice"); $("#hdr-practice").classList.remove("hidden"); }
+renderMap(); coachLevel(null); show("map");
+/* test hooks (tools/check_game4.js) */
+window.__rr = { S: () => S, LEVELS, TRACKS, briefing, startBrief: id => startBrief(LV[id]), B: () => B, answer, PF, kitFor, practice: PRACTICE,
+  preview: q => { B = { L: LEVELS[0], qs: [Object.assign({}, q, { role: "focus" })], i: 0, right: 0, res: [] }; renderQ(); } };
+</script>
+</body>
+</html>
