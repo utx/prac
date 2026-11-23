@@ -54,7 +54,8 @@ main { min-width: 0; }
 .qhead .px { font-size: 10px; color: #444; }
 .dots { display: flex; gap: 6px; } .dots span { width: 14px; height: 14px; border: 2px solid #000; border-radius: 3px; background: #dee2e6; } .dots .ok { background: var(--green); } .dots .no { background: var(--red); } .dots .cur { background: var(--gold); }
 .passage { background: #fff; border: 2px solid #d3d9e3; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; max-height: 46vh; overflow: auto; }
-.qgrid { display: grid; gap: 18px; }
+.qgrid { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+.qgrid > div { min-width: 0; }
 @media (min-width: 900px) {
   .qgrid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; }
   .qgrid .left .passage { max-height: calc(100vh - 230px); }
@@ -111,7 +112,7 @@ aside#coach .ladder li.cur { font-weight: 800; } aside#coach .ladder li.cur::mar
 details.grown { margin-top: 16px; } details.grown summary { cursor: pointer; color: var(--muted); }
 table.prog { border-collapse: collapse; font-size: 13px; width: 100%; } table.prog th, table.prog td { border: 1px solid #3a4170; padding: 4px 6px; text-align: left; }
 footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-@media (max-width: 640px) { .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
+@media (max-width: 640px) { table.grid th, table.grid td { padding: 5px 6px; min-width: 36px; } .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
 </style>
 </head>
 <body>

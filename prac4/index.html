@@ -54,7 +54,8 @@ main { min-width: 0; }
 .qhead .px { font-size: 10px; color: #444; }
 .dots { display: flex; gap: 6px; } .dots span { width: 14px; height: 14px; border: 2px solid #000; border-radius: 3px; background: #dee2e6; } .dots .ok { background: var(--green); } .dots .no { background: var(--red); } .dots .cur { background: var(--gold); }
 .passage { background: #fff; border: 2px solid #d3d9e3; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; max-height: 46vh; overflow: auto; }
-.qgrid { display: grid; gap: 18px; }
+.qgrid { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+.qgrid > div { min-width: 0; }
 @media (min-width: 900px) {
   .qgrid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; }
   .qgrid .left .passage { max-height: calc(100vh - 230px); }
@@ -111,7 +112,7 @@ aside#coach .ladder li.cur { font-weight: 800; } aside#coach .ladder li.cur::mar
 details.grown { margin-top: 16px; } details.grown summary { cursor: pointer; color: var(--muted); }
 table.prog { border-collapse: collapse; font-size: 13px; width: 100%; } table.prog th, table.prog td { border: 1px solid #3a4170; padding: 4px 6px; text-align: left; }
 footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-@media (max-width: 640px) { .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
+@media (max-width: 640px) { table.grid th, table.grid td { padding: 5px 6px; min-width: 36px; } .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
 </style>
 </head>
 <body>
@@ -1935,25 +1936,25 @@ const PF = (() => {
     const ground = (c, h) => { for (let y = 0; y < ROWS; y++) map[y][c] = y >= h ? 1 : 0; };
     const air = c => { for (let y = 0; y < ROWS; y++) map[y][c] = 0; };
     const flat = (n, opt = {}) => { for (let i = 0; i < n; i++) ground(x + i, gh); if (opt.walker && n >= 5) ents.push({ t: "walker", x: (x + Math.floor(n / 2)) * TS, y: gh * TS - 10 }); if (opt.coins) for (let i = 1; i < n - 1; i += 2) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 2) * TS + 4 }); x += n; };
-    const maxGap = w === 1 ? 2 : 3, maxStep = w === 1 ? 1 : w === 4 ? 3 : 2;
+    const maxGap = 3, maxStep = w >= 3 ? 3 : 2, walkerP = 0.45 + 0.1 * w;
     flat(8);
     ents.push({ t: "check", x: 2 * TS, y: gh * TS });
-    let sinceCheck = 0, nests = 0, wantNests = L.boss ? 0 : w === 1 ? 1 : 2, sinceNest = 0;
+    let sinceCheck = 0, nests = 0, wantNests = L.boss ? 0 : w <= 2 ? 2 : 3, sinceNest = 0;
     while (x < len - 14) {
       const k = r();
       if (sinceCheck > 30) { flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); sinceCheck = 0; continue; }
-      if (nests < wantNests && sinceNest > 22 && x > len * (nests + 1) / (wantNests + 1.4)) {
-        flat(3); ents.push({ t: "nest", x: (x) * TS, y: gh * TS, id: nests }); flat(5); nests++; sinceNest = 0; sinceCheck += 8; continue;
+      if (nests < wantNests && x >= Math.round((len - 14) * (nests + 0.8) / (wantNests + 0.6))) {
+        flat(3); ents.push({ t: "nest", x: (x) * TS, y: gh * TS, id: nests }); flat(4); ground(x, gh); for (let y = 0; y < gh; y++) map[y][x] = 4; ents.push({ t: "gate", x: x * TS, y: gh * TS, col: x, nest: nests }); x++; flat(3); nests++; sinceNest = 0; sinceCheck += 8; continue;
       }
       let used = 0;
-      if (k < 0.2) { flat(int(4, 8), { walker: r() < 0.25 + 0.12 * w, coins: r() < 0.5 }); }
-      else if (k < 0.42) {                                            /* a gap with coins over it */
+      if (k < 0.16) { flat(int(5, 8), { walker: r() < walkerP, coins: r() < 0.5 }); }
+      else if (k < 0.34) {                                            /* a gap with coins over it */
         const g = int(2, maxGap); for (let i = 0; i < g; i++) air(x + i);
         for (let i = 0; i < g; i++) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 3) * TS });
         x += g; flat(int(3, 5));
-      } else if (k < 0.58) {                                          /* a step up or down */
-        const d = int(1, maxStep) * (r() < 0.5 ? -1 : 1); gh = Math.max(8, Math.min(14, gh + d)); flat(int(4, 6), { walker: w >= 2 && r() < 0.3 });
-      } else if (k < 0.72 && w >= 2) {                                /* floating blocks over a pit */
+      } else if (k < 0.46) {                                          /* a step up or down */
+        const d = int(1, maxStep) * (r() < 0.5 ? -1 : 1); gh = Math.max(8, Math.min(14, gh + d)); flat(int(4, 6), { walker: r() < walkerP * 0.6 });
+      } else if (k < 0.58) {                                /* floating blocks over a pit */
         const top = gh, n = int(2, 3); let px = x;
         for (let i = 0; i < 2; i++) air(px++);
         for (let p = 0; p < n; p++) {
@@ -1963,11 +1964,21 @@ const PF = (() => {
           px += wid; const g = int(1, 2); for (let i = 0; i < g; i++) air(px++);
         }
         x = px; flat(int(3, 5));
-      } else if (k < 0.84 && w >= 2) {                                /* spikes on the ground */
-        flat(2); const s = int(1, 2); for (let i = 0; i < s; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } x += s; flat(int(3, 4));
-      } else if (k < 0.94 && w >= 3) {                                /* a drone patrol */
+      } else if (k < 0.68) {                                         /* spikes on the ground */
+        flat(2); const s = int(1, w === 1 ? 2 : 3); for (let i = 0; i < s; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } x += s; flat(int(3, 4));
+      } else if (k < 0.8) {                                          /* a run of narrow pillars */
+        let h = gh; const n = int(3, 3 + w);
+        for (let p = 0; p < n; p++) {
+          const g = int(1, 2); for (let i = 0; i < g; i++) air(x++);
+          h = Math.max(8, Math.min(14, h + int(-maxStep, Math.min(2, maxStep)))); const wid = w >= 3 ? 1 : int(1, 2);
+          for (let i = 0; i < wid; i++) ground(x + i, h);
+          if (r() < 0.5) ents.push({ t: "coin", x: x * TS + 4, y: (h - 2) * TS + 4 });
+          x += wid;
+        }
+        air(x++); gh = h; flat(int(3, 4));
+      } else if (k < 0.9 && w >= 2) {                                /* a drone patrol */
         flat(int(5, 7)); ents.push({ t: "drone", x: (x - 3) * TS, y: (gh - 3) * TS, y0: (gh - 3) * TS });
-      } else { flat(int(4, 7), { walker: r() < 0.5, coins: true }); }
+      } else { flat(int(6, 8), { walker: true, coins: true }); if (w >= 2) ents.push({ t: "walker", x: (x - 2) * TS, y: gh * TS - 10 }); }
       sinceCheck += 6; sinceNest += 6;
     }
     if (L.boss) { flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); flat(4); ents.push({ t: "nest", x: x * TS, y: gh * TS, id: 9, boss: true }); flat(10); }
@@ -1979,7 +1990,7 @@ const PF = (() => {
     const mid = ents.filter(e => e.t === "check")[1]; if (mid) ents.push({ t: "heart", x: mid.x + 24, y: mid.y - 40 });
     return { map, ents, cols, theme: THEMES[w - 1], world: w };
   }
-  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2; };
+  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2 || (t === 4 && !G.open && !(G.gateOpen && G.gateOpen[c])); };
   const spikeAt = (G, c, r) => c >= 0 && c < G.cols && r >= 0 && r < ROWS && G.map[r][c] === 3;
 
   /* one physics step for a body {x, y, vx, vy, ground} with input {dir, jump (held), jumpPressed} */
@@ -2008,7 +2019,7 @@ const PF = (() => {
 
   /* ---------------- can the goal be reached? (uses the same physics, no double jump) ---------------- */
   function reach(L) {
-    const G = gen(L), goal = G.ents.find(e => e.t === "goal" || e.boss);
+    const G = gen(L); G.open = true; const  goal = G.ents.find(e => e.t === "goal" || e.boss);
     const gx = Math.floor(goal.x / TS);
     const startC = 2, stand = new Map(), queue = [];
     const groundRow = c => { for (let r = 0; r < ROWS; r++) if (solidAt(G, c, r)) return r; return -1; };
@@ -2071,9 +2082,10 @@ const PF = (() => {
     S = { G, cv, ctx, opts, kit: Object.assign({}, opts.kit), sound: opts.sound !== false, t: 0, cam: 0, coins: 0, lost: 0, msgs: [], parts: [],
       P: { x: first.x + 3, y: first.y - PH.h, vx: 0, vy: 0, ground: false, face: 1, inv: 0, boots: opts.kit.boots, cd: 0 },
       check: { x: first.x + 3, y: first.y - PH.h }, hearts: opts.kit.hearts, shield: opts.kit.shield ? 1 : 0, ammo: opts.kit.ammo, rounds: opts.kit.rounds,
-      ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -0.5 : 0, ph: i * 1.7 }, e)),
+      ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -(0.45 + 0.15 * opts.level.world) : 0, ph: i * 1.7 }, e)),
       bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible };
     S.ents.filter(e => e.t === "nest").forEach(e => { e.sentries = makeSentries(e); });
+    G.gateOpen = {};
     addEventListener("keydown", kd); addEventListener("keyup", ku);
     let last = performance.now(), acc = 0;
     const loop = now => {
@@ -2140,7 +2152,7 @@ const PF = (() => {
         msg(head ? "HEADSHOT!" : "HIT!", 50, head ? "#ff6b6b" : "#fff"); S.coins += head ? 3 : 1;
         if (s.hp <= 0) { s.alive = false; s.state = "ko"; msg(s.boss ? "The Warden is down!" : "Sentry down!", 70, "#9be15d"); }
         else { s.state = "hide"; s.st = 0; s.hold = 30; s.x = s.at; }
-        if (!sc.nest.sentries.list.some(q => q.alive)) { msg(sc.nest.boss ? "BOSS DEFEATED!" : "Ridge clear!", 120, "#9be15d"); if (sc.nest.boss) { S.scope = null; end(true); } else setTimeout(() => { if (S && S.scope) S.scope = null; }, 600); }
+        if (!sc.nest.sentries.list.some(q => q.alive)) { msg(sc.nest.boss ? "BOSS DEFEATED!" : "Ridge clear!", 120, "#9be15d"); if (sc.nest.boss) { S.scope = null; end(true); } else { const g = S.ents.find(e => e.t === "gate" && e.nest === sc.nest.id); if (g) { S.G.gateOpen[g.col] = true; msg("The laser gate is open!", 120, "#9be15d"); beep(392, .1, "triangle"); beep(587, .15, "triangle"); } setTimeout(() => { if (S && S.scope) S.scope = null; }, 600); } }
         return;
       }
     }
@@ -2156,7 +2168,7 @@ const PF = (() => {
     }
     if (pressed("leave") || pressed("use")) { S.scope = null; msg(sc.nest.sentries.list.some(s => s.alive) ? "Careful: the sentries left standing will shell the path" : "", 120, "#ffd43b"); return; }
     if (sc.cd > 0) sc.cd--; if (sc.flash > 0) sc.flash--;
-    if (S.rounds <= 0 && sc.nest.boss && sc.nest.sentries.list.some(s => s.alive)) { if (++sc.supply === 150) { S.rounds += 3; msg("Supply drop: +3 sniper rounds", 90, "#9be15d"); sc.supply = 0; } }
+    if (S.rounds <= 0 && sc.nest.sentries.list.some(s => s.alive)) { if (++sc.supply === 150) { S.rounds += 3; msg("Supply drop: +3 sniper rounds", 90, "#9be15d"); sc.supply = 0; } }
     for (const s of sc.nest.sentries.list) {
       if (!s.alive) continue;
       s.st++;
@@ -2167,7 +2179,7 @@ const PF = (() => {
       if (s.st < s.hold) continue;
       const r = Math.random();
       if (s.state === "hide") { s.side = Math.random() < 0.5 ? -1 : 1; out(); if (r < (s.boss ? 0.45 : 0.25) + 0.05 * w) { s.state = "aim"; s.st = 0; } else { s.state = "peek"; s.st = 0; s.hold = 70 + Math.random() * 60 - 8 * w; } }
-      else if (s.state === "peek") { if (w >= 2 && r < 0.3 + 0.1 * w) { const o = s.rocks.filter(x => x !== s.at); s.at = o[Math.floor(Math.random() * o.length)]; s.tx = s.at + s.side * (s.boss ? 42 : 36); s.state = "run"; s.st = 0; } else { s.state = "hide"; s.st = 0; s.hold = 40 + Math.random() * 60; s.x = s.at; } }
+      else if (s.state === "peek") { if (r < 0.2 + 0.1 * w) { const o = s.rocks.filter(x => x !== s.at); s.at = o[Math.floor(Math.random() * o.length)]; s.tx = s.at + s.side * (s.boss ? 42 : 36); s.state = "run"; s.st = 0; } else { s.state = "hide"; s.st = 0; s.hold = 40 + Math.random() * 60; s.x = s.at; } }
     }
   }
 
@@ -2214,12 +2226,13 @@ const PF = (() => {
       else if (e.t === "heart" && hitP(10, 10)) { e.alive = false; S.hearts = Math.min(6, S.hearts + 1); msg("+1 heart", 50, "#ff8787"); beep(760, .1, "triangle"); }
       else if (e.t === "crate" && hitP(12, 12)) { e.alive = false; S.ammo += 3; msg("+3 blaster ammo", 50, "#ffd43b"); beep(500, .06); }
       else if (e.t === "check" && !e.on && Math.abs(P.x - e.x) < 12) { e.on = true; S.check = { x: e.x + 2, y: e.y - PH.h }; msg("Checkpoint", 40, "#9be15d"); beep(540, .07, "triangle"); }
+      else if (e.t === "gate" && !G.gateOpen[e.col] && Math.abs(P.x + PH.w - e.x) < 3 && S.t % 90 === 0) msg("Laser gate locked: clear the sentries from the nest (▼ / E)", 90, "#ffb3b3");
       else if (e.t === "goal" && Math.abs(P.x - e.x) < 12) { e.alive = false; msg("LEVEL CLEAR!", 120, "#9be15d"); beep(523, .1, "triangle"); beep(784, .2, "triangle"); end(true); return; }
     }
     /* shells from sentries left standing: they cover the stretch after their nest */
     for (const n of S.ents.filter(e => e.t === "nest" && !e.boss)) {
       const alive = n.sentries.list.filter(s => s.alive).length;
-      if (!alive || P.x < n.x + 30 || P.x > n.x + 30 * TS) continue;
+      if (!alive || S.P.inv > 0 || P.x < n.x - 6 * TS || P.x > n.x + 30 * TS) continue;
       n.shellT = (n.shellT || 0) + alive;
       if (n.shellT > 170) { n.shellT = 0; S.shells.push({ x: P.x + 5 + P.vx * 30, y: groundBelow(P.x + 5 + P.vx * 30), d: 70 }); }
     }
@@ -2256,6 +2269,7 @@ const PF = (() => {
       else if (e.t === "heart") { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 1, y + 2, 3, 3); ctx.fillRect(x + 6, y + 2, 3, 3); ctx.fillRect(x, y + 3, 10, 3); ctx.fillRect(x + 2, y + 6, 6, 2); ctx.fillRect(x + 4, y + 8, 2, 1); }
       else if (e.t === "crate") { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 14); ctx.fillStyle = "#c97a3e"; ctx.fillRect(x, y, 12, 12); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 3, y + 4, 6, 4); }
       else if (e.t === "check") { ctx.fillStyle = "#5a3a22"; ctx.fillRect(x, y - 30, 2, 30); ctx.fillStyle = e.on ? "#40c057" : "#adb5bd"; ctx.fillRect(x + 2, y - 30, 12, 8); }
+      else if (e.t === "gate") { if (!S.G.gateOpen[e.col]) { ctx.fillStyle = "#495057"; ctx.fillRect(x - 2, 0, 20, 6); ctx.fillRect(x - 2, y - 4, 20, 4); for (let k = 0; k < 3; k++) { ctx.fillStyle = (S.t + k * 5) % 14 < 7 ? "#ff3b3b" : "#ff8787"; ctx.fillRect(x + 2 + k * 5, 6, 2, y - 10); } } else { ctx.fillStyle = "#495057"; ctx.fillRect(x - 2, y - 4, 20, 4); } }
       else if (e.t === "goal") { ctx.fillStyle = "#e9ecef"; ctx.fillRect(x, y - 64, 3, 64); const wv = Math.round(2 * Math.sin(S.t / 6)); ctx.fillStyle = "#ff7a29"; ctx.fillRect(x + 3, y - 64 + wv, 20, 12); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 10, y - 60 + wv, 6, 4); }
       else if (e.t === "nest") {
         const clear = !e.sentries.list.some(s => s.alive);
@@ -2341,6 +2355,8 @@ const PF = (() => {
     state: () => S && { x: S.P.x, y: S.P.y, hearts: S.hearts, ammo: S.ammo, rounds: S.rounds, coins: S.coins, scope: !!S.scope, over: S.over, cols: S.G.cols, shield: S.shield, check: S.check },
     teleport: (col) => { if (!S) return; const c = Math.max(0, Math.min(S.G.cols - 1, col)); let r = 0; while (r < ROWS && !solidAt(S.G, c, r)) r++; S.P.x = c * TS + 3; S.P.y = r * TS - PH.h; S.P.vx = S.P.vy = 0; },
     nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length })) : [],
+    gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
+    setRounds: n => { if (S) S.rounds = n; },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.x = s.at + s.side * (s.boss ? 42 : 36); const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
     key: (k, down) => { KEYS[k] = down; if (down) KEYS[k + "P"] = true; },

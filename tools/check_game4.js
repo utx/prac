@@ -211,6 +211,9 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   /* every level can be finished */
   const stuck = await p.evaluate(() => __rr.LEVELS.filter(L => !__rr.PF.reach({ world: L.world, boss: !!L.boss, seed: L.seed }).ok).map(L => L.id));
   if (stuck.length) bad(`levels that can't be finished: ${stuck.join(", ")}`);
+  /* every level has its sniper nests (2 in worlds 1–2, 3 in worlds 3–4), each with a laser gate after it */
+  const nestBad = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }), n = G.ents.filter(e => e.t === "nest").length, g = G.ents.filter(e => e.t === "gate").length; return n !== (L.world <= 2 ? 2 : 3) || g !== n; }).map(L => L.id));
+  if (nestBad.length) bad(`levels without the right number of nests and gates: ${nestBad.join(", ")}`);
   const nodes = await p.$$eval(".node", n => n.length), locked = await p.$$eval(".node.lock", n => n.length);
   if (nodes !== 16 || locked !== 15) bad(`world 1 should show 16 levels with only the first open (shows ${nodes}, ${locked} locked)`);
   /* play level 1 from the map */
@@ -235,8 +238,20 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "head")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(100);
   const after = await p.evaluate(() => __rr.PF.hook.nests()[0].alive); if (after !== before - 1) bad(`a shot on a sentry should knock it out (${before} → ${after})`);
   if (shots) await p.screenshot({ path: path.join(shots, "rr-scope.png") });
+  /* the gate after the nest stays shut (it blocks the hero) until the ridge is clear */
+  if ((await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("the laser gate should start shut");
   await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
   if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("E should leave the scope");
+  await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.gates()[0].col - 3)); await p.keyboard.down("ArrowRight"); await p.waitForTimeout(900); await p.keyboard.up("ArrowRight");
+  const gx = await p.evaluate(() => __rr.PF.hook.state().x), gcol = await p.evaluate(() => __rr.PF.hook.gates()[0].col);
+  if (gx > gcol * 16) bad("a shut laser gate should block the way");
+  await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
+  /* out of rounds: a supply drop comes (never stuck) */
+  await p.evaluate(() => __rr.PF.hook.setRounds(0)); await p.waitForTimeout(3200);
+  if (!((await p.evaluate(() => __rr.PF.hook.state().rounds)) > 0)) bad("running out of sniper rounds at a nest should bring a supply drop");
+  for (let k = 0; k < 8 && (await p.evaluate(() => __rr.PF.hook.nests()[0].alive)) > 0; k++) { await p.evaluate(() => { __rr.PF.hook.aimAt(0, "head"); __rr.PF.hook.fire(); }); await p.waitForTimeout(120); }
+  if (!(await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("clearing the ridge should open the laser gate");
+  await p.waitForTimeout(800);
   /* reach the flag */
   await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.state().cols - 5)); await p.waitForTimeout(1600);
   if (!(await p.isVisible("#scr-result"))) bad("reaching the flag should finish the level");
