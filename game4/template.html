@@ -86,6 +86,7 @@ ul.clues, ol.sts { margin: 6px 0; } .gapline { font-size: 17px; }
 /* kit */
 .kitgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 12px 0; }
 .kit { background: var(--panel2); border: 3px solid #000; border-radius: 10px; padding: 10px; }
+.tip { background: #2c335c; border: 2px solid #000; border-radius: 8px; padding: 8px 12px; }
 .kit .v { font-size: 22px; font-weight: 800; color: var(--gold); } .kit.off { opacity: .5; } .kit small { color: var(--muted); display: block; }
 /* play */
 .stage { position: relative; background: #000; border: 3px solid #000; border-radius: 10px; overflow: hidden; }
@@ -135,7 +136,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
       <div class="grp"><button class="pad" data-k="left" aria-label="left">◀</button><button class="pad" data-k="right" aria-label="right">▶</button><button class="pad" data-k="down" aria-label="down or use">▼</button></div>
       <div class="grp"><button class="pad wide" data-k="duck">DUCK</button><button class="pad wide" data-k="use">SCOPE</button><button class="pad" data-k="fire" aria-label="fire">✦</button><button class="pad" data-k="jump" aria-label="jump">▲</button></div>
     </div>
-    <p class="keys"><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd> run · <kbd>↑</kbd>/<kbd>W</kbd>/<kbd>Space</kbd> jump (hold for higher) · <kbd>J</kbd> blaster · at a nest <kbd>↓</kbd>/<kbd>E</kbd> scope · in the scope: arrows aim, <kbd>J</kbd> fire, hold <kbd>K</kbd> duck, <kbd>E</kbd> leave</p>
+    <p class="keys"><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd> run · <kbd>↑</kbd>/<kbd>W</kbd>/<kbd>Space</kbd> jump (hold for higher) · <kbd>J</kbd> blaster · grab gold bullets for sniper rounds · at a nest <kbd>↓</kbd>/<kbd>E</kbd> scope · in the scope: arrows aim, <kbd>J</kbd> fire, hold <kbd>K</kbd> duck, <kbd>E</kbd> leave</p>
     <div class="adminbar hidden" id="play-admin"><button class="btn sm grn" id="adm-win">Win this level</button><button class="btn sm alt" id="adm-inv">Invincible: off</button><button class="btn sm red" id="adm-quit">Quit to map</button></div>
   </section>
   <section id="scr-result" class="hidden"></section>
@@ -315,6 +316,7 @@ function showKit() {
     <p>Every right answer made your kit better. ${B.right < n ? `With all ${n} right you would have had ${best.hearts} hearts, ${best.ammo} blaster shots, ${best.rounds} sniper rounds, boots and a shield.` : "A perfect briefing: you have everything!"}</p>
     <div class="kitgrid">${item("❤ Hearts", k.hearts, "hits you can take")}${item("✦ Blaster", k.ammo, "shots for crawler bots and drones")}${item("◎ Sniper rounds", k.rounds, "for the sentries at each nest")}
       ${item("〰 Steady scope", k.steady ? "YES" : "no", "less sway (half right or better)", k.steady)}${item("⤒ Double-jump boots", k.boots ? "YES" : "no", "jump again in the air (¾ right or better)", k.boots)}${item("◆ Shield", k.shield ? "YES" : "no", "blocks one hit (all right)", k.shield)}</div>
+    <p class="tip">◎ <b>Need more sniper rounds?</b> Grab the <b style="color:var(--gold)">gold bullets</b> in the level: over the gaps, on top of the pillars and beside the bots. Beaten bots sometimes drop one, and 3 in a row without being hit earns a bonus round. A sign before each nest says how many sentries are waiting.</p>
     <button class="btn grn" id="btn-play">Start the level ▶</button></div>`;
   $("#btn-play").onclick = () => play();
   coachKit();
@@ -338,6 +340,7 @@ function done(res) {
     const i = LEVELS.indexOf(L), next = LEVELS[i + 1];
     $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">${L.boss ? "BOSS DEFEATED!" : "LEVEL CLEAR!"}</h2>
       <p style="font-size:28px;color:var(--gold)">${stars(st)}</p><p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
+      ${res.totalAmmo ? `<p>Sniper bullets gathered: <b>${res.got} of ${res.totalAmmo}</b>${res.got === res.totalAmmo ? " · every one!" : ""}</p>` : ""}
       <p class="note" style="color:var(--muted)">★ for clearing the level, ★ for ¾ of the briefing right, ★ for a perfect briefing.</p>
       ${next ? `<button class="btn grn" id="btn-nextlv">Next: ${next.boss ? "the Warden" : esc(TR[next.track].name)} ▶</button>` : `<p class="px" style="color:var(--gold)">YOU BEAT ALL FOUR WORLDS!</p>`}
       <button class="btn alt" id="btn-tomap">Map</button></div>`;

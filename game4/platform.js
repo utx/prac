@@ -32,13 +32,13 @@ const PF = (() => {
       const k = r();
       if (sinceCheck > 30) { flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); sinceCheck = 0; continue; }
       if (nests < wantNests && x >= Math.round((len - 14) * (nests + 0.8) / (wantNests + 0.6))) {
-        flat(3); ents.push({ t: "nest", x: (x) * TS, y: gh * TS, id: nests }); flat(4); ground(x, gh); for (let y = 0; y < gh; y++) map[y][x] = 4; ents.push({ t: "gate", x: x * TS, y: gh * TS, col: x, nest: nests }); x++; flat(3); nests++; sinceNest = 0; sinceCheck += 8; continue;
+        ents.push({ t: "sign", x: (x - 5) * TS, y: gh * TS, nest: nests }); ents.push({ t: "ammo", x: (x - 2) * TS + 4, y: (gh - 4) * TS }); flat(3); ents.push({ t: "nest", x: (x) * TS, y: gh * TS, id: nests }); flat(4); ground(x, gh); for (let y = 0; y < gh; y++) map[y][x] = 4; ents.push({ t: "gate", x: x * TS, y: gh * TS, col: x, nest: nests }); x++; flat(3); nests++; sinceNest = 0; sinceCheck += 8; continue;
       }
       let used = 0;
       if (k < 0.16) { flat(int(5, 8), { walker: r() < walkerP, coins: r() < 0.5 }); }
       else if (k < 0.34) {                                            /* a gap with coins over it */
         const g = int(2, maxGap); for (let i = 0; i < g; i++) air(x + i);
-        for (let i = 0; i < g; i++) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 3) * TS });
+        for (let i = 0; i < g; i++) ents.push({ t: i === Math.floor(g / 2) ? "ammo" : "coin", x: (x + i) * TS + 4, y: (gh - 3) * TS });   /* a bullet at the top of the jump */
         x += g; flat(int(3, 5));
       } else if (k < 0.46) {                                          /* a step up or down */
         const d = int(1, maxStep) * (r() < 0.5 ? -1 : 1); gh = Math.max(8, Math.min(14, gh + d)); flat(int(4, 6), { walker: r() < walkerP * 0.6 });
@@ -48,7 +48,7 @@ const PF = (() => {
         for (let p = 0; p < n; p++) {
           const h = Math.max(7, Math.min(13, top - int(0, 2))), wid = int(2, 3);
           for (let i = 0; i < wid; i++) { air(px + i); map[h][px + i] = 2; }
-          ents.push({ t: "coin", x: (px + 1) * TS + 4, y: (h - 2) * TS + 4 });
+          ents.push({ t: p === n - 1 ? "ammo" : "coin", x: (px + 1) * TS + 4, y: (h - 2) * TS + 4 });
           px += wid; const g = int(1, 2); for (let i = 0; i < g; i++) air(px++);
         }
         x = px; flat(int(3, 5));
@@ -60,18 +60,21 @@ const PF = (() => {
           const g = int(1, 2); for (let i = 0; i < g; i++) air(x++);
           h = Math.max(8, Math.min(14, h + int(-maxStep, Math.min(2, maxStep)))); const wid = w >= 3 ? 1 : int(1, 2);
           for (let i = 0; i < wid; i++) ground(x + i, h);
-          if (r() < 0.5) ents.push({ t: "coin", x: x * TS + 4, y: (h - 2) * TS + 4 });
+          if (r() < 0.6) ents.push({ t: p === n - 1 || r() < 0.3 ? "ammo" : "coin", x: x * TS + 4, y: (h - 2) * TS + 4 });
           x += wid;
         }
         air(x++); gh = h; flat(int(3, 4));
       } else if (k < 0.9 && w >= 2) {                                /* a drone patrol */
         flat(int(5, 7)); ents.push({ t: "drone", x: (x - 3) * TS, y: (gh - 3) * TS, y0: (gh - 3) * TS });
-      } else { flat(int(6, 8), { walker: true, coins: true }); if (w >= 2) ents.push({ t: "walker", x: (x - 2) * TS, y: gh * TS - 10 }); }
+      } else { flat(int(6, 8), { walker: true, coins: true }); ents.push({ t: "ammo", x: (x - 4) * TS + 4, y: (gh - 3) * TS }); if (w >= 2) ents.push({ t: "walker", x: (x - 2) * TS, y: gh * TS - 10 }); }
       sinceCheck += 6; sinceNest += 6;
     }
     if (L.boss) { flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); flat(4); ents.push({ t: "nest", x: x * TS, y: gh * TS, id: 9, boss: true }); flat(10); }
     else { flat(12); ents.push({ t: "goal", x: (x - 5) * TS, y: gh * TS }); }
-    ents.push({ t: "crate", x: 5 * TS, y: 12 * TS - 12 });                // a small ammo crate near the start
+    ents.push({ t: "crate", x: 5 * TS, y: 12 * TS - 12 });                // a small blaster crate near the start
+    { const sentries = L.boss ? 0 : (w === 1 ? 2 : w === 4 ? 4 : 3) * nests, have = () => ents.filter(e => e.t === "ammo").length;
+      const coins = ents.filter(e => e.t === "coin"); for (let i = 0; have() < sentries + 3 && i < coins.length; i += 3) coins[i].t = "ammo";
+      for (let c = 12; have() < sentries + 3 && c < x - 12; c += 5) { let r0 = 0; while (r0 < ROWS && map[r0][c] !== 1) r0++; if (r0 < ROWS && map[r0 - 1][c] === 0 && !ents.some(e => Math.abs(e.x - c * TS) < 20 && e.t !== "coin")) ents.push({ t: "ammo", x: c * TS + 4, y: (r0 - 3) * TS }); } }
     const cols = x;
     for (let y = 0; y < ROWS; y++) for (let c = 0; c < cols; c++) map[y][c] = map[y][c] || 0;
     /* hearts: one spare in the middle of longer levels */
@@ -171,7 +174,8 @@ const PF = (() => {
       P: { x: first.x + 3, y: first.y - PH.h, vx: 0, vy: 0, ground: false, face: 1, inv: 0, boots: opts.kit.boots, cd: 0 },
       check: { x: first.x + 3, y: first.y - PH.h }, hearts: opts.kit.hearts, shield: opts.kit.shield ? 1 : 0, ammo: opts.kit.ammo, rounds: opts.kit.rounds,
       ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -(0.45 + 0.15 * opts.level.world) : 0, ph: i * 1.7 }, e)),
-      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible };
+      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0 };
+    S.totalAmmo = S.ents.filter(e => e.t === "ammo").length;
     S.ents.filter(e => e.t === "nest").forEach(e => { e.sentries = makeSentries(e); });
     G.gateOpen = {};
     addEventListener("keydown", kd); addEventListener("keyup", ku);
@@ -182,7 +186,7 @@ const PF = (() => {
       draw(); if (S && !S.over) raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
-    msg(G.theme.name + (opts.level.boss ? ": the boss waits at the end" : ": reach the flag"), 160);
+    msg(G.theme.name + (opts.level.boss ? ": the boss waits at the end" : ": reach the flag"), 160); msg("Grab the gold bullets: every one is a sniper round!", 200, "#ffd43b");
   }
   function stop() { cancelAnimationFrame(raf); removeEventListener("keydown", kd); removeEventListener("keyup", ku); for (const k in KEYS) KEYS[k] = false; S = null; }
   const msg = (t, d = 90, c = "#fff") => S.msgs.push({ t, d, c });
@@ -190,12 +194,12 @@ const PF = (() => {
   function hurt(why) {
     if (S.P.inv > 0 || S.invincible) return;
     if (S.shield) { S.shield = 0; S.P.inv = 90; msg("Shield saved you!", 80, "#9fe7ff"); beep(600, .1, "triangle"); return; }
-    S.hearts--; S.lost++; S.P.inv = 100; beep(140, .15); msg(why, 70, "#ffb3b3");
+    S.hearts--; S.lost++; S.P.inv = 100; if (S.streak) msg("Bullet streak lost", 50, "#ffb3b3"); S.streak = 0; beep(140, .15); msg(why, 70, "#ffb3b3");
     if (S.hearts <= 0) end(false);
   }
   function end(win) {
     if (S.over) return; S.over = true;
-    const res = { win, coins: S.coins, lost: S.lost, hearts: S.hearts };
+    const res = { win, coins: S.coins, lost: S.lost, hearts: S.hearts, got: S.got, totalAmmo: S.totalAmmo };
     setTimeout(() => { const cb = S && S.opts.onEnd; stop(); cb && cb(res); }, win ? 900 : 700);
     draw();
   }
@@ -256,7 +260,7 @@ const PF = (() => {
     }
     if (pressed("leave") || pressed("use")) { S.scope = null; msg(sc.nest.sentries.list.some(s => s.alive) ? "Careful: the sentries left standing will shell the path" : "", 120, "#ffd43b"); return; }
     if (sc.cd > 0) sc.cd--; if (sc.flash > 0) sc.flash--;
-    if (S.rounds <= 0 && sc.nest.sentries.list.some(s => s.alive)) { if (++sc.supply === 150) { S.rounds += 3; msg("Supply drop: +3 sniper rounds", 90, "#9be15d"); sc.supply = 0; } }
+    if (S.rounds <= 0 && sc.nest.sentries.list.some(s => s.alive)) { if (++sc.supply === 300) { S.rounds += 2; msg("Supply drop: +2 sniper rounds (gather bullets to skip the wait)", 120, "#9be15d"); sc.supply = 0; } else if (sc.supply === 1) msg("Out of rounds: a supply drop is on its way…", 120, "#ffd43b"); }
     for (const s of sc.nest.sentries.list) {
       if (!s.alive) continue;
       s.st++;
@@ -294,7 +298,7 @@ const PF = (() => {
     if (nest && nest.boss && !nest.seen) { nest.seen = true; enterNest(nest); }
     /* bolts */
     for (const b of S.bolts) { b.x += b.vx; b.d--; if (solidAt(G, Math.floor(b.x / TS), Math.floor(b.y / TS))) b.d = 0;
-      for (const e of S.ents) if (e.alive && (e.t === "walker" || e.t === "drone") && Math.abs(b.x - (e.x + 6)) < 9 && Math.abs(b.y - (e.y + 5)) < 9) { e.alive = false; b.d = 0; burst(e.x + 6, e.y + 5, "#ffd43b"); S.coins++; beep(300, .06); } }
+      for (const e of S.ents) if (e.alive && (e.t === "walker" || e.t === "drone") && Math.abs(b.x - (e.x + 6)) < 9 && Math.abs(b.y - (e.y + 5)) < 9) { e.alive = false; b.d = 0; burst(e.x + 6, e.y + 5, "#ffd43b"); S.coins++; beep(300, .06); dropAmmo(e); } }
     S.bolts = S.bolts.filter(b => b.d > 0);
     /* entities */
     for (const e of S.ents) {
@@ -307,11 +311,16 @@ const PF = (() => {
       const hitP = (w, h) => P.x < e.x + w && P.x + PH.w > e.x && P.y < e.y + h && P.y + PH.h > e.y;
       if (e.t === "walker" || e.t === "drone") {
         if (hitP(12, 10)) {
-          if (P.vy > 0.5 && P.y + PH.h - e.y < 9) { e.alive = false; P.vy = -4.5; burst(e.x + 6, e.y + 4, "#ffd43b"); S.coins++; beep(660, .06); msg("STOMP!", 30); }
+          if (P.vy > 0.5 && P.y + PH.h - e.y < 9) { e.alive = false; P.vy = -4.5; burst(e.x + 6, e.y + 4, "#ffd43b"); S.coins++; beep(660, .06); msg("STOMP!", 30); dropAmmo(e); }
           else hurt(e.t === "walker" ? "Bumped by a crawler bot" : "Zapped by a drone");
         }
       } else if (e.t === "coin" && hitP(8, 8)) { e.alive = false; S.coins++; beep(980, .04, "triangle", .03); }
       else if (e.t === "heart" && hitP(10, 10)) { e.alive = false; S.hearts = Math.min(6, S.hearts + 1); msg("+1 heart", 50, "#ff8787"); beep(760, .1, "triangle"); }
+      else if (e.t === "ammo" && hitP(8, 12)) {
+        e.alive = false; S.rounds++; S.got++; S.streak++; S.flash = 40; burst(e.x + 3, e.y + 4, "#ffd43b", 10); beep(880, .05, "triangle"); beep(1320, .07, "triangle");
+        msg("+1 SNIPER ROUND", 50, "#ffd43b");
+        if (S.streak % 3 === 0) { S.rounds++; msg(`BULLET STREAK x${S.streak}: +1 BONUS ROUND`, 80, "#ffa94d"); beep(1568, .12, "triangle"); }
+      }
       else if (e.t === "crate" && hitP(12, 12)) { e.alive = false; S.ammo += 3; msg("+3 blaster ammo", 50, "#ffd43b"); beep(500, .06); }
       else if (e.t === "check" && !e.on && Math.abs(P.x - e.x) < 12) { e.on = true; S.check = { x: e.x + 2, y: e.y - PH.h }; msg("Checkpoint", 40, "#9be15d"); beep(540, .07, "triangle"); }
       else if (e.t === "gate" && !G.gateOpen[e.col] && Math.abs(P.x + PH.w - e.x) < 3 && S.t % 90 === 0) msg("Laser gate locked: clear the sentries from the nest (▼ / E)", 90, "#ffb3b3");
@@ -330,6 +339,8 @@ const PF = (() => {
     S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0);
     S.cam = Math.max(0, Math.min(G.cols * TS - VW, P.x - VW * 0.4));
   }
+  /* every second beaten bot drops a bullet (the drop is decided by the bot, so it is the same each play) */
+  function dropAmmo(e) { if (e.i % 2) return; const x = e.x + 3; S.ents.push({ t: "ammo", x, y: groundBelow(x) - 12, alive: true, i: S.ents.length, ph: 0 }); S.totalAmmo++; msg("It dropped a bullet!", 50, "#ffd43b"); }
   const groundBelow = x => { const c = Math.floor(x / TS); for (let r = 0; r < ROWS; r++) if (solidAt(S.G, c, r)) return r * TS; return ROWS * TS; };
 
   /* ---------- drawing ---------- */
@@ -355,6 +366,8 @@ const PF = (() => {
       else if (e.t === "walker") { const f = Math.floor(S.t / 8) % 2; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 10); ctx.fillStyle = "#8a6a4a"; ctx.fillRect(x, y, 12, 8); ctx.fillStyle = "#b08a62"; ctx.fillRect(x + 1, y, 10, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + (e.vx < 0 ? 2 : 7), y + 3, 3, 3); ctx.fillStyle = "#e03131"; ctx.fillRect(x + (e.vx < 0 ? 3 : 8), y + 4, 1, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1 + f * 2, y + 8, 3, 2); ctx.fillRect(x + 8 - f * 2, y + 8, 3, 2); }
       else if (e.t === "drone") { const f = S.t % 6 < 3; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y + 2, 14, 7); ctx.fillStyle = "#c92a2a"; ctx.fillRect(x, y + 3, 12, 5); ctx.fillStyle = "#ffec99"; ctx.fillRect(x + 5, y + 4, 2, 2); ctx.fillStyle = "#adb5bd"; ctx.fillRect(f ? x - 2 : x, y, f ? 6 : 3, 1); ctx.fillRect(f ? x + 8 : x + 10, y, f ? 6 : 3, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1, y + 1, 1, 2); ctx.fillRect(x + 10, y + 1, 1, 2); }
       else if (e.t === "heart") { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 1, y + 2, 3, 3); ctx.fillRect(x + 6, y + 2, 3, 3); ctx.fillRect(x, y + 3, 10, 3); ctx.fillRect(x + 2, y + 6, 6, 2); ctx.fillRect(x + 4, y + 8, 2, 1); }
+      else if (e.t === "ammo") { const b = Math.round(2 * Math.sin(S.t / 9 + e.i)), gl = 0.35 + 0.25 * Math.sin(S.t / 6 + e.i); ctx.fillStyle = `rgba(255,212,59,${gl})`; ctx.fillRect(x - 3, y - 3 + b, 13, 17); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x, y - 1 + b, 7, 12); ctx.fillStyle = "#e8a33d"; ctx.fillRect(x + 1, y + 4 + b, 5, 6); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 1, y + 4 + b, 2, 6); ctx.fillStyle = "#adb5bd"; ctx.fillRect(x + 2, y + b, 3, 4); ctx.fillStyle = "#e9ecef"; ctx.fillRect(x + 2, y + b, 1, 3); }
+      else if (e.t === "sign") { const n = S.ents.find(q => q.t === "nest" && q.id === e.nest), left = n ? n.sentries.list.filter(s => s.alive).length : 0; ctx.fillStyle = "#5a3a22"; ctx.fillRect(x + 10, y - 20, 3, 20); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 15, y - 44, 54, 25); ctx.fillStyle = left ? "#ffd43b" : "#8ce99a"; ctx.fillRect(x - 14, y - 43, 52, 23); txt(ctx, left ? "NEST AHEAD" : "RIDGE CLEAR", x + 12, y - 34, 7, "#1b1b2f"); if (left) txt(ctx, `${left} SENTRIES`, x + 12, y - 24, 7, "#c92a2a"); }
       else if (e.t === "crate") { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 14); ctx.fillStyle = "#c97a3e"; ctx.fillRect(x, y, 12, 12); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 3, y + 4, 6, 4); }
       else if (e.t === "check") { ctx.fillStyle = "#5a3a22"; ctx.fillRect(x, y - 30, 2, 30); ctx.fillStyle = e.on ? "#40c057" : "#adb5bd"; ctx.fillRect(x + 2, y - 30, 12, 8); }
       else if (e.t === "gate") { if (!S.G.gateOpen[e.col]) { ctx.fillStyle = "#495057"; ctx.fillRect(x - 2, 0, 20, 6); ctx.fillRect(x - 2, y - 4, 20, 4); for (let k = 0; k < 3; k++) { ctx.fillStyle = (S.t + k * 5) % 14 < 7 ? "#ff3b3b" : "#ff8787"; ctx.fillRect(x + 2 + k * 5, 6, 2, y - 10); } } else { ctx.fillStyle = "#495057"; ctx.fillRect(x - 2, y - 4, 20, 4); } }
@@ -379,13 +392,17 @@ const PF = (() => {
     hud(); messages();
   }
   function txt(ctx, s, x, y, size = 10, c = "#fff", align = "center") { ctx.font = `bold ${size}px "Courier New", monospace`; ctx.textAlign = align; ctx.fillStyle = "#1b1b2f"; ctx.fillText(s, x + 1, y + 1); ctx.fillStyle = c; ctx.fillText(s, x, y); }
+  const need0 = () => S.ents.some(e => e.t === "nest" && !e.boss && e.x > S.P.x - 40 && e.x - S.P.x < 22 * TS && e.sentries.list.some(q => q.alive));
   function hud() {
     const ctx = S.ctx; ctx.fillStyle = "rgba(10,12,30,.55)"; ctx.fillRect(0, 0, VW, 18);
     for (let i = 0; i < S.hearts; i++) { const x = 6 + i * 12; ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 1, 5, 3, 3); ctx.fillRect(x + 5, 5, 3, 3); ctx.fillRect(x, 6, 9, 3); ctx.fillRect(x + 2, 9, 5, 2); ctx.fillRect(x + 4, 11, 1, 1); }
     let x = 6 + Math.max(S.hearts, 1) * 12 + 6;
     if (S.shield) { txt(ctx, "◆SHIELD", x, 13, 9, "#9fe7ff", "left"); x += 56; }
     txt(ctx, `BLASTER ${S.ammo}`, x, 13, 9, "#9fe7ff", "left"); x += 76;
-    txt(ctx, `SNIPER ${S.rounds}`, x, 13, 9, "#ffd43b", "left"); x += 70;
+    if (S.flash > 0) { S.flash--; ctx.fillStyle = `rgba(255,212,59,${S.flash / 60})`; ctx.fillRect(x - 4, 1, need0() ? 118 : 74, 16); }
+    const near = S.ents.find(e => e.t === "nest" && !e.boss && e.x > S.P.x - 40 && e.x - S.P.x < 22 * TS && e.sentries.list.some(q => q.alive)), need = near ? near.sentries.list.filter(q => q.alive).length : 0;
+    txt(ctx, `SNIPER ${S.rounds}${need ? ` · NEED ${need}` : ""}`, x, 13, 9, need && S.rounds < need ? "#ff8787" : "#ffd43b", "left"); x += need ? 118 : 74;
+    if (S.streak % 3) { txt(ctx, "▮".repeat(S.streak % 3) + "▯".repeat(3 - S.streak % 3), x - 4, 13, 9, "#ffa94d", "left"); x += 30; }
     if (S.kit.boots) { txt(ctx, "BOOTS", x, 13, 9, "#b197fc", "left"); x += 44; }
     if (S.kit.steady) { txt(ctx, "STEADY", x, 13, 9, "#8ce99a", "left"); }
     txt(ctx, `● ${S.coins}`, VW - 8, 13, 9, "#ffd43b", "right");
@@ -445,6 +462,8 @@ const PF = (() => {
     nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length })) : [],
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
+    ammo: () => S ? S.ents.filter(e => e.t === "ammo" && e.alive).map(e => ({ x: e.x, y: e.y })) : [],
+    grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.x = s.at + s.side * (s.boss ? 42 : 36); const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
     key: (k, down) => { KEYS[k] = down; if (down) KEYS[k + "P"] = true; },

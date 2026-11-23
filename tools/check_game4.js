@@ -238,6 +238,13 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "head")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(100);
   const after = await p.evaluate(() => __rr.PF.hook.nests()[0].alive); if (after !== before - 1) bad(`a shot on a sentry should knock it out (${before} → ${after})`);
   if (shots) await p.screenshot({ path: path.join(shots, "rr-scope.png") });
+  /* gold bullets: every level has more than enough for its sentries, and grabbing one adds a sniper round */
+  const short = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }); const sentries = (L.world === 1 ? 2 : L.world === 4 ? 4 : 3) * G.ents.filter(e => e.t === "nest").length; return G.ents.filter(e => e.t === "ammo").length < sentries + 3; }).map(L => L.id));
+  if (short.length) bad(`levels without enough gold bullets for their sentries: ${short.join(", ")}`);
+  { const r0 = await p.evaluate(() => __rr.PF.hook.state().rounds); await p.evaluate(() => __rr.PF.hook.key("leave", true)); await p.waitForTimeout(60); await p.evaluate(() => __rr.PF.hook.key("leave", false));
+    await p.evaluate(() => __rr.PF.hook.grab()); await p.waitForTimeout(150);
+    const r1 = await p.evaluate(() => __rr.PF.hook.state().rounds); if (r1 !== r0 + 1) bad(`grabbing a gold bullet should add a sniper round (${r0} → ${r1})`);
+    await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100); }
   /* the gate after the nest stays shut (it blocks the hero) until the ridge is clear */
   if ((await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("the laser gate should start shut");
   await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
@@ -247,7 +254,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   if (gx > gcol * 16) bad("a shut laser gate should block the way");
   await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
   /* out of rounds: a supply drop comes (never stuck) */
-  await p.evaluate(() => __rr.PF.hook.setRounds(0)); await p.waitForTimeout(3200);
+  await p.evaluate(() => __rr.PF.hook.setRounds(0)); await p.waitForTimeout(5800);
   if (!((await p.evaluate(() => __rr.PF.hook.state().rounds)) > 0)) bad("running out of sniper rounds at a nest should bring a supply drop");
   for (let k = 0; k < 8 && (await p.evaluate(() => __rr.PF.hook.nests()[0].alive)) > 0; k++) { await p.evaluate(() => { __rr.PF.hook.aimAt(0, "head"); __rr.PF.hook.fire(); }); await p.waitForTimeout(120); }
   if (!(await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("clearing the ridge should open the laser gate");
