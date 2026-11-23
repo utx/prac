@@ -21,7 +21,7 @@ button { font: inherit; cursor: pointer; }
 .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #000; }
 .btn.alt { background: #dee2ff; } .btn.grn { background: var(--green); } .btn.red { background: var(--red); } .btn.sm { padding: 6px 10px; font-size: 14px; }
 .btn[disabled] { opacity: .45; cursor: default; }
-.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; max-width: 1180px; margin: 0 auto; padding: 16px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; max-width: 1560px; margin: 0 auto; padding: 12px 16px; }
 body.practice .layout { grid-template-columns: minmax(0, 1fr) 380px; }
 @media (max-width: 1000px) { body.practice .layout { grid-template-columns: minmax(0, 1fr); } }
 main { min-width: 0; }
@@ -54,6 +54,17 @@ main { min-width: 0; }
 .qhead .px { font-size: 10px; color: #444; }
 .dots { display: flex; gap: 6px; } .dots span { width: 14px; height: 14px; border: 2px solid #000; border-radius: 3px; background: #dee2e6; } .dots .ok { background: var(--green); } .dots .no { background: var(--red); } .dots .cur { background: var(--gold); }
 .passage { background: #fff; border: 2px solid #d3d9e3; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; max-height: 46vh; overflow: auto; }
+.qgrid { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+.qgrid > div { min-width: 0; }
+@media (min-width: 900px) {
+  .qgrid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; }
+  .qgrid .left .passage { max-height: calc(100vh - 230px); }
+  .qgrid .right { position: sticky; top: 70px; }
+  .qgrid .opts { margin-top: 0; }
+}
+.after { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+.after .verdict { margin: 0; }
+.keyhint { color: #666; font-size: 12px; margin-top: 8px; }
 .extracts p { margin: 0 0 10px; }
 .figure { margin: 10px 0; overflow-x: auto; } .figure svg { max-width: 100%; height: auto; }
 table.grid { border-collapse: collapse; background: #fff; } table.grid th, table.grid td { border: 2px solid var(--ink); padding: 6px 10px; text-align: center; min-width: 46px; } table.grid th { background: #eef1f6; } table.grid td.gap { background: #fff3bf; }
@@ -72,10 +83,10 @@ ul.clues, ol.sts { margin: 6px 0; } .gapline { font-size: 17px; }
 .explain .method { background: #e7f5ff; border-left: 5px solid #339af0; padding: 6px 10px; border-radius: 4px; }
 .explain .why-not { background: #fff4e6; border-left: 5px solid #fd7e14; padding: 6px 10px; border-radius: 4px; }
 .verdict { font-weight: 800; font-size: 18px; } .verdict.ok { color: #2b8a3e; } .verdict.no { color: #c92a2a; }
-.next { margin-top: 12px; text-align: right; }
 /* kit */
 .kitgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 12px 0; }
 .kit { background: var(--panel2); border: 3px solid #000; border-radius: 10px; padding: 10px; }
+.tip { background: #2c335c; border: 2px solid #000; border-radius: 8px; padding: 8px 12px; }
 .kit .v { font-size: 22px; font-weight: 800; color: var(--gold); } .kit.off { opacity: .5; } .kit small { color: var(--muted); display: block; }
 /* play */
 .stage { position: relative; background: #000; border: 3px solid #000; border-radius: 10px; overflow: hidden; }
@@ -102,7 +113,7 @@ aside#coach .ladder li.cur { font-weight: 800; } aside#coach .ladder li.cur::mar
 details.grown { margin-top: 16px; } details.grown summary { cursor: pointer; color: var(--muted); }
 table.prog { border-collapse: collapse; font-size: 13px; width: 100%; } table.prog th, table.prog td { border: 1px solid #3a4170; padding: 4px 6px; text-align: left; }
 footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-@media (max-width: 640px) { .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
+@media (max-width: 640px) { table.grid th, table.grid td { padding: 5px 6px; min-width: 36px; } .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
 </style>
 </head>
 <body>
@@ -125,7 +136,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
       <div class="grp"><button class="pad" data-k="left" aria-label="left">◀</button><button class="pad" data-k="right" aria-label="right">▶</button><button class="pad" data-k="down" aria-label="down or use">▼</button></div>
       <div class="grp"><button class="pad wide" data-k="duck">DUCK</button><button class="pad wide" data-k="use">SCOPE</button><button class="pad" data-k="fire" aria-label="fire">✦</button><button class="pad" data-k="jump" aria-label="jump">▲</button></div>
     </div>
-    <p class="keys"><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd> run · <kbd>↑</kbd>/<kbd>W</kbd>/<kbd>Space</kbd> jump (hold for higher) · <kbd>J</kbd> blaster · at a nest <kbd>↓</kbd>/<kbd>E</kbd> scope · in the scope: arrows aim, <kbd>J</kbd> fire, hold <kbd>K</kbd> duck, <kbd>E</kbd> leave</p>
+    <p class="keys"><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd> run · <kbd>↑</kbd>/<kbd>W</kbd>/<kbd>Space</kbd> jump (hold for higher) · <kbd>J</kbd> blaster · grab gold bullets for sniper rounds · at a nest <kbd>↓</kbd>/<kbd>E</kbd> scope · in the scope: arrows aim, <kbd>J</kbd> fire, hold <kbd>K</kbd> duck, <kbd>E</kbd> leave</p>
     <div class="adminbar hidden" id="play-admin"><button class="btn sm grn" id="adm-win">Win this level</button><button class="btn sm alt" id="adm-inv">Invincible: off</button><button class="btn sm red" id="adm-quit">Quit to map</button></div>
   </section>
   <section id="scr-result" class="hidden"></section>
@@ -1345,51 +1356,51 @@ H("flaw", 2, "tf2d", { stem: `<p>Most children at the holiday camp chose the can
     ["Some children may have wanted to try two or even three activities at the camp.", "this is about what children wanted, not about Tom's choice"]],
   body: "“Most” chose the canoe trip, so some didn't. Tom might be one of them." });
 H("flaw", 3, "tf3a", { stem: `<p>This season the Owls played 20 netball games and scored 300 goals. The Hawks played 10 games and scored 200 goals.</p><p>Coach Lee says: “The Owls scored more goals, so they are better at scoring than the Hawks.”</p><p>${MIS("Coach Lee")}</p>`,
-  opts: [["The Hawks may have a taller goal shooter than the Owls do.", "a guess about players, not the gap in the comparison"],
-    ["Some of the games may have been played in the rain.", "both teams played in the same season, so this doesn't show the mistake"],
-    ["The Owls may have more players who want to be goal shooter than the Hawks have.", "who wants to shoot doesn't touch the comparison"],
+  opts: [["The Hawks may have let in more goals than the Owls did this season.", "this is about defending, not scoring, so it doesn't touch the comparison"],
+    ["The Owls may have scored more goals in the second half of the season than in the first.", "true or not, it doesn't show what is unfair about comparing the two teams"],
+    ["Scoring 300 goals may be a club record for the Owls.", "a record would make the Owls sound better: it agrees with the coach instead of showing the gap"],
     ["The Owls may have scored more only because they played twice as many games.", null]],
   body: "The comparison isn't fair: the Owls played twice as many games. Per game the Owls scored 300 ÷ 20 = 15 and the Hawks 200 ÷ 10 = 20, so the Hawks actually scored more each game." });
 H("flaw", 3, "tf3b", { stem: `<p>New hand-washing posters went up in our school in October. Since then, fewer children have had colds.</p><p>Ms Tan says: “The posters have stopped children catching colds.”</p><p>${MIS("Ms Tan")}</p>`,
-  opts: [["Some children may not have read the posters.", "even if some didn't read them, the posters might still have helped, so this doesn't show the gap"],
-    ["Colds may have dropped simply because the weather has got warmer.", null],
-    ["The posters may have been designed and painted by the Year 6 children in art class.", "who made them doesn't matter"],
-    ["Children may catch more colds at home than at school.", "where colds are caught doesn't show the mistake"]],
+  opts: [["Some children may still forget to wash their hands after lunch.", "the posters could still have helped even if some children forget, so this doesn't show the gap"],
+    ["Fewer children may have been away sick since October.", "this just repeats that there are fewer colds; it doesn't question why"],
+    ["The posters may be put up in the other schools in our area next year as well.", "about the future, not about the reasoning"],
+    ["Colds may have dropped simply because the weather has got warmer.", null]],
   body: "Ms Tan ignores another possible cause. In Australia, October to summer is when the weather warms up, and colds usually become less common anyway." });
 H("flaw", 3, "tf3c", { stem: `<p>Jess grew two bean plants. Plant A was on a sunny windowsill and got plant food every week. Plant B was in a dark corner and got no plant food. Plant A grew much taller.</p><p>Jess says: “Plant food makes beans grow taller.”</p><p>${MIS("Jess")}</p>`,
-  opts: [["Beans may be one of the easiest vegetables to grow.", "true or not, this doesn't touch the experiment"],
-    ["Plant food may cost more than ordinary garden soil.", "the cost has nothing to do with the reasoning"],
-    ["Plant A may have grown taller because of the sunlight, not the plant food.", null],
-    ["Jess may want to grow tomatoes as well as beans next spring in a much bigger pot.", "Jess's future plans don't show her mistake"]],
+  opts: [["Plant food may help some kinds of plants more than others.", "true about plant food, but it doesn't show what went wrong in Jess's test"],
+    ["Jess may have given both plants the same amount of water each day.", "this would make the test FAIRER in one way; it doesn't show the problem"],
+    ["Plant B may have grown more leaves than Plant A, even though it was shorter.", "a detail about leaves doesn't touch Jess's conclusion about height"],
+    ["Plant A may have grown taller because of the sunlight, not the plant food.", null]],
   body: "The test wasn't fair: TWO things were different (plant food AND sunlight). Jess can't tell which one made plant A taller." });
 H("flaw", 3, "tf3d", { stem: `<p>Shop P sold 300 ice creams on a Saturday. Shop Q sold 200 ice creams on the following Monday.</p><p>Mr Ford says: “Shop P's ice creams must be more popular than Shop Q's.”</p><p>${MIS("Mr Ford")}</p>`,
-  opts: [["Shop P may have sold more because Saturdays are busier than Mondays.", null],
-    ["Shop Q may sell more flavours than Shop P does.", "more flavours doesn't show why the comparison is unfair"],
-    ["Ice creams may sell better in summer than in winter, when fewer people want cold food.", "both days were in the same week, so the season is the same for both shops"],
-    ["Mr Ford may prefer the ice creams that Shop P makes.", "what Mr Ford likes isn't the gap in his reasoning"]],
+  opts: [["Shop P may also sell more cold drinks and snacks than Shop Q does on most days.", "about drinks, not about the unfair comparison of ice creams"],
+    ["Shop Q's ice creams may be just as tasty as Shop P's.", "this only disagrees with Mr Ford; it doesn't show the mistake in HOW he compared"],
+    ["Both shops may be open for the same number of hours each day.", "this would make the comparison fairer in one way; it doesn't show the problem"],
+    ["Shop P may have sold more because Saturdays are busier than Mondays.", null]],
   body: "The comparison is unfair: the two shops were compared on different days. A Saturday is usually much busier than a Monday." });
 H("flaw", 4, "tf4a", { stem: `<p>On every school day, the crossing guard is at the school gate.</p><p>Zac says: “The crossing guard is at the gate, so today must be a school day.”</p><p>${MIS("Zac")}</p>`,
-  opts: [["The crossing guard may also be at the gate on some days that are not school days.", null],
-    ["The crossing guard may have worked at the school for many years.", "how long she has worked there doesn't matter"],
-    ["Some children may walk to school without crossing the road at all, even on rainy days when the gate is busy.", "how children get to school doesn't show Zac's mistake"],
-    ["School days may start at the same time every week.", "this doesn't touch the reasoning"]],
+  opts: [["The crossing guard may sometimes be late on school days.", "even if she is late sometimes, it doesn't show that Zac used the rule backwards"],
+    ["There may be many more cars parked outside the school on school days than at weekends.", "true perhaps, but it doesn't touch Zac's reasoning"],
+    ["Zac may have seen children in school uniform walking past the gate.", "this would SUPPORT Zac's idea that it is a school day"],
+    ["The crossing guard may also be at the gate on some days that are not school days.", null]],
   body: "Zac turns the rule back to front. The rule says school day → guard at the gate. It doesn't say guard at the gate → school day. She could be there on other days too, for example for a weekend sports day." });
 H("flaw", 4, "tf4b", { stem: `<p>Olivia says: “Either Dad took the car keys or Mum took them. Dad says he didn't, so Mum must have them.”</p><p>${MIS("Olivia")}</p>`,
-  opts: [["Dad may have driven the car yesterday.", "this doesn't show the gap"],
-    ["Mum may keep a spare set of keys at work.", "a spare set doesn't tell us who took these keys"],
-    ["Someone else, such as Grandma, may have taken the keys.", null],
-    ["The keys may be easy to lose because they are small and have no key ring.", "this doesn't show what Olivia has assumed"]],
+  opts: [["Mum may have driven the car more often than Dad this week.", "this makes Olivia's guess seem more likely; it doesn't show the gap"],
+    ["Mum may not remember where she put the keys.", "this assumes Mum has them, which is exactly what Olivia hasn't shown"],
+    ["Dad may be telling the truth when he says he didn't take them.", "Olivia already believes Dad; this agrees with her"],
+    ["Someone else, such as Grandma, may have taken the keys.", null]],
   body: "Olivia assumes there are only two possibilities. If someone else could have taken them, ruling out Dad doesn't prove it was Mum." });
 H("flaw", 4, "tf4c", { stem: `<p>The Comets lost their game on Saturday. Two of their best players were sick.</p><p>The captain says: “We lost because two players were sick, so it can't have been because we hadn't practised enough.”</p><p>${MIS("the captain")}</p>`,
-  opts: [["The other team may have had more supporters watching.", "this doesn't show the captain's mistake"],
-    ["There may have been more than one reason, such as missing players and little practice.", null],
-    ["The two sick players may be well again in time for next week's game against the top team.", "next week doesn't matter to this reasoning"],
-    ["The Comets may have won more games last year than this year.", "last year has nothing to do with it"]],
+  opts: [["The two sick players may be the team's best shooters.", "this backs up the captain's first reason; it doesn't show the mistake"],
+    ["Teams with two sick players may lose far more often than teams that have everyone fit and well.", "this also backs up the captain's first reason"],
+    ["The other team may also have had one of its best players missing from that game.", "this questions the first reason, but the mistake is ruling out a SECOND reason"],
+    ["There may have been more than one reason, such as missing players and little practice.", null]],
   body: "The captain assumes one cause rules out another. Things often happen for more than one reason at once." });
 H("flaw", 4, "tf4d", { stem: `<p>Everyone who wins the art prize has a painting in the school art show.</p><p>Ruby has a painting in the school art show. Her friend says: “So Ruby must have won the art prize!”</p><p>${MIS("Ruby's friend")}</p>`,
-  opts: [["Ruby may have painted her picture with watercolours.", "the type of paint doesn't matter"],
-    ["The art prize may be given out at the end of the year.", "when the prize is given doesn't show the mistake"],
-    ["Ruby's painting may be the largest and most colourful one in the whole art show.", "size doesn't tell us who won"],
+  opts: [["Ruby may have won the art prize in an earlier year.", "an earlier year has nothing to do with this year's reasoning"],
+    ["The prize-winning painting may hang in the middle of the show.", "where it hangs doesn't show the friend's mistake"],
+    ["Only a few of the children in the school may have entered paintings for the art prize.", "even with few entries, being in the show still doesn't prove Ruby won"],
     ["Many children may have paintings in the show without having won the prize.", null]],
   body: "The rule is prize → painting in the show. Ruby's friend uses it backwards (painting in the show → prize). Lots of children can have paintings in the show without winning." });
 
@@ -1444,51 +1455,51 @@ H("claim", 2, "tc2d", { stem: `<p>Dad: “We should hang the bird feeder outside
     ["Watching birds is a popular hobby in Australia, and many people keep a notebook of sightings.", "about watching birds in general (Y), but not about this window"]],
   body: "X = hang it by the window, Y = watch the birds. Only one option links that place to watching." });
 H("claim", 3, "tc3a", { stem: `<p>Coach Ana: “Our runners should eat breakfast before every race so that they run faster.”</p><p>${SUP("Coach Ana")}</p>`,
-  opts: [["The fastest runners in the club all own expensive running shoes.", "this shows two things go together (fast runners, expensive shoes), and it is about shoes, not breakfast"],
-    ["Runners who eat a big, heavy meal just before a race can get a stomach ache and run slowly.", "this works AGAINST the claim"],
-    ["Many people skip breakfast on busy mornings.", "true, but it doesn't link breakfast to running faster"],
+  opts: [["Runners who win races often say they ate a good breakfast that morning.", "this only shows winners and breakfast go together; they might win for other reasons"],
+    ["Runners who eat a big, heavy meal just before a race can get a stomach ache and run slowly.", "this works AGAINST eating before a race"],
+    ["Breakfast is often called the most important meal of the day.", "a general saying about breakfast; it doesn't link breakfast to running faster"],
     ["Breakfast gives the body energy, and runners with more energy can keep up their speed.", null]],
   body: "Only one option explains HOW breakfast (X) leads to running faster (Y). Watch for options that just show two things happening together." });
 H("claim", 3, "tc3b", { stem: `<p>A teacher: “We should paint our classroom in bright, warm colours so that the children feel more cheerful.”</p><p>${SUP("the teacher")}</p>`,
-  opts: [["Cheerful children are more likely to have lots of friends and enjoy coming to school.", "this goes from Y to something else; it doesn't show that colours make children cheerful"],
-    ["People report feeling more cheerful in rooms painted in bright, warm colours.", null],
-    ["Bright paint fades more quickly in strong sunlight.", "a reason against, not a support"],
-    ["New schools often have brightly painted classrooms.", "this shows bright rooms and new schools go together; it says nothing about feelings"]],
+  opts: [["Children enjoy choosing the paint colours for their own classroom.", "this is about enjoying the choice, not about how the colours make them feel"],
+    ["Cheerful children are more likely to enjoy coming to school.", "this is what happens AFTER children are cheerful; it doesn't show colours make them cheerful"],
+    ["Schools that have just been painted often have happier students than schools that haven't.", "this shows two things go together, and it is about new paint, not bright colours"],
+    ["People report feeling more cheerful in rooms painted in bright, warm colours.", null]],
   body: "X = bright colours, Y = more cheerful children. One option links them directly." });
 H("claim", 3, "tc3c", { stem: `<p>Dad: “We should get a dog so that our family goes walking more.”</p><p>${SUP("Dad")}</p>`,
-  opts: [["Families who walk a lot are often the ones who already own dogs, cats or other pets.", "this shows walking and dogs go together, but it might be that walkers choose to get dogs, not that dogs make people walk"],
-    ["Dogs can be noisy when they are left alone all day.", "a reason against the claim"],
-    ["A dog needs a walk every day, so someone in the family would have to take it out.", null],
-    ["Walking is good for people's hearts.", "about why walking is good (Y), not about the dog"]],
+  opts: [["Families who walk a lot are often the ones who already own dogs, cats or other pets.", "this shows walking and pets go together, but walkers may choose pets, not the other way round"],
+    ["Walking together is a good way for families to talk and catch up.", "this is a good result of walking (Y), but it doesn't involve the dog"],
+    ["Some dog breeds are happy with only a short walk each day.", "this works slightly AGAINST the claim"],
+    ["A dog needs a walk every day, so someone in the family would have to take it out.", null]],
   body: "The link must show that having a dog CAUSES more walking. “Go together” is not the same as “because”." });
 H("claim", 3, "tc3d", { stem: `<p>A council member: “We should build a bike path to the beach so that fewer cars are parked there.”</p><p>${SUP("the council member")}</p>`,
-  opts: [["People who could ride safely to the beach would leave their cars at home.", null],
-    ["People who ride bikes are often fitter and healthier than people who drive to the beach.", "this shows bike riders and fitness go together; it doesn't show fewer cars"],
+  opts: [["People who ride bikes are often fitter and healthier than people who drive to the beach.", "this supports a different goal (health), not fewer cars"],
     ["The beach car park is full on hot summer days.", "this describes the problem (Y) but doesn't involve the bike path"],
-    ["A bike path would take about a year to build.", "how long it takes doesn't support the goal"]],
+    ["Bike paths in other towns are popular with tourists.", "popular elsewhere doesn't show that local people would leave their cars at home"],
+    ["People who could ride safely to the beach would leave their cars at home.", null]],
   body: "X = a bike path, Y = fewer parked cars. Only one option links the path to people leaving their cars behind." });
 H("claim", 4, "tc4a", { stem: `<p>A parent: “The canteen should sell water instead of fizzy drinks so that children's teeth stay healthy.”</p><p>${SUP("the parent")}</p>`,
-  opts: [["Fizzy drinks contain sugar and acid that damage teeth, but water does not.", null],
-    ["Water is cheaper for the canteen to sell than fizzy drinks.", "this supports a different goal (saving money), not healthy teeth"],
-    ["Children should brush their teeth at least twice a day to keep them healthy.", "true about healthy teeth (Y), but it doesn't involve the canteen's drinks"],
-    ["Some children would still buy fizzy drinks at the shop on the way home.", "this works against the claim"]],
+  opts: [["Children who drink a lot of water are often healthier overall.", "close, but it is about health in general, not teeth, and only shows two things go together"],
+    ["Dentists say that sugar in many foods can harm teeth.", "true about teeth, but it doesn't show that swapping the canteen's DRINKS helps"],
+    ["Many children at the school say they would happily drink water with their lunch instead.", "this shows the plan could work, not that it would keep teeth healthy"],
+    ["Fizzy drinks contain sugar and acid that damage teeth, but water does not.", null]],
   body: "Several options sound helpful, but only one shows that swapping fizzy drinks for water (X) protects teeth (Y)." });
 H("claim", 4, "tc4b", { stem: `<p>The club leader: “Our club should meet on Saturday mornings instead of Tuesday evenings so that more members come.”</p><p>${SUP("the club leader")}</p>`,
   opts: [["Saturday meetings would let the club use the big hall.", "a different benefit, not more members coming"],
     ["More members coming would mean the club could take on bigger and more ambitious projects together.", "this is what happens AFTER more members come; it doesn't show Saturday brings them"],
-    ["Many members have sport or homework on Tuesday evenings but are free on Saturday mornings.", null],
-    ["The club's best meeting ever was held on a Tuesday evening.", "this works against the claim"]],
+    ["Most members say Saturday is their favourite day of the week.", "liking a day is not the same as being free to come"],
+    ["Many members have sport or homework on Tuesday evenings but are free on Saturday mornings.", null]],
   body: "X = move to Saturday, Y = more members come. The link: members are busy on Tuesdays but free on Saturdays." });
 H("claim", 4, "tc4c", { stem: `<p>Lena: “Students should be allowed to listen to quiet music while they do maths so that they concentrate better.”</p><p>${SUP("Lena")}</p>`,
   opts: [["Most students say they enjoy listening to music.", "enjoying music isn't the same as concentrating better"],
-    ["In a trial, students working with quiet music made fewer careless mistakes than students working in silence.", null],
-    ["Loud music can make it hard to think clearly.", "about LOUD music, and it works against the claim if anything"],
-    ["Students who are good at maths often learn a musical instrument, and many of them practise every single day after school.", "this shows two things go together; it doesn't show music helps concentration"]],
+    ["Students who listen to music at home often finish their homework faster.", "this only shows two things go together, at home, and finishing fast isn't concentrating better"],
+    ["Some teachers already play quiet music in the morning while students come into the classroom and unpack their bags.", "about music in class, but it doesn't show music helps students concentrate on maths"],
+    ["In a trial, students working with quiet music made fewer careless mistakes than students working in silence.", null]],
   body: "Only one option compares students with and without quiet music and shows better concentration (fewer careless mistakes)." });
 H("claim", 4, "tc4d", { stem: `<p>A librarian: “We should display the newest books just inside the front door so that more children borrow them.”</p><p>${SUP("the librarian")}</p>`,
-  opts: [["New books usually cost more than older ones.", "about price, not about borrowing"],
-    ["Children who borrow more books from the library often become stronger and more confident readers over time.", "this is a good result of borrowing, but it doesn't show the display leads to more borrowing"],
-    ["The front door is also where the returns box is kept.", "a fact about the door, not a link to borrowing"],
+  opts: [["Children who borrow more books from the library often become stronger and more confident readers over time.", "a good result of borrowing, but it doesn't show the display leads to more borrowing"],
+    ["New books often have the brightest, most eye-catching covers.", "true about new books, but it doesn't say WHERE they should go"],
+    ["Last year the library bought more new books than ever before.", "about buying books, not about children borrowing them"],
     ["Children often choose a book they see as soon as they walk in rather than searching the shelves.", null]],
   body: "X = display new books by the door, Y = more children borrow them. The link: children pick what they see first." });
 
@@ -1565,8 +1576,8 @@ whose("rule", 3, "tr3d", "Ella", "Finn", "If the fire alarm rings, everyone must
 H("rule", 4, "tr4a", { stem: `<p>Most of the cats at the animal shelter are more than five years old. Bella is a cat at the shelter.</p><p>Which of these is the best conclusion?</p>`,
   opts: [["Bella is probably more than five years old.", null],
     ["Bella is definitely more than five years old.", "“most” only gives “probably”: Bella could be one of the younger cats"],
-    ["Bella is less than five years old.", "nothing points to that; most cats there are older"],
-    ["Most cats at the shelter are kittens.", "the opposite of what we are told"]],
+    ["Bella is more likely to be younger than five years old.", "the opposite: most cats there are older, so older is more likely"],
+    ["Every cat at the shelter is more than five years old.", "“most” is not “every”"]],
   body: "“Most” lets you say “probably”, never “definitely”." });
 H("rule", 4, "tr4b", { stem: `<p>A bag holds 4 red, 3 blue and 2 green marbles. Without looking, Jai takes marbles out one at a time.</p><p>What is the smallest number he must take to be <b>certain</b> of having two marbles of the same colour?</p>`,
   opts: [["2", "two marbles could be different colours"],
@@ -1647,21 +1658,21 @@ H("infer", 2, "ri2d", { passage: P(`<p>Grandma kept the key to the garden shed o
   body: "Grandma tells us she loses small things; the long ribbon makes the key big and easy to spot, which is why she never loses it." });
 H("infer", 3, "ri3a", { passage: P(`<p>The puppy bulldozed through the flower bed.</p>`),
   stem: `<p>What does the word “bulldozed” suggest about the puppy?</p>`,
-  opts: [["It moved slowly and carefully.", "the opposite of what a bulldozer does"],
-    ["It was driving a small machine.", "the word is used as a comparison, not literally"],
-    ["It was trying to dig a hole to bury something in the garden.", "bulldozers push things over; the word isn't about digging"],
+  opts: [["It ran in quickly but stepped neatly between the flowers.", "keeps the speed but misses the damage a bulldozer does"],
+    ["It was very strong and heavy for a puppy.", "takes the bulldozer too literally; the word is about how it moved through"],
+    ["It was trying to dig a hole to bury something in the garden.", "bulldozers push things flat; the word isn't about digging"],
     ["It pushed through clumsily, flattening the flowers.", null]],
   body: "A bulldozer pushes everything flat in its way. Using that word for a puppy makes us see it charging through and squashing the flowers." });
 H("infer", 3, "ri3b", { passage: P(`<p>“Of course you can borrow my new pencils,” said Lucy, pushing the tin towards Max with two fingers, as if it might bite.</p>`),
   stem: `<p>What does “as if it might bite” suggest about Lucy?</p>`,
   opts: [["She thinks the tin is dangerous.", "taken literally; the comparison is about her feelings"],
     ["She doesn't really want to lend the pencils.", null],
-    ["She is very generous and happy to share her things.", "her words say yes, but her actions say she is unwilling"],
+    ["She is proud of how new and shiny the pencils are.", "the pencils ARE new, but the comparison shows unwillingness, not pride"],
     ["She is frightened of Max.", "she is reluctant about the pencils, not scared of Max"]],
   body: "She says “of course”, but she pushes the tin away as little as possible, like something unpleasant. The comparison shows she is unwilling." });
 H("infer", 3, "ri3c", { passage: P(`<p>On wet afternoons the old library was a cave of whispers.</p>`),
   stem: `<p>What does the writer suggest by calling the library “a cave of whispers”?</p>`,
-  opts: [["It was underground and damp.", "taking “cave” literally; the library isn't underground"],
+  opts: [["It was cold and damp because of the rain.", "uses the real detail (wet afternoons) but takes “cave” literally"],
     ["People went there to tell secrets.", "whispering here is about keeping quiet, not secrets"],
     ["It was dim, hushed and quiet.", null],
     ["It was frightening to go into.", "caves can be scary, but nothing else suggests fear"]],
@@ -1670,14 +1681,14 @@ H("infer", 3, "ri3d", { passage: P(`<p>Dad looked at the blackened toast on his 
   stem: `<p>What does the word “flatly” tell us?</p>`,
   opts: [["He doesn't really think the toast is lovely.", null],
     ["He thinks the toast is delicious, just the way he likes it.", "that is what the word “lovely” says, but “flatly” tells us he doesn't mean it"],
-    ["He said it very loudly.", "flatly means without feeling, not loudly"],
-    ["He is too tired to speak.", "he does speak; the word describes HOW"]],
+    ["He is trying hard to sound cheerful.", "the opposite: a flat voice has no cheer in it at all"],
+    ["He is too tired to say much.", "he does speak; the word describes HOW, with no feeling"]],
   body: "“Flatly” means with no feeling in the voice. Saying “lovely” flatly about burnt toast shows he means the opposite." });
 H("infer", 4, "ri4a", { passage: P(`<p>My first day at drama club went like this. I arrived early, which was good. I sat in the director's chair, which was bad. I opened my folder and found my sister's maths homework instead of my script, which was worse.</p><p>The director, a tall woman with a pencil behind each ear, peered at me over her glasses. “Interesting choice,” she said. Twenty actors turned to look.</p><p>I read the maths homework aloud as my lines for the whole rehearsal. Nobody asked me to. Nobody asked me to stop, either. At the end the director said I had “a lot of nerve”, and I still don't know whether that was good.</p>`),
-  stem: `<p>What is the main effect of the way the writer lists what went wrong (“which was good … bad … worse”)?</p>`,
+  stem: `<p>What is the main effect of the way the writer lists what happened (“which was good … bad … worse”)?</p>`,
   opts: [["It turns an embarrassing day into a funny story by building up each disaster.", null],
-    ["It shows the writer is angry with his sister.", "the sister's homework is mentioned, but there's no anger in the telling"],
-    ["It explains how to get ready for a rehearsal.", "it is a story, not instructions"],
+    ["It shows that the writer was nervous all through the rehearsal.", "the day was awkward, but the calm, step-by-step telling is comic, not nervous"],
+    ["It shows that each problem was the writer's sister's fault.", "only one problem involves the sister's homework, and no one is blamed"],
     ["It shows that the director was unkind and embarrassed him in front of all the other actors.", "her “interesting choice” is dry humour, and she lets him carry on"]],
   body: "Each step is worse than the one before, and the writer tells it calmly: the pattern builds to a punchline. Read the whole passage: it is a comic memory, not a complaint." });
 H("infer", 4, "ri4b", { passage: P(`<p>The tall ones arrive while the sky is still grey. They bang their wooden tables open and tip out ice that slides and squeaks. I keep to my place on top of the stacked crates, where the boards are still warm from the lamp.</p><p>Soon the silver fish are laid out in rows, and the smell climbs up to me like a song. The tall one in the green apron pretends not to see me. Every morning he drops one small fish by the back wheel of his cart, and every morning he looks the other way while I take it. Neither of us has ever mentioned it.</p>`),
@@ -1692,13 +1703,13 @@ H("infer", 4, "ri4c", { passage: P(`<p>Aunt Rosa never threw anything away. A br
   opts: [["Stubborn", "she keeps things, but the passage shows her cleverness in using them, not refusing to change"],
     ["Resourceful", null],
     ["Untidy", "the bathtub garden might look odd, but she lays the clock wheels out “in order”"],
-    ["Lonely", "half the street comes to her gate; nothing suggests loneliness"]],
+    ["Old-fashioned", "she uses old things, but the point is the clever new uses she finds for them"]],
   body: "Every example shows her finding a clever new use for something broken, and in the end her neighbours need her. That is resourceful." });
 H("infer", 4, "ri4d", { passage: P(`<p>“Chess is boring,” I told Grandpa. He just set up the board.</p><p>For the first ten games I lost so quickly that I barely had time to sit down. Then Grandpa showed me how to protect my king with a wall of pawns and to wait, a little at a time, for him to make a mistake. In the eleventh game I trapped his queen. I could feel my heart thumping, as if it wanted to jump out and do a lap of the park.</p><p>We stayed at the park table until the light went orange. On the walk home Grandpa asked what I thought now.</p><p>“Chess is boring,” I said, grinning, and he laughed so hard he had to sit down on the kerb.</p>`),
   stem: `<p>Why does the writer say “Chess is boring” again at the end?</p>`,
   opts: [["Because the writer still thinks chess is boring", "the grin, the long afternoon and Grandpa's laughter show the opposite"],
-    ["To show that the writer was tired and grumpy after the long day at the park", "nothing about the words or the grin suggests tiredness"],
-    ["To show that Grandpa did not enjoy the games", "Grandpa laughs; he enjoyed the day too"],
+    ["To show the writer is embarrassed about losing the first ten games", "the early losses are real, but the writer is grinning, not embarrassed"],
+    ["To tease Grandpa because the writer won every game after that", "the writer trapped his queen once; nothing says every game was won"],
     ["As a joke: by now the writer loves chess, and Grandpa knows it", null]],
   body: "The same words mean the opposite at the end. The grin and Grandpa's laughter show it is a shared joke: the writer's mind has completely changed." });
 
@@ -1865,7 +1876,8 @@ ext("same", 4, "rs4d", MOVE, "Which extract suggests someone has found a way to 
 
 /* RIDGE RUNNER: finish the hand-written questions.
    Each step gets its own shuffle of answer letters, so no letter pattern repeats from step to step, while the
-   answers inside a step stay on different letters. Options that must stay in order (Extract A–D,
+   answers inside a step stay on different letters (the target letter depends on each question's place in its step,
+   not on where the answer was written). Options that must stay in order (Extract A–D,
    "X only / Y only / Both / Neither", plain numbers) keep their places. Then the explanation is built:
    the track's method + the body + why each trap is wrong. */
 (() => {
@@ -1882,18 +1894,18 @@ ext("same", 4, "rs4d", MOVE, "Which extract suggests someone has found a way to 
     for (let k = 0; k < 24; k++) {
       const p = PERMS[(h + k * 7) % 24], seen = new Set();
       let ok = true;
-      for (const r of list) { const a = fixedOrder(r.q) ? ans(r) : p[ans(r)]; if (seen.has(a)) { ok = false; break; } seen.add(a); }
+      list.forEach((r, i) => { const a = fixedOrder(r.q) ? ans(r) : p[i % 4]; if (seen.has(a)) ok = false; seen.add(a); });
       if (ok) { chosen = p; break; }
     }
-    for (const r of list) {
+    list.forEach((r, i) => {
       let opts = r.q.opts;
-      if (!fixedOrder(r.q)) { const a = ans(r), k = ((a - chosen[a]) % 4 + 4) % 4; opts = opts.slice(k).concat(opts.slice(0, k)); }
+      if (!fixedOrder(r.q)) { const a = ans(r), k = ((a - chosen[i % 4]) % 4 + 4) % 4; opts = opts.slice(k).concat(opts.slice(0, k)); }
       const options = opts.map(o => o[0]), answer = opts.findIndex(o => o[1] === null), traps = {};
       opts.forEach((o, i) => { if (o[1] !== null) traps[i] = o[1]; });
       const method = TRACKS.find(t => t.id === r.track).method;
       HAND.push({ id: r.id, track: r.track, rung: r.rung, passage: r.q.passage || "", stem: r.q.stem, options, answer, traps, visual: !!r.q.visual,
         explain: `<p class="method"><b>Method:</b> ${method}</p><p>${r.q.body}</p>${LIB.whyNot({ options, traps })}` });
-    }
+    });
   }
 })();
 
@@ -1925,51 +1937,64 @@ const PF = (() => {
     const ground = (c, h) => { for (let y = 0; y < ROWS; y++) map[y][c] = y >= h ? 1 : 0; };
     const air = c => { for (let y = 0; y < ROWS; y++) map[y][c] = 0; };
     const flat = (n, opt = {}) => { for (let i = 0; i < n; i++) ground(x + i, gh); if (opt.walker && n >= 5) ents.push({ t: "walker", x: (x + Math.floor(n / 2)) * TS, y: gh * TS - 10 }); if (opt.coins) for (let i = 1; i < n - 1; i += 2) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 2) * TS + 4 }); x += n; };
-    const maxGap = w === 1 ? 2 : 3, maxStep = w === 1 ? 1 : w === 4 ? 3 : 2;
+    const maxGap = 3, maxStep = w >= 3 ? 3 : 2, walkerP = 0.45 + 0.1 * w;
     flat(8);
     ents.push({ t: "check", x: 2 * TS, y: gh * TS });
-    let sinceCheck = 0, nests = 0, wantNests = L.boss ? 0 : w === 1 ? 1 : 2, sinceNest = 0;
+    let sinceCheck = 0, nests = 0, wantNests = L.boss ? 0 : w <= 2 ? 2 : 3, sinceNest = 0;
     while (x < len - 14) {
       const k = r();
       if (sinceCheck > 30) { flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); sinceCheck = 0; continue; }
-      if (nests < wantNests && sinceNest > 22 && x > len * (nests + 1) / (wantNests + 1.4)) {
-        flat(3); ents.push({ t: "nest", x: (x) * TS, y: gh * TS, id: nests }); flat(5); nests++; sinceNest = 0; sinceCheck += 8; continue;
+      if (nests < wantNests && x >= Math.round((len - 14) * (nests + 0.8) / (wantNests + 0.6))) {
+        ents.push({ t: "sign", x: (x - 5) * TS, y: gh * TS, nest: nests }); ents.push({ t: "ammo", x: (x - 2) * TS + 4, y: (gh - 4) * TS }); flat(3); ents.push({ t: "nest", x: (x) * TS, y: gh * TS, id: nests }); flat(4); ground(x, gh); for (let y = 0; y < gh; y++) map[y][x] = 4; ents.push({ t: "gate", x: x * TS, y: gh * TS, col: x, nest: nests }); x++; flat(3); nests++; sinceNest = 0; sinceCheck += 8; continue;
       }
       let used = 0;
-      if (k < 0.2) { flat(int(4, 8), { walker: r() < 0.25 + 0.12 * w, coins: r() < 0.5 }); }
-      else if (k < 0.42) {                                            /* a gap with coins over it */
+      if (k < 0.16) { flat(int(5, 8), { walker: r() < walkerP, coins: r() < 0.5 }); }
+      else if (k < 0.34) {                                            /* a gap with coins over it */
         const g = int(2, maxGap); for (let i = 0; i < g; i++) air(x + i);
-        for (let i = 0; i < g; i++) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 3) * TS });
+        for (let i = 0; i < g; i++) ents.push({ t: i === Math.floor(g / 2) ? "ammo" : "coin", x: (x + i) * TS + 4, y: (gh - 3) * TS });   /* a bullet at the top of the jump */
         x += g; flat(int(3, 5));
-      } else if (k < 0.58) {                                          /* a step up or down */
-        const d = int(1, maxStep) * (r() < 0.5 ? -1 : 1); gh = Math.max(8, Math.min(14, gh + d)); flat(int(4, 6), { walker: w >= 2 && r() < 0.3 });
-      } else if (k < 0.72 && w >= 2) {                                /* floating blocks over a pit */
+      } else if (k < 0.46) {                                          /* a step up or down */
+        const d = int(1, maxStep) * (r() < 0.5 ? -1 : 1); gh = Math.max(8, Math.min(14, gh + d)); flat(int(4, 6), { walker: r() < walkerP * 0.6 });
+      } else if (k < 0.58) {                                /* floating blocks over a pit */
         const top = gh, n = int(2, 3); let px = x;
         for (let i = 0; i < 2; i++) air(px++);
         for (let p = 0; p < n; p++) {
           const h = Math.max(7, Math.min(13, top - int(0, 2))), wid = int(2, 3);
           for (let i = 0; i < wid; i++) { air(px + i); map[h][px + i] = 2; }
-          ents.push({ t: "coin", x: (px + 1) * TS + 4, y: (h - 2) * TS + 4 });
+          ents.push({ t: p === n - 1 ? "ammo" : "coin", x: (px + 1) * TS + 4, y: (h - 2) * TS + 4 });
           px += wid; const g = int(1, 2); for (let i = 0; i < g; i++) air(px++);
         }
         x = px; flat(int(3, 5));
-      } else if (k < 0.84 && w >= 2) {                                /* spikes on the ground */
-        flat(2); const s = int(1, 2); for (let i = 0; i < s; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } x += s; flat(int(3, 4));
-      } else if (k < 0.94 && w >= 3) {                                /* a drone patrol */
+      } else if (k < 0.68) {                                         /* spikes on the ground */
+        flat(2); const s = int(1, w === 1 ? 2 : 3); for (let i = 0; i < s; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } x += s; flat(int(3, 4));
+      } else if (k < 0.8) {                                          /* a run of narrow pillars */
+        let h = gh; const n = int(3, 3 + w);
+        for (let p = 0; p < n; p++) {
+          const g = int(1, 2); for (let i = 0; i < g; i++) air(x++);
+          h = Math.max(8, Math.min(14, h + int(-maxStep, Math.min(2, maxStep)))); const wid = w >= 3 ? 1 : int(1, 2);
+          for (let i = 0; i < wid; i++) ground(x + i, h);
+          if (r() < 0.6) ents.push({ t: p === n - 1 || r() < 0.3 ? "ammo" : "coin", x: x * TS + 4, y: (h - 2) * TS + 4 });
+          x += wid;
+        }
+        air(x++); gh = h; flat(int(3, 4));
+      } else if (k < 0.9 && w >= 2) {                                /* a drone patrol */
         flat(int(5, 7)); ents.push({ t: "drone", x: (x - 3) * TS, y: (gh - 3) * TS, y0: (gh - 3) * TS });
-      } else { flat(int(4, 7), { walker: r() < 0.5, coins: true }); }
+      } else { flat(int(6, 8), { walker: true, coins: true }); ents.push({ t: "ammo", x: (x - 4) * TS + 4, y: (gh - 3) * TS }); if (w >= 2) ents.push({ t: "walker", x: (x - 2) * TS, y: gh * TS - 10 }); }
       sinceCheck += 6; sinceNest += 6;
     }
     if (L.boss) { flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); flat(4); ents.push({ t: "nest", x: x * TS, y: gh * TS, id: 9, boss: true }); flat(10); }
     else { flat(12); ents.push({ t: "goal", x: (x - 5) * TS, y: gh * TS }); }
-    ents.push({ t: "crate", x: 5 * TS, y: 12 * TS - 12 });                // a small ammo crate near the start
+    ents.push({ t: "crate", x: 5 * TS, y: 12 * TS - 12 });                // a small blaster crate near the start
+    { const sentries = L.boss ? 0 : (w === 1 ? 2 : w === 4 ? 4 : 3) * nests, have = () => ents.filter(e => e.t === "ammo").length;
+      const coins = ents.filter(e => e.t === "coin"); for (let i = 0; have() < sentries + 3 && i < coins.length; i += 3) coins[i].t = "ammo";
+      for (let c = 12; have() < sentries + 3 && c < x - 12; c += 5) { let r0 = 0; while (r0 < ROWS && map[r0][c] !== 1) r0++; if (r0 < ROWS && map[r0 - 1][c] === 0 && !ents.some(e => Math.abs(e.x - c * TS) < 20 && e.t !== "coin")) ents.push({ t: "ammo", x: c * TS + 4, y: (r0 - 3) * TS }); } }
     const cols = x;
     for (let y = 0; y < ROWS; y++) for (let c = 0; c < cols; c++) map[y][c] = map[y][c] || 0;
     /* hearts: one spare in the middle of longer levels */
     const mid = ents.filter(e => e.t === "check")[1]; if (mid) ents.push({ t: "heart", x: mid.x + 24, y: mid.y - 40 });
     return { map, ents, cols, theme: THEMES[w - 1], world: w };
   }
-  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2; };
+  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2 || (t === 4 && !G.open && !(G.gateOpen && G.gateOpen[c])); };
   const spikeAt = (G, c, r) => c >= 0 && c < G.cols && r >= 0 && r < ROWS && G.map[r][c] === 3;
 
   /* one physics step for a body {x, y, vx, vy, ground} with input {dir, jump (held), jumpPressed} */
@@ -1998,7 +2023,7 @@ const PF = (() => {
 
   /* ---------------- can the goal be reached? (uses the same physics, no double jump) ---------------- */
   function reach(L) {
-    const G = gen(L), goal = G.ents.find(e => e.t === "goal" || e.boss);
+    const G = gen(L); G.open = true; const  goal = G.ents.find(e => e.t === "goal" || e.boss);
     const gx = Math.floor(goal.x / TS);
     const startC = 2, stand = new Map(), queue = [];
     const groundRow = c => { for (let r = 0; r < ROWS; r++) if (solidAt(G, c, r)) return r; return -1; };
@@ -2061,9 +2086,11 @@ const PF = (() => {
     S = { G, cv, ctx, opts, kit: Object.assign({}, opts.kit), sound: opts.sound !== false, t: 0, cam: 0, coins: 0, lost: 0, msgs: [], parts: [],
       P: { x: first.x + 3, y: first.y - PH.h, vx: 0, vy: 0, ground: false, face: 1, inv: 0, boots: opts.kit.boots, cd: 0 },
       check: { x: first.x + 3, y: first.y - PH.h }, hearts: opts.kit.hearts, shield: opts.kit.shield ? 1 : 0, ammo: opts.kit.ammo, rounds: opts.kit.rounds,
-      ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -0.5 : 0, ph: i * 1.7 }, e)),
-      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible };
+      ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -(0.45 + 0.15 * opts.level.world) : 0, ph: i * 1.7 }, e)),
+      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0 };
+    S.totalAmmo = S.ents.filter(e => e.t === "ammo").length;
     S.ents.filter(e => e.t === "nest").forEach(e => { e.sentries = makeSentries(e); });
+    G.gateOpen = {};
     addEventListener("keydown", kd); addEventListener("keyup", ku);
     let last = performance.now(), acc = 0;
     const loop = now => {
@@ -2072,7 +2099,7 @@ const PF = (() => {
       draw(); if (S && !S.over) raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
-    msg(G.theme.name + (opts.level.boss ? ": the boss waits at the end" : ": reach the flag"), 160);
+    msg(G.theme.name + (opts.level.boss ? ": the boss waits at the end" : ": reach the flag"), 160); msg("Grab the gold bullets: every one is a sniper round!", 200, "#ffd43b");
   }
   function stop() { cancelAnimationFrame(raf); removeEventListener("keydown", kd); removeEventListener("keyup", ku); for (const k in KEYS) KEYS[k] = false; S = null; }
   const msg = (t, d = 90, c = "#fff") => S.msgs.push({ t, d, c });
@@ -2080,12 +2107,12 @@ const PF = (() => {
   function hurt(why) {
     if (S.P.inv > 0 || S.invincible) return;
     if (S.shield) { S.shield = 0; S.P.inv = 90; msg("Shield saved you!", 80, "#9fe7ff"); beep(600, .1, "triangle"); return; }
-    S.hearts--; S.lost++; S.P.inv = 100; beep(140, .15); msg(why, 70, "#ffb3b3");
+    S.hearts--; S.lost++; S.P.inv = 100; if (S.streak) msg("Bullet streak lost", 50, "#ffb3b3"); S.streak = 0; beep(140, .15); msg(why, 70, "#ffb3b3");
     if (S.hearts <= 0) end(false);
   }
   function end(win) {
     if (S.over) return; S.over = true;
-    const res = { win, coins: S.coins, lost: S.lost, hearts: S.hearts };
+    const res = { win, coins: S.coins, lost: S.lost, hearts: S.hearts, got: S.got, totalAmmo: S.totalAmmo };
     setTimeout(() => { const cb = S && S.opts.onEnd; stop(); cb && cb(res); }, win ? 900 : 700);
     draw();
   }
@@ -2130,7 +2157,7 @@ const PF = (() => {
         msg(head ? "HEADSHOT!" : "HIT!", 50, head ? "#ff6b6b" : "#fff"); S.coins += head ? 3 : 1;
         if (s.hp <= 0) { s.alive = false; s.state = "ko"; msg(s.boss ? "The Warden is down!" : "Sentry down!", 70, "#9be15d"); }
         else { s.state = "hide"; s.st = 0; s.hold = 30; s.x = s.at; }
-        if (!sc.nest.sentries.list.some(q => q.alive)) { msg(sc.nest.boss ? "BOSS DEFEATED!" : "Ridge clear!", 120, "#9be15d"); if (sc.nest.boss) { S.scope = null; end(true); } else setTimeout(() => { if (S && S.scope) S.scope = null; }, 600); }
+        if (!sc.nest.sentries.list.some(q => q.alive)) { msg(sc.nest.boss ? "BOSS DEFEATED!" : "Ridge clear!", 120, "#9be15d"); if (sc.nest.boss) { S.scope = null; end(true); } else { const g = S.ents.find(e => e.t === "gate" && e.nest === sc.nest.id); if (g) { S.G.gateOpen[g.col] = true; msg("The laser gate is open!", 120, "#9be15d"); beep(392, .1, "triangle"); beep(587, .15, "triangle"); } setTimeout(() => { if (S && S.scope) S.scope = null; }, 600); } }
         return;
       }
     }
@@ -2146,7 +2173,7 @@ const PF = (() => {
     }
     if (pressed("leave") || pressed("use")) { S.scope = null; msg(sc.nest.sentries.list.some(s => s.alive) ? "Careful: the sentries left standing will shell the path" : "", 120, "#ffd43b"); return; }
     if (sc.cd > 0) sc.cd--; if (sc.flash > 0) sc.flash--;
-    if (S.rounds <= 0 && sc.nest.boss && sc.nest.sentries.list.some(s => s.alive)) { if (++sc.supply === 150) { S.rounds += 3; msg("Supply drop: +3 sniper rounds", 90, "#9be15d"); sc.supply = 0; } }
+    if (S.rounds <= 0 && sc.nest.sentries.list.some(s => s.alive)) { if (++sc.supply === 300) { S.rounds += 2; msg("Supply drop: +2 sniper rounds (gather bullets to skip the wait)", 120, "#9be15d"); sc.supply = 0; } else if (sc.supply === 1) msg("Out of rounds: a supply drop is on its way…", 120, "#ffd43b"); }
     for (const s of sc.nest.sentries.list) {
       if (!s.alive) continue;
       s.st++;
@@ -2157,7 +2184,7 @@ const PF = (() => {
       if (s.st < s.hold) continue;
       const r = Math.random();
       if (s.state === "hide") { s.side = Math.random() < 0.5 ? -1 : 1; out(); if (r < (s.boss ? 0.45 : 0.25) + 0.05 * w) { s.state = "aim"; s.st = 0; } else { s.state = "peek"; s.st = 0; s.hold = 70 + Math.random() * 60 - 8 * w; } }
-      else if (s.state === "peek") { if (w >= 2 && r < 0.3 + 0.1 * w) { const o = s.rocks.filter(x => x !== s.at); s.at = o[Math.floor(Math.random() * o.length)]; s.tx = s.at + s.side * (s.boss ? 42 : 36); s.state = "run"; s.st = 0; } else { s.state = "hide"; s.st = 0; s.hold = 40 + Math.random() * 60; s.x = s.at; } }
+      else if (s.state === "peek") { if (r < 0.2 + 0.1 * w) { const o = s.rocks.filter(x => x !== s.at); s.at = o[Math.floor(Math.random() * o.length)]; s.tx = s.at + s.side * (s.boss ? 42 : 36); s.state = "run"; s.st = 0; } else { s.state = "hide"; s.st = 0; s.hold = 40 + Math.random() * 60; s.x = s.at; } }
     }
   }
 
@@ -2184,7 +2211,7 @@ const PF = (() => {
     if (nest && nest.boss && !nest.seen) { nest.seen = true; enterNest(nest); }
     /* bolts */
     for (const b of S.bolts) { b.x += b.vx; b.d--; if (solidAt(G, Math.floor(b.x / TS), Math.floor(b.y / TS))) b.d = 0;
-      for (const e of S.ents) if (e.alive && (e.t === "walker" || e.t === "drone") && Math.abs(b.x - (e.x + 6)) < 9 && Math.abs(b.y - (e.y + 5)) < 9) { e.alive = false; b.d = 0; burst(e.x + 6, e.y + 5, "#ffd43b"); S.coins++; beep(300, .06); } }
+      for (const e of S.ents) if (e.alive && (e.t === "walker" || e.t === "drone") && Math.abs(b.x - (e.x + 6)) < 9 && Math.abs(b.y - (e.y + 5)) < 9) { e.alive = false; b.d = 0; burst(e.x + 6, e.y + 5, "#ffd43b"); S.coins++; beep(300, .06); dropAmmo(e); } }
     S.bolts = S.bolts.filter(b => b.d > 0);
     /* entities */
     for (const e of S.ents) {
@@ -2197,19 +2224,25 @@ const PF = (() => {
       const hitP = (w, h) => P.x < e.x + w && P.x + PH.w > e.x && P.y < e.y + h && P.y + PH.h > e.y;
       if (e.t === "walker" || e.t === "drone") {
         if (hitP(12, 10)) {
-          if (P.vy > 0.5 && P.y + PH.h - e.y < 9) { e.alive = false; P.vy = -4.5; burst(e.x + 6, e.y + 4, "#ffd43b"); S.coins++; beep(660, .06); msg("STOMP!", 30); }
+          if (P.vy > 0.5 && P.y + PH.h - e.y < 9) { e.alive = false; P.vy = -4.5; burst(e.x + 6, e.y + 4, "#ffd43b"); S.coins++; beep(660, .06); msg("STOMP!", 30); dropAmmo(e); }
           else hurt(e.t === "walker" ? "Bumped by a crawler bot" : "Zapped by a drone");
         }
       } else if (e.t === "coin" && hitP(8, 8)) { e.alive = false; S.coins++; beep(980, .04, "triangle", .03); }
       else if (e.t === "heart" && hitP(10, 10)) { e.alive = false; S.hearts = Math.min(6, S.hearts + 1); msg("+1 heart", 50, "#ff8787"); beep(760, .1, "triangle"); }
+      else if (e.t === "ammo" && hitP(8, 12)) {
+        e.alive = false; S.rounds++; S.got++; S.streak++; S.flash = 40; burst(e.x + 3, e.y + 4, "#ffd43b", 10); beep(880, .05, "triangle"); beep(1320, .07, "triangle");
+        msg("+1 SNIPER ROUND", 50, "#ffd43b");
+        if (S.streak % 3 === 0) { S.rounds++; msg(`BULLET STREAK x${S.streak}: +1 BONUS ROUND`, 80, "#ffa94d"); beep(1568, .12, "triangle"); }
+      }
       else if (e.t === "crate" && hitP(12, 12)) { e.alive = false; S.ammo += 3; msg("+3 blaster ammo", 50, "#ffd43b"); beep(500, .06); }
       else if (e.t === "check" && !e.on && Math.abs(P.x - e.x) < 12) { e.on = true; S.check = { x: e.x + 2, y: e.y - PH.h }; msg("Checkpoint", 40, "#9be15d"); beep(540, .07, "triangle"); }
+      else if (e.t === "gate" && !G.gateOpen[e.col] && Math.abs(P.x + PH.w - e.x) < 3 && S.t % 90 === 0) msg("Laser gate locked: clear the sentries from the nest (▼ / E)", 90, "#ffb3b3");
       else if (e.t === "goal" && Math.abs(P.x - e.x) < 12) { e.alive = false; msg("LEVEL CLEAR!", 120, "#9be15d"); beep(523, .1, "triangle"); beep(784, .2, "triangle"); end(true); return; }
     }
     /* shells from sentries left standing: they cover the stretch after their nest */
     for (const n of S.ents.filter(e => e.t === "nest" && !e.boss)) {
       const alive = n.sentries.list.filter(s => s.alive).length;
-      if (!alive || P.x < n.x + 30 || P.x > n.x + 30 * TS) continue;
+      if (!alive || S.P.inv > 0 || P.x < n.x - 6 * TS || P.x > n.x + 30 * TS) continue;
       n.shellT = (n.shellT || 0) + alive;
       if (n.shellT > 170) { n.shellT = 0; S.shells.push({ x: P.x + 5 + P.vx * 30, y: groundBelow(P.x + 5 + P.vx * 30), d: 70 }); }
     }
@@ -2219,6 +2252,8 @@ const PF = (() => {
     S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0);
     S.cam = Math.max(0, Math.min(G.cols * TS - VW, P.x - VW * 0.4));
   }
+  /* every second beaten bot drops a bullet (the drop is decided by the bot, so it is the same each play) */
+  function dropAmmo(e) { if (e.i % 2) return; const x = e.x + 3; S.ents.push({ t: "ammo", x, y: groundBelow(x) - 12, alive: true, i: S.ents.length, ph: 0 }); S.totalAmmo++; msg("It dropped a bullet!", 50, "#ffd43b"); }
   const groundBelow = x => { const c = Math.floor(x / TS); for (let r = 0; r < ROWS; r++) if (solidAt(S.G, c, r)) return r * TS; return ROWS * TS; };
 
   /* ---------- drawing ---------- */
@@ -2244,8 +2279,11 @@ const PF = (() => {
       else if (e.t === "walker") { const f = Math.floor(S.t / 8) % 2; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 10); ctx.fillStyle = "#8a6a4a"; ctx.fillRect(x, y, 12, 8); ctx.fillStyle = "#b08a62"; ctx.fillRect(x + 1, y, 10, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + (e.vx < 0 ? 2 : 7), y + 3, 3, 3); ctx.fillStyle = "#e03131"; ctx.fillRect(x + (e.vx < 0 ? 3 : 8), y + 4, 1, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1 + f * 2, y + 8, 3, 2); ctx.fillRect(x + 8 - f * 2, y + 8, 3, 2); }
       else if (e.t === "drone") { const f = S.t % 6 < 3; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y + 2, 14, 7); ctx.fillStyle = "#c92a2a"; ctx.fillRect(x, y + 3, 12, 5); ctx.fillStyle = "#ffec99"; ctx.fillRect(x + 5, y + 4, 2, 2); ctx.fillStyle = "#adb5bd"; ctx.fillRect(f ? x - 2 : x, y, f ? 6 : 3, 1); ctx.fillRect(f ? x + 8 : x + 10, y, f ? 6 : 3, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1, y + 1, 1, 2); ctx.fillRect(x + 10, y + 1, 1, 2); }
       else if (e.t === "heart") { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 1, y + 2, 3, 3); ctx.fillRect(x + 6, y + 2, 3, 3); ctx.fillRect(x, y + 3, 10, 3); ctx.fillRect(x + 2, y + 6, 6, 2); ctx.fillRect(x + 4, y + 8, 2, 1); }
+      else if (e.t === "ammo") { const b = Math.round(2 * Math.sin(S.t / 9 + e.i)), gl = 0.35 + 0.25 * Math.sin(S.t / 6 + e.i); ctx.fillStyle = `rgba(255,212,59,${gl})`; ctx.fillRect(x - 3, y - 3 + b, 13, 17); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x, y - 1 + b, 7, 12); ctx.fillStyle = "#e8a33d"; ctx.fillRect(x + 1, y + 4 + b, 5, 6); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 1, y + 4 + b, 2, 6); ctx.fillStyle = "#adb5bd"; ctx.fillRect(x + 2, y + b, 3, 4); ctx.fillStyle = "#e9ecef"; ctx.fillRect(x + 2, y + b, 1, 3); }
+      else if (e.t === "sign") { const n = S.ents.find(q => q.t === "nest" && q.id === e.nest), left = n ? n.sentries.list.filter(s => s.alive).length : 0; ctx.fillStyle = "#5a3a22"; ctx.fillRect(x + 10, y - 20, 3, 20); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 15, y - 44, 54, 25); ctx.fillStyle = left ? "#ffd43b" : "#8ce99a"; ctx.fillRect(x - 14, y - 43, 52, 23); txt(ctx, left ? "NEST AHEAD" : "RIDGE CLEAR", x + 12, y - 34, 7, "#1b1b2f"); if (left) txt(ctx, `${left} SENTRIES`, x + 12, y - 24, 7, "#c92a2a"); }
       else if (e.t === "crate") { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 14); ctx.fillStyle = "#c97a3e"; ctx.fillRect(x, y, 12, 12); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 3, y + 4, 6, 4); }
       else if (e.t === "check") { ctx.fillStyle = "#5a3a22"; ctx.fillRect(x, y - 30, 2, 30); ctx.fillStyle = e.on ? "#40c057" : "#adb5bd"; ctx.fillRect(x + 2, y - 30, 12, 8); }
+      else if (e.t === "gate") { if (!S.G.gateOpen[e.col]) { ctx.fillStyle = "#495057"; ctx.fillRect(x - 2, 0, 20, 6); ctx.fillRect(x - 2, y - 4, 20, 4); for (let k = 0; k < 3; k++) { ctx.fillStyle = (S.t + k * 5) % 14 < 7 ? "#ff3b3b" : "#ff8787"; ctx.fillRect(x + 2 + k * 5, 6, 2, y - 10); } } else { ctx.fillStyle = "#495057"; ctx.fillRect(x - 2, y - 4, 20, 4); } }
       else if (e.t === "goal") { ctx.fillStyle = "#e9ecef"; ctx.fillRect(x, y - 64, 3, 64); const wv = Math.round(2 * Math.sin(S.t / 6)); ctx.fillStyle = "#ff7a29"; ctx.fillRect(x + 3, y - 64 + wv, 20, 12); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 10, y - 60 + wv, 6, 4); }
       else if (e.t === "nest") {
         const clear = !e.sentries.list.some(s => s.alive);
@@ -2267,13 +2305,17 @@ const PF = (() => {
     hud(); messages();
   }
   function txt(ctx, s, x, y, size = 10, c = "#fff", align = "center") { ctx.font = `bold ${size}px "Courier New", monospace`; ctx.textAlign = align; ctx.fillStyle = "#1b1b2f"; ctx.fillText(s, x + 1, y + 1); ctx.fillStyle = c; ctx.fillText(s, x, y); }
+  const need0 = () => S.ents.some(e => e.t === "nest" && !e.boss && e.x > S.P.x - 40 && e.x - S.P.x < 22 * TS && e.sentries.list.some(q => q.alive));
   function hud() {
     const ctx = S.ctx; ctx.fillStyle = "rgba(10,12,30,.55)"; ctx.fillRect(0, 0, VW, 18);
     for (let i = 0; i < S.hearts; i++) { const x = 6 + i * 12; ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 1, 5, 3, 3); ctx.fillRect(x + 5, 5, 3, 3); ctx.fillRect(x, 6, 9, 3); ctx.fillRect(x + 2, 9, 5, 2); ctx.fillRect(x + 4, 11, 1, 1); }
     let x = 6 + Math.max(S.hearts, 1) * 12 + 6;
     if (S.shield) { txt(ctx, "◆SHIELD", x, 13, 9, "#9fe7ff", "left"); x += 56; }
     txt(ctx, `BLASTER ${S.ammo}`, x, 13, 9, "#9fe7ff", "left"); x += 76;
-    txt(ctx, `SNIPER ${S.rounds}`, x, 13, 9, "#ffd43b", "left"); x += 70;
+    if (S.flash > 0) { S.flash--; ctx.fillStyle = `rgba(255,212,59,${S.flash / 60})`; ctx.fillRect(x - 4, 1, need0() ? 118 : 74, 16); }
+    const near = S.ents.find(e => e.t === "nest" && !e.boss && e.x > S.P.x - 40 && e.x - S.P.x < 22 * TS && e.sentries.list.some(q => q.alive)), need = near ? near.sentries.list.filter(q => q.alive).length : 0;
+    txt(ctx, `SNIPER ${S.rounds}${need ? ` · NEED ${need}` : ""}`, x, 13, 9, need && S.rounds < need ? "#ff8787" : "#ffd43b", "left"); x += need ? 118 : 74;
+    if (S.streak % 3) { txt(ctx, "▮".repeat(S.streak % 3) + "▯".repeat(3 - S.streak % 3), x - 4, 13, 9, "#ffa94d", "left"); x += 30; }
     if (S.kit.boots) { txt(ctx, "BOOTS", x, 13, 9, "#b197fc", "left"); x += 44; }
     if (S.kit.steady) { txt(ctx, "STEADY", x, 13, 9, "#8ce99a", "left"); }
     txt(ctx, `● ${S.coins}`, VW - 8, 13, 9, "#ffd43b", "right");
@@ -2331,6 +2373,10 @@ const PF = (() => {
     state: () => S && { x: S.P.x, y: S.P.y, hearts: S.hearts, ammo: S.ammo, rounds: S.rounds, coins: S.coins, scope: !!S.scope, over: S.over, cols: S.G.cols, shield: S.shield, check: S.check },
     teleport: (col) => { if (!S) return; const c = Math.max(0, Math.min(S.G.cols - 1, col)); let r = 0; while (r < ROWS && !solidAt(S.G, c, r)) r++; S.P.x = c * TS + 3; S.P.y = r * TS - PH.h; S.P.vx = S.P.vy = 0; },
     nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length })) : [],
+    gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
+    setRounds: n => { if (S) S.rounds = n; },
+    ammo: () => S ? S.ents.filter(e => e.t === "ammo" && e.alive).map(e => ({ x: e.x, y: e.y })) : [],
+    grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.x = s.at + s.side * (s.boss ? 42 : 36); const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
     key: (k, down) => { KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
@@ -2462,9 +2508,10 @@ function renderQ() {
   $("#scr-brief").innerHTML = `<div class="qcard"><div class="qhead"><span class="px">BRIEFING · ${B.L.boss ? `WORLD ${B.L.world} BOSS` : `LEVEL ${B.L.k + 1}`} · QUESTION ${B.i + 1} OF ${B.qs.length}</span>
       <span class="dots">${B.qs.map((x, i) => `<span class="${B.res[i] === true ? "ok" : B.res[i] === false ? "no" : i === B.i ? "cur" : ""}"></span>`).join("")}</span></div>
     <p class="note"><span class="tag ${t.subject}">${t.subject}</span> ${esc(t.name)} · ${role}</p>
-    ${q.passage || ""}<div class="stem">${q.stem}</div>
-    <div class="opts ${visual ? "visual" : ""}">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><b class="l">${letters[i]}</b><span>${o}</span></button>`).join("")}</div>
-    <div class="explain hidden" id="explain"></div></div>`;
+    <div class="qgrid"><div class="left">${q.passage || ""}<div class="stem">${q.stem}</div></div>
+    <div class="right"><div class="opts ${visual ? "visual" : ""}">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><b class="l">${letters[i]}</b><span>${o}</span></button>`).join("")}</div>
+    <div class="after hidden" id="after"></div><p class="keyhint" id="keyhint">Keys: ${letters.slice(0, q.options.length).split("").join(" ")} to answer</p>
+    <div class="explain hidden" id="explain"></div></div></div></div>`;
   document.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.i));
   coachQ(q);
   show("brief");
@@ -2474,11 +2521,20 @@ function answer(i) {
   const ok = i === q.answer; B.res[B.i] = ok; if (ok) B.right++;
   document.querySelectorAll(".opt").forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add("right"); else if (k === i) b.classList.add("wrong"); });
   const last = B.i === B.qs.length - 1;
-  const ex = $("#explain"); ex.classList.remove("hidden");
-  ex.innerHTML = `<p class="verdict ${ok ? "ok" : "no"}">${ok ? "✔ Right! Kit upgraded." : `✘ Not this time: the answer is ${"ABCDE"[q.answer]}.`}</p>${q.explain}<div class="next"><button class="btn" id="btn-next">${last ? "See your kit" : "Next question"}</button></div>`;
+  const af = $("#after"); af.classList.remove("hidden");
+  af.innerHTML = `<p class="verdict ${ok ? "ok" : "no"}">${ok ? "✔ Right! Kit upgraded." : `✘ Not this time: the answer is ${"ABCDE"[q.answer]}.`}</p><button class="btn" id="btn-next">${last ? "See your kit ▶" : "Next question ▶"}</button>`;
+  $("#keyhint").textContent = "Press Enter for the " + (last ? "kit" : "next question");
+  const ex = $("#explain"); ex.classList.remove("hidden"); ex.innerHTML = q.explain;
   $("#btn-next").onclick = () => { if (last) showKit(); else { B.i++; renderQ(); } };
   S.log.push([q.track, q.rung, ok ? 1 : 0]); if (S.log.length > 400) S.log.shift(); save();
 }
+
+addEventListener("keydown", e => {
+  if ($("#scr-brief").classList.contains("hidden") || !B || e.ctrlKey || e.metaKey || e.altKey) return;
+  const q = B.qs[B.i], k = e.key.toUpperCase();
+  if (B.res[B.i] === undefined) { const i = "ABCDE".indexOf(k) >= 0 ? "ABCDE".indexOf(k) : "12345".indexOf(k); if (k.length === 1 && i >= 0 && i < q.options.length) { e.preventDefault(); answer(i); } }
+  else if (e.key === "Enter" || e.key === "ArrowRight") { const b = $("#btn-next"); if (b) { e.preventDefault(); b.click(); } }
+});
 
 /* ================= kit ================= */
 function kitFor(right, n, boss) {
@@ -2494,6 +2550,7 @@ function showKit() {
     <p>Every right answer made your kit better. ${B.right < n ? `With all ${n} right you would have had ${best.hearts} hearts, ${best.ammo} blaster shots, ${best.rounds} sniper rounds, boots and a shield.` : "A perfect briefing: you have everything!"}</p>
     <div class="kitgrid">${item("❤ Hearts", k.hearts, "hits you can take")}${item("✦ Blaster", k.ammo, "shots for crawler bots and drones")}${item("◎ Sniper rounds", k.rounds, "for the sentries at each nest")}
       ${item("〰 Steady scope", k.steady ? "YES" : "no", "less sway (half right or better)", k.steady)}${item("⤒ Double-jump boots", k.boots ? "YES" : "no", "jump again in the air (¾ right or better)", k.boots)}${item("◆ Shield", k.shield ? "YES" : "no", "blocks one hit (all right)", k.shield)}</div>
+    <p class="tip">◎ <b>Need more sniper rounds?</b> Grab the <b style="color:var(--gold)">gold bullets</b> in the level: over the gaps, on top of the pillars and beside the bots. Beaten bots sometimes drop one, and 3 in a row without being hit earns a bonus round. A sign before each nest says how many sentries are waiting.</p>
     <button class="btn grn" id="btn-play">Start the level ▶</button></div>`;
   $("#btn-play").onclick = () => play();
   coachKit();
@@ -2517,6 +2574,7 @@ function done(res) {
     const i = LEVELS.indexOf(L), next = LEVELS[i + 1];
     $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">${L.boss ? "BOSS DEFEATED!" : "LEVEL CLEAR!"}</h2>
       <p style="font-size:28px;color:var(--gold)">${stars(st)}</p><p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
+      ${res.totalAmmo ? `<p>Sniper bullets gathered: <b>${res.got} of ${res.totalAmmo}</b>${res.got === res.totalAmmo ? " · every one!" : ""}</p>` : ""}
       <p class="note" style="color:var(--muted)">★ for clearing the level, ★ for ¾ of the briefing right, ★ for a perfect briefing.</p>
       ${next ? `<button class="btn grn" id="btn-nextlv">Next: ${next.boss ? "the Warden" : esc(TR[next.track].name)} ▶</button>` : `<p class="px" style="color:var(--gold)">YOU BEAT ALL FOUR WORLDS!</p>`}
       <button class="btn alt" id="btn-tomap">Map</button></div>`;

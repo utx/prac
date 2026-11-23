@@ -211,6 +211,9 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   /* every level can be finished */
   const stuck = await p.evaluate(() => __rr.LEVELS.filter(L => !__rr.PF.reach({ world: L.world, boss: !!L.boss, seed: L.seed }).ok).map(L => L.id));
   if (stuck.length) bad(`levels that can't be finished: ${stuck.join(", ")}`);
+  /* every level has its sniper nests (2 in worlds 1–2, 3 in worlds 3–4), each with a laser gate after it */
+  const nestBad = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }), n = G.ents.filter(e => e.t === "nest").length, g = G.ents.filter(e => e.t === "gate").length; return n !== (L.world <= 2 ? 2 : 3) || g !== n; }).map(L => L.id));
+  if (nestBad.length) bad(`levels without the right number of nests and gates: ${nestBad.join(", ")}`);
   const nodes = await p.$$eval(".node", n => n.length), locked = await p.$$eval(".node.lock", n => n.length);
   if (nodes !== 16 || locked !== 15) bad(`world 1 should show 16 levels with only the first open (shows ${nodes}, ${locked} locked)`);
   /* play level 1 from the map */
@@ -235,8 +238,27 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "head")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(100);
   const after = await p.evaluate(() => __rr.PF.hook.nests()[0].alive); if (after !== before - 1) bad(`a shot on a sentry should knock it out (${before} → ${after})`);
   if (shots) await p.screenshot({ path: path.join(shots, "rr-scope.png") });
+  /* gold bullets: every level has more than enough for its sentries, and grabbing one adds a sniper round */
+  const short = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }); const sentries = (L.world === 1 ? 2 : L.world === 4 ? 4 : 3) * G.ents.filter(e => e.t === "nest").length; return G.ents.filter(e => e.t === "ammo").length < sentries + 3; }).map(L => L.id));
+  if (short.length) bad(`levels without enough gold bullets for their sentries: ${short.join(", ")}`);
+  { const r0 = await p.evaluate(() => __rr.PF.hook.state().rounds); await p.evaluate(() => __rr.PF.hook.key("leave", true)); await p.waitForTimeout(60); await p.evaluate(() => __rr.PF.hook.key("leave", false));
+    await p.evaluate(() => __rr.PF.hook.grab()); await p.waitForTimeout(150);
+    const r1 = await p.evaluate(() => __rr.PF.hook.state().rounds); if (r1 !== r0 + 1) bad(`grabbing a gold bullet should add a sniper round (${r0} → ${r1})`);
+    await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100); }
+  /* the gate after the nest stays shut (it blocks the hero) until the ridge is clear */
+  if ((await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("the laser gate should start shut");
   await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
   if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("E should leave the scope");
+  await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.gates()[0].col - 3)); await p.keyboard.down("ArrowRight"); await p.waitForTimeout(900); await p.keyboard.up("ArrowRight");
+  const gx = await p.evaluate(() => __rr.PF.hook.state().x), gcol = await p.evaluate(() => __rr.PF.hook.gates()[0].col);
+  if (gx > gcol * 16) bad("a shut laser gate should block the way");
+  await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
+  /* out of rounds: a supply drop comes (never stuck) */
+  await p.evaluate(() => __rr.PF.hook.setRounds(0)); await p.waitForTimeout(5800);
+  if (!((await p.evaluate(() => __rr.PF.hook.state().rounds)) > 0)) bad("running out of sniper rounds at a nest should bring a supply drop");
+  for (let k = 0; k < 8 && (await p.evaluate(() => __rr.PF.hook.nests()[0].alive)) > 0; k++) { await p.evaluate(() => { __rr.PF.hook.aimAt(0, "head"); __rr.PF.hook.fire(); }); await p.waitForTimeout(120); }
+  if (!(await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("clearing the ridge should open the laser gate");
+  await p.waitForTimeout(800);
   /* reach the flag */
   await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.state().cols - 5)); await p.waitForTimeout(1600);
   if (!(await p.isVisible("#scr-result"))) bad("reaching the flag should finish the level");
@@ -285,6 +307,32 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   if ((await p.evaluate(() => localStorage.getItem("prac4.v1"))) !== saved) bad("practice mode must not save progress");
   await p.goto(url + "?admin=1"); await p.evaluate(() => sessionStorage.removeItem("prac.admin")); await p.goto(url + "?admin=1");
   if (await p.isVisible("#coach")) bad("?admin=1 without the PIN should not show coach notes");
+  /* on a monitor (laptop 1366 × 768, with and without the coach sidebar) the options and the Next button
+     show without scrolling, for every hand-written question and some of every template */
+  for (const [admin, vp] of [[false, { width: 1366, height: 768 }], [true, { width: 1366, height: 768 }], [false, { width: 1920, height: 1080 }]]) {
+    const pg = await open(vp);
+    if (admin) { await pg.evaluate(() => sessionStorage.setItem("prac.admin", "1")); await pg.goto(url + "?admin=1"); }
+    const off = await pg.evaluate(() => {
+      const out = [], qs = [...HAND, ...GENS.flatMap(g => [1, 2].map(s => g.make(s * 23)).filter(Boolean))];
+      for (const q of qs) {
+        __rr.preview(q); window.scrollTo(0, 0);
+        const opts = [...document.querySelectorAll("#scr-brief .opt")], lastOpt = opts[opts.length - 1].getBoundingClientRect();
+        __rr.answer(q.answer);
+        const nx = document.querySelector("#btn-next").getBoundingClientRect();
+        if (lastOpt.bottom > innerHeight || nx.bottom > innerHeight) out.push(`${q.id} (${Math.round(Math.max(lastOpt.bottom, nx.bottom))}px)`);
+      }
+      return out;
+    });
+    if (off.length) bad(`at ${vp.width}×${vp.height}${admin ? " with the coach sidebar" : ""} these need scrolling to reach the options or Next: ${off.slice(0, 6).join(", ")}${off.length > 6 ? ` … (${off.length})` : ""}`);
+    if (shots && vp.width === 1366 && admin) { await pg.evaluate(() => { __rr.preview(HAND.find(q => q.id === "ri4a")); __rr.answer(0); }); await pg.screenshot({ path: path.join(shots, "rr-monitor.png") }); }
+    await pg.close();
+  }
+  /* the keyboard answers and moves on */
+  { const pg = await open({ width: 1366, height: 768 });
+    await pg.evaluate(() => __rr.startBrief("1-frac")); const i0 = await pg.evaluate(() => __rr.B().i);
+    await pg.keyboard.press("b"); await pg.keyboard.press("Enter");
+    if ((await pg.evaluate(() => __rr.B().i)) !== i0 + 1 || (await pg.evaluate(() => __rr.B().res[0])) === undefined) bad("keys A–E should answer and Enter should go to the next question");
+    await pg.close(); }
   /* every hand-written question (and some of every template) fits a phone screen */
   const ph = await open({ width: 390, height: 800 });
   const wide = await ph.evaluate(() => {
