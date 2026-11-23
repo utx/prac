@@ -4,6 +4,7 @@
    work the answer out again by its own method. Wrong options come from real mistakes, most tempting first.
    --------------------------------------------------------------- */
 (() => {
+const { GIRLS, BOYS } = LIB;
 const { gen, opts, spread, frac, fracT, money, clock, gcd, whyNot, gridSvg, pieSvg, countersSvg, colGraph, pictGraph, scaleSvg, jugSvg, tbl, svg, T, NAMES } = LIB;
 const M = (track) => TRACKS.find(t => t.id === track).method;
 const ex = (track, body, o) => `<p class="method"><b>Method:</b> ${M(track)}</p>${body}${whyNot(o)}`;
@@ -37,8 +38,8 @@ gen("m-frac-2", "frac", 2, R => {
   const ctx = R.pick(["marbles", "money", "minutes", "ribbon", "class"]);
   let total, unitTxt, say, fmt = String, q;
   if (ctx === "marbles") { total = d * R.int(3, 9); q = `A jar holds ${total} marbles. ${frac(n, d)} of them are blue. How many marbles are blue?`; }
-  else if (ctx === "money") { total = d * R.int(2, 12) * 5; fmt = v => "$" + v; q = `${R.pick(NAMES)} had $${total}. She spent ${frac(n, d)} of it on a new game. How much did the game cost?`; }
-  else if (ctx === "minutes") { const opt = [60, 90, 120].filter(t => t % d === 0); total = R.pick(opt.length ? opt : [60 * d]); fmt = v => v + " minutes"; q = `A film lasts ${total} minutes. ${R.pick(NAMES)} has watched ${frac(n, d)} of it. How many minutes has he watched?`; }
+  else if (ctx === "money") { total = d * R.int(2, 12) * 5; fmt = v => "$" + v; q = `${R.pick(GIRLS)} had $${total}. She spent ${frac(n, d)} of it on a new game. How much did the game cost?`; }
+  else if (ctx === "minutes") { const opt = [60, 90, 120].filter(t => t % d === 0); total = R.pick(opt.length ? opt : [60 * d]); fmt = v => v + " minutes"; q = `A film lasts ${total} minutes. ${R.pick(BOYS)} has watched ${frac(n, d)} of it. How many minutes has he watched?`; }
   else if (ctx === "ribbon") { const opt = [100, 200, 300, 400].filter(t => t % d === 0); total = R.pick(opt.length ? opt : [100 * d]); fmt = v => v + " cm"; q = `A ribbon is ${total / 100} m long. ${frac(n, d)} of it is cut off. How many centimetres are cut off?`; }
   else { total = d * R.int(4, 8); q = `There are ${total} children in a class. ${frac(n, d)} of them walk to school. How many children walk to school?`; }
   const unit = total / d, correct = unit * n;
@@ -59,8 +60,8 @@ gen("m-frac-3", "frac", 3, R => {
   const s = sh, real = fewer ? s - target : target - s;
   let stem;
   if (ctx === "grid") stem = `<p>The shape below is made of ${n} equal squares.</p>${gridSvg(rows, cols, [...Array(s).keys()], 30)}<p>How many ${fewer ? "shaded squares must be rubbed out (made white)" : "<b>more</b> squares must be shaded"} so that exactly ${frac(a, b)} of the shape is shaded?</p>`;
-  else if (ctx === "class") stem = `<p>There are ${n} children in a class. ${s} of them have finished their project.</p><p>How many <b>more</b> children must finish so that ${frac(a, b)} of the class has finished?</p>`;
-  else stem = `<p>A tray holds ${n} cupcakes. ${s} of them have been iced.</p><p>How many <b>more</b> cupcakes must be iced so that ${frac(a, b)} of the tray is iced?</p>`;
+  else if (ctx === "class") stem = `<p>There are ${n} children in a class. ${s} of them ${s === 1 ? "has" : "have"} finished their project.</p><p>How many <b>more</b> children must finish so that ${frac(a, b)} of the class has finished?</p>`;
+  else stem = `<p>A tray holds ${n} cupcakes. ${s} of them ${s === 1 ? "has" : "have"} been iced.</p><p>How many <b>more</b> cupcakes must be iced so that ${frac(a, b)} of the tray is iced?</p>`;
   const o = opts(R, real, [[target, `gave the target (${frac(a, b)} of ${n} = ${target}) and forgot those already ${ctx === "grid" ? "shaded" : "done"}`], [a, `used the top number ${a} as the answer`], [n - target, "found how many are NOT in the fraction"], [n / b, `found one part (${n} ÷ ${b}) only`], [fewer ? n - s : 0, "counted the white squares"]], String, 5);
   return { form: ctx + (fewer ? "-fewer" : ""), stem, ...o, data: { n, a, b, s, fewer },
     explain: ex("frac", `<p>Target: ${n} ÷ ${b} × ${a} = ${target}. ${s} ${s === 1 ? "is" : "are"} already ${ctx === "grid" ? "shaded" : "done"}, so ${fewer ? `${s} − ${target}` : `${target} − ${s}`} = <b>${real}</b>.</p>`, o) };
@@ -77,7 +78,7 @@ gen("m-frac-4", "frac", 4, R => {
       explain: ex("frac", `<p>The whole is hidden. ${k} squares are ${frac(1, b1)}, so the whole shape is ${k} × ${b1} = ${whole} squares. Target: ${whole} ÷ ${b} × ${a} = ${target}. Already shaded: ${k}. ${target} − ${k} = <b>${correct}</b>.</p>`, o) };
   }
   if (form === "rest") {
-    const p = R.pick([3, 4, 5]), q = R.pick([2, 3, 4]), T0 = p * q * R.int(2, 6) * (R.chance(.5) ? 1 : 2), name = R.pick(NAMES);
+    const p = R.pick([3, 4, 5]), q = R.pick([2, 3, 4]), T0 = p * q * R.int(2, 6) * (R.chance(.5) ? 1 : 2), name = R.pick(GIRLS);
     const first = T0 / p, rest = T0 - first, second = rest / q, left = rest - second;
     const o = opts(R, left, [[T0 - first - T0 / q, `took ${frac(1, q)} of the WHOLE amount, not of what was left`], [rest, "stopped after the first step"], [second, "gave the second amount spent, not what was left"], [first, "gave the first amount spent"]], v => "$" + v);
     return { form, stem: `<p>${name} had $${T0}. She spent ${frac(1, p)} of her money on a book. Then she spent ${frac(1, q)} of the money she had <b>left</b> on lunch.</p><p>How much money does she have now?</p>`, ...o, data: { form, T0, p, q },
@@ -156,7 +157,7 @@ gen("m-data-3", "data", 3, R => {
   const rows = names.map(nm => [nm, R.int(2, 7)]);
   const total = rows.reduce((a, r) => a + r[1], 0) * k, i = R.int(0, 3);
   const o = opts(R, rows[i][1] * k, [[rows[i][1], "counted the symbols and forgot to find the key"], [total / rows.length, "shared the total out equally"], [k, "gave the key (one symbol) instead"], [rows[i][1] * (k + 1), "used the wrong key"]]);
-  return { form: "missing key", stem: `<p>The picture graph shows ${what}. The key is missing. Altogether ${total} were ${what.split(" ")[1]}.</p>${pictGraph(rows, "= ?")}<p>How many did <b>${names[i]}</b> ${what.includes("shells") ? "collect" : "plant"}?</p>`, ...o, data: { form: "key", syms: rows.map(r => r[1]), total, i },
+  return { form: "missing key", stem: `<p>The picture graph shows ${what}. The key is missing. Altogether ${total} were ${what.split(" ")[1]}.</p>${pictGraph(rows, "= ?")}<p>${what.includes("shells") ? `How many shells did <b>${names[i]}</b> collect?` : `How many <b>${names[i]}</b> trees were planted?`}</p>`, ...o, data: { form: "key", syms: rows.map(r => r[1]), total, i },
     explain: `<p class="method"><b>Method:</b> Work out the key first: total ÷ number of symbols.</p><p>There are ${rows.reduce((a, r) => a + r[1], 0)} symbols for ${total}, so one symbol = ${total} ÷ ${rows.reduce((a, r) => a + r[1], 0)} = ${k}. ${names[i]}: ${rows[i][1]} × ${k} = <b>${rows[i][1] * k}</b>.</p>${whyNot(o)}` };
 });
 gen("m-data-4", "data", 4, R => {
@@ -221,7 +222,7 @@ gen("m-time-3", "time", 3, R => {
   const first = 7 * 60 + R.pick([0, 5, 10, 15]), every = R.pick([20, 25, 30]);
   const buses = [0, 1, 2, 3].map(k => { let t = first + k * every; return stops.map((s, i) => i ? (t += gap[i - 1]) : t); });
   const body = stops.map((s, i) => [s, ...buses.map(b => clock(b[i]).replace(" am", ""))]);
-  const arr = buses[1][1] + R.int(1, every - 2), name = R.pick(NAMES);
+  const arr = buses[1][1] + R.int(1, every - 2), name = R.pick(BOYS);
   const nb = buses.findIndex(b => b[1] >= arr), bus = buses[nb];
   const form = R.pick(["arrive", "wait"]);
   if (form === "arrive") {
@@ -305,9 +306,9 @@ gen("m-scale-3", "scale", 3, R => {
   let A, B; do { A = make(s1); B = make(s2); } while (A.v === B.v);
   const hi = A.v > B.v ? A : B, lo = A.v > B.v ? B : A, d = hi.v - lo.v;
   const wrongA = A.i * s2, wrongB = B.i * s1;
-  const o = opts(R, d, [[Math.abs(A.v - wrongB), "read both scales as if they had the same marks"], [hi.v, "gave one reading, not the difference"], [Math.abs(A.i - B.i), "found the difference in marks, not in degrees"], [hi.v + lo.v, "added the two readings"]], v => v + " °C", 5, 1);
-  return { form: "two thermometers", stem: `<p>Two thermometers are marked differently.</p><p><b>Thermometer P</b></p>${scaleSvg(A.a, A.b, 4, 5, A.v, "°")}<p><b>Thermometer Q</b></p>${scaleSvg(B.a, B.b, 4, 5, B.v, "°")}<p>How many degrees warmer is the higher reading than the lower one?</p>`, ...o, data: { A: [A.label, A.v], B: [B.label, B.v] },
-    explain: ex("scale", `<p>P: labels ${A.label}° apart with 5 spaces, so a mark is ${A.s}°; it reads ${A.v}°. Q: labels ${B.label}° apart, so a mark is ${B.s}°; it reads ${B.v}°. ${hi.v} − ${lo.v} = <b>${d} °C</b>.</p>`, o) };
+  const o = opts(R, d, [[Math.abs(A.v - wrongB), "read both scales as if they had the same marks"], [hi.v, "gave one reading, not the difference"], [Math.abs(A.i - B.i), "found the difference in marks, not in millilitres"], [hi.v + lo.v, "added the two readings"]], v => v + " mL", 5, 1);
+  return { form: "two scales", stem: `<p>Two measuring jugs have been laid on their sides. Their scales are marked differently, in millilitres.</p><p><b>Jug P</b></p>${scaleSvg(A.a, A.b, 4, 5, A.v, "")}<p><b>Jug Q</b></p>${scaleSvg(B.a, B.b, 4, 5, B.v, "")}<p>How much more water is in one jug than in the other?</p>`, ...o, data: { A: [A.label, A.v], B: [B.label, B.v] },
+    explain: ex("scale", `<p>P: labels ${A.label} mL apart with 5 spaces, so a mark is ${A.s} mL; it reads ${A.v} mL. Q: labels ${B.label} mL apart, so a mark is ${B.s} mL; it reads ${B.v} mL. ${hi.v} − ${lo.v} = <b>${d} mL</b>.</p>`, o) };
 });
 gen("m-scale-4", "scale", 4, R => {
   if (R.chance(0.5)) {
@@ -358,7 +359,7 @@ gen("m-back-2", "back", 2, R => {
   const wrongOrder = plus ? out / a - b : out / a + b;
   const o = opts(R, x, [[wrongOrder, "undid the steps in the wrong order"], [plus ? out - b : out + b, "undid only the last step"], [a * out + (plus ? b : -b), "went forwards through the machine instead of backwards"], [Math.round(out / a), "undid only the first step"]]);
   const steps = `× ${a}, then ${plus ? "+" : "−"} ${b}`;
-  const stem = story ? `<p>${R.pick(NAMES)} thinks of a number. She multiplies it by ${a}, then ${plus ? "adds" : "takes away"} ${b}. Her answer is ${out}.</p><p>What number did she think of?</p>`
+  const stem = story ? `<p>${R.pick(GIRLS)} thinks of a number. She multiplies it by ${a}, then ${plus ? "adds" : "takes away"} ${b}. Her answer is ${out}.</p><p>What number did she think of?</p>`
     : `<p>A number goes into this machine.</p><p class="big">☐ → × ${a} → ${plus ? "+" : "−"} ${b} → ${out}</p><p>What number went in?</p>`;
   return { form: story ? "story" : "machine", stem, ...o, data: { x, a, b, plus, out },
     explain: ex("back", `<p>The machine did ${steps}. Undo from the end: ${out} ${plus ? "−" : "+"} ${b} = ${plus ? out - b : out + b}, then ÷ ${a} = <b>${x}</b>. Check: ${x} × ${a} = ${a * x}, ${plus ? "+" : "−"} ${b} = ${out}. ✓</p>`, o) };
@@ -382,7 +383,7 @@ gen("m-back-3", "back", 3, R => {
 });
 gen("m-back-4", "back", 4, R => {
   if (R.chance(0.5)) {
-    const order = R.chance(.5), name = R.pick(NAMES), E = R.int(5, 30), a = R.int(3, 15);
+    const order = R.chance(.5), name = R.pick(GIRLS), E = R.int(5, 30), a = R.int(3, 15);
     let X, stem, ow, why;
     if (order) { X = 2 * E + a; stem = `${name} had some money. She spent $${a} on a drink, then spent half of what was left on a book. She had $${E} left.`; ow = 2 * (E + a); }
     else { X = 2 * (E + a); stem = `${name} had some money. She spent half of it on a book, then spent $${a} on a drink. She had $${E} left.`; ow = 2 * E + a; }
@@ -450,7 +451,7 @@ gen("m-shape-4", "shape", 4, R => {
   const a = R.int(3, 9), b = R.int(2, 7), laps = R.int(2, 5), extra = R.int(1, 3), P = 2 * (a + b);
   const sides = [a, b, a, b].slice(0, extra).reduce((x, y) => x + y, 0), ans = laps * P + sides;
   const o = opts(R, ans, [[laps * P, "forgot the extra sides"], [(laps + 1) * P, "counted the extra sides as another full lap"], [laps * (a + b) + sides, "used only half the perimeter for each lap"], [laps * P + extra, "counted the extra sides as 1 m each"]], v => v + " m");
-  return { form: "laps", stem: `<p>A path goes round a rectangle that is ${a} m long and ${b} m wide. ${R.pick(NAMES)} starts at a corner and walks along a ${a} m side first. He walks right round the rectangle ${laps} times, then along ${extra} more side${extra > 1 ? "s" : ""}, always in the same direction.</p><p>How far does he walk?</p>`, ...o, data: { form: "laps", a, b, laps, extra },
+  return { form: "laps", stem: `<p>A path goes round a rectangle that is ${a} m long and ${b} m wide. ${R.pick(BOYS)} starts at a corner and walks along one of the ${a} m sides first. He walks right round the rectangle ${laps} times, then along ${extra} more side${extra > 1 ? "s" : ""}, always in the same direction.</p><p>How far does he walk?</p>`, ...o, data: { form: "laps", a, b, laps, extra },
     explain: ex("shape", `<p>One lap: ${a} + ${b} + ${a} + ${b} = ${P} m. ${laps} laps: ${laps} × ${P} = ${laps * P} m. Then ${extra} more side${extra > 1 ? "s" : ""} starting with a ${a} m side: ${[a, b, a, b].slice(0, extra).join(" + ")} = ${sides} m. Total <b>${ans} m</b>.</p>`, o) };
 });
 })();

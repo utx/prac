@@ -142,7 +142,8 @@ const LIB = (() => {
     return `<svg viewBox="0 0 ${8 + n * size} ${8 + n * size}" width="${8 + n * size}" role="img" aria-label="a shape on a grid">${g}</svg>`;
   }
   const NAMES = ["Ava", "Ben", "Cleo", "Dev", "Esha", "Finn", "Gia", "Hugo", "Isla", "Jai", "Kira", "Leo", "Mila", "Noah", "Omar", "Pia", "Remy", "Suki", "Theo", "Uma", "Vera", "Will", "Yusuf", "Zoe"];
+  const GIRLS = ["Ava", "Cleo", "Esha", "Gia", "Isla", "Kira", "Mila", "Pia", "Suki", "Uma", "Vera", "Zoe"], BOYS = ["Ben", "Dev", "Finn", "Hugo", "Jai", "Leo", "Noah", "Omar", "Remy", "Theo", "Will", "Yusuf"];
   /* a template: gen(id, track, rung, fn(R) -> {stem, options, answer, traps, explain, data, form}) */
   const gen = (id, track, rung, fn) => GENS.push({ id, track, rung, make: seed => { const q = fn(R(seed)); return q && q.options && q.answer >= 0 ? Object.assign({ id: id + "#" + seed, gen: id, track, rung, seed }, q) : null; } });
-  return { R, gcd, frac, fracT, money, clock, T, svg, tbl, spread, opts, shuffleOpts, whyNot, gridSvg, pieSvg, countersSvg, colGraph, pictGraph, scaleSvg, jugSvg, cellsSvg, NAMES, gen };
+  return { R, gcd, frac, fracT, money, clock, T, svg, tbl, spread, opts, shuffleOpts, whyNot, gridSvg, pieSvg, countersSvg, colGraph, pictGraph, scaleSvg, jugSvg, cellsSvg, NAMES, GIRLS, BOYS, gen };
 })();
