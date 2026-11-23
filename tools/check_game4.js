@@ -285,6 +285,32 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   if ((await p.evaluate(() => localStorage.getItem("prac4.v1"))) !== saved) bad("practice mode must not save progress");
   await p.goto(url + "?admin=1"); await p.evaluate(() => sessionStorage.removeItem("prac.admin")); await p.goto(url + "?admin=1");
   if (await p.isVisible("#coach")) bad("?admin=1 without the PIN should not show coach notes");
+  /* on a monitor (laptop 1366 × 768, with and without the coach sidebar) the options and the Next button
+     show without scrolling, for every hand-written question and some of every template */
+  for (const [admin, vp] of [[false, { width: 1366, height: 768 }], [true, { width: 1366, height: 768 }], [false, { width: 1920, height: 1080 }]]) {
+    const pg = await open(vp);
+    if (admin) { await pg.evaluate(() => sessionStorage.setItem("prac.admin", "1")); await pg.goto(url + "?admin=1"); }
+    const off = await pg.evaluate(() => {
+      const out = [], qs = [...HAND, ...GENS.flatMap(g => [1, 2].map(s => g.make(s * 23)).filter(Boolean))];
+      for (const q of qs) {
+        __rr.preview(q); window.scrollTo(0, 0);
+        const opts = [...document.querySelectorAll("#scr-brief .opt")], lastOpt = opts[opts.length - 1].getBoundingClientRect();
+        __rr.answer(q.answer);
+        const nx = document.querySelector("#btn-next").getBoundingClientRect();
+        if (lastOpt.bottom > innerHeight || nx.bottom > innerHeight) out.push(`${q.id} (${Math.round(Math.max(lastOpt.bottom, nx.bottom))}px)`);
+      }
+      return out;
+    });
+    if (off.length) bad(`at ${vp.width}×${vp.height}${admin ? " with the coach sidebar" : ""} these need scrolling to reach the options or Next: ${off.slice(0, 6).join(", ")}${off.length > 6 ? ` … (${off.length})` : ""}`);
+    if (shots && vp.width === 1366 && admin) { await pg.evaluate(() => { __rr.preview(HAND.find(q => q.id === "ri4a")); __rr.answer(0); }); await pg.screenshot({ path: path.join(shots, "rr-monitor.png") }); }
+    await pg.close();
+  }
+  /* the keyboard answers and moves on */
+  { const pg = await open({ width: 1366, height: 768 });
+    await pg.evaluate(() => __rr.startBrief("1-frac")); const i0 = await pg.evaluate(() => __rr.B().i);
+    await pg.keyboard.press("b"); await pg.keyboard.press("Enter");
+    if ((await pg.evaluate(() => __rr.B().i)) !== i0 + 1 || (await pg.evaluate(() => __rr.B().res[0])) === undefined) bad("keys A–E should answer and Enter should go to the next question");
+    await pg.close(); }
   /* every hand-written question (and some of every template) fits a phone screen */
   const ph = await open({ width: 390, height: 800 });
   const wide = await ph.evaluate(() => {

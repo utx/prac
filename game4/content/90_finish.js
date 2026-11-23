@@ -1,6 +1,7 @@
 /* RIDGE RUNNER: finish the hand-written questions.
    Each step gets its own shuffle of answer letters, so no letter pattern repeats from step to step, while the
-   answers inside a step stay on different letters. Options that must stay in order (Extract A–D,
+   answers inside a step stay on different letters (the target letter depends on each question's place in its step,
+   not on where the answer was written). Options that must stay in order (Extract A–D,
    "X only / Y only / Both / Neither", plain numbers) keep their places. Then the explanation is built:
    the track's method + the body + why each trap is wrong. */
 (() => {
@@ -17,17 +18,17 @@
     for (let k = 0; k < 24; k++) {
       const p = PERMS[(h + k * 7) % 24], seen = new Set();
       let ok = true;
-      for (const r of list) { const a = fixedOrder(r.q) ? ans(r) : p[ans(r)]; if (seen.has(a)) { ok = false; break; } seen.add(a); }
+      list.forEach((r, i) => { const a = fixedOrder(r.q) ? ans(r) : p[i % 4]; if (seen.has(a)) ok = false; seen.add(a); });
       if (ok) { chosen = p; break; }
     }
-    for (const r of list) {
+    list.forEach((r, i) => {
       let opts = r.q.opts;
-      if (!fixedOrder(r.q)) { const a = ans(r), k = ((a - chosen[a]) % 4 + 4) % 4; opts = opts.slice(k).concat(opts.slice(0, k)); }
+      if (!fixedOrder(r.q)) { const a = ans(r), k = ((a - chosen[i % 4]) % 4 + 4) % 4; opts = opts.slice(k).concat(opts.slice(0, k)); }
       const options = opts.map(o => o[0]), answer = opts.findIndex(o => o[1] === null), traps = {};
       opts.forEach((o, i) => { if (o[1] !== null) traps[i] = o[1]; });
       const method = TRACKS.find(t => t.id === r.track).method;
       HAND.push({ id: r.id, track: r.track, rung: r.rung, passage: r.q.passage || "", stem: r.q.stem, options, answer, traps, visual: !!r.q.visual,
         explain: `<p class="method"><b>Method:</b> ${method}</p><p>${r.q.body}</p>${LIB.whyNot({ options, traps })}` });
-    }
+    });
   }
 })();
