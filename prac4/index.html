@@ -110,7 +110,7 @@ aside#coach .ladder li.cur { font-weight: 800; } aside#coach .ladder li.cur::mar
 .tag { display: inline-block; border-radius: 4px; padding: 0 6px; font-size: 12px; font-weight: 800; color: #fff; }
 .tag.maths { background: #e8590c; } .tag.thinking { background: #1c7ed6; } .tag.reading { background: #7048e8; }
 .adminbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
-details.grown { margin-top: 16px; } details.grown summary { cursor: pointer; color: var(--muted); }
+ol.climb { margin: 4px 0 10px; } details.grown { margin-top: 16px; } details.grown summary { cursor: pointer; color: var(--muted); }
 table.prog { border-collapse: collapse; font-size: 13px; width: 100%; } table.prog th, table.prog td { border: 1px solid #3a4170; padding: 4px 6px; text-align: left; }
 footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
 @media (max-width: 640px) { table.grid th, table.grid td { padding: 5px 6px; min-width: 36px; } .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
@@ -2087,7 +2087,7 @@ const PF = (() => {
       P: { x: first.x + 3, y: first.y - PH.h, vx: 0, vy: 0, ground: false, face: 1, inv: 0, boots: opts.kit.boots, cd: 0 },
       check: { x: first.x + 3, y: first.y - PH.h }, hearts: opts.kit.hearts, shield: opts.kit.shield ? 1 : 0, ammo: opts.kit.ammo, rounds: opts.kit.rounds,
       ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -(0.45 + 0.15 * opts.level.world) : 0, ph: i * 1.7 }, e)),
-      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0 };
+      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0 };
     S.totalAmmo = S.ents.filter(e => e.t === "ammo").length;
     S.ents.filter(e => e.t === "nest").forEach(e => { e.sentries = makeSentries(e); });
     G.gateOpen = {};
@@ -2132,6 +2132,7 @@ const PF = (() => {
     const alive = n.sentries.list.filter(s => s.alive);
     if (!alive.length) { msg("This nest is clear", 60); return; }
     S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0 };
+    S.msgs = [];                                                        // the platform's messages would clutter the scope
     msg(n.boss ? "BOSS: the Warden is on the far ridge!" : "Scope up: knock out the sentries on the far ridge", 140, "#ffe066");
     beep(500, .08, "triangle");
   }
@@ -2153,15 +2154,19 @@ const PF = (() => {
     for (const s of sc.nest.sentries.list) {
       if (!s.alive) continue; const b = sBox(s); if (!b.vis) continue;
       if (x >= b.l - 2 && x <= b.r + 2 && y >= b.top - 2 && y <= b.bot) {
-        const head = y <= b.head; s.hp -= head ? 2 : 1; burst(x, y, "#ff6b6b", 10); beep(head ? 880 : 520, .08, "triangle");
-        msg(head ? "HEADSHOT!" : "HIT!", 50, head ? "#ff6b6b" : "#fff"); S.coins += head ? 3 : 1;
-        if (s.hp <= 0) { s.alive = false; s.state = "ko"; msg(s.boss ? "The Warden is down!" : "Sentry down!", 70, "#9be15d"); }
-        else { s.state = "hide"; s.st = 0; s.hold = 30; s.x = s.at; }
+        const head = y <= b.head, dir = x < s.x ? 1 : -1; s.hp -= head ? 2 : 1; S.coins += head ? 3 : 1;
+        burst(x, y, head ? "#ff3b3b" : "#ffd43b", head ? 18 : 12);
+        S.hfx.push({ k: "mark", x, y, head, t: 0 }, { k: "pop", x: s.x, y: b.top - 12, text: head ? "HEADSHOT! ×2" : "HIT!", sub: head ? "+3 coins" : "+1 coin", c: head ? "#ff4d4d" : "#ffffff", t: 0 });
+        if (head) S.hfx.push({ k: "ring", x, y, t: 0 }, { k: "helmet", x: s.x, y: b.top, vx: dir * 1.4, vy: -3.2, t: 0, boss: s.boss });
+        S.stop = head ? 9 : 6; S.shake = head ? 10 : 6; s.flash = 9;
+        beep(head ? 1175 : 784, .07, "triangle", .06); beep(head ? 1760 : 1046, head ? .16 : .1, "triangle", .05);
+        if (s.hp <= 0) { s.alive = false; s.state = "ko"; s.koT = 0; s.koDir = dir; s.koHead = head; S.hfx.push({ k: "pop", x: s.x, y: b.top - 30, text: s.boss ? "THE WARDEN IS DOWN!" : "SENTRY DOWN!", c: "#9be15d", t: -10 }); }
+        else { s.hideIn = 10; }
         if (!sc.nest.sentries.list.some(q => q.alive)) { msg(sc.nest.boss ? "BOSS DEFEATED!" : "Ridge clear!", 120, "#9be15d"); if (sc.nest.boss) { S.scope = null; end(true); } else { const g = S.ents.find(e => e.t === "gate" && e.nest === sc.nest.id); if (g) { S.G.gateOpen[g.col] = true; msg("The laser gate is open!", 120, "#9be15d"); beep(392, .1, "triangle"); beep(587, .15, "triangle"); } setTimeout(() => { if (S && S.scope) S.scope = null; }, 600); } }
         return;
       }
     }
-    burst(x, Math.min(y, FAR + 30), "#c9b48a", 5); msg(y > ay + 1 || x !== ax ? "MISS: check the dots" : "MISS", 40);
+    burst(x, Math.min(y, FAR + 30), "#c9b48a", 5); S.hfx.push({ k: "miss", x, y: Math.min(y, FAR + 20), t: 0 }); msg(y > ay + 1 || x !== ax ? "MISS: check the dots" : "MISS", 40);
   }
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
@@ -2192,7 +2197,12 @@ const PF = (() => {
   function tick() {
     if (!S || S.over) return;
     S.t++;
-    if (S.scope) { scopeTick(); S.parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .15; p.d--; }); S.parts = S.parts.filter(p => p.d > 0); S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0); return; }
+    if (S.scope) {
+      S.hfx.forEach(f => { f.t++; if (f.k === "helmet") { f.x += f.vx; f.y += f.vy; f.vy += 0.25; } }); S.hfx = S.hfx.filter(f => f.t < (f.k === "pop" ? 70 : f.k === "helmet" ? 60 : 26));
+      for (const q of S.scope.nest.sentries.list) { if (q.flash > 0) q.flash--; if (q.koT !== undefined) q.koT++; if (q.hideIn > 0 && --q.hideIn === 0 && q.alive) { q.state = "hide"; q.st = 0; q.hold = 30; q.x = q.at; } }
+      if (S.shake > 0) S.shake--;
+      if (S.stop > 0) { S.stop--; return; }                                               /* the freeze-frame on a hit */
+      scopeTick(); S.parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .15; p.d--; }); S.parts = S.parts.filter(p => p.d > 0); S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0); return; }
     const P = S.P, G = S.G;
     const dir = (KEYS.right ? 1 : 0) - (KEYS.left ? 1 : 0); if (dir) P.face = dir;
     const jp = pressed("jump") || pressed("up");
@@ -2323,17 +2333,30 @@ const PF = (() => {
   function messages() { S.msgs.slice(-2).forEach((m, i) => txt(S.ctx, m.t, VW / 2, 44 + i * 16, 11, m.c)); }
   function drawScope() {
     const { ctx } = S, sc = S.scope, w = S.G.world, th = S.G.theme;
+    ctx.save(); if (S.shake > 0) ctx.translate(Math.round((Math.random() - .5) * S.shake), Math.round((Math.random() - .5) * S.shake));
     const g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
     ctx.fillStyle = th.far; for (let x = 0; x < VW; x += 4) { const y = 120 + Math.round(16 * Math.sin(x / 40) + 8 * Math.sin(x / 13)); ctx.fillRect(x, y, 4, VH); }
     ctx.fillStyle = th.top; ctx.fillRect(0, FAR - 6, VW, 4); ctx.fillStyle = th.dirt; ctx.fillRect(0, FAR - 2, VW, VH);
     for (const s of sc.nest.sentries.list) {
       if (!s.alive && s.state !== "ko") continue; const b = sBox(s); if (!b.vis && s.state !== "ko") continue;
       const k = s.boss ? 1.5 : 1;
-      if (s.state === "ko") { ctx.fillStyle = "#495057"; ctx.fillRect(s.x - 10 * k, FAR - 5, 20 * k, 5); continue; }
+      if (s.state === "ko") {
+        const a = Math.min(1, (s.koT || 0) / 16) * Math.PI / 2 * (s.koDir || 1), h = 30 * k, wd = 14 * k;
+        ctx.save(); ctx.translate(s.x, FAR); ctx.rotate(a);
+        ctx.fillStyle = "#1b1b2f"; ctx.fillRect(-wd / 2 - 1, -h - 1, wd + 2, h + 1);
+        ctx.fillStyle = s.boss ? "#7048e8" : "#2b8a3e"; ctx.fillRect(-wd / 2, -h + 10 * k, wd, h - 10 * k);
+        if (!s.koHead) { ctx.fillStyle = s.boss ? "#ffd43b" : "#495057"; ctx.fillRect(-wd / 2, -h, wd, 10 * k); }
+        else { ctx.fillStyle = "#f2c8a0"; ctx.fillRect(-wd / 2 + 2, -h + 2, wd - 4, 8 * k); }
+        ctx.restore();
+        const kt = s.koT || 0;
+        if (kt > 14 && kt < 80) for (let i = 0; i < 3; i++) { const an = kt / 8 + i * 2.1, sx = s.x + (s.koDir || 1) * 20 * k + Math.cos(an) * 9, sy = FAR - 12 + Math.sin(an) * 3; ctx.fillStyle = "#ffd43b"; ctx.fillRect(sx - 1, sy - 3, 2, 6); ctx.fillRect(sx - 3, sy - 1, 6, 2); }
+        continue;
+      }
       ctx.fillStyle = "#1b1b2f"; ctx.fillRect(b.l - 1, b.top - 1, b.r - b.l + 2, b.bot - b.top + 1);
       ctx.fillStyle = s.boss ? "#7048e8" : "#2b8a3e"; ctx.fillRect(b.l, b.head, b.r - b.l, b.bot - b.head);
       ctx.fillStyle = s.boss ? "#ffd43b" : "#495057"; ctx.fillRect(b.l, b.top, b.r - b.l, b.head - b.top);
       ctx.fillStyle = "#ff6b6b"; ctx.fillRect(b.l + 2, b.top + 4 * k, b.r - b.l - 4, 2 * k);
+      if (s.flash > 0) { ctx.fillStyle = `rgba(255,255,255,${s.flash / 9})`; ctx.fillRect(b.l - 1, b.top - 1, b.r - b.l + 2, b.bot - b.top + 1); }
       if (s.boss) { ctx.fillStyle = "#ffd43b"; ctx.fillRect(b.l + 1, b.top - 4, 3, 4); ctx.fillRect(s.x - 1, b.top - 6, 3, 6); ctx.fillRect(b.r - 4, b.top - 4, 3, 4); }
       if (s.state === "aim") { const f = 3 + 2 * Math.abs(Math.sin(S.t / 4)); ctx.fillStyle = "#ff2b2b"; ctx.fillRect(s.x - f * 2, b.top + 6, f * 4, 2); ctx.fillRect(s.x - 1, b.top + 6 - f * 2, 2, f * 4); }
     }
@@ -2355,18 +2378,41 @@ const PF = (() => {
       if (w >= 2 && near && Math.abs(near.x - x) < 50) { const d = near.range / 100 - 1; txt(ctx, `RANGE ${near.range} m: ${d ? `aim ${d} dot${d > 1 ? "s" : ""} HIGH` : "aim dead on"}`, x, y - R - 6, 9, "#ffd43b"); }
       if (sc.cd > 0) txt(ctx, "RELOADING", x, y + R + 12, 9, "#ffd43b");
     }
+    hitFx(ctx);
+    ctx.restore();
     const wind = sc.nest.sentries.wind;
     ctx.fillStyle = "rgba(10,12,30,.7)"; ctx.fillRect(0, 0, VW, 18);
     txt(ctx, `SNIPER ${S.rounds}`, 8, 13, 9, "#ffd43b", "left");
     for (let i = 0; i < S.hearts; i++) { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(90 + i * 10, 6, 7, 6); }
     if (S.shield) txt(ctx, "◆", 160, 13, 9, "#9fe7ff", "left");
     const left = sc.nest.sentries.list.filter(s => s.alive).length;
-    txt(ctx, sc.nest.boss ? `WARDEN ${"■".repeat(Math.max(0, sc.nest.sentries.list[0].hp))}` : `SENTRIES ${left}`, VW / 2, 13, 9, "#fff");
+    const down = sc.nest.sentries.list.length - left;
+    txt(ctx, sc.nest.boss ? `WARDEN ${"■".repeat(Math.max(0, sc.nest.sentries.list[0].hp))}` : `SENTRIES DOWN ${"●".repeat(down)}${"○".repeat(left)}`, VW / 2, 13, 9, "#fff");
     if (wind) txt(ctx, `WIND ${wind > 0 ? "→".repeat(wind) : "←".repeat(-wind)} ${Math.abs(wind)}: aim ${Math.abs(wind)} dot${Math.abs(wind) > 1 ? "s" : ""} ${wind > 0 ? "LEFT" : "RIGHT"}`, VW - 8, 13, 9, "#8ce99a", "right");
     const glint = sc.nest.sentries.list.some(s => s.alive && s.state === "aim");
     if (glint && !sc.duck) txt(ctx, "RED GLINT! HOLD K TO DUCK", VW / 2, 36, 11, "#ff6b6b");
     txt(ctx, "J fire · K duck · E leave", VW / 2, VH - 8, 9, "#ced4da");
     messages();
+  }
+  /* the hit effects: a hit marker (an X of four strokes round the impact), a burst ring on a headshot,
+     a flying helmet, a puff for a miss, and big pop-up words that grow in, float up and fade */
+  function hitFx(ctx) {
+    for (const f of S.hfx) {
+      if (f.k === "mark") {
+        const p = Math.min(1, f.t / 4), g = 4 + 8 * p, L = 7, a = f.t < 14 ? 1 : 1 - (f.t - 14) / 12;
+        ctx.strokeStyle = `rgba(${f.head ? "255,59,59" : "255,255,255"},${a})`; ctx.lineWidth = f.head ? 3 : 2;
+        for (const [dx, dy] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { ctx.beginPath(); ctx.moveTo(f.x + dx * g, f.y + dy * g); ctx.lineTo(f.x + dx * (g + L), f.y + dy * (g + L)); ctx.stroke(); }
+      } else if (f.k === "ring") {
+        const r = 6 + f.t * 2.2, a = 1 - f.t / 26; ctx.strokeStyle = `rgba(255,212,59,${a})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(f.x, f.y, r, 0, 7); ctx.stroke();
+      } else if (f.k === "helmet") {
+        ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(f.t * 0.35); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(-8, -5, 16, 10); ctx.fillStyle = f.boss ? "#ffd43b" : "#495057"; ctx.fillRect(-7, -4, 14, 8); ctx.fillStyle = "#ff6b6b"; ctx.fillRect(-5, 0, 10, 2); ctx.restore();
+      } else if (f.k === "miss") {
+        const a = 1 - f.t / 26; ctx.fillStyle = `rgba(201,180,138,${a})`; for (let i = 0; i < 5; i++) ctx.fillRect(f.x - 6 + i * 3, f.y - f.t * 0.4 - (i % 2) * 3, 3, 3);
+      } else if (f.k === "pop" && f.t >= 0) {
+        const grow = f.t < 6 ? 1.8 - f.t * 0.13 : 1, a = f.t < 50 ? 1 : 1 - (f.t - 50) / 20, y = f.y - Math.min(f.t, 40) * 0.5;
+        ctx.globalAlpha = Math.max(0, a); txt(ctx, f.text, Math.max(70, Math.min(VW - 70, f.x)), Math.max(40, y), Math.round(15 * grow), f.c); if (f.sub) txt(ctx, f.sub, Math.max(70, Math.min(VW - 70, f.x)), Math.max(40, y) + 14, 9, "#ffd43b"); ctx.globalAlpha = 1;
+      }
+    }
   }
   /* test hooks: used only by tools/check_game4.js */
   const hook = {
@@ -2375,6 +2421,7 @@ const PF = (() => {
     nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length })) : [],
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
+    fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
     ammo: () => S ? S.ents.filter(e => e.t === "ammo" && e.alive).map(e => ({ x: e.x, y: e.y })) : [],
     grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.x = s.at + s.side * (s.boss ? 42 : 36); const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
@@ -2392,14 +2439,14 @@ const PF = (() => {
 const ORDER = ["frac", "flaw", "infer", "data", "claim", "word", "time", "rule", "link", "scale", "order", "same", "back", "space", "shape"];
 const TR = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 const WORLDS = [
-  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", sub: "Step 1 of every skill: the building blocks." },
-  { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", sub: "Step 2: the skills start to join together. Your scope now has drop dots for range." },
-  { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", sub: "Step 3: two-step thinking. Night falls, and wind pushes your shots." },
-  { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", sub: "Step 4: the hardest third of the sample papers." }];
+  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", sub: "Every level climbs: four questions on one skill, from a warm-up to test level. One sniper nest after another." },
+  { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", sub: "Every skill again, with new questions. Your scope now has drop dots for range." },
+  { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", sub: "New questions again. Night falls, and wind pushes your shots." },
+  { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", sub: "The last round of new questions, and the hardest levels and ridges." }];
 const hash = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };
 const LEVELS = [];
 for (const W of WORLDS) {
-  ORDER.forEach((t, k) => LEVELS.push({ id: `${W.n}-${t}`, world: W.n, k, track: t, rung: W.n, seed: hash(`${W.n}-${t}`) }));
+  ORDER.forEach((t, k) => LEVELS.push({ id: `${W.n}-${t}`, world: W.n, k, track: t, seed: hash(`${W.n}-${t}`) }));
   LEVELS.push({ id: `${W.n}-boss`, world: W.n, k: ORDER.length, boss: true, seed: hash(`${W.n}-boss`) });
 }
 const LV = Object.fromEntries(LEVELS.map(l => [l.id, l]));
@@ -2439,13 +2486,13 @@ function briefing(L) {
   const out = [], ids = [];
   const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); out.push(Object.assign({}, q, { role })); } };
   if (L.boss) {
+    /* the boss mixes six skills (2 maths, 2 thinking, 2 reading), still climbing: steps 1, 2, 3, 3, 4, 4 */
     const bySub = s => ORDER.filter(t => TR[t].subject === s).sort(() => Math.random() - .5).slice(0, 2);
     const ts = [...bySub("maths"), ...bySub("thinking"), ...bySub("reading")].sort(() => Math.random() - .5);
-    ts.forEach(t => add(t, L.world, "boss"));
+    ts.forEach((t, i) => add(t, [1, 2, 3, 3, 4, 4][i], "boss"));
   } else {
-    if (L.k > 0) { const j = Math.floor(Math.random() * L.k); add(ORDER[j], L.world, "review"); }
-    else if (L.world > 1) add(ORDER[Math.floor(Math.random() * ORDER.length)], L.world - 1, "review");
-    while (out.length < QN.normal) { const before = out.length; add(L.track, L.rung, "focus"); if (out.length === before) add(L.track, L.rung, "focus"); if (out.length === before) break; }
+    /* one skill, climbing inside the level: step 1 (warm-up) -> step 2 -> step 3 -> step 4 (test level) */
+    for (let r = 1; r <= QN.normal; r++) add(L.track, r, "focus");
   }
   return out;
 }
@@ -2483,14 +2530,14 @@ function levelCard(L) {
   const rec = S.levels[L.id] || {};
   if (L.boss) return `<h3 class="px">WORLD ${L.world} BOSS: THE WARDEN</h3><p>A mixed briefing of ${QN.boss} questions from this world's skills, then a run to the Warden's ridge and a sniper duel. Read the drop dots and the wind!</p>
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
-  const t = TR[L.track], r = t.rungs[L.rung - 1];
-  return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(t.name.toUpperCase())}</h3><p><span class="tag ${t.subject}">${t.subject}</span> Step ${L.rung} of 4: <b>${esc(r.title)}</b></p><p>${esc(r.builds)}</p>
+  const t = TR[L.track];
+  return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(t.name.toUpperCase())}</h3><p><span class="tag ${t.subject}">${t.subject}</span> Four questions that climb, from a warm-up to test level:</p><ol class="climb">${t.rungs.map(r => `<li><b>${esc(r.title)}</b></li>`).join("")}</ol>
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.normal} · ${stars(rec.stars || 0)}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
 }
 function grownUps() {
   const rows = ORDER.map(t => { const tr = TR[t]; return `<tr><td>${esc(tr.name)}</td>${WORLDS.map(w => { const r = S.levels[`${w.n}-${t}`]; return `<td>${r ? `${r.cleared ? "✔ " : ""}${r.best}/${QN.normal}` : "–"}</td>`; }).join("")}</tr>`; }).join("");
-  return `<details class="grown"><summary>For grown-ups: best briefing scores by skill</summary><div class="panel" style="margin-top:8px"><p>Each skill is built in four steps, one per world. The score is the best briefing (questions right before the level).</p>
-    <table class="prog"><tr><th>Skill</th>${WORLDS.map(w => `<th>Step ${w.n}</th>`).join("")}</tr>${rows}</table></div></details>`;
+  return `<details class="grown"><summary>For grown-ups: best briefing scores by skill</summary><div class="panel" style="margin-top:8px"><p>Every level's briefing climbs through the skill's four steps. Each world brings the skill back with new questions. The score is the best briefing (questions right before the level).</p>
+    <table class="prog"><tr><th>Skill</th>${WORLDS.map(w => `<th>World ${w.n}</th>`).join("")}</tr>${rows}</table></div></details>`;
 }
 
 /* ================= briefing ================= */
@@ -2504,7 +2551,7 @@ function renderQ() {
   const q = B.qs[B.i], t = TR[q.track], letters = "ABCDE";
   S.seen[q.gen || q.id] = S.seed++; save();
   const visual = q.visual || q.options.some(o => /<svg/.test(o));
-  const role = q.role === "review" ? "Warm-up from an earlier level" : q.role === "boss" ? "Boss briefing" : `Step ${q.rung} of 4`;
+  const role = (q.role === "boss" ? "Boss briefing · " : "") + `Step ${q.rung} of 4${q.rung === 1 ? " (warm-up)" : q.rung === 4 ? " (test level)" : ""}`;
   $("#scr-brief").innerHTML = `<div class="qcard"><div class="qhead"><span class="px">BRIEFING · ${B.L.boss ? `WORLD ${B.L.world} BOSS` : `LEVEL ${B.L.k + 1}`} · QUESTION ${B.i + 1} OF ${B.qs.length}</span>
       <span class="dots">${B.qs.map((x, i) => `<span class="${B.res[i] === true ? "ok" : B.res[i] === false ? "no" : i === B.i ? "cur" : ""}"></span>`).join("")}</span></div>
     <p class="note"><span class="tag ${t.subject}">${t.subject}</span> ${esc(t.name)} · ${role}</p>
@@ -2594,20 +2641,20 @@ function done(res) {
 
 /* ================= coach sidebar (practice mode only) ================= */
 function samplesHtml(t, rung) {
-  return `<ul>${t.samples.map(s => { const now = s.rungs.includes(rung); return `<li class="${now ? "" : "later"}"><span class="${now ? "now" : ""}">${esc(s.ref)}</span>: ${esc(s.what)}${now ? "" : ` <i>(step${s.rungs.length > 1 ? "s" : ""} ${s.rungs.join(", ")})</i>`}</li>`; }).join("")}</ul>`;
+  return `<ul>${t.samples.map(s => { const now = !rung || s.rungs.includes(rung); return `<li class="${now ? "" : "later"}"><span class="${now ? "now" : ""}">${esc(s.ref)}</span>: ${esc(s.what)}${now ? "" : ` <i>(step${s.rungs.length > 1 ? "s" : ""} ${s.rungs.join(", ")})</i>`}</li>`; }).join("")}</ul>`;
 }
 function ladderHtml(t, rung) { return `<ol class="ladder">${t.rungs.map((r, i) => `<li class="${i + 1 === rung ? "cur" : ""}"><b>${esc(r.title)}</b>: ${esc(r.builds)}</li>`).join("")}</ol>`; }
 function coachLevel(L) {
   if (!PRACTICE) return;
   const el = $("#coach-body");
   if (!L) { el.innerHTML = `<h2 class="px">COACH NOTES (ADMIN ONLY)</h2><p>Pick a level to see which sample-paper questions its skill builds toward, and how the four steps of that skill climb from building blocks to the hardest questions.</p>
-    <h3>How the game is built</h3><ul><li>15 skills (6 maths, 5 thinking, 4 reading), each in 4 steps.</li><li>World n = step n of every skill, so the whole game climbs from easy to hard.</li><li>Each briefing: 3 questions on the level's step + 1 warm-up from an earlier level. Bosses mix 6 skills (2 per subject) as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
+    <h3>How the game is built</h3><ul><li>15 skills (6 maths, 5 thinking, 4 reading), each in 4 steps.</li><li>Every briefing climbs: 4 questions on one skill, step 1 (warm-up) to step 4 (test level).</li><li>Each world brings every skill back with new questions; the platforming and sniping get harder world by world.</li><li>Bosses mix 6 skills (2 per subject), still climbing (steps 1, 2, 3, 3, 4, 4), as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
   if (L.boss) { el.innerHTML = `<h2 class="px">COACH NOTES · WORLD ${L.world} BOSS</h2><p>The boss briefing mixes ${QN.boss} questions: 2 maths, 2 thinking and 2 reading skills, all at step ${L.world}. Coming without warning, mixed together like the real test, they check that each skill transfers when the topic isn't announced.</p>`; return; }
   const t = TR[L.track];
-  el.innerHTML = `<h2 class="px">COACH NOTES · ${esc(t.name.toUpperCase())}</h2><p><span class="tag ${t.subject}">${t.subject}</span> Step ${L.rung} of 4</p>
-    <h3>Sample questions this skill prepares for</h3>${samplesHtml(t, L.rung)}
+  el.innerHTML = `<h2 class="px">COACH NOTES · ${esc(t.name.toUpperCase())}</h2><p><span class="tag ${t.subject}">${t.subject}</span> World ${L.world}: the briefing climbs through all four steps (question 1 = step 1 … question 4 = step 4), with new questions in each world.</p>
+    <h3>Sample questions this skill prepares for</h3>${samplesHtml(t, 0)}
     <h3>The underlying skill</h3><ul>${t.ideas.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
-    <h3>The four steps</h3>${ladderHtml(t, L.rung)}
+    <h3>The four steps</h3>${ladderHtml(t, 0)}
     <h3>Same method, same words</h3><p>${esc(t.method)}</p><h3>Transfer</h3><p>${esc(t.transfer)}</p>`;
 }
 function coachQ(q) {
@@ -2616,7 +2663,7 @@ function coachQ(q) {
   const prev = t.rungs[q.rung - 2], next = t.rungs[q.rung];
   const traps = Object.entries(q.traps || {}).map(([i, x]) => `<li><b>${letters[i]}</b>: ${esc(x)}</li>`).join("");
   $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · QUESTION ${B.i + 1}</h2>
-    <p><span class="tag ${t.subject}">${t.subject}</span> <b>${esc(t.name)}</b>, step ${q.rung} of 4: ${esc(r.title)}${q.role === "review" ? " <i>(a warm-up from an earlier level, so the skill doesn't fade)</i>" : q.role === "boss" ? " <i>(boss: mixed skills, a transfer check)</i>" : ""}.
+    <p><span class="tag ${t.subject}">${t.subject}</span> <b>${esc(t.name)}</b>, step ${q.rung} of 4: ${esc(r.title)}${q.role === "boss" ? " <i>(boss: mixed skills, still climbing, a transfer check)</i>" : ` <i>(question ${B.i + 1} of the climb)</i>`}.
       Answer: <b>${letters[q.answer]}</b>.${q.gen ? ` A template (<code>${esc(q.gen)}</code>, form: ${esc(q.form || "")}): new numbers and context every play.` : ` Hand-written (<code>${esc(q.id)}</code>).`}</p>
     <h3>Sample questions it builds toward</h3>${samplesHtml(t, q.rung)}
     <h3>The underlying skill</h3><ul>${t.ideas.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
@@ -2630,7 +2677,7 @@ function coachQ(q) {
 }
 function coachKit() {
   if (!PRACTICE) return;
-  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · RESULTS</h2><p>${B.right} of ${B.qs.length} right.</p><ul>${B.qs.map((q, i) => `<li>${B.res[i] ? "✔" : "✘"} ${esc(TR[q.track].name)} (step ${q.rung})${q.role === "review" ? ", warm-up" : ""}</li>`).join("")}</ul>
+  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · RESULTS</h2><p>${B.right} of ${B.qs.length} right.</p><ul>${B.qs.map((q, i) => `<li>${B.res[i] ? "✔" : "✘"} ${esc(TR[q.track].name)} (step ${q.rung})</li>`).join("")}</ul>
     <p>The kit scales with the score, so the questions stay the thing that matters: more right answers = more hearts, ammo and gear.</p>`;
 }
 

@@ -174,7 +174,7 @@ const PF = (() => {
       P: { x: first.x + 3, y: first.y - PH.h, vx: 0, vy: 0, ground: false, face: 1, inv: 0, boots: opts.kit.boots, cd: 0 },
       check: { x: first.x + 3, y: first.y - PH.h }, hearts: opts.kit.hearts, shield: opts.kit.shield ? 1 : 0, ammo: opts.kit.ammo, rounds: opts.kit.rounds,
       ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -(0.45 + 0.15 * opts.level.world) : 0, ph: i * 1.7 }, e)),
-      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0 };
+      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0 };
     S.totalAmmo = S.ents.filter(e => e.t === "ammo").length;
     S.ents.filter(e => e.t === "nest").forEach(e => { e.sentries = makeSentries(e); });
     G.gateOpen = {};
@@ -219,6 +219,7 @@ const PF = (() => {
     const alive = n.sentries.list.filter(s => s.alive);
     if (!alive.length) { msg("This nest is clear", 60); return; }
     S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0 };
+    S.msgs = [];                                                        // the platform's messages would clutter the scope
     msg(n.boss ? "BOSS: the Warden is on the far ridge!" : "Scope up: knock out the sentries on the far ridge", 140, "#ffe066");
     beep(500, .08, "triangle");
   }
@@ -240,15 +241,19 @@ const PF = (() => {
     for (const s of sc.nest.sentries.list) {
       if (!s.alive) continue; const b = sBox(s); if (!b.vis) continue;
       if (x >= b.l - 2 && x <= b.r + 2 && y >= b.top - 2 && y <= b.bot) {
-        const head = y <= b.head; s.hp -= head ? 2 : 1; burst(x, y, "#ff6b6b", 10); beep(head ? 880 : 520, .08, "triangle");
-        msg(head ? "HEADSHOT!" : "HIT!", 50, head ? "#ff6b6b" : "#fff"); S.coins += head ? 3 : 1;
-        if (s.hp <= 0) { s.alive = false; s.state = "ko"; msg(s.boss ? "The Warden is down!" : "Sentry down!", 70, "#9be15d"); }
-        else { s.state = "hide"; s.st = 0; s.hold = 30; s.x = s.at; }
+        const head = y <= b.head, dir = x < s.x ? 1 : -1; s.hp -= head ? 2 : 1; S.coins += head ? 3 : 1;
+        burst(x, y, head ? "#ff3b3b" : "#ffd43b", head ? 18 : 12);
+        S.hfx.push({ k: "mark", x, y, head, t: 0 }, { k: "pop", x: s.x, y: b.top - 12, text: head ? "HEADSHOT! ×2" : "HIT!", sub: head ? "+3 coins" : "+1 coin", c: head ? "#ff4d4d" : "#ffffff", t: 0 });
+        if (head) S.hfx.push({ k: "ring", x, y, t: 0 }, { k: "helmet", x: s.x, y: b.top, vx: dir * 1.4, vy: -3.2, t: 0, boss: s.boss });
+        S.stop = head ? 9 : 6; S.shake = head ? 10 : 6; s.flash = 9;
+        beep(head ? 1175 : 784, .07, "triangle", .06); beep(head ? 1760 : 1046, head ? .16 : .1, "triangle", .05);
+        if (s.hp <= 0) { s.alive = false; s.state = "ko"; s.koT = 0; s.koDir = dir; s.koHead = head; S.hfx.push({ k: "pop", x: s.x, y: b.top - 30, text: s.boss ? "THE WARDEN IS DOWN!" : "SENTRY DOWN!", c: "#9be15d", t: -10 }); }
+        else { s.hideIn = 10; }
         if (!sc.nest.sentries.list.some(q => q.alive)) { msg(sc.nest.boss ? "BOSS DEFEATED!" : "Ridge clear!", 120, "#9be15d"); if (sc.nest.boss) { S.scope = null; end(true); } else { const g = S.ents.find(e => e.t === "gate" && e.nest === sc.nest.id); if (g) { S.G.gateOpen[g.col] = true; msg("The laser gate is open!", 120, "#9be15d"); beep(392, .1, "triangle"); beep(587, .15, "triangle"); } setTimeout(() => { if (S && S.scope) S.scope = null; }, 600); } }
         return;
       }
     }
-    burst(x, Math.min(y, FAR + 30), "#c9b48a", 5); msg(y > ay + 1 || x !== ax ? "MISS: check the dots" : "MISS", 40);
+    burst(x, Math.min(y, FAR + 30), "#c9b48a", 5); S.hfx.push({ k: "miss", x, y: Math.min(y, FAR + 20), t: 0 }); msg(y > ay + 1 || x !== ax ? "MISS: check the dots" : "MISS", 40);
   }
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
@@ -279,7 +284,12 @@ const PF = (() => {
   function tick() {
     if (!S || S.over) return;
     S.t++;
-    if (S.scope) { scopeTick(); S.parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .15; p.d--; }); S.parts = S.parts.filter(p => p.d > 0); S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0); return; }
+    if (S.scope) {
+      S.hfx.forEach(f => { f.t++; if (f.k === "helmet") { f.x += f.vx; f.y += f.vy; f.vy += 0.25; } }); S.hfx = S.hfx.filter(f => f.t < (f.k === "pop" ? 70 : f.k === "helmet" ? 60 : 26));
+      for (const q of S.scope.nest.sentries.list) { if (q.flash > 0) q.flash--; if (q.koT !== undefined) q.koT++; if (q.hideIn > 0 && --q.hideIn === 0 && q.alive) { q.state = "hide"; q.st = 0; q.hold = 30; q.x = q.at; } }
+      if (S.shake > 0) S.shake--;
+      if (S.stop > 0) { S.stop--; return; }                                               /* the freeze-frame on a hit */
+      scopeTick(); S.parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .15; p.d--; }); S.parts = S.parts.filter(p => p.d > 0); S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0); return; }
     const P = S.P, G = S.G;
     const dir = (KEYS.right ? 1 : 0) - (KEYS.left ? 1 : 0); if (dir) P.face = dir;
     const jp = pressed("jump") || pressed("up");
@@ -410,17 +420,30 @@ const PF = (() => {
   function messages() { S.msgs.slice(-2).forEach((m, i) => txt(S.ctx, m.t, VW / 2, 44 + i * 16, 11, m.c)); }
   function drawScope() {
     const { ctx } = S, sc = S.scope, w = S.G.world, th = S.G.theme;
+    ctx.save(); if (S.shake > 0) ctx.translate(Math.round((Math.random() - .5) * S.shake), Math.round((Math.random() - .5) * S.shake));
     const g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
     ctx.fillStyle = th.far; for (let x = 0; x < VW; x += 4) { const y = 120 + Math.round(16 * Math.sin(x / 40) + 8 * Math.sin(x / 13)); ctx.fillRect(x, y, 4, VH); }
     ctx.fillStyle = th.top; ctx.fillRect(0, FAR - 6, VW, 4); ctx.fillStyle = th.dirt; ctx.fillRect(0, FAR - 2, VW, VH);
     for (const s of sc.nest.sentries.list) {
       if (!s.alive && s.state !== "ko") continue; const b = sBox(s); if (!b.vis && s.state !== "ko") continue;
       const k = s.boss ? 1.5 : 1;
-      if (s.state === "ko") { ctx.fillStyle = "#495057"; ctx.fillRect(s.x - 10 * k, FAR - 5, 20 * k, 5); continue; }
+      if (s.state === "ko") {
+        const a = Math.min(1, (s.koT || 0) / 16) * Math.PI / 2 * (s.koDir || 1), h = 30 * k, wd = 14 * k;
+        ctx.save(); ctx.translate(s.x, FAR); ctx.rotate(a);
+        ctx.fillStyle = "#1b1b2f"; ctx.fillRect(-wd / 2 - 1, -h - 1, wd + 2, h + 1);
+        ctx.fillStyle = s.boss ? "#7048e8" : "#2b8a3e"; ctx.fillRect(-wd / 2, -h + 10 * k, wd, h - 10 * k);
+        if (!s.koHead) { ctx.fillStyle = s.boss ? "#ffd43b" : "#495057"; ctx.fillRect(-wd / 2, -h, wd, 10 * k); }
+        else { ctx.fillStyle = "#f2c8a0"; ctx.fillRect(-wd / 2 + 2, -h + 2, wd - 4, 8 * k); }
+        ctx.restore();
+        const kt = s.koT || 0;
+        if (kt > 14 && kt < 80) for (let i = 0; i < 3; i++) { const an = kt / 8 + i * 2.1, sx = s.x + (s.koDir || 1) * 20 * k + Math.cos(an) * 9, sy = FAR - 12 + Math.sin(an) * 3; ctx.fillStyle = "#ffd43b"; ctx.fillRect(sx - 1, sy - 3, 2, 6); ctx.fillRect(sx - 3, sy - 1, 6, 2); }
+        continue;
+      }
       ctx.fillStyle = "#1b1b2f"; ctx.fillRect(b.l - 1, b.top - 1, b.r - b.l + 2, b.bot - b.top + 1);
       ctx.fillStyle = s.boss ? "#7048e8" : "#2b8a3e"; ctx.fillRect(b.l, b.head, b.r - b.l, b.bot - b.head);
       ctx.fillStyle = s.boss ? "#ffd43b" : "#495057"; ctx.fillRect(b.l, b.top, b.r - b.l, b.head - b.top);
       ctx.fillStyle = "#ff6b6b"; ctx.fillRect(b.l + 2, b.top + 4 * k, b.r - b.l - 4, 2 * k);
+      if (s.flash > 0) { ctx.fillStyle = `rgba(255,255,255,${s.flash / 9})`; ctx.fillRect(b.l - 1, b.top - 1, b.r - b.l + 2, b.bot - b.top + 1); }
       if (s.boss) { ctx.fillStyle = "#ffd43b"; ctx.fillRect(b.l + 1, b.top - 4, 3, 4); ctx.fillRect(s.x - 1, b.top - 6, 3, 6); ctx.fillRect(b.r - 4, b.top - 4, 3, 4); }
       if (s.state === "aim") { const f = 3 + 2 * Math.abs(Math.sin(S.t / 4)); ctx.fillStyle = "#ff2b2b"; ctx.fillRect(s.x - f * 2, b.top + 6, f * 4, 2); ctx.fillRect(s.x - 1, b.top + 6 - f * 2, 2, f * 4); }
     }
@@ -442,18 +465,41 @@ const PF = (() => {
       if (w >= 2 && near && Math.abs(near.x - x) < 50) { const d = near.range / 100 - 1; txt(ctx, `RANGE ${near.range} m: ${d ? `aim ${d} dot${d > 1 ? "s" : ""} HIGH` : "aim dead on"}`, x, y - R - 6, 9, "#ffd43b"); }
       if (sc.cd > 0) txt(ctx, "RELOADING", x, y + R + 12, 9, "#ffd43b");
     }
+    hitFx(ctx);
+    ctx.restore();
     const wind = sc.nest.sentries.wind;
     ctx.fillStyle = "rgba(10,12,30,.7)"; ctx.fillRect(0, 0, VW, 18);
     txt(ctx, `SNIPER ${S.rounds}`, 8, 13, 9, "#ffd43b", "left");
     for (let i = 0; i < S.hearts; i++) { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(90 + i * 10, 6, 7, 6); }
     if (S.shield) txt(ctx, "◆", 160, 13, 9, "#9fe7ff", "left");
     const left = sc.nest.sentries.list.filter(s => s.alive).length;
-    txt(ctx, sc.nest.boss ? `WARDEN ${"■".repeat(Math.max(0, sc.nest.sentries.list[0].hp))}` : `SENTRIES ${left}`, VW / 2, 13, 9, "#fff");
+    const down = sc.nest.sentries.list.length - left;
+    txt(ctx, sc.nest.boss ? `WARDEN ${"■".repeat(Math.max(0, sc.nest.sentries.list[0].hp))}` : `SENTRIES DOWN ${"●".repeat(down)}${"○".repeat(left)}`, VW / 2, 13, 9, "#fff");
     if (wind) txt(ctx, `WIND ${wind > 0 ? "→".repeat(wind) : "←".repeat(-wind)} ${Math.abs(wind)}: aim ${Math.abs(wind)} dot${Math.abs(wind) > 1 ? "s" : ""} ${wind > 0 ? "LEFT" : "RIGHT"}`, VW - 8, 13, 9, "#8ce99a", "right");
     const glint = sc.nest.sentries.list.some(s => s.alive && s.state === "aim");
     if (glint && !sc.duck) txt(ctx, "RED GLINT! HOLD K TO DUCK", VW / 2, 36, 11, "#ff6b6b");
     txt(ctx, "J fire · K duck · E leave", VW / 2, VH - 8, 9, "#ced4da");
     messages();
+  }
+  /* the hit effects: a hit marker (an X of four strokes round the impact), a burst ring on a headshot,
+     a flying helmet, a puff for a miss, and big pop-up words that grow in, float up and fade */
+  function hitFx(ctx) {
+    for (const f of S.hfx) {
+      if (f.k === "mark") {
+        const p = Math.min(1, f.t / 4), g = 4 + 8 * p, L = 7, a = f.t < 14 ? 1 : 1 - (f.t - 14) / 12;
+        ctx.strokeStyle = `rgba(${f.head ? "255,59,59" : "255,255,255"},${a})`; ctx.lineWidth = f.head ? 3 : 2;
+        for (const [dx, dy] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { ctx.beginPath(); ctx.moveTo(f.x + dx * g, f.y + dy * g); ctx.lineTo(f.x + dx * (g + L), f.y + dy * (g + L)); ctx.stroke(); }
+      } else if (f.k === "ring") {
+        const r = 6 + f.t * 2.2, a = 1 - f.t / 26; ctx.strokeStyle = `rgba(255,212,59,${a})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(f.x, f.y, r, 0, 7); ctx.stroke();
+      } else if (f.k === "helmet") {
+        ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(f.t * 0.35); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(-8, -5, 16, 10); ctx.fillStyle = f.boss ? "#ffd43b" : "#495057"; ctx.fillRect(-7, -4, 14, 8); ctx.fillStyle = "#ff6b6b"; ctx.fillRect(-5, 0, 10, 2); ctx.restore();
+      } else if (f.k === "miss") {
+        const a = 1 - f.t / 26; ctx.fillStyle = `rgba(201,180,138,${a})`; for (let i = 0; i < 5; i++) ctx.fillRect(f.x - 6 + i * 3, f.y - f.t * 0.4 - (i % 2) * 3, 3, 3);
+      } else if (f.k === "pop" && f.t >= 0) {
+        const grow = f.t < 6 ? 1.8 - f.t * 0.13 : 1, a = f.t < 50 ? 1 : 1 - (f.t - 50) / 20, y = f.y - Math.min(f.t, 40) * 0.5;
+        ctx.globalAlpha = Math.max(0, a); txt(ctx, f.text, Math.max(70, Math.min(VW - 70, f.x)), Math.max(40, y), Math.round(15 * grow), f.c); if (f.sub) txt(ctx, f.sub, Math.max(70, Math.min(VW - 70, f.x)), Math.max(40, y) + 14, 9, "#ffd43b"); ctx.globalAlpha = 1;
+      }
+    }
   }
   /* test hooks: used only by tools/check_game4.js */
   const hook = {
@@ -462,6 +508,7 @@ const PF = (() => {
     nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length })) : [],
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
+    fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
     ammo: () => S ? S.ents.filter(e => e.t === "ammo" && e.alive).map(e => ({ x: e.x, y: e.y })) : [],
     grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.x = s.at + s.side * (s.boss ? 42 : 36); const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },

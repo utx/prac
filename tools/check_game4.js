@@ -219,6 +219,11 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   /* play level 1 from the map */
   await p.click('.node[data-l="1-frac"]'); await p.click("#btn-go");
   const n1 = await p.evaluate(() => __rr.B().qs.length); if (n1 !== 4) bad(`a briefing should have 4 questions (has ${n1})`);
+  const climb = await p.evaluate(() => __rr.B().qs.map(q => q.track + ":" + q.rung).join(","));
+  if (climb !== "frac:1,frac:2,frac:3,frac:4") bad(`a briefing should climb through one skill's steps 1 to 4 (got ${climb})`);
+  /* every level of every world climbs easy to hard, on its own skill */
+  const climbs = await p.evaluate(() => { const out = []; for (const L of __rr.LEVELS) { const qs = __rr.briefing(L), steps = qs.map(q => q.rung); if (steps.some((r, i) => i && r < steps[i - 1]) || (!L.boss && (qs.length !== 4 || qs.some(q => q.track !== L.track)))) out.push(L.id); } return out; });
+  if (climbs.length) bad(`briefings that don't climb easy to hard: ${climbs.join(", ")}`);
   for (let i = 0; i < 4; i++) { await p.evaluate(i => { const B = __rr.B(), q = B.qs[B.i]; __rr.answer(i < 2 ? q.answer : (q.answer + 1) % q.options.length); }, i); if (!(await p.isVisible("#explain"))) bad("the explanation should show after answering"); await p.click("#btn-next"); }
   const kit = await p.evaluate(() => __rr.B().kit), want = await p.evaluate(() => __rr.kitFor(2, 4, false));
   if (JSON.stringify(kit) !== JSON.stringify(want)) bad("the kit should follow the briefing score");
@@ -236,6 +241,9 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   if (!(await p.evaluate(() => __rr.PF.hook.state().scope))) bad("E at a nest should open the scope");
   const before = await p.evaluate(() => __rr.PF.hook.nests()[0].alive);
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "head")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(100);
+  const fx = await p.evaluate(() => __rr.PF.hook.fx());
+  if (!fx.includes("mark-head") || !fx.includes("pop") || !fx.includes("helmet")) bad(`a headshot should show a red hit marker, pop-up words and a flying helmet (${fx.join(", ")})`);
+  if (shots) { await p.waitForTimeout(150); await p.screenshot({ path: path.join(shots, "rr-hit.png") }); }
   const after = await p.evaluate(() => __rr.PF.hook.nests()[0].alive); if (after !== before - 1) bad(`a shot on a sentry should knock it out (${before} → ${after})`);
   if (shots) await p.screenshot({ path: path.join(shots, "rr-scope.png") });
   /* gold bullets: every level has more than enough for its sentries, and grabbing one adds a sniper round */
@@ -283,6 +291,8 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   if ((await p.evaluate(() => __rr.B().qs.length)) !== 6) bad("a boss briefing has 6 questions");
   const subs = await p.evaluate(() => __rr.B().qs.map(q => __rr.TRACKS.find(t => t.id === q.track).subject).sort().join(","));
   if (subs !== "maths,maths,reading,reading,thinking,thinking") bad(`a boss briefing mixes 2 of each subject (${subs})`);
+  const bossSteps = await p.evaluate(() => __rr.B().qs.map(q => q.rung).join(","));
+  if (bossSteps !== "1,2,3,3,4,4") bad(`a boss briefing should climb 1, 2, 3, 3, 4, 4 (got ${bossSteps})`);
   for (let i = 0; i < 6; i++) { await p.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await p.click("#btn-next"); }
   await p.click("#btn-play"); await p.waitForTimeout(300);
   await p.evaluate(() => { const n = __rr.PF.hook.nests().find(x => x.boss); __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(250);
