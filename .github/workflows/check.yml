@@ -31,9 +31,9 @@ jobs:
 
       - name: Generated pages are up to date
         run: |
-          if ! git diff --quiet -- index.html tests pracadmin prac2 prac3; then
+          if ! git diff --quiet -- index.html tests pracadmin prac2 prac3 prac4; then
             echo "::error::Generated files are out of date. Run 'python3 tools/build.py' and commit the result."
-            git --no-pager diff --stat -- index.html tests pracadmin prac2 prac3
+            git --no-pager diff --stat -- index.html tests pracadmin prac2 prac3 prac4
             exit 1
           fi
 
@@ -48,6 +48,9 @@ jobs:
 
       - name: Check the battle game (prac3)
         run: node tools/check_game3.js "$RUNNER_TEMP"
+
+      - name: Check the platform game (prac4)
+        run: node tools/check_game4.js "$RUNNER_TEMP"
 
       - name: Keep screenshots
         if: always()
