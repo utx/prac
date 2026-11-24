@@ -173,7 +173,7 @@ const TR = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 const WORLDS = [
   { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", sub: "Every level climbs: four questions on one skill, from a warm-up to test level. One sniper nest after another." },
   { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", sub: "Every skill again, with new questions. Your scope now has drop dots for range." },
-  { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", sub: "New questions again. Night falls, and wind pushes your shots." },
+  { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", sub: "New questions again. Night falls, and the sentries shoot faster." },
   { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", sub: "The last round of new questions, and the hardest levels and ridges." }];
 const hash = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };
 const LEVELS = [];
@@ -262,7 +262,7 @@ function renderMap() {
 }
 function levelCard(L) {
   const rec = S.levels[L.id] || {};
-  if (L.boss) return `<h3 class="px">WORLD ${L.world} BOSS: THE WARDEN</h3><p>A mixed briefing of ${QN.boss} questions from this world's skills, then a run to the Warden's ridge and a sniper duel. Read the drop dots and the wind!</p>
+  if (L.boss) return `<h3 class="px">WORLD ${L.world} BOSS: THE WARDEN</h3><p>A mixed briefing of ${QN.boss} questions from this world's skills, then a run to the Warden's ridge and a sniper duel. Read the drop dots and watch for incoming bullets!</p>
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
   const t = TR[L.track];
   return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(t.name.toUpperCase())}</h3><p><span class="tag ${t.subject}">${t.subject}</span> Four questions that climb, from a warm-up to test level:</p><ol class="climb">${t.rungs.map(r => `<li><b>${esc(r.title)}</b></li>`).join("")}</ol>
