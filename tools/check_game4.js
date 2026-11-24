@@ -2,7 +2,8 @@
 /* Checks the platform game (prac4/index.html, built by tools/build_game4.py).
    1. Content: 15 skill tracks with 4 steps each, every step has questions; sample references only by number;
       hand-written questions have unique ids, 4 options, a trap named for every wrong option, a why-not paragraph,
-      the correct option never the single longest, and the four answers in each step on different letters.
+      the correct option never the single longest, and the answers in each step spread evenly over the letters
+      (at most twice each in a step of 8).
    2. Templates: 300 seeds each; every answer is worked out again HERE by a separate method from `data`
       (or from the picture itself for the spatial ones); options are all different; every wrong option names a trap.
    3. In a real browser: all 64 levels can be finished (the hero's own physics, no double jump); a level is played
@@ -59,7 +60,8 @@ for (const q of HAND) {
 for (const t of TRACKS) for (let r = 1; r <= 4; r++) {
   const qs = HAND.filter(q => q.track === t.id && q.rung === r); if (!qs.length) continue;
   const n = {}; qs.forEach(q => n[q.answer] = (n[q.answer] || 0) + 1);
-  if (Math.max(...Object.values(n)) > Math.ceil(qs.length / 4) + 0) bad(`${t.id} step ${r}: answer letters not spread ${JSON.stringify(n)}`);
+  /* spread evenly: no letter more than ceil(n / 4) times, so at most twice in a step of 8 */
+  if (Math.max(...Object.values(n)) > Math.ceil(qs.length / 4)) bad(`${t.id} step ${r}: answer letters not spread ${JSON.stringify(n)}`);
 }
 const page = fs.existsSync(PAGE) ? fs.readFileSync(PAGE, "utf8") : "";
 if (!page) bad("prac4/index.html is missing: run python3 tools/build_game4.py");
