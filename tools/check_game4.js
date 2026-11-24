@@ -221,6 +221,11 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const n1 = await p.evaluate(() => __rr.B().qs.length); if (n1 !== 4) bad(`a briefing should have 4 questions (has ${n1})`);
   const climb = await p.evaluate(() => __rr.B().qs.map(q => q.track + ":" + q.rung).join(","));
   if (climb !== "frac:1,frac:2,frac:3,frac:4") bad(`a briefing should climb through one skill's steps 1 to 4 (got ${climb})`);
+  /* no repeats while unseen questions are left, even when a briefing is left early */
+  const pr = await open({ width: 1280, height: 800 });
+  const rep = await pr.evaluate(() => { const got = []; for (let k = 0; k < 4; k++) { __rr.startBrief("1-flaw"); got.push(...__rr.B().qs.map(q => q.id)); } return got.length - new Set(got).size; });
+  await pr.evaluate(() => localStorage.clear()); await pr.close();
+  if (rep) bad(`four briefings of the same skill (each left after the first question) repeated ${rep} question(s) while unseen ones were left`);
   /* every level of every world climbs easy to hard, on its own skill */
   const climbs = await p.evaluate(() => { const out = []; for (const L of __rr.LEVELS) { const qs = __rr.briefing(L), steps = qs.map(q => q.rung); if (steps.some((r, i) => i && r < steps[i - 1]) || (!L.boss && (qs.length !== 4 || qs.some(q => q.track !== L.track)))) out.push(L.id); } return out; });
   if (climbs.length) bad(`briefings that don't climb easy to hard: ${climbs.join(", ")}`);

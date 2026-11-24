@@ -2484,7 +2484,8 @@ function pick(track, rung, avoid) {
 }
 function briefing(L) {
   const out = [], ids = [];
-  const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); out.push(Object.assign({}, q, { role })); } };
+  /* a question counts as seen as soon as it is put into a briefing, so leaving a briefing early never brings its questions straight back */
+  const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); S.seen[q.gen || q.id] = S.seed++; out.push(Object.assign({}, q, { role })); } };
   if (L.boss) {
     /* the boss mixes six skills (2 maths, 2 thinking, 2 reading), still climbing: steps 1, 2, 3, 3, 4, 4 */
     const bySub = s => ORDER.filter(t => TR[t].subject === s).sort(() => Math.random() - .5).slice(0, 2);
@@ -2494,6 +2495,7 @@ function briefing(L) {
     /* one skill, climbing inside the level: step 1 (warm-up) -> step 2 -> step 3 -> step 4 (test level) */
     for (let r = 1; r <= QN.normal; r++) add(L.track, r, "focus");
   }
+  save();
   return out;
 }
 
@@ -2549,7 +2551,7 @@ function startBrief(L) {
 }
 function renderQ() {
   const q = B.qs[B.i], t = TR[q.track], letters = "ABCDE";
-  S.seen[q.gen || q.id] = S.seed++; save();
+  save();
   const visual = q.visual || q.options.some(o => /<svg/.test(o));
   const role = (q.role === "boss" ? "Boss briefing · " : "") + `Step ${q.rung} of 4${q.rung === 1 ? " (warm-up)" : q.rung === 4 ? " (test level)" : ""}`;
   $("#scr-brief").innerHTML = `<div class="qcard"><div class="qhead"><span class="px">BRIEFING · ${B.L.boss ? `WORLD ${B.L.world} BOSS` : `LEVEL ${B.L.k + 1}`} · QUESTION ${B.i + 1} OF ${B.qs.length}</span>
