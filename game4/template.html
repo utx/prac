@@ -94,6 +94,11 @@ ul.clues, ol.sts { margin: 6px 0; } .gapline { font-size: 17px; }
 .loot { text-align: center; padding: 10px; border: 3px solid #000; border-radius: 12px; background: linear-gradient(#fff9db, #ffe066); margin-top: 10px; animation: pop .35s ease-out; }
 .loot .li { font-size: 46px; } .loot .ln { font-size: 22px; font-weight: 900; }
 @keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.snipe { background: #1b1f3b; border: 3px solid var(--gold); border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }
+.snipe .px { font-size: 11px; color: var(--gold); } .snipe .big2 { font-size: 44px; font-weight: 900; color: var(--gold); line-height: 1.1; }
+.snipe .nhs { font-family: "Press Start 2P", monospace; color: #ff922b; font-size: 14px; animation: pop .5s ease-out infinite alternate; }
+.snipe .note2 { color: var(--muted); } .snipe .stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.snipe .stats span { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); } .snipe .stats b { font-size: 20px; color: #fff; }
 .tip { background: #2c335c; border: 2px solid #000; border-radius: 8px; padding: 8px 12px; }
 .kit .v { font-size: 22px; font-weight: 800; color: var(--gold); } .kit.off { opacity: .5; } .kit small { color: var(--muted); display: block; }
 /* play */
@@ -230,7 +235,7 @@ function briefing(L) {
 const $ = s => document.querySelector(s);
 const SCR = ["map", "brief", "kit", "play", "result"];
 function show(name) { SCR.forEach(n => $("#scr-" + n).classList.toggle("hidden", n !== name)); if (name !== "play") PF.stop(); window.scrollTo(0, 0); hdr(); }
-function hdr() { $("#hdr-stars").textContent = "★ " + totalStars(); $("#hdr-coins").textContent = "● " + S.coins; $("#btn-sound").textContent = "Sound: " + (S.sound ? "on" : "off"); }
+function hdr() { $("#hdr-stars").textContent = "★ " + totalStars() + (S.snipeBest ? `  🎯 ${S.snipeBest}` : ""); $("#hdr-coins").textContent = "● " + S.coins; $("#btn-sound").textContent = "Sound: " + (S.sound ? "on" : "off"); }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const stars = n => "★".repeat(n) + "☆".repeat(3 - n);
 let SEL = null;
@@ -261,7 +266,7 @@ function levelCard(L) {
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
   const t = TR[L.track];
   return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(t.name.toUpperCase())}</h3><p><span class="tag ${t.subject}">${t.subject}</span> Four questions that climb, from a warm-up to test level:</p><ol class="climb">${t.rungs.map(r => `<li><b>${esc(r.title)}</b></li>`).join("")}</ol>
-    ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.normal} · ${stars(rec.stars || 0)}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
+    ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.normal} · ${stars(rec.stars || 0)}${rec.snipeBest ? ` · 🎯 sniper best <b style="color:var(--gold)">${rec.snipeBest}</b>` : ""}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
 }
 function grownUps() {
   const rows = ORDER.map(t => { const tr = TR[t]; return `<tr><td>${esc(tr.name)}</td>${WORLDS.map(w => { const r = S.levels[`${w.n}-${t}`]; return `<td>${r ? `${r.cleared ? "✔ " : ""}${r.best}/${QN.normal}` : "–"}</td>`; }).join("")}</tr>`; }).join("");
@@ -331,6 +336,7 @@ function showKit() {
   $("#scr-kit").innerHTML = `<div class="panel"><h2 class="px" style="font-size:14px;color:var(--gold)">YOUR KIT: ${B.right} OF ${n} RIGHT</h2>
     <p>Each right answer in the briefing bought you something for the level. Here is what you have and how it helps:</p>
     <div class="kitlist">${rows.map(([ic, name, v, on, how, need]) => `<div class="kitrow ${on ? "" : "off"}"><div class="ki">${ic}</div><div><b>${name}: <span class="kv">${v}</span></b><br>${how}${on && !/with all/.test(need) ? "" : ` <small>(${on ? need : "you get this " + need})</small>`}</div></div>`).join("")}</div>
+    <p class="tip">🎯 <b>Sniper nests are a score attack:</b> knock out enough to open the gate, then keep going until your rounds run out. Headshots, shooting first and streaks score more: <b>every extra round is a chance at a high score.</b></p>
     <p class="tip">🎁 <b>Treasure chests</b> wait in every level. Answer a bonus question from another skill to open one: a med kit, shield, boots, steady scope or more ammo. ◎ <b>Gold bullets</b> lie over gaps, on pillars and beside bots: each is one more sniper round.</p>
     <button class="btn grn" id="btn-play">Start the level ▶</button></div>`;
   $("#btn-play").onclick = () => play();
@@ -385,18 +391,24 @@ let INV = false;
 function play() {
   show("play");
   $("#play-admin").classList.toggle("hidden", !PRACTICE);
-  PF.start({ canvas: $("#cv"), level: { world: B.L.world, boss: !!B.L.boss, seed: B.L.seed }, kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done, onChest });
+  PF.start({ canvas: $("#cv"), level: { world: B.L.world, boss: !!B.L.boss, seed: B.L.seed }, kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done, onChest, bestRidge: (S.levels[B.L.id] || {}).ridgeBest || 0 });
   $("#cv").focus();
 }
 function done(res) {
   S.coins += res.coins;
   const L = B.L, rec = S.levels[L.id] || (S.levels[L.id] = {}), n = B.qs.length;
+  /* sniper high scores: the best single ridge and the best level total, kept even if the level is lost */
+  const sn = res.snipe || {}, newBest = (sn.score || 0) > (rec.snipeBest || 0) && sn.score > 0, prevBest = rec.snipeBest || 0;
+  rec.snipeBest = Math.max(prevBest, sn.score || 0); rec.ridgeBest = Math.max(rec.ridgeBest || 0, sn.ridgeMax || 0); S.snipeBest = Math.max(S.snipeBest || 0, sn.score || 0);
+  const acc = sn.shots ? Math.round(100 * sn.hits / sn.shots) : 0;
+  const snipeCard = sn.shots ? `<div class="snipe"><div class="px">SNIPER SCORE</div><div class="big2">${sn.score}</div>${newBest ? `<div class="nhs">NEW HIGH SCORE!</div>` : `<div class="note2">Best on this level: ${prevBest}</div>`}
+    <div class="stats">${[["Knocked out", sn.ko], ["Headshots", sn.head], ["Shot first", sn.first], ["Accuracy", acc + "%"], ["Best streak", sn.best]].map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join("")}</div></div>` : "";
   if (res.win) {
     const st = 1 + (B.right >= Math.ceil(n * 0.75) ? 1 : 0) + (B.right === n ? 1 : 0);
     rec.cleared = true; rec.stars = Math.max(rec.stars || 0, st); save();
     const i = LEVELS.indexOf(L), next = LEVELS[i + 1];
     $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">${L.boss ? "BOSS DEFEATED!" : "LEVEL CLEAR!"}</h2>
-      <p style="font-size:28px;color:var(--gold)">${stars(st)}</p><p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
+      <p style="font-size:28px;color:var(--gold)">${stars(st)}</p>${snipeCard}<p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
       ${res.totalAmmo ? `<p>Sniper bullets gathered: <b>${res.got} of ${res.totalAmmo}</b>${res.got === res.totalAmmo ? " · every one!" : ""}</p>` : ""}
       <p class="note" style="color:var(--muted)">★ for clearing the level, ★ for ¾ of the briefing right, ★ for a perfect briefing.</p>
       ${next ? `<button class="btn grn" id="btn-nextlv">Next: ${next.boss ? "the Warden" : esc(TR[next.track].name)} ▶</button>` : `<p class="px" style="color:var(--gold)">YOU BEAT ALL FOUR WORLDS!</p>`}
@@ -405,7 +417,7 @@ function done(res) {
   } else {
     save();
     $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--red);font-size:16px">OUT OF HEARTS</h2>
-      <p>The kit comes from the briefing. A new briefing means new questions and a new kit.</p>
+      ${snipeCard}<p>The kit comes from the briefing. A new briefing means new questions and a new kit.</p>
       ${B.retries > 0 ? `<button class="btn" id="btn-retry">Try again with this kit (${B.retries} left)</button>` : ""}
       <button class="btn grn" id="btn-rebrief">New briefing</button> <button class="btn alt" id="btn-tomap">Map</button></div>`;
     if (B.retries > 0) $("#btn-retry").onclick = () => { B.retries--; play(); };

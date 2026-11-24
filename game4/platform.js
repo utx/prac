@@ -179,7 +179,7 @@ const PF = (() => {
       P: { x: first.x + 3, y: first.y - PH.h, vx: 0, vy: 0, ground: false, face: 1, inv: 0, boots: opts.kit.boots, cd: 0 },
       check: { x: first.x + 3, y: first.y - PH.h }, hearts: opts.kit.hearts, shield: opts.kit.shield ? 1 : 0, ammo: opts.kit.ammo, rounds: opts.kit.rounds,
       ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -(0.45 + 0.15 * opts.level.world) : 0, ph: i * 1.7 }, e)),
-      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0, incoming: [] };
+      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0, incoming: [], snipe: { score: 0, ko: 0, head: 0, shots: 0, hits: 0, best: 0, first: 0 } };
     S.totalAmmo = S.ents.filter(e => e.t === "ammo").length;
     S.ents.filter(e => e.t === "nest").forEach(e => { e.sentries = makeSentries(e); });
     G.gateOpen = {};
@@ -204,7 +204,7 @@ const PF = (() => {
   }
   function end(win) {
     if (S.over) return; S.over = true;
-    const res = { win, coins: S.coins, lost: S.lost, hearts: S.hearts, got: S.got, totalAmmo: S.totalAmmo };
+    const res = { win, coins: S.coins, lost: S.lost, hearts: S.hearts, got: S.got, totalAmmo: S.totalAmmo, snipe: snipeTotals() };
     setTimeout(() => { const cb = S && S.opts.onEnd; stop(); cb && cb(res); }, win ? 900 : 700);
     draw();
   }
@@ -218,14 +218,19 @@ const PF = (() => {
     const ranges = w === 1 ? [100] : [100, 200, 300];
     const list = [];
     for (let i = 0; i < n; i++) list.push({ at: rocks[i % rocks.length], side: i % 2 ? -1 : 1, x: rocks[i % rocks.length], tx: rocks[i % rocks.length], state: "hide", st: 40 + i * 50, hp: boss ? 6 : 1, alive: true, range: boss ? 300 : ranges[(i + nest.id) % ranges.length], boss, rocks, hold: 60 + i * 40 });
-    return { list, rocks, wind: w >= 3 ? [-2, -1, 1, 2][(nest.id + w) % 4] : 0 };
+    return { list, rocks, ranges, n, wind: w >= 3 ? [-2, -1, 1, 2][(nest.id + w) % 4] : 0, min: boss ? 1 : w === 1 ? 2 : 3,
+      stat: { ko: 0, head: 0, shots: 0, hits: 0, streak: 0, best: 0, first: 0, score: 0 }, respawn: [], gate: false, card: null };
+  }
+  /* a fresh sentry drops in at a rock nobody is using */
+  function spawnSentry(ss) {
+    const used = ss.list.filter(q => q.alive).map(q => q.at), free = ss.rocks.filter(r => !used.includes(r)), at = (free.length ? free : ss.rocks)[Math.floor(Math.random() * (free.length || ss.rocks.length))];
+    ss.list.push({ at, side: Math.random() < .5 ? -1 : 1, x: at, tx: at, state: "hide", st: 0, hp: 1, alive: true, range: ss.ranges[Math.floor(Math.random() * ss.ranges.length)], boss: false, rocks: ss.rocks, hold: 30 + Math.random() * 40 });
   }
   function enterNest(n) {
-    const alive = n.sentries.list.filter(s => s.alive);
-    if (!alive.length) { msg("This nest is clear", 60); return; }
+    n.sentries.card = null;
     S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0 };
     S.msgs = [];                                                        // the platform's messages would clutter the scope
-    msg(n.boss ? "BOSS: the Warden is on the far ridge!" : "Scope up: knock out the sentries on the far ridge", 140, "#ffe066");
+    msg(n.boss ? "BOSS: the Warden is on the far ridge!" : `SCORE ATTACK! Knock out ${n.sentries.min} to open the gate, then as many as your rounds allow`, 160, "#ffe066");
     if (S.kit.steady && !S.tipSteady) { S.tipSteady = true; msg("STEADY SCOPE: half the sway, from your briefing", 140, "#8ce99a"); }
     beep(500, .08, "triangle");
   }
@@ -236,31 +241,41 @@ const PF = (() => {
   function scopeFire() {
     const sc = S.scope; if (sc.cd > 0) return;
     if (S.rounds <= 0) { msg("Out of sniper rounds", 60, "#ffb3b3"); beep(90, .1); return; }
-    S.rounds--; sc.cd = 32; sc.flash = 6; beep(150, .1); beep(90, .08, "sawtooth");
+    S.rounds--; sc.cd = 32; sc.flash = 6; beep(150, .1); beep(90, .08, "sawtooth"); const st = sc.nest.sentries.stat; st.shots++;
     const [ax, ay] = sway(), w = sc.nest.sentries.wind;
     /* where the shot lands: the closest visible sentry's range decides the drop */
     let tgt = null, bd = 1e9;
     for (const s of sc.nest.sentries.list) if (s.alive) { const d = Math.abs(s.x - ax); if (d < bd) { bd = d; tgt = s; } }
     const drop = tgt ? (tgt.range / 100 - 1) * 8 : 0;
     const x = ax + w * 8, y = ay + drop; sc.fx = x; sc.fy = y;
-    if (inRock(sc, x, y)) { burst(x, y, "#c8c0b0"); msg("ROCK!", 30, "#ffd8a8"); return; }
+    if (inRock(sc, x, y)) { burst(x, y, "#c8c0b0"); msg("ROCK!", 30, "#ffd8a8"); st.streak = 0; return; }
     for (const s of sc.nest.sentries.list) {
       if (!s.alive) continue; const b = sBox(s); if (!b.vis) continue;
       if (x >= b.l - 2 && x <= b.r + 2 && y >= b.top - 2 && y <= b.bot) {
         const head = y <= b.head, dir = x < s.x ? 1 : -1; s.hp -= head ? 2 : 1; S.coins += head ? 3 : 1;
-        if (s.state === "aim") { S.coins += 2; S.hfx.push({ k: "pop", x: s.x, y: b.top - 46, text: "SHOT FIRST! +2", c: "#8ce99a", t: -4 }); }
+        st.hits++; st.streak++; st.best = Math.max(st.best, st.streak);
+        let pts = 0;
+        if (s.state === "aim") { S.coins += 2; st.first++; pts += 50; S.hfx.push({ k: "pop", x: s.x, y: b.top - 46, text: "SHOT FIRST! +50", c: "#8ce99a", t: -4 }); }
         burst(x, y, head ? "#ff3b3b" : "#ffd43b", head ? 18 : 12);
-        S.hfx.push({ k: "mark", x, y, head, t: 0 }, { k: "pop", x: s.x, y: b.top - 12, text: head ? "HEADSHOT! ×2" : "HIT!", sub: head ? "+3 coins" : "+1 coin", c: head ? "#ff4d4d" : "#ffffff", t: 0 });
+        const willKo = s.hp <= 0;
+        pts += willKo ? (head ? 250 : 100) : 50; if (st.streak >= 3) pts += 25 * st.streak; st.score += pts;
+        if (willKo && !s.boss) { st.ko++; if (head) st.head++; } else if (head) st.head++;
+        S.hfx.push({ k: "mark", x, y, head, t: 0 }, { k: "pop", x: s.x, y: b.top - 12, text: head ? "HEADSHOT!" : "HIT!", sub: `+${pts}${st.streak >= 3 ? ` (STREAK x${st.streak})` : ""}`, c: head ? "#ff4d4d" : "#ffffff", t: 0 });
         if (head) S.hfx.push({ k: "ring", x, y, t: 0 }, { k: "helmet", x: s.x, y: b.top, vx: dir * 1.4, vy: -3.2, t: 0, boss: s.boss });
         S.stop = head ? 9 : 6; S.shake = head ? 10 : 6; s.flash = 9;
         beep(head ? 1175 : 784, .07, "triangle", .06); beep(head ? 1760 : 1046, head ? .16 : .1, "triangle", .05);
         if (s.hp <= 0) { s.alive = false; s.state = "ko"; s.koT = 0; s.koDir = dir; s.koHead = head; S.hfx.push({ k: "pop", x: s.x, y: b.top - 30, text: s.boss ? "THE WARDEN IS DOWN!" : "SENTRY DOWN!", c: "#9be15d", t: -10 }); }
         else { s.hideIn = 10; }
-        if (!sc.nest.sentries.list.some(q => q.alive)) { msg(sc.nest.boss ? "BOSS DEFEATED!" : "Ridge clear!", 120, "#9be15d"); if (sc.nest.boss) { S.scope = null; end(true); } else { const g = S.ents.find(e => e.t === "gate" && e.nest === sc.nest.id); if (g) { S.G.gateOpen[g.col] = true; msg("The laser gate is open!", 120, "#9be15d"); beep(392, .1, "triangle"); beep(587, .15, "triangle"); } setTimeout(() => { if (S && S.scope) S.scope = null; }, 600); } }
+        const ss = sc.nest.sentries;
+        if (sc.nest.boss && !ss.list.some(q => q.alive)) { msg("BOSS DEFEATED!", 120, "#9be15d"); st.ko = 1; ss.card = cardFor(ss); setTimeout(() => { if (S) { S.scope = null; end(true); } }, 900); }
+        else if (!sc.nest.boss && s.hp <= 0) {
+          ss.respawn.push(70 + Math.floor(Math.random() * 50));
+          if (!ss.gate && st.ko >= ss.min) { ss.gate = true; const g = S.ents.find(e => e.t === "gate" && e.nest === sc.nest.id); if (g) S.G.gateOpen[g.col] = true; S.hfx.push({ k: "pop", x: VW / 2, y: 80, text: "GATE OPEN! NOW GO FOR A HIGH SCORE", c: "#9be15d", t: -8 }); beep(392, .1, "triangle"); beep(587, .15, "triangle"); }
+        }
         return;
       }
     }
-    burst(x, Math.min(y, FAR + 30), "#c9b48a", 5); S.hfx.push({ k: "miss", x, y: Math.min(y, FAR + 20), t: 0 }); msg(y > ay + 1 || x !== ax ? "MISS: check the dots" : "MISS", 40);
+    st.streak = 0; burst(x, Math.min(y, FAR + 30), "#c9b48a", 5); S.hfx.push({ k: "miss", x, y: Math.min(y, FAR + 20), t: 0 }); msg(y > ay + 1 || x !== ax ? "MISS: check the dots" : "MISS", 40);
   }
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
@@ -278,9 +293,15 @@ const PF = (() => {
       sc.x = Math.max(16, Math.min(VW - 16, sc.x)); sc.y = Math.max(60, Math.min(VH - 30, sc.y));
       if (pressed("fire")) scopeFire();
     }
-    if (pressed("leave") || pressed("use")) { S.scope = null; msg(sc.nest.sentries.list.some(s => s.alive) ? "Careful: the sentries left standing will shell the path" : "", 120, "#ffd43b"); return; }
+    const ss = sc.nest.sentries;
+    if (ss.card && !sc.nest.boss) { if (pressed("leave") || pressed("use") || pressed("fire") || pressed("jump")) closeCard(); return; }
+    if (pressed("leave") || pressed("use")) { if (sc.nest.boss) { S.scope = null; return; } ss.card = cardFor(ss); return; }
+    ss.respawn = ss.respawn.map(t => t - 1); while (ss.respawn.length && ss.respawn[0] <= 0) { ss.respawn.shift(); spawnSentry(ss); }
+    ss.list = ss.list.filter(q => q.alive || (q.koT || 0) < 100);
+    /* out of rounds: the report card once the gate is open, a supply drop if not (never stuck) */
+    if (!sc.nest.boss && S.rounds <= 0 && sc.cd === 0 && !S.incoming.length && ss.gate) { ss.card = cardFor(ss); return; }
     if (sc.cd > 0) sc.cd--; if (sc.flash > 0) sc.flash--;
-    if (S.rounds <= 0 && sc.nest.sentries.list.some(s => s.alive)) { if (++sc.supply === 300) { S.rounds += 2; msg("Supply drop: +2 sniper rounds (gather bullets to skip the wait)", 120, "#9be15d"); sc.supply = 0; } else if (sc.supply === 1) msg("Out of rounds: a supply drop is on its way…", 120, "#ffd43b"); }
+    if (S.rounds <= 0 && (sc.nest.boss || !ss.gate)) { if (++sc.supply === 300) { S.rounds += 2; msg("Supply drop: +2 sniper rounds (gather bullets to skip the wait)", 120, "#9be15d"); sc.supply = 0; } else if (sc.supply === 1) msg("Out of rounds: a supply drop is on its way…", 120, "#ffd43b"); }
     for (const s of sc.nest.sentries.list) {
       if (!s.alive) continue;
       s.st++;
@@ -384,7 +405,7 @@ const PF = (() => {
     }
     /* shells from sentries left standing: they cover the stretch after their nest */
     for (const n of S.ents.filter(e => e.t === "nest" && !e.boss)) {
-      const alive = n.sentries.list.filter(s => s.alive).length;
+      const alive = n.sentries.gate ? 0 : n.sentries.list.filter(s => s.alive).length;
       if (!alive || S.P.inv > 0 || P.x < n.x - 6 * TS || P.x > n.x + 30 * TS) continue;
       n.shellT = (n.shellT || 0) + alive;
       if (n.shellT > 170) { n.shellT = 0; S.shells.push({ x: P.x + 5 + P.vx * 30, y: groundBelow(P.x + 5 + P.vx * 30), d: 70 }); }
@@ -413,6 +434,33 @@ const PF = (() => {
     if (key === "boots") { S.kit.boots = true; S.P.boots = true; } if (key === "steady") S.kit.steady = true;
     msg(`${L.icon} ${L.name}: ${L.what}`, 140, "#ffd43b"); beep(784, .1, "triangle"); beep(1175, .15, "triangle"); burst(S.P.x + 5, S.P.y, "#ffd43b", 16);
     return { before, after: { med: S.hearts, ammo: S.rounds, blaster: S.ammo }[key] };
+  }
+  /* the ridge report: how this nest went, and whether it is a best */
+  function cardFor(ss) {
+    const st = ss.stat, acc = st.shots ? Math.round(100 * st.hits / st.shots) : 0;
+    const ridgeBest = S.opts.bestRidge || 0, isBest = st.score > ridgeBest && st.score > 0;
+    if (isBest) { S.newRidgeBest = st.score; beep(523, .1, "triangle"); beep(659, .1, "triangle"); beep(1046, .25, "triangle"); }
+    return Object.assign({}, st, { acc, isBest, ridgeBest, t: 0 });
+  }
+  function closeCard() { const ss = S.scope.nest.sentries; S.scope = null; ss.card = null; if (!ss.gate) msg("The gate is still shut: come back with more rounds", 120, "#ffb3b3"); }
+  /* the level's sniper totals, added up from every nest once at the end (so nothing is counted twice) */
+  function snipeTotals() {
+    const t = { score: 0, ko: 0, head: 0, shots: 0, hits: 0, best: 0, first: 0, ridgeMax: 0 };
+    for (const n of S.ents.filter(e => e.t === "nest")) { const st = n.sentries.stat; for (const k of ["score", "ko", "head", "shots", "hits", "first"]) t[k] += st[k]; t.best = Math.max(t.best, st.best); t.ridgeMax = Math.max(t.ridgeMax, st.score); }
+    return t;
+  }
+  function drawCard(ctx, c) {
+    c.t++; const g = Math.min(1, c.t / 12);
+    ctx.fillStyle = `rgba(5,8,20,${0.8 * g})`; ctx.fillRect(0, 0, VW, VH);
+    ctx.save(); ctx.translate(VW / 2, VH / 2); ctx.scale(0.6 + 0.4 * g, 0.6 + 0.4 * g); ctx.translate(-VW / 2, -VH / 2);
+    ctx.fillStyle = "#1b1b2f"; ctx.fillRect(86, 34, 308, 206); ctx.fillStyle = "#2c335c"; ctx.fillRect(90, 38, 300, 198); ctx.fillStyle = "#ffd43b"; ctx.fillRect(90, 38, 300, 22);
+    txt(ctx, "RIDGE REPORT", VW / 2, 54, 12, "#1b1b2f");
+    const rows = [["KNOCKED OUT", c.ko], ["HEADSHOTS", c.head], ["SHOT FIRST", c.first], ["ACCURACY", c.acc + "%"], ["BEST STREAK", c.best]];
+    rows.forEach(([k, v], i) => { const show = c.t > 10 + i * 8; if (!show) return; txt(ctx, k, 110, 82 + i * 18, 10, "#ced4da", "left"); txt(ctx, String(v), 370, 82 + i * 18, 11, "#fff", "right"); });
+    if (c.t > 56) { txt(ctx, "SCORE", 110, 186, 12, "#ffd43b", "left"); txt(ctx, String(Math.min(c.score, Math.round(c.score * (c.t - 56) / 20))), 370, 188, 16, "#ffd43b", "right"); }
+    if (c.t > 80) { if (c.isBest) txt(ctx, c.t % 20 < 12 ? "NEW HIGH SCORE!" : "", VW / 2, 212, 14, "#ff922b"); else txt(ctx, `BEST ON THIS LEVEL: ${c.ridgeBest}`, VW / 2, 212, 9, "#adb5bd"); }
+    if (c.t > 90) txt(ctx, "Press E or J to carry on", VW / 2, 230, 8, "#ced4da");
+    ctx.restore();
   }
   /* every second beaten bot drops a bullet (the drop is decided by the bot, so it is the same each play) */
   function dropAmmo(e) { if (e.i % 2) return; const x = e.x + 3; S.ents.push({ t: "ammo", x, y: groundBelow(x) - 12, alive: true, i: S.ents.length, ph: 0 }); S.totalAmmo++; msg("It dropped a bullet!", 50, "#ffd43b"); }
@@ -447,13 +495,13 @@ const PF = (() => {
       else if (e.t === "heart") { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 1, y + 2, 3, 3); ctx.fillRect(x + 6, y + 2, 3, 3); ctx.fillRect(x, y + 3, 10, 3); ctx.fillRect(x + 2, y + 6, 6, 2); ctx.fillRect(x + 4, y + 8, 2, 1); }
       else if (e.t === "ammo") { if (e.high) { ctx.fillStyle = "rgba(177,151,252,.35)"; ctx.fillRect(x - 5, y - 5, 17, 21); }
         const b = Math.round(2 * Math.sin(S.t / 9 + e.i)), gl = 0.35 + 0.25 * Math.sin(S.t / 6 + e.i); ctx.fillStyle = `rgba(255,212,59,${gl})`; ctx.fillRect(x - 3, y - 3 + b, 13, 17); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x, y - 1 + b, 7, 12); ctx.fillStyle = "#e8a33d"; ctx.fillRect(x + 1, y + 4 + b, 5, 6); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 1, y + 4 + b, 2, 6); ctx.fillStyle = "#adb5bd"; ctx.fillRect(x + 2, y + b, 3, 4); ctx.fillStyle = "#e9ecef"; ctx.fillRect(x + 2, y + b, 1, 3); }
-      else if (e.t === "sign") { const n = S.ents.find(q => q.t === "nest" && q.id === e.nest), left = n ? n.sentries.list.filter(s => s.alive).length : 0; ctx.fillStyle = "#5a3a22"; ctx.fillRect(x + 10, y - 20, 3, 20); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 15, y - 44, 54, 25); ctx.fillStyle = left ? "#ffd43b" : "#8ce99a"; ctx.fillRect(x - 14, y - 43, 52, 23); txt(ctx, left ? "NEST AHEAD" : "RIDGE CLEAR", x + 12, y - 34, 7, "#1b1b2f"); if (left) txt(ctx, `${left} SENTRIES`, x + 12, y - 24, 7, "#c92a2a"); }
+      else if (e.t === "sign") { const n = S.ents.find(q => q.t === "nest" && q.id === e.nest), left = n && !n.sentries.gate ? n.sentries.min : 0; ctx.fillStyle = "#5a3a22"; ctx.fillRect(x + 10, y - 20, 3, 20); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 15, y - 44, 54, 25); ctx.fillStyle = left ? "#ffd43b" : "#8ce99a"; ctx.fillRect(x - 14, y - 43, 52, 23); txt(ctx, left ? "SNIPER NEST" : "GATE OPEN", x + 12, y - 34, 7, "#1b1b2f"); if (left) txt(ctx, `${left} KO FOR GATE`, x + 12, y - 24, 7, "#c92a2a"); }
       else if (e.t === "crate") { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 14); ctx.fillStyle = "#c97a3e"; ctx.fillRect(x, y, 12, 12); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 3, y + 4, 6, 4); }
       else if (e.t === "check") { ctx.fillStyle = "#5a3a22"; ctx.fillRect(x, y - 30, 2, 30); ctx.fillStyle = e.on ? "#40c057" : "#adb5bd"; ctx.fillRect(x + 2, y - 30, 12, 8); }
       else if (e.t === "gate") { if (!S.G.gateOpen[e.col]) { ctx.fillStyle = "#495057"; ctx.fillRect(x - 2, 0, 20, 6); ctx.fillRect(x - 2, y - 4, 20, 4); for (let k = 0; k < 3; k++) { ctx.fillStyle = (S.t + k * 5) % 14 < 7 ? "#ff3b3b" : "#ff8787"; ctx.fillRect(x + 2 + k * 5, 6, 2, y - 10); } } else { ctx.fillStyle = "#495057"; ctx.fillRect(x - 2, y - 4, 20, 4); } }
       else if (e.t === "goal") { ctx.fillStyle = "#e9ecef"; ctx.fillRect(x, y - 64, 3, 64); const wv = Math.round(2 * Math.sin(S.t / 6)); ctx.fillStyle = "#ff7a29"; ctx.fillRect(x + 3, y - 64 + wv, 20, 12); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 10, y - 60 + wv, 6, 4); }
       else if (e.t === "nest") {
-        const clear = !e.sentries.list.some(s => s.alive);
+        const clear = e.sentries.gate || !!e.sentries.card;
         ctx.fillStyle = "#5a3a22"; ctx.fillRect(x - 10, y - 34, 3, 34); ctx.fillRect(x + 9, y - 34, 3, 34); ctx.fillStyle = "#7a4a2a"; ctx.fillRect(x - 12, y - 36, 26, 5); ctx.fillStyle = e.boss ? "#e03131" : clear ? "#40c057" : "#ffd43b"; ctx.fillRect(x - 6, y - 46, 14, 9);
         ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 2, y - 44, 6, 2);
         if (Math.abs(S.P.x - e.x) < 22 && !clear) { ctx.fillStyle = "rgba(0,0,0,.65)"; ctx.fillRect(x - 46, y - 64, 94, 13); txt(ctx, "▼ / E: use the scope", x + 1, y - 54, 8, "#fff"); }
@@ -472,7 +520,7 @@ const PF = (() => {
     hud(); messages();
   }
   function txt(ctx, s, x, y, size = 10, c = "#fff", align = "center") { ctx.font = `bold ${size}px "Courier New", monospace`; ctx.textAlign = align; ctx.fillStyle = "#1b1b2f"; ctx.fillText(s, x + 1, y + 1); ctx.fillStyle = c; ctx.fillText(s, x, y); }
-  const need0 = () => S.ents.some(e => e.t === "nest" && !e.boss && e.x > S.P.x - 40 && e.x - S.P.x < 22 * TS && e.sentries.list.some(q => q.alive));
+  const need0 = () => S.ents.some(e => e.t === "nest" && !e.boss && e.x > S.P.x - 40 && e.x - S.P.x < 22 * TS && !e.sentries.gate);
   function hud() {
     const ctx = S.ctx; ctx.fillStyle = "rgba(10,12,30,.55)"; ctx.fillRect(0, 0, VW, 18);
     for (let i = 0; i < S.hearts; i++) { const x = 6 + i * 12; ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 1, 5, 3, 3); ctx.fillRect(x + 5, 5, 3, 3); ctx.fillRect(x, 6, 9, 3); ctx.fillRect(x + 2, 9, 5, 2); ctx.fillRect(x + 4, 11, 1, 1); }
@@ -480,7 +528,7 @@ const PF = (() => {
     if (S.shield) { txt(ctx, "◆SHIELD", x, 13, 9, "#9fe7ff", "left"); x += 56; }
     txt(ctx, `BLASTER ${S.ammo}`, x, 13, 9, "#9fe7ff", "left"); x += 76;
     if (S.flash > 0) { S.flash--; ctx.fillStyle = `rgba(255,212,59,${S.flash / 60})`; ctx.fillRect(x - 4, 1, need0() ? 118 : 74, 16); }
-    const near = S.ents.find(e => e.t === "nest" && !e.boss && e.x > S.P.x - 40 && e.x - S.P.x < 22 * TS && e.sentries.list.some(q => q.alive)), need = near ? near.sentries.list.filter(q => q.alive).length : 0;
+    const near = S.ents.find(e => e.t === "nest" && !e.boss && e.x > S.P.x - 40 && e.x - S.P.x < 22 * TS && !e.sentries.gate), need = near ? near.sentries.min - near.sentries.stat.ko : 0;
     txt(ctx, `SNIPER ${S.rounds}${need ? ` · NEED ${need}` : ""}`, x, 13, 9, need && S.rounds < need ? "#ff8787" : "#ffd43b", "left"); x += need ? 118 : 74;
     if (S.streak % 3) { txt(ctx, "▮".repeat(S.streak % 3) + "▯".repeat(3 - S.streak % 3), x - 4, 13, 9, "#ffa94d", "left"); x += 30; }
     if (S.kit.boots) { txt(ctx, "BOOTS", x, 13, 9, "#b197fc", "left"); x += 44; }
@@ -548,6 +596,7 @@ const PF = (() => {
     }
     hitFx(ctx);
     ctx.restore();
+    if (sc.nest.sentries.card) { drawCard(ctx, sc.nest.sentries.card); return; }
     const wind = sc.nest.sentries.wind;
     ctx.fillStyle = "rgba(10,12,30,.7)"; ctx.fillRect(0, 0, VW, 18);
     txt(ctx, `SNIPER ${S.rounds}`, 8, 13, 9, "#ffd43b", "left");
@@ -555,9 +604,8 @@ const PF = (() => {
     for (let i = 0; i < S.hearts; i++) { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(90 + i * 10, 6, 7, 6); }
     if (ouch) { const t = ouch.t; ctx.fillStyle = `rgba(255,107,107,${1 - t / 50})`; ctx.fillRect(90 + S.hearts * 10 + Math.min(t, 20) * 0.3, 6 + t * 0.8, 7, 6); }
     if (S.shield) txt(ctx, "◆", 160, 13, 9, "#9fe7ff", "left");
-    const left = sc.nest.sentries.list.filter(s => s.alive).length;
-    const down = sc.nest.sentries.list.length - left;
-    txt(ctx, sc.nest.boss ? `WARDEN ${"■".repeat(Math.max(0, sc.nest.sentries.list[0].hp))}` : `SENTRIES DOWN ${"●".repeat(down)}${"○".repeat(left)}`, VW / 2, 13, 9, "#fff");
+    const sst = sc.nest.sentries.stat, need = Math.max(0, sc.nest.sentries.min - sst.ko);
+    txt(ctx, sc.nest.boss ? `WARDEN ${"■".repeat(Math.max(0, sc.nest.sentries.list[0].hp))}` : `KO ${sst.ko}${sst.head ? ` · HEAD ${sst.head}` : ""} · SCORE ${sst.score}${need ? ` · GATE: ${need} MORE` : " · GATE ✓"}`, VW / 2, 13, 9, "#fff");
     if (wind) txt(ctx, `WIND ${wind > 0 ? "→".repeat(wind) : "←".repeat(-wind)} ${Math.abs(wind)}: aim ${Math.abs(wind)} dot${Math.abs(wind) > 1 ? "s" : ""} ${wind > 0 ? "LEFT" : "RIGHT"}`, VW - 8, 13, 9, "#8ce99a", "right");
     const glint = sc.nest.sentries.list.some(s => s.alive && s.state === "aim");
     if (glint && !sc.duck && !S.incoming.length) txt(ctx, "RED GLINT: SHOOT THEM FIRST, OR GET READY TO DUCK (K)", VW / 2, 36, 10, "#ff6b6b");
@@ -607,7 +655,10 @@ const PF = (() => {
   const hook = {
     state: () => S && { x: S.P.x, y: S.P.y, hearts: S.hearts, ammo: S.ammo, rounds: S.rounds, coins: S.coins, scope: !!S.scope, over: S.over, cols: S.G.cols, shield: S.shield, check: S.check },
     teleport: (col) => { if (!S) return; const c = Math.max(0, Math.min(S.G.cols - 1, col)); let r = 0; while (r < ROWS && !solidAt(S.G, c, r)) r++; S.P.x = c * TS + 3; S.P.y = r * TS - PH.h; S.P.vx = S.P.vy = 0; },
-    nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length })) : [],
+    nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length, ko: e.sentries.stat.ko, score: e.sentries.stat.score, min: e.sentries.min, gate: e.sentries.gate, card: !!e.sentries.card })) : [],
+    snipe: () => S && snipeTotals(),
+    quiet: () => { if (!S || !S.scope) return; const ss = S.scope.nest.sentries; ss.respawn = []; S.incoming = []; ss.list.forEach((q, i) => { if (i && q.alive) { q.state = "hide"; q.st = 0; q.hold = 99999; } }); },
+    exitScope: () => { if (S && S.scope) { S.scope.nest.sentries.card = null; S.scope = null; } },
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
     fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
@@ -618,7 +669,7 @@ const PF = (() => {
     kit: () => S && Object.assign({}, S.kit, { boots: !!S.P.boots, shield: S.shield, hearts: S.hearts, rounds: S.rounds, ammo: S.ammo }),
     ammo: () => S ? S.ents.filter(e => e.t === "ammo" && e.alive).map(e => ({ x: e.x, y: e.y })) : [],
     grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
-    aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.x = s.at + s.side * (s.boss ? 42 : 36); const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
+    aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.hideIn = 0; s.x = s.at + s.side * (s.boss ? 42 : 36); S.stop = 0; const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
     key: (k, down) => { KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
     hurt: () => S && hurt("test"), win: () => S && end(true), lose: () => { if (S) { S.hearts = 1; S.shield = 0; S.P.inv = 0; hurt("test"); } }
