@@ -86,6 +86,19 @@ ul.clues, ol.sts { margin: 6px 0; } .gapline { font-size: 17px; }
 /* kit */
 .kitgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 12px 0; }
 .kit { background: var(--panel2); border: 3px solid #000; border-radius: 10px; padding: 10px; }
+.kitlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 8px; margin: 10px 0; }
+.kitrow { display: flex; gap: 10px; align-items: flex-start; background: var(--panel2); border: 3px solid #000; border-radius: 10px; padding: 8px 10px; }
+.kitrow .ki { font-size: 26px; width: 34px; text-align: center; } .kitrow .kv { color: var(--gold); } .kitrow.off { opacity: .55; } .kitrow small { color: var(--muted); }
+.modal { position: fixed; inset: 0; background: rgba(5,8,20,.78); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal .qcard { max-width: 1100px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; }
+.loot { text-align: center; padding: 10px; border: 3px solid #000; border-radius: 12px; background: linear-gradient(#fff9db, #ffe066); margin-top: 10px; animation: pop .35s ease-out; }
+.loot .li { font-size: 46px; } .loot .ln { font-size: 22px; font-weight: 900; }
+@keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.snipe { background: #1b1f3b; border: 3px solid var(--gold); border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }
+.snipe .px { font-size: 11px; color: var(--gold); } .snipe .big2 { font-size: 44px; font-weight: 900; color: var(--gold); line-height: 1.1; }
+.snipe .nhs { font-family: "Press Start 2P", monospace; color: #ff922b; font-size: 14px; animation: pop .5s ease-out infinite alternate; }
+.snipe .note2 { color: var(--muted); } .snipe .stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.snipe .stats span { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); } .snipe .stats b { font-size: 20px; color: #fff; }
 .tip { background: #2c335c; border: 2px solid #000; border-radius: 8px; padding: 8px 12px; }
 .kit .v { font-size: 22px; font-weight: 800; color: var(--gold); } .kit.off { opacity: .5; } .kit small { color: var(--muted); display: block; }
 /* play */
@@ -203,7 +216,8 @@ function pick(track, rung, avoid) {
 }
 function briefing(L) {
   const out = [], ids = [];
-  const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); out.push(Object.assign({}, q, { role })); } };
+  /* a question counts as seen as soon as it is put into a briefing, so leaving a briefing early never brings its questions straight back */
+  const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); S.seen[q.gen || q.id] = S.seed++; out.push(Object.assign({}, q, { role })); } };
   if (L.boss) {
     /* the boss mixes six skills (2 maths, 2 thinking, 2 reading), still climbing: steps 1, 2, 3, 3, 4, 4 */
     const bySub = s => ORDER.filter(t => TR[t].subject === s).sort(() => Math.random() - .5).slice(0, 2);
@@ -213,6 +227,7 @@ function briefing(L) {
     /* one skill, climbing inside the level: step 1 (warm-up) -> step 2 -> step 3 -> step 4 (test level) */
     for (let r = 1; r <= QN.normal; r++) add(L.track, r, "focus");
   }
+  save();
   return out;
 }
 
@@ -220,7 +235,7 @@ function briefing(L) {
 const $ = s => document.querySelector(s);
 const SCR = ["map", "brief", "kit", "play", "result"];
 function show(name) { SCR.forEach(n => $("#scr-" + n).classList.toggle("hidden", n !== name)); if (name !== "play") PF.stop(); window.scrollTo(0, 0); hdr(); }
-function hdr() { $("#hdr-stars").textContent = "★ " + totalStars(); $("#hdr-coins").textContent = "● " + S.coins; $("#btn-sound").textContent = "Sound: " + (S.sound ? "on" : "off"); }
+function hdr() { $("#hdr-stars").textContent = "★ " + totalStars() + (S.snipeBest ? `  🎯 ${S.snipeBest}` : ""); $("#hdr-coins").textContent = "● " + S.coins; $("#btn-sound").textContent = "Sound: " + (S.sound ? "on" : "off"); }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const stars = n => "★".repeat(n) + "☆".repeat(3 - n);
 let SEL = null;
@@ -251,7 +266,7 @@ function levelCard(L) {
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
   const t = TR[L.track];
   return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(t.name.toUpperCase())}</h3><p><span class="tag ${t.subject}">${t.subject}</span> Four questions that climb, from a warm-up to test level:</p><ol class="climb">${t.rungs.map(r => `<li><b>${esc(r.title)}</b></li>`).join("")}</ol>
-    ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.normal} · ${stars(rec.stars || 0)}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
+    ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.normal} · ${stars(rec.stars || 0)}${rec.snipeBest ? ` · 🎯 sniper best <b style="color:var(--gold)">${rec.snipeBest}</b>` : ""}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
 }
 function grownUps() {
   const rows = ORDER.map(t => { const tr = TR[t]; return `<tr><td>${esc(tr.name)}</td>${WORLDS.map(w => { const r = S.levels[`${w.n}-${t}`]; return `<td>${r ? `${r.cleared ? "✔ " : ""}${r.best}/${QN.normal}` : "–"}</td>`; }).join("")}</tr>`; }).join("");
@@ -268,7 +283,7 @@ function startBrief(L) {
 }
 function renderQ() {
   const q = B.qs[B.i], t = TR[q.track], letters = "ABCDE";
-  S.seen[q.gen || q.id] = S.seed++; save();
+  save();
   const visual = q.visual || q.options.some(o => /<svg/.test(o));
   const role = (q.role === "boss" ? "Boss briefing · " : "") + `Step ${q.rung} of 4${q.rung === 1 ? " (warm-up)" : q.rung === 4 ? " (test level)" : ""}`;
   $("#scr-brief").innerHTML = `<div class="qcard"><div class="qhead"><span class="px">BRIEFING · ${B.L.boss ? `WORLD ${B.L.world} BOSS` : `LEVEL ${B.L.k + 1}`} · QUESTION ${B.i + 1} OF ${B.qs.length}</span>
@@ -311,35 +326,89 @@ function showKit() {
   const n = B.qs.length, k = kitFor(B.right, n, B.L.boss), best = kitFor(n, n, B.L.boss);
   B.kit = k; B.retries = 1;
   const rec = S.levels[B.L.id] || (S.levels[B.L.id] = {}); rec.best = Math.max(rec.best || 0, B.right); rec.last = B.right; save();
-  const item = (name, v, desc, on = true) => `<div class="kit ${on ? "" : "off"}"><div>${name}</div><div class="v">${v}</div><small>${desc}</small></div>`;
+  const rows = [
+    ["❤", "Hearts", k.hearts, true, "Every hit from spikes, a bot, a fall or a sniper bullet costs one heart. Lose them all and you start the level again.", `${best.hearts} with all right`],
+    ["◆", "Shield", k.shield ? "ON" : "off", k.shield, "Blocks the first hit completely: no heart lost.", "for all right"],
+    ["⤒", "Double-jump boots", k.boots ? "ON" : "off", k.boots, "Press jump again in mid-air: clear wide gaps and reach the <b style=\"color:#b197fc\">high gold bullets</b> (purple glow) that a normal jump can't.", "for ¾ right"],
+    ["〰", "Steady scope", k.steady ? "ON" : "off", k.steady, "At a sniper nest the crosshair sways half as much, so shots land where you aim.", "for half right"],
+    ["◎", "Sniper rounds", k.rounds, true, "One shot each at the nests. Knock out every sentry to open the laser gate. Gold bullets in the level add more.", `${best.rounds} with all right`],
+    ["✦", "Blaster", k.ammo, true, "Press J to shoot bots, hoppers, rollers and drones. Spiky rollers can't be stomped: blast them or jump over.", `${best.ammo} with all right`]];
   $("#scr-kit").innerHTML = `<div class="panel"><h2 class="px" style="font-size:14px;color:var(--gold)">YOUR KIT: ${B.right} OF ${n} RIGHT</h2>
-    <p>Every right answer made your kit better. ${B.right < n ? `With all ${n} right you would have had ${best.hearts} hearts, ${best.ammo} blaster shots, ${best.rounds} sniper rounds, boots and a shield.` : "A perfect briefing: you have everything!"}</p>
-    <div class="kitgrid">${item("❤ Hearts", k.hearts, "hits you can take")}${item("✦ Blaster", k.ammo, "shots for crawler bots and drones")}${item("◎ Sniper rounds", k.rounds, "for the sentries at each nest")}
-      ${item("〰 Steady scope", k.steady ? "YES" : "no", "less sway (half right or better)", k.steady)}${item("⤒ Double-jump boots", k.boots ? "YES" : "no", "jump again in the air (¾ right or better)", k.boots)}${item("◆ Shield", k.shield ? "YES" : "no", "blocks one hit (all right)", k.shield)}</div>
-    <p class="tip">◎ <b>Need more sniper rounds?</b> Grab the <b style="color:var(--gold)">gold bullets</b> in the level: over the gaps, on top of the pillars and beside the bots. Beaten bots sometimes drop one, and 3 in a row without being hit earns a bonus round. A sign before each nest says how many sentries are waiting.</p>
+    <p>Each right answer in the briefing bought you something for the level. Here is what you have and how it helps:</p>
+    <div class="kitlist">${rows.map(([ic, name, v, on, how, need]) => `<div class="kitrow ${on ? "" : "off"}"><div class="ki">${ic}</div><div><b>${name}: <span class="kv">${v}</span></b><br>${how}${on && !/with all/.test(need) ? "" : ` <small>(${on ? need : "you get this " + need})</small>`}</div></div>`).join("")}</div>
+    <p class="tip">🎯 <b>Sniper nests are a score attack:</b> knock out enough to open the gate, then keep going until your rounds run out. Headshots, shooting first and streaks score more: <b>every extra round is a chance at a high score.</b></p>
+    <p class="tip">🎁 <b>Treasure chests</b> wait in every level. Answer a bonus question from another skill to open one: a med kit, shield, boots, steady scope or more ammo. ◎ <b>Gold bullets</b> lie over gaps, on pillars and beside bots: each is one more sniper round.</p>
     <button class="btn grn" id="btn-play">Start the level ▶</button></div>`;
   $("#btn-play").onclick = () => play();
   coachKit();
   show("kit");
 }
 
+/* ================= treasure chests: a bonus question from another skill opens the loot ================= */
+let CH = null;
+function onChest(info, api) {
+  const others = ORDER.filter(t => t !== B.L.track), track = others[Math.floor(Math.random() * others.length)];
+  const steps = [[1, 2], [2, 3], [3, 3], [3, 4]][info.world - 1], rung = steps[Math.floor(Math.random() * steps.length)];
+  const q = pick(track, rung, []); if (!q) { api.lock(); api.resume(); return; }
+  S.seen[q.gen || q.id] = S.seed++; save();
+  CH = { q, info, api, done: false };
+  const t = TR[q.track], letters = "ABCDE", visual = q.visual || q.options.some(o => /<svg/.test(o));
+  const m = document.createElement("div"); m.className = "modal"; m.id = "chest";
+  m.innerHTML = `<div class="qcard"><div class="qhead"><span class="px">🎁 TREASURE CHEST: ONE GO TO OPEN IT</span><span class="note"><span class="tag ${t.subject}">${t.subject}</span> a bonus question: ${esc(t.name)}</span></div>
+    <div class="qgrid"><div class="left">${q.passage || ""}<div class="stem">${q.stem}</div></div>
+    <div class="right"><div class="opts ${visual ? "visual" : ""}">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><b class="l">${letters[i]}</b><span>${o}</span></button>`).join("")}</div>
+    <div class="after hidden" id="ch-after"></div><div id="ch-loot"></div><div class="explain hidden" id="ch-explain"></div></div></div></div>`;
+  document.body.appendChild(m);
+  m.querySelectorAll(".opt").forEach(b => b.onclick = () => chestAnswer(+b.dataset.i));
+  if (PRACTICE) coachQ(Object.assign({}, q, { role: "chest" }));
+}
+function chestAnswer(i) {
+  if (!CH || CH.done) return; CH.done = true;
+  const q = CH.q, ok = i === q.answer;
+  document.querySelectorAll("#chest .opt").forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add("right"); else if (k === i) b.classList.add("wrong"); });
+  let loot = "";
+  if (ok) { const r = CH.api.open(CH.info.pick); const change = r.before !== undefined ? ` (${r.key === "med" ? "hearts" : r.key === "ammo" ? "sniper rounds" : "blaster shots"} ${r.before} → ${r.after})` : "";
+    loot = `<div class="loot"><div class="li">${r.icon}</div><div class="ln">${esc(r.name)}!</div><div>${esc(r.what)}${change}</div></div>`; }
+  else CH.api.lock();
+  $("#ch-after").classList.remove("hidden");
+  $("#ch-after").innerHTML = `<p class="verdict ${ok ? "ok" : "no"}">${ok ? "✔ Right! The chest opens…" : `✘ The lock holds: the answer is ${"ABCDE"[q.answer]}.`}</p><button class="btn" id="ch-back">Back to the level ▶</button>`;
+  $("#ch-loot").innerHTML = loot;
+  const ex = $("#ch-explain"); ex.classList.remove("hidden"); ex.innerHTML = q.explain;
+  $("#ch-back").onclick = closeChest;
+  S.log.push([q.track, q.rung, ok ? 1 : 0]); save();
+}
+function closeChest() { if (!CH) return; const api = CH.api; CH = null; const m = $("#chest"); if (m) m.remove(); api.resume(); $("#cv").focus(); }
+addEventListener("keydown", e => {
+  if (!CH || e.ctrlKey || e.metaKey || e.altKey) return;
+  e.stopPropagation();
+  const k = e.key.toUpperCase(), i = "ABCDE".indexOf(k) >= 0 ? "ABCDE".indexOf(k) : "12345".indexOf(k);
+  if (!CH.done && k.length === 1 && i >= 0 && i < CH.q.options.length) { e.preventDefault(); chestAnswer(i); }
+  else if (CH.done && (e.key === "Enter" || e.key === "ArrowRight")) { e.preventDefault(); closeChest(); }
+}, true);
+
 /* ================= play ================= */
 let INV = false;
 function play() {
   show("play");
   $("#play-admin").classList.toggle("hidden", !PRACTICE);
-  PF.start({ canvas: $("#cv"), level: { world: B.L.world, boss: !!B.L.boss, seed: B.L.seed }, kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done });
+  PF.start({ canvas: $("#cv"), level: { world: B.L.world, boss: !!B.L.boss, seed: B.L.seed }, kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done, onChest, bestRidge: (S.levels[B.L.id] || {}).ridgeBest || 0 });
   $("#cv").focus();
 }
 function done(res) {
   S.coins += res.coins;
   const L = B.L, rec = S.levels[L.id] || (S.levels[L.id] = {}), n = B.qs.length;
+  /* sniper high scores: the best single ridge and the best level total, kept even if the level is lost */
+  const sn = res.snipe || {}, newBest = (sn.score || 0) > (rec.snipeBest || 0) && sn.score > 0, prevBest = rec.snipeBest || 0;
+  rec.snipeBest = Math.max(prevBest, sn.score || 0); rec.ridgeBest = Math.max(rec.ridgeBest || 0, sn.ridgeMax || 0); S.snipeBest = Math.max(S.snipeBest || 0, sn.score || 0);
+  const acc = sn.shots ? Math.round(100 * sn.hits / sn.shots) : 0;
+  const snipeCard = sn.shots ? `<div class="snipe"><div class="px">SNIPER SCORE</div><div class="big2">${sn.score}</div>${newBest ? `<div class="nhs">NEW HIGH SCORE!</div>` : `<div class="note2">Best on this level: ${prevBest}</div>`}
+    <div class="stats">${[["Knocked out", sn.ko], ["Headshots", sn.head], ["Shot first", sn.first], ["Accuracy", acc + "%"], ["Best streak", sn.best]].map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join("")}</div></div>` : "";
   if (res.win) {
     const st = 1 + (B.right >= Math.ceil(n * 0.75) ? 1 : 0) + (B.right === n ? 1 : 0);
     rec.cleared = true; rec.stars = Math.max(rec.stars || 0, st); save();
     const i = LEVELS.indexOf(L), next = LEVELS[i + 1];
     $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">${L.boss ? "BOSS DEFEATED!" : "LEVEL CLEAR!"}</h2>
-      <p style="font-size:28px;color:var(--gold)">${stars(st)}</p><p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
+      <p style="font-size:28px;color:var(--gold)">${stars(st)}</p>${snipeCard}<p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
       ${res.totalAmmo ? `<p>Sniper bullets gathered: <b>${res.got} of ${res.totalAmmo}</b>${res.got === res.totalAmmo ? " · every one!" : ""}</p>` : ""}
       <p class="note" style="color:var(--muted)">★ for clearing the level, ★ for ¾ of the briefing right, ★ for a perfect briefing.</p>
       ${next ? `<button class="btn grn" id="btn-nextlv">Next: ${next.boss ? "the Warden" : esc(TR[next.track].name)} ▶</button>` : `<p class="px" style="color:var(--gold)">YOU BEAT ALL FOUR WORLDS!</p>`}
@@ -348,7 +417,7 @@ function done(res) {
   } else {
     save();
     $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--red);font-size:16px">OUT OF HEARTS</h2>
-      <p>The kit comes from the briefing. A new briefing means new questions and a new kit.</p>
+      ${snipeCard}<p>The kit comes from the briefing. A new briefing means new questions and a new kit.</p>
       ${B.retries > 0 ? `<button class="btn" id="btn-retry">Try again with this kit (${B.retries} left)</button>` : ""}
       <button class="btn grn" id="btn-rebrief">New briefing</button> <button class="btn alt" id="btn-tomap">Map</button></div>`;
     if (B.retries > 0) $("#btn-retry").onclick = () => { B.retries--; play(); };
@@ -381,8 +450,8 @@ function coachQ(q) {
   const t = TR[q.track], r = t.rungs[q.rung - 1], letters = "ABCDE";
   const prev = t.rungs[q.rung - 2], next = t.rungs[q.rung];
   const traps = Object.entries(q.traps || {}).map(([i, x]) => `<li><b>${letters[i]}</b>: ${esc(x)}</li>`).join("");
-  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · QUESTION ${B.i + 1}</h2>
-    <p><span class="tag ${t.subject}">${t.subject}</span> <b>${esc(t.name)}</b>, step ${q.rung} of 4: ${esc(r.title)}${q.role === "boss" ? " <i>(boss: mixed skills, still climbing, a transfer check)</i>" : ` <i>(question ${B.i + 1} of the climb)</i>`}.
+  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · ${q.role === "chest" ? "TREASURE CHEST" : `QUESTION ${B.i + 1}`}</h2>
+    <p><span class="tag ${t.subject}">${t.subject}</span> <b>${esc(t.name)}</b>, step ${q.rung} of 4: ${esc(r.title)}${q.role === "boss" ? " <i>(boss: mixed skills, still climbing, a transfer check)</i>" : q.role === "chest" ? " <i>(a treasure-chest bonus question from another skill, so old skills stay fresh)</i>" : ` <i>(question ${B.i + 1} of the climb)</i>`}.
       Answer: <b>${letters[q.answer]}</b>.${q.gen ? ` A template (<code>${esc(q.gen)}</code>, form: ${esc(q.form || "")}): new numbers and context every play.` : ` Hand-written (<code>${esc(q.id)}</code>).`}</p>
     <h3>Sample questions it builds toward</h3>${samplesHtml(t, q.rung)}
     <h3>The underlying skill</h3><ul>${t.ideas.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
@@ -413,7 +482,7 @@ $("#adm-quit").onclick = () => { PF.stop(); renderMap(); show("map"); };
 if (PRACTICE) { document.body.classList.add("practice"); $("#hdr-practice").classList.remove("hidden"); }
 renderMap(); coachLevel(null); show("map");
 /* test hooks (tools/check_game4.js) */
-window.__rr = { S: () => S, LEVELS, TRACKS, briefing, startBrief: id => startBrief(LV[id]), B: () => B, answer, PF, kitFor, practice: PRACTICE,
+window.__rr = { chestAnswer: i => chestAnswer(i), closeChest: () => closeChest(), chest: () => CH && { answer: CH.q.answer, done: CH.done }, S: () => S, LEVELS, TRACKS, briefing, startBrief: id => startBrief(LV[id]), B: () => B, answer, PF, kitFor, practice: PRACTICE,
   preview: q => { B = { L: LEVELS[0], qs: [Object.assign({}, q, { role: "focus" })], i: 0, right: 0, res: [] }; renderQ(); } };
 </script>
 </body>

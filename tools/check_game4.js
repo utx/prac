@@ -221,6 +221,11 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const n1 = await p.evaluate(() => __rr.B().qs.length); if (n1 !== 4) bad(`a briefing should have 4 questions (has ${n1})`);
   const climb = await p.evaluate(() => __rr.B().qs.map(q => q.track + ":" + q.rung).join(","));
   if (climb !== "frac:1,frac:2,frac:3,frac:4") bad(`a briefing should climb through one skill's steps 1 to 4 (got ${climb})`);
+  /* no repeats while unseen questions are left, even when a briefing is left early */
+  const pr = await open({ width: 1280, height: 800 });
+  const rep = await pr.evaluate(() => { const got = []; for (let k = 0; k < 4; k++) { __rr.startBrief("1-flaw"); got.push(...__rr.B().qs.map(q => q.id)); } return got.length - new Set(got).size; });
+  await pr.evaluate(() => localStorage.clear()); await pr.close();
+  if (rep) bad(`four briefings of the same skill (each left after the first question) repeated ${rep} question(s) while unseen ones were left`);
   /* every level of every world climbs easy to hard, on its own skill */
   const climbs = await p.evaluate(() => { const out = []; for (const L of __rr.LEVELS) { const qs = __rr.briefing(L), steps = qs.map(q => q.rung); if (steps.some((r, i) => i && r < steps[i - 1]) || (!L.boss && (qs.length !== 4 || qs.some(q => q.track !== L.track)))) out.push(L.id); } return out; });
   if (climbs.length) bad(`briefings that don't climb easy to hard: ${climbs.join(", ")}`);
@@ -249,14 +254,42 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   /* gold bullets: every level has more than enough for its sentries, and grabbing one adds a sniper round */
   const short = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }); const sentries = (L.world === 1 ? 2 : L.world === 4 ? 4 : 3) * G.ents.filter(e => e.t === "nest").length; return G.ents.filter(e => e.t === "ammo").length < sentries + 3; }).map(L => L.id));
   if (short.length) bad(`levels without enough gold bullets for their sentries: ${short.join(", ")}`);
-  { const r0 = await p.evaluate(() => __rr.PF.hook.state().rounds); await p.evaluate(() => __rr.PF.hook.key("leave", true)); await p.waitForTimeout(60); await p.evaluate(() => __rr.PF.hook.key("leave", false));
+  { await p.evaluate(() => __rr.PF.hook.exitScope()); const r0 = await p.evaluate(() => __rr.PF.hook.state().rounds);
     await p.evaluate(() => __rr.PF.hook.grab()); await p.waitForTimeout(150);
     const r1 = await p.evaluate(() => __rr.PF.hook.state().rounds); if (r1 !== r0 + 1) bad(`grabbing a gold bullet should add a sniper round (${r0} → ${r1})`);
     await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100); }
+  /* moving enemies of several kinds from world 1, and two treasure chests in every normal level */
+  const kinds = await p.evaluate(() => { const k = new Set(); for (const L of __rr.LEVELS.filter(L => L.world === 1 && !L.boss)) __rr.PF.gen({ world: 1, boss: false, seed: L.seed }).ents.forEach(e => k.add(e.t)); return [...k]; });
+  for (const t of ["walker", "hopper", "roller", "drone"]) if (!kinds.includes(t)) bad(`world 1 should have ${t} enemies`);
+  const noChest = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss && __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }).ents.filter(e => e.t === "chest").length !== 2).map(L => L.id));
+  if (noChest.length) bad(`levels without two treasure chests: ${noChest.join(", ")}`);
+  /* a chest: the game pauses, a right answer opens it and gives loot, the level carries on */
+  { await p.evaluate(() => __rr.PF.hook.exitScope());
+    const k0 = await p.evaluate(() => __rr.PF.hook.kit());
+    await p.evaluate(() => __rr.PF.hook.toChest()); await p.waitForTimeout(250);
+    if (!(await p.isVisible("#chest")) || !(await p.evaluate(() => __rr.PF.hook.paused()))) bad("touching a chest should pause the level and ask a question");
+    if (shots) await p.screenshot({ path: path.join(shots, "rr-chest.png") });
+    await p.evaluate(() => __rr.chestAnswer(__rr.chest().answer)); await p.waitForTimeout(100);
+    if (!(await p.isVisible("#chest .loot"))) bad("a right answer should reveal the loot");
+    if (shots) await p.screenshot({ path: path.join(shots, "rr-loot.png") });
+    await p.keyboard.press("Enter"); await p.waitForTimeout(150);
+    const k1 = await p.evaluate(() => __rr.PF.hook.kit());
+    if (await p.isVisible("#chest")) bad("Enter should close the chest"); if (await p.evaluate(() => __rr.PF.hook.paused())) bad("the level should carry on after the chest");
+    if (JSON.stringify(k0) === JSON.stringify(k1)) bad("the loot should change the kit");
+    if ((await p.evaluate(() => __rr.PF.hook.chests()))[0] !== "open") bad("the chest should stay open");
+    await p.evaluate(() => __rr.PF.hook.toChest()); await p.waitForTimeout(250);
+    await p.evaluate(() => __rr.chestAnswer((__rr.chest().answer + 1) % 4)); await p.waitForTimeout(80);
+    if (await p.isVisible("#chest .loot")) bad("a wrong answer should leave the chest locked");
+    await p.evaluate(() => __rr.closeChest()); await p.waitForTimeout(80);
+    if ((await p.evaluate(() => __rr.PF.hook.chests()))[1] !== "locked") bad("a wrongly answered chest should stay locked");
+    await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100); }
   /* the gate after the nest stays shut (it blocks the hero) until the ridge is clear */
   if ((await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("the laser gate should start shut");
+  await p.keyboard.press("KeyE"); await p.waitForTimeout(150);
+  if (!(await p.evaluate(() => __rr.PF.hook.nests()[0].card))) bad("E should show the ridge report");
+  if (shots) await p.screenshot({ path: path.join(shots, "rr-report.png") });
   await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
-  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("E should leave the scope");
+  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("E again should leave the scope");
   await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.gates()[0].col - 3)); await p.keyboard.down("ArrowRight"); await p.waitForTimeout(900); await p.keyboard.up("ArrowRight");
   const gx = await p.evaluate(() => __rr.PF.hook.state().x), gcol = await p.evaluate(() => __rr.PF.hook.gates()[0].col);
   if (gx > gcol * 16) bad("a shut laser gate should block the way");
@@ -264,10 +297,19 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   /* out of rounds: a supply drop comes (never stuck) */
   await p.evaluate(() => __rr.PF.hook.setRounds(0)); await p.waitForTimeout(5800);
   if (!((await p.evaluate(() => __rr.PF.hook.state().rounds)) > 0)) bad("running out of sniper rounds at a nest should bring a supply drop");
-  for (let k = 0; k < 8 && (await p.evaluate(() => __rr.PF.hook.nests()[0].alive)) > 0; k++) { await p.evaluate(() => { __rr.PF.hook.aimAt(0, "head"); __rr.PF.hook.fire(); }); await p.waitForTimeout(120); }
-  if (!(await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("clearing the ridge should open the laser gate");
+  /* score attack: knocked-out sentries are replaced, the gate opens at the minimum, and the score keeps climbing */
+  for (let k = 0; k < 12 && !(await p.evaluate(() => __rr.PF.hook.nests()[0].gate)); k++) { await p.evaluate(() => { __rr.PF.hook.aimAt(0, "head"); __rr.PF.hook.fire(); }); await p.waitForTimeout(700); }
+  if (!(await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("knocking out the minimum should open the laser gate");
+  await p.waitForTimeout(1600);
+  if (!((await p.evaluate(() => __rr.PF.hook.nests()[0].alive)) > 0)) bad("knocked-out sentries should be replaced by new ones");
+  const sc0 = await p.evaluate(() => __rr.PF.hook.nests()[0].score);
+  await p.evaluate(() => { __rr.PF.hook.aimAt(0, "head"); __rr.PF.hook.fire(); }); await p.waitForTimeout(150);
+  if (!((await p.evaluate(() => __rr.PF.hook.nests()[0].score)) > sc0)) bad("shots after the gate opens should keep adding to the score");
+  await p.evaluate(() => __rr.PF.hook.setRounds(0)); await p.waitForTimeout(700);
+  if (!(await p.evaluate(() => __rr.PF.hook.nests()[0].card))) bad("running out of rounds after the gate opens should show the ridge report");
   await p.waitForTimeout(800);
   /* reach the flag */
+  await p.evaluate(() => __rr.PF.hook.exitScope());
   await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.state().cols - 5)); await p.waitForTimeout(1600);
   if (!(await p.isVisible("#scr-result"))) bad("reaching the flag should finish the level");
   const rec = await p.evaluate(() => __rr.S().levels["1-frac"]); if (!rec || !rec.cleared || rec.stars !== 1) bad("clearing with 2/4 should save 1 star");
@@ -280,6 +322,19 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const hp0 = await p.evaluate(() => __rr.PF.hook.state().hearts);
   await p.keyboard.down("KeyK"); await p.waitForTimeout(3500); await p.keyboard.up("KeyK");
   const hp1 = await p.evaluate(() => __rr.PF.hook.state().hearts); if (hp1 !== hp0) bad("holding K (duck) should dodge every sniper shot");
+  /* a sentry that aims fires a bullet you can see; standing up costs a heart, shooting it first stops the shot */
+  { await p.evaluate(() => { __rr.PF.hook.hurt = __rr.PF.hook.hurt; __rr.PF.hook.forceAim(); });
+    let seen = 0; for (let k = 0; k < 40 && !seen; k++) { await p.waitForTimeout(80); seen = await p.evaluate(() => __rr.PF.hook.incoming()); }
+    if (!seen) bad("an aiming sentry should fire a bullet you can see coming");
+    const h0 = await p.evaluate(() => __rr.PF.hook.state().hearts + __rr.PF.hook.state().shield);
+    for (let k = 0; k < 30 && (await p.evaluate(() => __rr.PF.hook.incoming())); k++) await p.waitForTimeout(60);
+    const h1 = await p.evaluate(() => __rr.PF.hook.state().hearts + __rr.PF.hook.state().shield);
+    if (h1 !== h0 - 1) bad(`a bullet that arrives while standing should cost a heart or the shield (${h0} → ${h1})`);
+    if (shots) await p.screenshot({ path: path.join(shots, "rr-ouch.png") });
+    /* the other sentries are held still for this one, so only the sentry we shoot could fire */
+    await p.evaluate(() => { __rr.PF.hook.quiet(); __rr.PF.hook.forceAim(); }); await p.waitForTimeout(100);
+    await p.evaluate(() => { __rr.PF.hook.aimAt(0, "body"); __rr.PF.hook.fire(); __rr.PF.hook.quiet(); }); await p.waitForTimeout(1500);
+    if (await p.evaluate(() => __rr.PF.hook.incoming())) bad("shooting an aiming sentry first should stop its shot"); }
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "body")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(80);
   /* losing: one retry with the same kit, then a new briefing */
   await p.evaluate(() => __rr.PF.hook.lose()); await p.waitForTimeout(900);
@@ -297,7 +352,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.click("#btn-play"); await p.waitForTimeout(300);
   await p.evaluate(() => { const n = __rr.PF.hook.nests().find(x => x.boss); __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(250);
   if (!(await p.evaluate(() => __rr.PF.hook.state().scope))) bad("reaching the boss nest should open the scope");
-  for (let k = 0; k < 6 && !(await p.isVisible("#scr-result")); k++) { await p.evaluate(() => { __rr.PF.hook.aimAt(0, "head"); __rr.PF.hook.fire(); }); await p.waitForTimeout(150); }
+  for (let k = 0; k < 10 && !(await p.isVisible("#scr-result")); k++) { await p.evaluate(() => { __rr.PF.hook.aimAt(0, "head"); __rr.PF.hook.fire(); }); await p.waitForTimeout(250); }
   await p.waitForTimeout(1200);
   if (!(await p.evaluate(() => (__rr.S().levels["1-boss"] || {}).cleared))) bad("three headshots should beat the world 1 boss");
   /* practice mode: everything open, coach notes, nothing saved */
