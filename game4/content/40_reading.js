@@ -63,7 +63,7 @@ H("infer", 2, "ri2a", { passage: P(`<p>Grandpa's workshop smelled of sawdust and
   stem: `<p>Why does the writer describe the outlines drawn on the wall?</p>`,
   opts: [["To show that Grandpa had too many tools to remember", "the outlines show exactly where each tool goes, the opposite of forgetting"],
     ["To set up the gap that shows the saw is still missing", null],
-    ["To suggest that Grandpa's tools were often stolen", "only one tool is missing, and it was lent, not stolen"],
+    ["To show that Grandpa was fussy and hard to please", "the outlines show he is orderly, but he is patient about the saw for years, not hard to please"],
     ["To show that Grandpa enjoyed drawing far more than doing woodwork", "takes the drawing too literally"]],
   body: "The outlines mean any missing tool leaves a gap you can see. That sets up the saw-shaped gap, which has been waiting for years, and makes its return feel special." });
 H("infer", 2, "ri2b", { passage: P(`<p>Tomasz arrived in the middle of term with a pencil case that still had its shop label on. At recess he stood beside the bubblers and read the notices on the wall, one after another, as if each one was very interesting.</p><p>On Thursday, Ms Ruiz asked who could help her carry some books, and his hand went up before she had finished the question. By Friday afternoon he was teaching three boys a card trick, and nobody remembered that he had ever stood alone by the bubblers.</p>`),
@@ -145,10 +145,10 @@ H("infer", 3, "ri3d", { passage: P(`<p>Dad looked at the blackened toast on his 
   body: "“Flatly” means with no feeling in the voice. Saying “lovely” flatly about burnt toast shows he means the opposite." });
 H("infer", 3, "ri3e", { passage: P(`<p>The old car coughed twice, shuddered and fell silent. Dad patted the steering wheel. “Come on, old girl,” he whispered. “Just one more trip.”</p>`),
   stem: `<p>What do the words “Come on, old girl” suggest about Dad?</p>`,
-  opts: [["He is talking to his daughter in the back seat.", "takes the words literally: he pats the steering wheel, so he is talking to the car"],
+  opts: [["He is whispering so that he doesn't wake his passengers.", "takes the whisper literally: no passengers are mentioned, and he is speaking TO the car"],
     ["He is fond of the car and treats it like a person.", null],
-    ["He is angry with the car for breaking down.", "he pats the wheel and whispers, which is gentle, not angry"],
-    ["He thinks the car is far too old and wants to buy a new one.", "“old girl” is affectionate, and he hopes for “one more trip”"]],
+    ["He is calling the car old because he is annoyed with it.", "“old girl” sounds like a complaint, but he pats the wheel and coaxes it gently"],
+    ["He is calm because he knows the car always starts in the end.", "“Just one more trip” is a plea: he isn't sure it will start at all"]],
   body: "Patting the wheel and coaxing it in a whisper, Dad speaks to the car like an old friend. “Old girl” is a fond nickname, not a complaint." });
 H("infer", 3, "ri3f", { passage: P(`<p>All night the wind sharpened its teeth on the iron roof, and none of us slept.</p>`),
   stem: `<p>What does “sharpened its teeth on the iron roof” suggest about the wind?</p>`,
@@ -167,9 +167,9 @@ H("infer", 3, "ri3g", { passage: P(`<p>When the principal walked in, the noisy c
 H("infer", 3, "ri3h", { passage: P(`<p>“What a lovely surprise,” said Mrs Vance, when she found the class's pet mice loose in the staffroom. Her smile did not reach her eyes.</p>`),
   stem: `<p>What does “her smile did not reach her eyes” suggest?</p>`,
   opts: [["She was only pretending to be pleased.", null],
-    ["She could not see the mice very well.", "takes “eyes” literally, as if it were about her eyesight"],
-    ["She smiled so widely that her eyes nearly closed.", "the opposite: her eyes did NOT join in"],
-    ["She was too shy to look at the class.", "nothing suggests shyness; the point is that her smile wasn't real"]],
+    ["She was pleased, but too surprised to show it fully.", "a real surprise would show in the eyes too; her words are polite cover"],
+    ["She was trying hard not to laugh at the mice.", "holding back a laugh would make the eyes smile, not stay cold"],
+    ["She was glad the lost mice had been found safely.", "this believes her words, but the cold eyes show she doesn't mean them"]],
   body: "A real smile lights up the eyes as well as the mouth. Hers stayed on her mouth only, so “What a lovely surprise” is polite, not sincere." });
 H("infer", 4, "ri4a", { passage: P(`<p>My first day at drama club went like this. I arrived early, which was good. I sat in the director's chair, which was bad. I opened my folder and found my sister's maths homework instead of my script, which was worse.</p><p>The director, a tall woman with a pencil behind each ear, peered at me over her glasses. “Interesting choice,” she said. Twenty actors turned to look.</p><p>I read the maths homework aloud as my lines for the whole rehearsal. Nobody asked me to. Nobody asked me to stop, either. At the end the director said I had “a lot of nerve”, and I still don't know whether that was good.</p>`),
   stem: `<p>What is the main effect of the way the writer lists what happened (“which was good … bad … worse”)?</p>`,
@@ -224,8 +224,8 @@ H("infer", 4, "ri4h", { passage: P(`<p>Imagine walking up a window and across th
   stem: `<p>Why does the writer compare the gecko's toes to “a sticky label” at the end?</p>`,
   opts: [["To help the reader picture how a gecko lets go of a surface", null],
     ["To show that a gecko's feet are covered in glue", "the passage says “without a drop of glue”"],
-    ["To suggest that geckos can only climb smooth things like labels", "the comparison is about letting go, not about what they climb"],
-    ["To explain why geckos are mostly active at night", "night is mentioned, but the label has nothing to do with it"]],
+    ["To suggest that a gecko's toes are as flat and smooth as a label", "the toes are covered in millions of tiny hairs, so they are not smooth"],
+    ["To suggest that a gecko's grip, like a label's, works only once", "nothing says the grip wears out: geckos climb every night"]],
   body: "The writer explains a hard idea with something familiar: just as a label comes away when peeled from one edge, the gecko peels its toes off rather than pulling straight away." });
 /* ---------- The right word ---------- */
 const GAP = s => `<p class="gapline">${s.replace("___", '<span class="blank">________</span>')}</p><p>Which word best fills the gap?</p>`;
@@ -289,18 +289,18 @@ H("word", 3, "rw3c", { stem: GAP("The scientist was famous ___ her work on rainf
 H("word", 3, "rw3d", { stem: GAP("The teacher ___ the class that the excursion had been cancelled."),
   opts: [["informed", null], ["announced", "you announce something TO the class, not “announced the class”"], ["explained", "you explain TO someone"], ["said", "you say something TO someone"]],
   body: "Only “informed” can be followed straight away by the people and then “that…”." });
-H("word", 3, "rw3e", { stem: GAP("The children were not capable ___ lifting the heavy log on their own."),
-  opts: [["to", "“capable to” breaks the grammar; we say “able to” but “capable of”"], ["for", "“capable for” isn't used"], ["with", "“capable with” isn't used"], ["of", null]],
-  body: "“Capable” takes “of” + an -ing word: capable of lifting." });
+H("word", 3, "rw3e", { stem: GAP("The scientists were intent ___ finding the cause of the mysterious illness."),
+  opts: [["to", "“intent to” is a noun phrase (“with intent to”), not what follows “were intent”"], ["for", "“intent for” isn't used"], ["at", "“intent at” isn't used"], ["on", null]],
+  body: "Being determined to do something is being “intent on” it: intent on finding." });
 H("word", 3, "rw3f", { stem: GAP("Ms Daly ___ that we bring a hat and a water bottle on the excursion."),
   opts: [["wanted", "“wanted that we bring” breaks the grammar: we say “wanted us to bring”"], ["suggested", null], ["told", "“told” needs a person first: “told us that …”"], ["let", "“let” needs a person and a plain verb: “let us bring”"]],
   body: "Only “suggested” can be followed straight away by “that we bring …”." });
 H("word", 3, "rw3g", { stem: GAP("The firefighters were praised ___ their bravery during the bushfire."),
   opts: [["of", "“praised of” isn't used"], ["for", null], ["with", "“praised with” would mean the praise came along with something else"], ["about", "“praised about” isn't used"]],
   body: "You are praised FOR something you did." });
-H("word", 3, "rw3h", { stem: GAP("Leo apologised ___ breaking the classroom window."),
-  opts: [["for", null], ["to", "you apologise TO a person, FOR what you did"], ["of", "“apologised of” isn't used"], ["at", "“apologised at” isn't used"]],
-  body: "“Apologise” takes “to” for the person and “for” for the reason: apologised for breaking." });
+H("word", 3, "rw3h", { stem: GAP("Although he was furious, the coach refrained ___ shouting at the referee."),
+  opts: [["from", null], ["to", "“refrained to” breaks the grammar"], ["of", "“refrained of” isn't used"], ["against", "“against” sounds right for holding back, but “refrain” takes “from”"]],
+  body: "“Refrain” (hold yourself back) takes “from” + an -ing word: refrained from shouting." });
 H("word", 4, "rw4a", { stem: `<p class="gapline">Ruby had expected the old house to be gloomy. Instead, the rooms were <span class="blank">________</span>, with sunlight pouring through tall windows onto white walls.</p><p>Which word best fills the gap?</p>`,
   opts: [["airy", null], ["dim", "dim is close to gloomy, but “Instead” says the rooms were the opposite"], ["cosy", "cosy suggests small and snug, not tall windows and pouring light"], ["musty", "musty is stale and old-smelling, which matches gloomy, not the sunlight"]],
   body: "“Instead” signals the opposite of gloomy, and the sunlight, tall windows and white walls describe light, open, fresh rooms: airy." });
@@ -322,9 +322,9 @@ H("word", 4, "rw4f", { stem: `<p class="gapline">The garden had once been the pr
 H("word", 4, "rw4g", { stem: `<p class="gapline">Toby is always the first to volunteer for anything. So when he sat silently at the back while the teacher asked for helpers, his friends were <span class="blank">________</span>.</p><p>Which word best fills the gap?</p>`,
   opts: [["unsurprised", "the first sentence says he ALWAYS volunteers, so this is the opposite of what they would expect"], ["puzzled", null], ["delighted", "nothing suggests his friends were happy he stayed quiet"], ["relieved", "relief would need a reason, such as not wanting him to help"]],
   body: "The first sentence sets up what is normal for Toby, and “So” shows the friends reacting to the change. Seeing him act out of character, they would be puzzled." });
-H("word", 4, "rw4h", { stem: `<p class="gapline">The old letters were extremely <span class="blank">________</span>, so the librarian wore cotton gloves and turned each page as slowly as she could.</p><p>Which word best fills the gap?</p>`,
-  opts: [["lengthy", "length wouldn't mean each page had to be turned slowly and gently"], ["popular", "popularity doesn't explain the gloves and slow, careful handling"], ["sturdy", "sturdy means strong, the opposite of needing gentle handling"], ["fragile", null]],
-  body: "“So” tells us the gap gives the reason for the gloves and the slow page-turning: the letters could easily tear or crumble. That is “fragile”." });
+H("word", 4, "rw4h", { stem: `<p class="gapline">The old letters had survived a house fire and a hundred years in a damp cellar. Nobody had read them for decades. When the museum finally received them, they were too <span class="blank">________</span> to be handled at all, so every page was photographed instead.</p><p>Which word best fills the gap?</p>`,
+  opts: [["tattered", "tattered means ragged and torn at the edges; torn paper can still be handled with care"], ["weathered", "weathered means worn by time and weather, which fits their history but doesn't stop anyone touching them"], ["musty", "musty means smelling of damp, which fits the cellar, but a smell doesn't stop anyone handling paper"], ["brittle", null]],
+  body: "All four words could describe old paper, so decide by the shade of meaning. “Too … to be handled at all” needs paper that would break if touched, and the first sentence explains why: fire dried it and damp weakened it. Paper so dry and hard that it snaps or crumbles is “brittle”." });
 /* ---------- Linking sentences ---------- */
 H("link", 1, "rl1a", { passage: P(`<p>Coral reefs are built by tiny animals called coral polyps. Each polyp builds a hard skeleton of limestone around its soft body. When it dies, the skeleton remains, and new polyps grow on top. Over thousands of years, the skeletons pile up into a reef.</p>`),
   stem: `<p>In “When it dies”, what does “it” refer to?</p>`,
@@ -503,7 +503,7 @@ H("same", 1, "rs1e", { stem: MEANS("Her explanation was anything but clear."),
   body: "“Anything but clear” means not clear at all, so it was confusing." });
 H("same", 1, "rs1f", { stem: MEANS("The team's victory was by no means certain."),
   opts: [["The team was certain to win by a large margin.", "“by no means” is the opposite of certain"],
-    ["The team might well not have won.", null],
+    ["It was far from sure that the team would win.", null],
     ["The team won, but only by a few points.", "shares the word “by”, but it is about the score"],
     ["There was no way at all that the team could win.", "too strong: not certain doesn't mean impossible"]],
   body: "“By no means certain” means not at all sure: they might well lose, though they might also win." });
@@ -547,10 +547,10 @@ ext("same", 2, "rs2e", SAND, "Which extract explains why something is a particul
 ext("same", 2, "rs2f", SAND, "Which extract describes how the writer's feelings have changed?", 0,
   ["", "this is all facts, with no feelings", "instructions, with no feelings", "the writer has strong feelings, but they don't change"],
   "“I used to cry … Now, waiting for the first wave is my favourite part”: the writer's feelings have changed completely.");
-ext("same", 2, "rs2g", SAND, "Which extract tells the reader how to make something?", 2,
-  ["the sandcastle is built, but the reader isn't told how", "it tells you what sand is made of, not how to make anything", "", "it says what should happen, but not how to make anything"],
-  "Extract C gives step-by-step instructions (pour, tape) for making a sand timer.");
-ext("same", 2, "rs2h", SAND, "Which extract mentions harm being done to animals?", 3,
+ext("same", 2, "rs2g", SAND, "Which extract is written so that the reader could follow it at home?", 2,
+  ["the sandcastle is described, but the reader isn't told how to build one", "it tells you what sand is made of; there is nothing to do", "", "it says what the government should do, not something a reader can follow"],
+  "Extract C is a set of instructions (pour, tape) for making a sand timer: something a reader can follow at home.");
+ext("same", 2, "rs2h", SAND, "Which extract mentions a danger to wildlife?", 3,
   ["the waves knock down a sandcastle, not an animal", "no animals are mentioned", "no animals are mentioned", ""],
   "Extract D says tyres “crush the eggs of shorebirds”.");
 const RAIN = `<div class="extracts"><p><b>Extract A</b> If you are caught outside in a thunderstorm, stay away from tall trees and open fields. Crouch down low, keep your feet together and wait until thirty minutes after the last thunder before you move on.</p>

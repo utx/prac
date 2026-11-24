@@ -38,12 +38,12 @@ H("flaw", 1, "tf1f", { stem: `<p>Everyone in Kiran's family loves spicy food.</p
     ["Kiran's family may eat spicy food several times every single week.", "this only repeats what Kiran knows about his family; it doesn't show his mistake"],
     ["Kiran's family may not like the same food as most of Year 4.", null]],
   body: "Kiran judges all of Year 4 by his own family. One family's taste can be very different from everyone else's." });
-H("flaw", 1, "tf1g", { stem: `<p>Ruben has used the school's computer room every Tuesday morning this term, and the printer has always worked.</p><p>Ruben says: “That printer never breaks down, so I can leave printing my project until five minutes before it is due on Friday afternoon.”</p><p>${MIS("Ruben")}</p>`,
-  opts: [["The printer may break down at times when Ruben is not using it.", null],
-    ["The computer room may be busier on Tuesday mornings than on other days.", "this uses a real detail, but how busy the room is doesn't show the gap about the printer"],
-    ["Ruben may have printed many pages this term without any problems.", "this agrees with Ruben: it is the evidence he is relying on"],
+H("flaw", 1, "tf1g", { stem: `<p>On Tuesday, Ruben printed one page in the school's computer room, and it came out perfectly.</p><p>Ruben says: “That printer never breaks down, so I can leave printing my project until five minutes before it is due on Friday afternoon.”</p><p>${MIS("Ruben")}</p>`,
+  opts: [["One page printing well may not show how the printer works on other days.", null],
+    ["The computer room may be busier on Tuesdays than on other days of the week.", "this uses a real detail, but how busy the room is doesn't show the gap about the printer"],
+    ["Ruben's page may have come out sharp and clear, with no smudges.", "this agrees with Ruben: it is the evidence he is relying on"],
     ["The printer may print in colour as well as in black and white.", "a fact about the printer that has nothing to do with it breaking down"]],
-  body: "Ruben has only seen the printer on Tuesday mornings. Working whenever HE uses it doesn't prove it never breaks down, for example on a busy Friday." });
+  body: "Ruben takes ONE good print as proof that the printer NEVER breaks down. One success can't show that: it could break down on a busy Friday." });
 H("flaw", 1, "tf1h", { stem: `<p>Talia read one book by the author Mira Stone and found it dull.</p><p>Talia says: “All of Mira Stone's books are boring, so I won't bother reading any of her others.”</p><p>${MIS("Talia")}</p>`,
   opts: [["Many of Talia's friends may also have found that book dull.", "this agrees with Talia about ONE book; it doesn't show her mistake"],
     ["Mira Stone's books may be kept in the library's adventure section.", "where the books are kept doesn't touch the reasoning"],
@@ -248,7 +248,7 @@ H("claim", 1, "tc1h", { stem: `<p>Mrs Kaur: “Our family should eat dinner toge
 H("claim", 2, "tc2a", { stem: `<p>Ms Lin: “The school should replace the old bubblers with bottle-filling taps so that students drink more water during the day.”</p><p>${SUP("Ms Lin")}</p>`,
   opts: [["Bottle-filling taps are easy to clean and cheap to run.", "true about the taps (X), but it doesn't show students would drink more"],
     ["Drinking enough water helps students stay alert and focused during every lesson.", "a good result of drinking more (Y), but the taps aren't involved"],
-    ["A student with a full bottle can keep sipping from it all day.", null],
+    ["The taps let students fill a bottle to sip from all day.", null],
     ["Many students already bring a full bottle from home.", "this works against the claim: they don't need the new taps"]],
   body: "X = bottle-filling taps, Y = students drink more. Only one option links them: a filled bottle goes back to class and gets sipped all day." });
 H("claim", 2, "tc2b", { stem: `<p>Coach Burke: “Our swimmers should practise their dives off the starting blocks every session so that they win more races.”</p><p>${SUP("Coach Burke")}</p>`,
@@ -284,8 +284,8 @@ H("claim", 2, "tc2f", { stem: `<p>The librarian: “The library should set up a 
 H("claim", 2, "tc2g", { stem: `<p>A farmer: “I should put a fence around my vegetable patch so that the wallabies stop eating my lettuces.”</p><p>${SUP("the farmer")}</p>`,
   opts: [["Wallabies mostly feed early in the morning and in the evening.", "about the wallabies (Y side), but not about the fence"],
     ["A tall enough fence keeps wallabies away from the plants.", null],
-    ["Fences need to be checked for holes after every storm.", "about looking after fences (X), not a link to the goal"],
-    ["Lettuces grow quickly in cool weather.", "about lettuces, not about the claim"]],
+    ["Farms with fenced gardens often grow more vegetables than farms without them.", "this only shows two things go together; bigger farms may simply build more fences"],
+    ["Frightened wallabies can leap over a low fence.", "this works against the claim"]],
   body: "X = a fence, Y = the wallabies stop eating the lettuces. Only one option shows the fence keeps them out." });
 H("claim", 2, "tc2h", { stem: `<p>Grandad: “You should write your name inside your new hat so that you get it back if you lose it.”</p><p>${SUP("Grandad")}</p>`,
   opts: [["Permanent marker does not wash out.", "a fact about the pen (X), but not about getting the hat back"],
@@ -386,8 +386,8 @@ H("claim", 4, "tc4g", { stem: `<p>The librarian: “Our library should run a hol
   body: "X = a holiday club, Y = more children join. The link: you have to join to come, and lots of children want to come." });
 H("claim", 4, "tc4h", { stem: `<p>Grandma: “You should learn to cook a few simple meals so that you can look after yourself when you leave home.”</p><p>${SUP("Grandma")}</p>`,
   opts: [["When you leave home, there may be no one else to cook your meals.", null],
-    ["Cooking can be a fun hobby to share with friends.", "a different goal: fun, not looking after yourself"],
-    ["Many young people leave home in their twenties.", "about leaving home (Y), but not about cooking"],
+    ["Learning to cook teaches you to follow instructions carefully.", "a different goal: following instructions, not looking after yourself"],
+    ["Young people who can cook often feel more confident when they leave home.", "this only shows two things go together: confident people may be the ones who learn to cook"],
     ["Simple home-cooked meals are often much cheaper than buying takeaway food.", "a different goal: saving money, not being able to look after yourself"]],
   body: "X = learn to cook, Y = look after yourself after leaving home. The link: once you've left, no one else may cook for you." });
 /* ---------- Rules and reasoning ---------- */
@@ -446,11 +446,11 @@ H("rule", 2, "tr2a", { stem: `<p>Only members of the swimming club can use the p
     ["People who are not members can use the pool on Sunday afternoons.", "the rule says nothing about afternoons"]],
   body: "“Only members” means being a member is NEEDED. Ellie did use the pool, so she must have what was needed: she is a member." });
 H("rule", 2, "tr2b", { stem: `<p>You need at least 30 points to reach Level 5 in the reading challenge. Zane has 34 points.</p><p>Which of these <b>must</b> be true?</p>`,
-  opts: [["Zane has enough points for Level 5.", null],
+  opts: [["Zane meets the points rule for Level 5.", null],
     ["Zane has reached Level 5.", "the points are NEEDED, but there may be other things needed too"],
     ["Zane has read more books than anyone with 30 points.", "points and books aren't the same, and we know nothing about others"],
     ["Anyone with fewer than 34 points is below Level 5.", "the line is at 30, not 34"]],
-  body: "30 points is needed, and Zane has 34, so he has enough points. That's all we can say: a need is not a promise that he has reached the level." });
+  body: "30 points is needed, and Zane has 34, so he meets the points rule. That's all we can say: a need is not a promise that he has reached the level." });
 H("rule", 2, "tr2c", { stem: `<p>A sunflower seed will sprout only if it is kept warm. Pip's sunflower seeds have sprouted.</p><p>Which of these <b>must</b> be true?</p>`,
   opts: [["Any sunflower seed that is kept warm will sprout.", "this turns the rule around: warmth is needed, not a promise"],
     ["Pip watered his seeds every day.", "the rule doesn't mention water"],
@@ -534,10 +534,10 @@ whose("rule", 3, "tr3e", "Jade", "Omar", "Only members of the art club can enter
   "Lena entered the poster competition, so she must be a member of the art club.", "Kai is a member of the art club, so he must have entered the poster competition.", 0,
   ["", "Omar turns the rule around: being a member lets you enter, it doesn't mean you did", "Omar's reasoning is not correct", "Jade's reasoning IS correct"],
   "“Only members” means membership is NEEDED to enter. Jade: Lena entered, so she must be a member. Correct. Omar: being a member doesn't mean Kai entered. Only Jade is right.");
-whose("rule", 3, "tr3f", "Lou", "Raj", "If a library book is returned late, the borrower must pay a 50-cent fine.",
+whose("rule", 3, "tr3f", "Lou", "Raj", "If a library book is returned late, the borrower must pay a 50-cent fine. Fines are also charged for books that come back damaged.",
   "Max paid a 50-cent fine, so he must have returned a book late.", "Sara returned her book on time, so she didn't have to pay any fine.", 3,
   ["Lou goes backwards: Max could have been fined for something else, such as a damaged book", "Raj goes beyond the rule: Sara could still be fined for something else, such as a damaged book", "both of them go beyond the rule", ""],
-  "The rule is late → fine. Lou goes backwards (fine → late). Raj says not late → no fine, but the rule never says late books are the ONLY reason for a fine. Neither is correct.");
+  "The rule is late → fine. Lou goes backwards (fine → late). Raj says not late → no fine, but the box says damaged books are fined too, so being on time doesn't rule out a fine. Neither is correct.");
 whose("rule", 3, "tr3g", "Kai", "Bella", "Every student who gets full marks in the spelling test gets a merit card.",
   "Tom didn't get a merit card, so he didn't get full marks.", "Ana got full marks, so she got a merit card.", 2,
   ["Bella is correct too", "Kai is correct too", "", "both of them are correct"],

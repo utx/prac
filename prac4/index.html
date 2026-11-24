@@ -1357,12 +1357,12 @@ H("flaw", 1, "tf1f", { stem: `<p>Everyone in Kiran's family loves spicy food.</p
     ["Kiran's family may eat spicy food several times every single week.", "this only repeats what Kiran knows about his family; it doesn't show his mistake"],
     ["Kiran's family may not like the same food as most of Year 4.", null]],
   body: "Kiran judges all of Year 4 by his own family. One family's taste can be very different from everyone else's." });
-H("flaw", 1, "tf1g", { stem: `<p>Ruben has used the school's computer room every Tuesday morning this term, and the printer has always worked.</p><p>Ruben says: “That printer never breaks down, so I can leave printing my project until five minutes before it is due on Friday afternoon.”</p><p>${MIS("Ruben")}</p>`,
-  opts: [["The printer may break down at times when Ruben is not using it.", null],
-    ["The computer room may be busier on Tuesday mornings than on other days.", "this uses a real detail, but how busy the room is doesn't show the gap about the printer"],
-    ["Ruben may have printed many pages this term without any problems.", "this agrees with Ruben: it is the evidence he is relying on"],
+H("flaw", 1, "tf1g", { stem: `<p>On Tuesday, Ruben printed one page in the school's computer room, and it came out perfectly.</p><p>Ruben says: “That printer never breaks down, so I can leave printing my project until five minutes before it is due on Friday afternoon.”</p><p>${MIS("Ruben")}</p>`,
+  opts: [["One page printing well may not show how the printer works on other days.", null],
+    ["The computer room may be busier on Tuesdays than on other days of the week.", "this uses a real detail, but how busy the room is doesn't show the gap about the printer"],
+    ["Ruben's page may have come out sharp and clear, with no smudges.", "this agrees with Ruben: it is the evidence he is relying on"],
     ["The printer may print in colour as well as in black and white.", "a fact about the printer that has nothing to do with it breaking down"]],
-  body: "Ruben has only seen the printer on Tuesday mornings. Working whenever HE uses it doesn't prove it never breaks down, for example on a busy Friday." });
+  body: "Ruben takes ONE good print as proof that the printer NEVER breaks down. One success can't show that: it could break down on a busy Friday." });
 H("flaw", 1, "tf1h", { stem: `<p>Talia read one book by the author Mira Stone and found it dull.</p><p>Talia says: “All of Mira Stone's books are boring, so I won't bother reading any of her others.”</p><p>${MIS("Talia")}</p>`,
   opts: [["Many of Talia's friends may also have found that book dull.", "this agrees with Talia about ONE book; it doesn't show her mistake"],
     ["Mira Stone's books may be kept in the library's adventure section.", "where the books are kept doesn't touch the reasoning"],
@@ -1567,7 +1567,7 @@ H("claim", 1, "tc1h", { stem: `<p>Mrs Kaur: “Our family should eat dinner toge
 H("claim", 2, "tc2a", { stem: `<p>Ms Lin: “The school should replace the old bubblers with bottle-filling taps so that students drink more water during the day.”</p><p>${SUP("Ms Lin")}</p>`,
   opts: [["Bottle-filling taps are easy to clean and cheap to run.", "true about the taps (X), but it doesn't show students would drink more"],
     ["Drinking enough water helps students stay alert and focused during every lesson.", "a good result of drinking more (Y), but the taps aren't involved"],
-    ["A student with a full bottle can keep sipping from it all day.", null],
+    ["The taps let students fill a bottle to sip from all day.", null],
     ["Many students already bring a full bottle from home.", "this works against the claim: they don't need the new taps"]],
   body: "X = bottle-filling taps, Y = students drink more. Only one option links them: a filled bottle goes back to class and gets sipped all day." });
 H("claim", 2, "tc2b", { stem: `<p>Coach Burke: “Our swimmers should practise their dives off the starting blocks every session so that they win more races.”</p><p>${SUP("Coach Burke")}</p>`,
@@ -1603,8 +1603,8 @@ H("claim", 2, "tc2f", { stem: `<p>The librarian: “The library should set up a 
 H("claim", 2, "tc2g", { stem: `<p>A farmer: “I should put a fence around my vegetable patch so that the wallabies stop eating my lettuces.”</p><p>${SUP("the farmer")}</p>`,
   opts: [["Wallabies mostly feed early in the morning and in the evening.", "about the wallabies (Y side), but not about the fence"],
     ["A tall enough fence keeps wallabies away from the plants.", null],
-    ["Fences need to be checked for holes after every storm.", "about looking after fences (X), not a link to the goal"],
-    ["Lettuces grow quickly in cool weather.", "about lettuces, not about the claim"]],
+    ["Farms with fenced gardens often grow more vegetables than farms without them.", "this only shows two things go together; bigger farms may simply build more fences"],
+    ["Frightened wallabies can leap over a low fence.", "this works against the claim"]],
   body: "X = a fence, Y = the wallabies stop eating the lettuces. Only one option shows the fence keeps them out." });
 H("claim", 2, "tc2h", { stem: `<p>Grandad: “You should write your name inside your new hat so that you get it back if you lose it.”</p><p>${SUP("Grandad")}</p>`,
   opts: [["Permanent marker does not wash out.", "a fact about the pen (X), but not about getting the hat back"],
@@ -1705,8 +1705,8 @@ H("claim", 4, "tc4g", { stem: `<p>The librarian: “Our library should run a hol
   body: "X = a holiday club, Y = more children join. The link: you have to join to come, and lots of children want to come." });
 H("claim", 4, "tc4h", { stem: `<p>Grandma: “You should learn to cook a few simple meals so that you can look after yourself when you leave home.”</p><p>${SUP("Grandma")}</p>`,
   opts: [["When you leave home, there may be no one else to cook your meals.", null],
-    ["Cooking can be a fun hobby to share with friends.", "a different goal: fun, not looking after yourself"],
-    ["Many young people leave home in their twenties.", "about leaving home (Y), but not about cooking"],
+    ["Learning to cook teaches you to follow instructions carefully.", "a different goal: following instructions, not looking after yourself"],
+    ["Young people who can cook often feel more confident when they leave home.", "this only shows two things go together: confident people may be the ones who learn to cook"],
     ["Simple home-cooked meals are often much cheaper than buying takeaway food.", "a different goal: saving money, not being able to look after yourself"]],
   body: "X = learn to cook, Y = look after yourself after leaving home. The link: once you've left, no one else may cook for you." });
 /* ---------- Rules and reasoning ---------- */
@@ -1765,11 +1765,11 @@ H("rule", 2, "tr2a", { stem: `<p>Only members of the swimming club can use the p
     ["People who are not members can use the pool on Sunday afternoons.", "the rule says nothing about afternoons"]],
   body: "“Only members” means being a member is NEEDED. Ellie did use the pool, so she must have what was needed: she is a member." });
 H("rule", 2, "tr2b", { stem: `<p>You need at least 30 points to reach Level 5 in the reading challenge. Zane has 34 points.</p><p>Which of these <b>must</b> be true?</p>`,
-  opts: [["Zane has enough points for Level 5.", null],
+  opts: [["Zane meets the points rule for Level 5.", null],
     ["Zane has reached Level 5.", "the points are NEEDED, but there may be other things needed too"],
     ["Zane has read more books than anyone with 30 points.", "points and books aren't the same, and we know nothing about others"],
     ["Anyone with fewer than 34 points is below Level 5.", "the line is at 30, not 34"]],
-  body: "30 points is needed, and Zane has 34, so he has enough points. That's all we can say: a need is not a promise that he has reached the level." });
+  body: "30 points is needed, and Zane has 34, so he meets the points rule. That's all we can say: a need is not a promise that he has reached the level." });
 H("rule", 2, "tr2c", { stem: `<p>A sunflower seed will sprout only if it is kept warm. Pip's sunflower seeds have sprouted.</p><p>Which of these <b>must</b> be true?</p>`,
   opts: [["Any sunflower seed that is kept warm will sprout.", "this turns the rule around: warmth is needed, not a promise"],
     ["Pip watered his seeds every day.", "the rule doesn't mention water"],
@@ -1853,10 +1853,10 @@ whose("rule", 3, "tr3e", "Jade", "Omar", "Only members of the art club can enter
   "Lena entered the poster competition, so she must be a member of the art club.", "Kai is a member of the art club, so he must have entered the poster competition.", 0,
   ["", "Omar turns the rule around: being a member lets you enter, it doesn't mean you did", "Omar's reasoning is not correct", "Jade's reasoning IS correct"],
   "“Only members” means membership is NEEDED to enter. Jade: Lena entered, so she must be a member. Correct. Omar: being a member doesn't mean Kai entered. Only Jade is right.");
-whose("rule", 3, "tr3f", "Lou", "Raj", "If a library book is returned late, the borrower must pay a 50-cent fine.",
+whose("rule", 3, "tr3f", "Lou", "Raj", "If a library book is returned late, the borrower must pay a 50-cent fine. Fines are also charged for books that come back damaged.",
   "Max paid a 50-cent fine, so he must have returned a book late.", "Sara returned her book on time, so she didn't have to pay any fine.", 3,
   ["Lou goes backwards: Max could have been fined for something else, such as a damaged book", "Raj goes beyond the rule: Sara could still be fined for something else, such as a damaged book", "both of them go beyond the rule", ""],
-  "The rule is late → fine. Lou goes backwards (fine → late). Raj says not late → no fine, but the rule never says late books are the ONLY reason for a fine. Neither is correct.");
+  "The rule is late → fine. Lou goes backwards (fine → late). Raj says not late → no fine, but the box says damaged books are fined too, so being on time doesn't rule out a fine. Neither is correct.");
 whose("rule", 3, "tr3g", "Kai", "Bella", "Every student who gets full marks in the spelling test gets a merit card.",
   "Tom didn't get a merit card, so he didn't get full marks.", "Ana got full marks, so she got a merit card.", 2,
   ["Bella is correct too", "Kai is correct too", "", "both of them are correct"],
@@ -1951,7 +1951,7 @@ H("infer", 2, "ri2a", { passage: P(`<p>Grandpa's workshop smelled of sawdust and
   stem: `<p>Why does the writer describe the outlines drawn on the wall?</p>`,
   opts: [["To show that Grandpa had too many tools to remember", "the outlines show exactly where each tool goes, the opposite of forgetting"],
     ["To set up the gap that shows the saw is still missing", null],
-    ["To suggest that Grandpa's tools were often stolen", "only one tool is missing, and it was lent, not stolen"],
+    ["To show that Grandpa was fussy and hard to please", "the outlines show he is orderly, but he is patient about the saw for years, not hard to please"],
     ["To show that Grandpa enjoyed drawing far more than doing woodwork", "takes the drawing too literally"]],
   body: "The outlines mean any missing tool leaves a gap you can see. That sets up the saw-shaped gap, which has been waiting for years, and makes its return feel special." });
 H("infer", 2, "ri2b", { passage: P(`<p>Tomasz arrived in the middle of term with a pencil case that still had its shop label on. At recess he stood beside the bubblers and read the notices on the wall, one after another, as if each one was very interesting.</p><p>On Thursday, Ms Ruiz asked who could help her carry some books, and his hand went up before she had finished the question. By Friday afternoon he was teaching three boys a card trick, and nobody remembered that he had ever stood alone by the bubblers.</p>`),
@@ -2033,10 +2033,10 @@ H("infer", 3, "ri3d", { passage: P(`<p>Dad looked at the blackened toast on his 
   body: "“Flatly” means with no feeling in the voice. Saying “lovely” flatly about burnt toast shows he means the opposite." });
 H("infer", 3, "ri3e", { passage: P(`<p>The old car coughed twice, shuddered and fell silent. Dad patted the steering wheel. “Come on, old girl,” he whispered. “Just one more trip.”</p>`),
   stem: `<p>What do the words “Come on, old girl” suggest about Dad?</p>`,
-  opts: [["He is talking to his daughter in the back seat.", "takes the words literally: he pats the steering wheel, so he is talking to the car"],
+  opts: [["He is whispering so that he doesn't wake his passengers.", "takes the whisper literally: no passengers are mentioned, and he is speaking TO the car"],
     ["He is fond of the car and treats it like a person.", null],
-    ["He is angry with the car for breaking down.", "he pats the wheel and whispers, which is gentle, not angry"],
-    ["He thinks the car is far too old and wants to buy a new one.", "“old girl” is affectionate, and he hopes for “one more trip”"]],
+    ["He is calling the car old because he is annoyed with it.", "“old girl” sounds like a complaint, but he pats the wheel and coaxes it gently"],
+    ["He is calm because he knows the car always starts in the end.", "“Just one more trip” is a plea: he isn't sure it will start at all"]],
   body: "Patting the wheel and coaxing it in a whisper, Dad speaks to the car like an old friend. “Old girl” is a fond nickname, not a complaint." });
 H("infer", 3, "ri3f", { passage: P(`<p>All night the wind sharpened its teeth on the iron roof, and none of us slept.</p>`),
   stem: `<p>What does “sharpened its teeth on the iron roof” suggest about the wind?</p>`,
@@ -2055,9 +2055,9 @@ H("infer", 3, "ri3g", { passage: P(`<p>When the principal walked in, the noisy c
 H("infer", 3, "ri3h", { passage: P(`<p>“What a lovely surprise,” said Mrs Vance, when she found the class's pet mice loose in the staffroom. Her smile did not reach her eyes.</p>`),
   stem: `<p>What does “her smile did not reach her eyes” suggest?</p>`,
   opts: [["She was only pretending to be pleased.", null],
-    ["She could not see the mice very well.", "takes “eyes” literally, as if it were about her eyesight"],
-    ["She smiled so widely that her eyes nearly closed.", "the opposite: her eyes did NOT join in"],
-    ["She was too shy to look at the class.", "nothing suggests shyness; the point is that her smile wasn't real"]],
+    ["She was pleased, but too surprised to show it fully.", "a real surprise would show in the eyes too; her words are polite cover"],
+    ["She was trying hard not to laugh at the mice.", "holding back a laugh would make the eyes smile, not stay cold"],
+    ["She was glad the lost mice had been found safely.", "this believes her words, but the cold eyes show she doesn't mean them"]],
   body: "A real smile lights up the eyes as well as the mouth. Hers stayed on her mouth only, so “What a lovely surprise” is polite, not sincere." });
 H("infer", 4, "ri4a", { passage: P(`<p>My first day at drama club went like this. I arrived early, which was good. I sat in the director's chair, which was bad. I opened my folder and found my sister's maths homework instead of my script, which was worse.</p><p>The director, a tall woman with a pencil behind each ear, peered at me over her glasses. “Interesting choice,” she said. Twenty actors turned to look.</p><p>I read the maths homework aloud as my lines for the whole rehearsal. Nobody asked me to. Nobody asked me to stop, either. At the end the director said I had “a lot of nerve”, and I still don't know whether that was good.</p>`),
   stem: `<p>What is the main effect of the way the writer lists what happened (“which was good … bad … worse”)?</p>`,
@@ -2112,8 +2112,8 @@ H("infer", 4, "ri4h", { passage: P(`<p>Imagine walking up a window and across th
   stem: `<p>Why does the writer compare the gecko's toes to “a sticky label” at the end?</p>`,
   opts: [["To help the reader picture how a gecko lets go of a surface", null],
     ["To show that a gecko's feet are covered in glue", "the passage says “without a drop of glue”"],
-    ["To suggest that geckos can only climb smooth things like labels", "the comparison is about letting go, not about what they climb"],
-    ["To explain why geckos are mostly active at night", "night is mentioned, but the label has nothing to do with it"]],
+    ["To suggest that a gecko's toes are as flat and smooth as a label", "the toes are covered in millions of tiny hairs, so they are not smooth"],
+    ["To suggest that a gecko's grip, like a label's, works only once", "nothing says the grip wears out: geckos climb every night"]],
   body: "The writer explains a hard idea with something familiar: just as a label comes away when peeled from one edge, the gecko peels its toes off rather than pulling straight away." });
 /* ---------- The right word ---------- */
 const GAP = s => `<p class="gapline">${s.replace("___", '<span class="blank">________</span>')}</p><p>Which word best fills the gap?</p>`;
@@ -2177,18 +2177,18 @@ H("word", 3, "rw3c", { stem: GAP("The scientist was famous ___ her work on rainf
 H("word", 3, "rw3d", { stem: GAP("The teacher ___ the class that the excursion had been cancelled."),
   opts: [["informed", null], ["announced", "you announce something TO the class, not “announced the class”"], ["explained", "you explain TO someone"], ["said", "you say something TO someone"]],
   body: "Only “informed” can be followed straight away by the people and then “that…”." });
-H("word", 3, "rw3e", { stem: GAP("The children were not capable ___ lifting the heavy log on their own."),
-  opts: [["to", "“capable to” breaks the grammar; we say “able to” but “capable of”"], ["for", "“capable for” isn't used"], ["with", "“capable with” isn't used"], ["of", null]],
-  body: "“Capable” takes “of” + an -ing word: capable of lifting." });
+H("word", 3, "rw3e", { stem: GAP("The scientists were intent ___ finding the cause of the mysterious illness."),
+  opts: [["to", "“intent to” is a noun phrase (“with intent to”), not what follows “were intent”"], ["for", "“intent for” isn't used"], ["at", "“intent at” isn't used"], ["on", null]],
+  body: "Being determined to do something is being “intent on” it: intent on finding." });
 H("word", 3, "rw3f", { stem: GAP("Ms Daly ___ that we bring a hat and a water bottle on the excursion."),
   opts: [["wanted", "“wanted that we bring” breaks the grammar: we say “wanted us to bring”"], ["suggested", null], ["told", "“told” needs a person first: “told us that …”"], ["let", "“let” needs a person and a plain verb: “let us bring”"]],
   body: "Only “suggested” can be followed straight away by “that we bring …”." });
 H("word", 3, "rw3g", { stem: GAP("The firefighters were praised ___ their bravery during the bushfire."),
   opts: [["of", "“praised of” isn't used"], ["for", null], ["with", "“praised with” would mean the praise came along with something else"], ["about", "“praised about” isn't used"]],
   body: "You are praised FOR something you did." });
-H("word", 3, "rw3h", { stem: GAP("Leo apologised ___ breaking the classroom window."),
-  opts: [["for", null], ["to", "you apologise TO a person, FOR what you did"], ["of", "“apologised of” isn't used"], ["at", "“apologised at” isn't used"]],
-  body: "“Apologise” takes “to” for the person and “for” for the reason: apologised for breaking." });
+H("word", 3, "rw3h", { stem: GAP("Although he was furious, the coach refrained ___ shouting at the referee."),
+  opts: [["from", null], ["to", "“refrained to” breaks the grammar"], ["of", "“refrained of” isn't used"], ["against", "“against” sounds right for holding back, but “refrain” takes “from”"]],
+  body: "“Refrain” (hold yourself back) takes “from” + an -ing word: refrained from shouting." });
 H("word", 4, "rw4a", { stem: `<p class="gapline">Ruby had expected the old house to be gloomy. Instead, the rooms were <span class="blank">________</span>, with sunlight pouring through tall windows onto white walls.</p><p>Which word best fills the gap?</p>`,
   opts: [["airy", null], ["dim", "dim is close to gloomy, but “Instead” says the rooms were the opposite"], ["cosy", "cosy suggests small and snug, not tall windows and pouring light"], ["musty", "musty is stale and old-smelling, which matches gloomy, not the sunlight"]],
   body: "“Instead” signals the opposite of gloomy, and the sunlight, tall windows and white walls describe light, open, fresh rooms: airy." });
@@ -2210,9 +2210,9 @@ H("word", 4, "rw4f", { stem: `<p class="gapline">The garden had once been the pr
 H("word", 4, "rw4g", { stem: `<p class="gapline">Toby is always the first to volunteer for anything. So when he sat silently at the back while the teacher asked for helpers, his friends were <span class="blank">________</span>.</p><p>Which word best fills the gap?</p>`,
   opts: [["unsurprised", "the first sentence says he ALWAYS volunteers, so this is the opposite of what they would expect"], ["puzzled", null], ["delighted", "nothing suggests his friends were happy he stayed quiet"], ["relieved", "relief would need a reason, such as not wanting him to help"]],
   body: "The first sentence sets up what is normal for Toby, and “So” shows the friends reacting to the change. Seeing him act out of character, they would be puzzled." });
-H("word", 4, "rw4h", { stem: `<p class="gapline">The old letters were extremely <span class="blank">________</span>, so the librarian wore cotton gloves and turned each page as slowly as she could.</p><p>Which word best fills the gap?</p>`,
-  opts: [["lengthy", "length wouldn't mean each page had to be turned slowly and gently"], ["popular", "popularity doesn't explain the gloves and slow, careful handling"], ["sturdy", "sturdy means strong, the opposite of needing gentle handling"], ["fragile", null]],
-  body: "“So” tells us the gap gives the reason for the gloves and the slow page-turning: the letters could easily tear or crumble. That is “fragile”." });
+H("word", 4, "rw4h", { stem: `<p class="gapline">The old letters had survived a house fire and a hundred years in a damp cellar. Nobody had read them for decades. When the museum finally received them, they were too <span class="blank">________</span> to be handled at all, so every page was photographed instead.</p><p>Which word best fills the gap?</p>`,
+  opts: [["tattered", "tattered means ragged and torn at the edges; torn paper can still be handled with care"], ["weathered", "weathered means worn by time and weather, which fits their history but doesn't stop anyone touching them"], ["musty", "musty means smelling of damp, which fits the cellar, but a smell doesn't stop anyone handling paper"], ["brittle", null]],
+  body: "All four words could describe old paper, so decide by the shade of meaning. “Too … to be handled at all” needs paper that would break if touched, and the first sentence explains why: fire dried it and damp weakened it. Paper so dry and hard that it snaps or crumbles is “brittle”." });
 /* ---------- Linking sentences ---------- */
 H("link", 1, "rl1a", { passage: P(`<p>Coral reefs are built by tiny animals called coral polyps. Each polyp builds a hard skeleton of limestone around its soft body. When it dies, the skeleton remains, and new polyps grow on top. Over thousands of years, the skeletons pile up into a reef.</p>`),
   stem: `<p>In “When it dies”, what does “it” refer to?</p>`,
@@ -2391,7 +2391,7 @@ H("same", 1, "rs1e", { stem: MEANS("Her explanation was anything but clear."),
   body: "“Anything but clear” means not clear at all, so it was confusing." });
 H("same", 1, "rs1f", { stem: MEANS("The team's victory was by no means certain."),
   opts: [["The team was certain to win by a large margin.", "“by no means” is the opposite of certain"],
-    ["The team might well not have won.", null],
+    ["It was far from sure that the team would win.", null],
     ["The team won, but only by a few points.", "shares the word “by”, but it is about the score"],
     ["There was no way at all that the team could win.", "too strong: not certain doesn't mean impossible"]],
   body: "“By no means certain” means not at all sure: they might well lose, though they might also win." });
@@ -2435,10 +2435,10 @@ ext("same", 2, "rs2e", SAND, "Which extract explains why something is a particul
 ext("same", 2, "rs2f", SAND, "Which extract describes how the writer's feelings have changed?", 0,
   ["", "this is all facts, with no feelings", "instructions, with no feelings", "the writer has strong feelings, but they don't change"],
   "“I used to cry … Now, waiting for the first wave is my favourite part”: the writer's feelings have changed completely.");
-ext("same", 2, "rs2g", SAND, "Which extract tells the reader how to make something?", 2,
-  ["the sandcastle is built, but the reader isn't told how", "it tells you what sand is made of, not how to make anything", "", "it says what should happen, but not how to make anything"],
-  "Extract C gives step-by-step instructions (pour, tape) for making a sand timer.");
-ext("same", 2, "rs2h", SAND, "Which extract mentions harm being done to animals?", 3,
+ext("same", 2, "rs2g", SAND, "Which extract is written so that the reader could follow it at home?", 2,
+  ["the sandcastle is described, but the reader isn't told how to build one", "it tells you what sand is made of; there is nothing to do", "", "it says what the government should do, not something a reader can follow"],
+  "Extract C is a set of instructions (pour, tape) for making a sand timer: something a reader can follow at home.");
+ext("same", 2, "rs2h", SAND, "Which extract mentions a danger to wildlife?", 3,
   ["the waves knock down a sandcastle, not an animal", "no animals are mentioned", "no animals are mentioned", ""],
   "Extract D says tyres “crush the eggs of shorebirds”.");
 const RAIN = `<div class="extracts"><p><b>Extract A</b> If you are caught outside in a thunderstorm, stay away from tall trees and open fields. Crouch down low, keep your feet together and wait until thirty minutes after the last thunder before you move on.</p>
