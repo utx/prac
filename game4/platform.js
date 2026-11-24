@@ -23,17 +23,20 @@ const PF = (() => {
     let x = 0, gh = 12;
     const ground = (c, h) => { for (let y = 0; y < ROWS; y++) map[y][c] = y >= h ? 1 : 0; };
     const air = c => { for (let y = 0; y < ROWS; y++) map[y][c] = 0; };
-    const flat = (n, opt = {}) => { for (let i = 0; i < n; i++) ground(x + i, gh); if (opt.walker && n >= 5) ents.push({ t: "walker", x: (x + Math.floor(n / 2)) * TS, y: gh * TS - 10 }); if (opt.coins) for (let i = 1; i < n - 1; i += 2) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 2) * TS + 4 }); x += n; };
+    /* the ground enemies, mixed from world 1: crawler bots, hopper bots and spiky rollers */
+    const foe = (c) => { const k = r(), t = k < 0.4 ? "walker" : k < 0.7 ? "hopper" : "roller"; ents.push({ t, x: c * TS, y: gh * TS - 10, y0: gh * TS - 10 }); };
+    const flat = (n, opt = {}) => { for (let i = 0; i < n; i++) ground(x + i, gh); if (opt.walker && n >= 5) foe(x + Math.floor(n / 2)); if (opt.coins) for (let i = 1; i < n - 1; i += 2) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 2) * TS + 4 }); x += n; };
     const maxGap = 3, maxStep = w >= 3 ? 3 : 2, walkerP = 0.45 + 0.1 * w;
     flat(8);
     ents.push({ t: "check", x: 2 * TS, y: gh * TS });
-    let sinceCheck = 0, nests = 0, wantNests = L.boss ? 0 : w <= 2 ? 2 : 3, sinceNest = 0;
+    let chests = 0, sinceCheck = 0, nests = 0, wantNests = L.boss ? 0 : w <= 2 ? 2 : 3, sinceNest = 0;
     while (x < len - 14) {
       const k = r();
       if (sinceCheck > 30) { flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); sinceCheck = 0; continue; }
       if (nests < wantNests && x >= Math.round((len - 14) * (nests + 0.8) / (wantNests + 0.6))) {
         ents.push({ t: "sign", x: (x - 5) * TS, y: gh * TS, nest: nests }); ents.push({ t: "ammo", x: (x - 2) * TS + 4, y: (gh - 4) * TS }); flat(3); ents.push({ t: "nest", x: (x) * TS, y: gh * TS, id: nests }); flat(4); ground(x, gh); for (let y = 0; y < gh; y++) map[y][x] = 4; ents.push({ t: "gate", x: x * TS, y: gh * TS, col: x, nest: nests }); x++; flat(3); nests++; sinceNest = 0; sinceCheck += 8; continue;
       }
+      if (!L.boss && chests < 2 && x >= Math.round(len * (chests ? 0.68 : 0.3))) { flat(2); ents.push({ t: "chest", x: x * TS + 2, y: gh * TS - 12 }); flat(4); chests++; continue; }
       let used = 0;
       if (k < 0.16) { flat(int(5, 8), { walker: r() < walkerP, coins: r() < 0.5 }); }
       else if (k < 0.34) {                                            /* a gap with coins over it */
@@ -64,9 +67,11 @@ const PF = (() => {
           x += wid;
         }
         air(x++); gh = h; flat(int(3, 4));
-      } else if (k < 0.9 && w >= 2) {                                /* a drone patrol */
+      } else if (k < 0.9) {                                         /* a drone patrol (and a swooper from world 2) */
         flat(int(5, 7)); ents.push({ t: "drone", x: (x - 3) * TS, y: (gh - 3) * TS, y0: (gh - 3) * TS });
-      } else { flat(int(6, 8), { walker: true, coins: true }); ents.push({ t: "ammo", x: (x - 4) * TS + 4, y: (gh - 3) * TS }); if (w >= 2) ents.push({ t: "walker", x: (x - 2) * TS, y: gh * TS - 10 }); }
+        if (w >= 2 && r() < 0.6) ents.push({ t: "swooper", x: (x - 1) * TS, y: (gh - 6) * TS, y0: (gh - 6) * TS, x0: (x - 1) * TS });
+      } else { flat(int(6, 8), { walker: true, coins: true }); ents.push({ t: "ammo", x: (x - 4) * TS + 4, y: (gh - 3) * TS }); if (w >= 2) foe(x - 2);
+        ents.push({ t: "ammo", high: true, x: (x - 6) * TS + 4, y: (gh - 6) * TS });             /* only a double jump reaches this one */ }
       sinceCheck += 6; sinceNest += 6;
     }
     if (L.boss) { flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); flat(4); ents.push({ t: "nest", x: x * TS, y: gh * TS, id: 9, boss: true }); flat(10); }
@@ -174,7 +179,7 @@ const PF = (() => {
       P: { x: first.x + 3, y: first.y - PH.h, vx: 0, vy: 0, ground: false, face: 1, inv: 0, boots: opts.kit.boots, cd: 0 },
       check: { x: first.x + 3, y: first.y - PH.h }, hearts: opts.kit.hearts, shield: opts.kit.shield ? 1 : 0, ammo: opts.kit.ammo, rounds: opts.kit.rounds,
       ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -(0.45 + 0.15 * opts.level.world) : 0, ph: i * 1.7 }, e)),
-      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0 };
+      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0, incoming: [] };
     S.totalAmmo = S.ents.filter(e => e.t === "ammo").length;
     S.ents.filter(e => e.t === "nest").forEach(e => { e.sentries = makeSentries(e); });
     G.gateOpen = {};
@@ -221,6 +226,7 @@ const PF = (() => {
     S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0 };
     S.msgs = [];                                                        // the platform's messages would clutter the scope
     msg(n.boss ? "BOSS: the Warden is on the far ridge!" : "Scope up: knock out the sentries on the far ridge", 140, "#ffe066");
+    if (S.kit.steady && !S.tipSteady) { S.tipSteady = true; msg("STEADY SCOPE: half the sway, from your briefing", 140, "#8ce99a"); }
     beep(500, .08, "triangle");
   }
   const sway = () => { const a = S.kit.steady ? 2.5 : 5.5; return [S.scope.x + a * Math.sin(S.t / 23), S.scope.y + a * 0.8 * Math.sin(S.t / 31 + 1)]; };
@@ -242,6 +248,7 @@ const PF = (() => {
       if (!s.alive) continue; const b = sBox(s); if (!b.vis) continue;
       if (x >= b.l - 2 && x <= b.r + 2 && y >= b.top - 2 && y <= b.bot) {
         const head = y <= b.head, dir = x < s.x ? 1 : -1; s.hp -= head ? 2 : 1; S.coins += head ? 3 : 1;
+        if (s.state === "aim") { S.coins += 2; S.hfx.push({ k: "pop", x: s.x, y: b.top - 46, text: "SHOT FIRST! +2", c: "#8ce99a", t: -4 }); }
         burst(x, y, head ? "#ff3b3b" : "#ffd43b", head ? 18 : 12);
         S.hfx.push({ k: "mark", x, y, head, t: 0 }, { k: "pop", x: s.x, y: b.top - 12, text: head ? "HEADSHOT! ×2" : "HIT!", sub: head ? "+3 coins" : "+1 coin", c: head ? "#ff4d4d" : "#ffffff", t: 0 });
         if (head) S.hfx.push({ k: "ring", x, y, t: 0 }, { k: "helmet", x: s.x, y: b.top, vx: dir * 1.4, vy: -3.2, t: 0, boss: s.boss });
@@ -257,6 +264,14 @@ const PF = (() => {
   }
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
+    for (const b of S.incoming) {                                              /* bullets flying at you */
+      b.t++;
+      if (b.t === b.dur) {
+        if (sc.duck) { msg("WHOOSH! Ducked just in time", 60, "#9be15d"); beep(900, .05, "triangle"); S.hfx.push({ k: "whoosh", t: 0 }); }
+        else { const h0 = S.hearts; hurt("Sniped! When a bullet comes, hold K to duck"); S.hfx.push({ k: "ouch", t: 0, lost: S.hearts < h0 }); S.shake = 12; }
+      }
+    }
+    S.incoming = S.incoming.filter(b => b.t < b.dur);
     sc.duck = !!KEYS.duck;
     if (!sc.duck) {
       const v = 2.4; if (KEYS.left) sc.x -= v; if (KEYS.right) sc.x += v; if (KEYS.up || KEYS.jump) sc.y -= v; if (KEYS.down) sc.y += v;
@@ -270,7 +285,14 @@ const PF = (() => {
       if (!s.alive) continue;
       s.st++;
       const glint = (s.boss ? 70 : 95) - 10 * w;
-      if (s.state === "aim") { if (s.st >= glint) { if (sc.duck) { msg("DUCKED!", 40, "#9be15d"); beep(700, .05, "triangle"); } else hurt("Sniped! Hold K to duck when you see the glint"); s.state = "hide"; s.st = 0; s.hold = 50 + Math.random() * 60; s.x = s.at; } continue; }
+      if (s.state === "aim") {
+        if (s.st >= glint + 25) {                                              /* the shot: a bullet you can see coming */
+          const b = sBox(s); S.incoming.push({ x0: s.x - 16, y0: b.top + 9, t: 0, dur: Math.max(24, 46 - 5 * w - (s.boss ? 6 : 0)) });
+          beep(220, .08, "sawtooth"); S.hfx.push({ k: "muzzle", x: s.x, y: b.top + 6, t: 0 });
+          s.state = "hide"; s.st = 0; s.hold = 60 + Math.random() * 60; s.x = s.at;
+        }
+        continue;
+      }
       if (s.state === "run") { const sp = 0.6 + 0.25 * w + (s.boss ? 0.3 : 0); s.x += Math.sign(s.tx - s.x) * sp; if (Math.abs(s.tx - s.x) <= sp) { s.x = s.tx; s.state = "peek"; s.st = 0; s.hold = 50 + Math.random() * 50 - 5 * w; } continue; }
       const out = () => { s.x = s.at + s.side * (s.boss ? 42 : 36); };
       if (s.st < s.hold) continue;
@@ -282,10 +304,10 @@ const PF = (() => {
 
   /* ---------- the main tick ---------- */
   function tick() {
-    if (!S || S.over) return;
+    if (!S || S.over || S.paused) return;
     S.t++;
     if (S.scope) {
-      S.hfx.forEach(f => { f.t++; if (f.k === "helmet") { f.x += f.vx; f.y += f.vy; f.vy += 0.25; } }); S.hfx = S.hfx.filter(f => f.t < (f.k === "pop" ? 70 : f.k === "helmet" ? 60 : 26));
+      S.hfx.forEach(f => { f.t++; if (f.k === "helmet") { f.x += f.vx; f.y += f.vy; f.vy += 0.25; } }); S.hfx = S.hfx.filter(f => f.t < (f.k === "pop" ? 70 : f.k === "helmet" ? 60 : f.k === "ouch" ? 50 : 26));
       for (const q of S.scope.nest.sentries.list) { if (q.flash > 0) q.flash--; if (q.koT !== undefined) q.koT++; if (q.hideIn > 0 && --q.hideIn === 0 && q.alive) { q.state = "hide"; q.st = 0; q.hold = 30; q.x = q.at; } }
       if (S.shake > 0) S.shake--;
       if (S.stop > 0) { S.stop--; return; }                                               /* the freeze-frame on a hit */
@@ -295,7 +317,8 @@ const PF = (() => {
     const jp = pressed("jump") || pressed("up");
     step(G, P, { dir, jump: KEYS.jump || KEYS.up, jumpPressed: jp });
     if (jp && P.jumped) { beep(420, .05); P.jumped = false; }
-    if (P.dbl > 0) { P.dbl--; if (P.dbl === 9) { burst(P.x + 5, P.y + 14, "#9fe7ff", 6); beep(620, .05); } }
+    if (P.dbl > 0) { P.dbl--; if (P.dbl === 9) { burst(P.x + 5, P.y + 14, "#9fe7ff", 6); beep(620, .05); if (!S.tipBoots) { S.tipBoots = true; msg("BOOTS: a second jump in mid-air!", 80, "#b197fc"); } } }
+    if (!S.tipStart && S.t === 200) { S.tipStart = true; const k = S.kit; msg(`Your kit: ${S.hearts} hearts${k.shield ? ", a shield" : ""}${k.boots ? ", double-jump boots" : ""}${k.steady ? ", a steady scope" : ""}, ${S.ammo} blaster shots, ${S.rounds} sniper rounds`, 200, "#9fe7ff"); }
     if (P.inv > 0) P.inv--;
     if (P.onSpike) hurt("Ouch! Spikes");
     if (P.y > ROWS * TS + 20) { hurt("You fell!"); if (S && !S.over) { P.x = S.check.x; P.y = S.check.y; P.vx = P.vy = 0; } }
@@ -308,7 +331,7 @@ const PF = (() => {
     if (nest && nest.boss && !nest.seen) { nest.seen = true; enterNest(nest); }
     /* bolts */
     for (const b of S.bolts) { b.x += b.vx; b.d--; if (solidAt(G, Math.floor(b.x / TS), Math.floor(b.y / TS))) b.d = 0;
-      for (const e of S.ents) if (e.alive && (e.t === "walker" || e.t === "drone") && Math.abs(b.x - (e.x + 6)) < 9 && Math.abs(b.y - (e.y + 5)) < 9) { e.alive = false; b.d = 0; burst(e.x + 6, e.y + 5, "#ffd43b"); S.coins++; beep(300, .06); dropAmmo(e); } }
+      for (const e of S.ents) if (e.alive && FOES.includes(e.t) && Math.abs(b.x - (e.x + 6)) < 9 && Math.abs(b.y - (e.y + 5)) < 9) { e.alive = false; b.d = 0; burst(e.x + 6, e.y + 5, "#ffd43b"); S.coins++; beep(300, .06); dropAmmo(e); } }
     S.bolts = S.bolts.filter(b => b.d > 0);
     /* entities */
     for (const e of S.ents) {
@@ -318,16 +341,39 @@ const PF = (() => {
         if (solidAt(G, c, Math.floor((e.y + 4) / TS)) || !solidAt(G, c, r)) e.vx = -e.vx; else e.x = nx;
       }
       if (e.t === "drone") { e.ph += 0.05; e.x += Math.sin(e.ph * 0.6) * 0.8; e.y = e.y0 + Math.sin(e.ph) * 14; }
+      if (e.t === "roller") {                                                  /* rolls fast, turns at edges and walls */
+        if (!e.vr) e.vr = -(1.0 + 0.2 * S.G.world); const nx = e.x + e.vr, c = Math.floor((e.vr < 0 ? nx : nx + 12) / TS), rr = Math.floor((e.y + 10) / TS);
+        if (solidAt(G, c, Math.floor((e.y + 4) / TS)) || !solidAt(G, c, rr)) e.vr = -e.vr; else e.x = nx; e.spin = (e.spin || 0) + e.vr * 0.3;
+      }
+      if (e.t === "hopper") {                                                  /* waits, then leaps towards you */
+        e.st = (e.st || 0) + 1; const near = Math.abs(P.x - e.x) < 170;
+        if (e.air) { e.vy += 0.3; e.x += e.vx; e.y += e.vy; const c = Math.floor((e.x + 6) / TS), rr = Math.floor((e.y + 10) / TS); if (e.vy > 0 && solidAt(G, c, rr)) { e.y = rr * TS - 10; e.air = false; e.st = 0; } if (solidAt(G, Math.floor((e.x + (e.vx > 0 ? 12 : 0)) / TS), Math.floor((e.y + 4) / TS))) e.vx = -e.vx; if (e.y > ROWS * TS) e.alive = false; }
+        else if (near && e.st > 70 - 6 * S.G.world) { const d = Math.sign(P.x - e.x) || -1, c2 = Math.floor((e.x + 6 + d * 40) / TS); if (solidAt(G, c2, Math.floor((e.y + 14) / TS)) || solidAt(G, c2, Math.floor((e.y + 30) / TS))) { e.air = true; e.vy = -5; e.vx = d * 1.3; } else e.st = 40; }
+      }
+      if (e.t === "swooper") {                                                 /* hovers, dives when you pass below, climbs back */
+        if (!e.mode) e.mode = "hover";
+        if (e.mode === "hover") { e.ph += 0.04; e.x = e.x0 + Math.sin(e.ph) * 30; e.y = e.y0 + Math.sin(e.ph * 2) * 4; if (Math.abs(P.x - e.x) < 50 && P.y > e.y) { e.mode = "dive"; e.tx = P.x; e.ty = P.y; } }
+        else if (e.mode === "dive") { const dx = e.tx - e.x, dy = e.ty - e.y, d = Math.hypot(dx, dy); if (d < 4) e.mode = "back"; else { e.x += dx / d * 2.6; e.y += dy / d * 2.6; } }
+        else { const dx = e.x0 - e.x, dy = e.y0 - e.y, d = Math.hypot(dx, dy); if (d < 3) e.mode = "hover"; else { e.x += dx / d * 1.4; e.y += dy / d * 1.4; } }
+      }
       const hitP = (w, h) => P.x < e.x + w && P.x + PH.w > e.x && P.y < e.y + h && P.y + PH.h > e.y;
-      if (e.t === "walker" || e.t === "drone") {
+      if (FOES.includes(e.t)) {
         if (hitP(12, 10)) {
-          if (P.vy > 0.5 && P.y + PH.h - e.y < 9) { e.alive = false; P.vy = -4.5; burst(e.x + 6, e.y + 4, "#ffd43b"); S.coins++; beep(660, .06); msg("STOMP!", 30); dropAmmo(e); }
-          else hurt(e.t === "walker" ? "Bumped by a crawler bot" : "Zapped by a drone");
+          if (e.t !== "roller" && P.vy > 0.5 && P.y + PH.h - e.y < 9) { e.alive = false; P.vy = -4.5; burst(e.x + 6, e.y + 4, "#ffd43b"); S.coins++; beep(660, .06); msg("STOMP!", 30); dropAmmo(e); }
+          else hurt({ walker: "Bumped by a crawler bot", drone: "Zapped by a drone", hopper: "A hopper bot landed on you", roller: "Spiky roller! Jump over it or blast it", swooper: "A swooper dived on you" }[e.t]);
         }
+      } else if (e.t === "chest" && !e.opened && hitP(14, 12)) {
+        e.opened = "asking"; S.paused = true; for (const k in KEYS) KEYS[k] = false;
+        beep(660, .08, "triangle"); beep(880, .1, "triangle");
+        const api = {
+          open: lootKey => { if (!S) return null; e.opened = "open"; return Object.assign({ key: lootKey }, LOOT[lootKey], giveLoot(lootKey)); },
+          lock: () => { if (S) { e.opened = "locked"; msg("The lock holds", 60, "#ffb3b3"); } },
+          resume: () => { if (S) { S.paused = false; for (const k in KEYS) KEYS[k] = false; } } };
+        if (S.opts.onChest) S.opts.onChest({ world: S.G.world, pick: pickLoot() }, api); else { api.lock(); api.resume(); }
       } else if (e.t === "coin" && hitP(8, 8)) { e.alive = false; S.coins++; beep(980, .04, "triangle", .03); }
       else if (e.t === "heart" && hitP(10, 10)) { e.alive = false; S.hearts = Math.min(6, S.hearts + 1); msg("+1 heart", 50, "#ff8787"); beep(760, .1, "triangle"); }
       else if (e.t === "ammo" && hitP(8, 12)) {
-        e.alive = false; S.rounds++; S.got++; S.streak++; S.flash = 40; burst(e.x + 3, e.y + 4, "#ffd43b", 10); beep(880, .05, "triangle"); beep(1320, .07, "triangle");
+        e.alive = false; if (e.high) msg("A high bullet: the boots paid off!", 70, "#b197fc"); S.rounds++; S.got++; S.streak++; S.flash = 40; burst(e.x + 3, e.y + 4, "#ffd43b", 10); beep(880, .05, "triangle"); beep(1320, .07, "triangle");
         msg("+1 SNIPER ROUND", 50, "#ffd43b");
         if (S.streak % 3 === 0) { S.rounds++; msg(`BULLET STREAK x${S.streak}: +1 BONUS ROUND`, 80, "#ffa94d"); beep(1568, .12, "triangle"); }
       }
@@ -348,6 +394,25 @@ const PF = (() => {
     S.parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .15; p.d--; }); S.parts = S.parts.filter(p => p.d > 0);
     S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0);
     S.cam = Math.max(0, Math.min(G.cols * TS - VW, P.x - VW * 0.4));
+  }
+  const FOES = ["walker", "drone", "hopper", "roller", "swooper"];
+  /* chest loot: something useful that you don't already have, most useful first */
+  const LOOT = {
+    med: { name: "Med kit", icon: "❤", what: "+1 heart" }, shield: { name: "Shield", icon: "◆", what: "blocks the next hit" },
+    ammo: { name: "Sniper ammo box", icon: "◎", what: "+3 sniper rounds" }, boots: { name: "Double-jump boots", icon: "⤒", what: "press jump again in mid-air (for the rest of this level)" },
+    steady: { name: "Steady scope", icon: "〰", what: "half the scope sway (for the rest of this level)" }, blaster: { name: "Blaster pack", icon: "✦", what: "+6 blaster shots" } };
+  function pickLoot() {
+    const k = S.kit, list = [];
+    if (!k.boots) list.push("boots"); if (!S.shield) list.push("shield"); if (S.hearts < 4) list.push("med"); if (!k.steady) list.push("steady");
+    list.push("ammo", "med", "blaster");
+    return list[Math.floor(Math.random() * Math.min(3, list.length))];
+  }
+  function giveLoot(key) {
+    const L = LOOT[key], before = { med: S.hearts, ammo: S.rounds, blaster: S.ammo }[key];
+    if (key === "med") S.hearts = Math.min(8, S.hearts + 1); if (key === "shield") S.shield = 1; if (key === "ammo") S.rounds += 3; if (key === "blaster") S.ammo += 6;
+    if (key === "boots") { S.kit.boots = true; S.P.boots = true; } if (key === "steady") S.kit.steady = true;
+    msg(`${L.icon} ${L.name}: ${L.what}`, 140, "#ffd43b"); beep(784, .1, "triangle"); beep(1175, .15, "triangle"); burst(S.P.x + 5, S.P.y, "#ffd43b", 16);
+    return { before, after: { med: S.hearts, ammo: S.rounds, blaster: S.ammo }[key] };
   }
   /* every second beaten bot drops a bullet (the drop is decided by the bot, so it is the same each play) */
   function dropAmmo(e) { if (e.i % 2) return; const x = e.x + 3; S.ents.push({ t: "ammo", x, y: groundBelow(x) - 12, alive: true, i: S.ents.length, ph: 0 }); S.totalAmmo++; msg("It dropped a bullet!", 50, "#ffd43b"); }
@@ -374,9 +439,14 @@ const PF = (() => {
       if (x < -40 || x > VW + 40) continue;
       if (e.t === "coin") { const w = 2 + Math.abs(Math.round(3 * Math.sin(S.t / 8 + e.i))); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 4 - w, y, w * 2, 8); ctx.fillStyle = "#e67700"; ctx.fillRect(x + 4 - w, y + 7, w * 2, 1); }
       else if (e.t === "walker") { const f = Math.floor(S.t / 8) % 2; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 10); ctx.fillStyle = "#8a6a4a"; ctx.fillRect(x, y, 12, 8); ctx.fillStyle = "#b08a62"; ctx.fillRect(x + 1, y, 10, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + (e.vx < 0 ? 2 : 7), y + 3, 3, 3); ctx.fillStyle = "#e03131"; ctx.fillRect(x + (e.vx < 0 ? 3 : 8), y + 4, 1, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1 + f * 2, y + 8, 3, 2); ctx.fillRect(x + 8 - f * 2, y + 8, 3, 2); }
+      else if (e.t === "hopper") { const sq = e.air ? 0 : Math.max(0, 3 - Math.floor((70 - (e.st || 0)) / 8)); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1 + sq, 14, 11 - sq); ctx.fillStyle = "#2f9e44"; ctx.fillRect(x, y + sq, 12, 9 - sq); ctx.fillStyle = "#8ce99a"; ctx.fillRect(x + 1, y + sq, 10, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + 2, y + 2 + sq, 3, 3); ctx.fillRect(x + 7, y + 2 + sq, 3, 3); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 3, y + 3 + sq, 1, 1); ctx.fillRect(x + 8, y + 3 + sq, 1, 1); ctx.fillRect(x, y + 9, 4, 1); ctx.fillRect(x + 8, y + 9, 4, 1); }
+      else if (e.t === "roller") { const a = e.spin || 0; ctx.fillStyle = "#1b1b2f"; ctx.beginPath(); ctx.arc(x + 6, y + 5, 6.5, 0, 7); ctx.fill(); ctx.fillStyle = "#868e96"; ctx.beginPath(); ctx.arc(x + 6, y + 5, 5, 0, 7); ctx.fill(); ctx.fillStyle = "#e9ecef"; for (let i = 0; i < 6; i++) { const an = a + i * Math.PI / 3; ctx.fillRect(Math.round(x + 6 + Math.cos(an) * 7) - 1, Math.round(y + 5 + Math.sin(an) * 7) - 1, 2, 2); } ctx.fillStyle = "#e03131"; ctx.fillRect(x + 5, y + 4, 2, 2); }
+      else if (e.t === "swooper") { const f = S.t % 10 < 5, dive = e.mode === "dive"; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 2, y + 2, 9, 6); ctx.fillStyle = "#5f3dc4"; ctx.fillRect(x + 3, y + 3, 7, 4); ctx.fillStyle = "#b197fc"; if (dive) { ctx.fillRect(x, y, 3, 3); ctx.fillRect(x + 10, y, 3, 3); } else { ctx.fillRect(x - 3, f ? y : y + 4, 5, 2); ctx.fillRect(x + 11, f ? y : y + 4, 5, 2); } ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 5, y + 7, 3, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + 4, y + 4, 1, 1); ctx.fillRect(x + 8, y + 4, 1, 1); }
+      else if (e.t === "chest") { const open = e.opened === "open", locked = e.opened === "locked", bob = e.opened ? 0 : Math.round(Math.sin(S.t / 10)); ctx.fillStyle = `rgba(255,212,59,${e.opened ? 0 : 0.3 + 0.2 * Math.sin(S.t / 7)})`; ctx.fillRect(x - 3, y - 4 + bob, 20, 18); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1 + bob, 16, 13); ctx.fillStyle = locked ? "#495057" : "#a0522d"; ctx.fillRect(x, y + 4 + bob, 14, 7); ctx.fillStyle = locked ? "#6c757d" : "#c97a3e"; ctx.fillRect(x, open ? y - 4 : y + bob, 14, 4); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 6, y + 3 + bob, 2, 3); if (open) { ctx.fillStyle = "#fff3bf"; ctx.fillRect(x + 3, y + 1, 8, 3); } if (!e.opened && Math.abs(S.P.x - e.x) < 60) txt(ctx, "TREASURE!", x + 7, y - 10, 7, "#ffd43b"); }
       else if (e.t === "drone") { const f = S.t % 6 < 3; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y + 2, 14, 7); ctx.fillStyle = "#c92a2a"; ctx.fillRect(x, y + 3, 12, 5); ctx.fillStyle = "#ffec99"; ctx.fillRect(x + 5, y + 4, 2, 2); ctx.fillStyle = "#adb5bd"; ctx.fillRect(f ? x - 2 : x, y, f ? 6 : 3, 1); ctx.fillRect(f ? x + 8 : x + 10, y, f ? 6 : 3, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1, y + 1, 1, 2); ctx.fillRect(x + 10, y + 1, 1, 2); }
       else if (e.t === "heart") { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 1, y + 2, 3, 3); ctx.fillRect(x + 6, y + 2, 3, 3); ctx.fillRect(x, y + 3, 10, 3); ctx.fillRect(x + 2, y + 6, 6, 2); ctx.fillRect(x + 4, y + 8, 2, 1); }
-      else if (e.t === "ammo") { const b = Math.round(2 * Math.sin(S.t / 9 + e.i)), gl = 0.35 + 0.25 * Math.sin(S.t / 6 + e.i); ctx.fillStyle = `rgba(255,212,59,${gl})`; ctx.fillRect(x - 3, y - 3 + b, 13, 17); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x, y - 1 + b, 7, 12); ctx.fillStyle = "#e8a33d"; ctx.fillRect(x + 1, y + 4 + b, 5, 6); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 1, y + 4 + b, 2, 6); ctx.fillStyle = "#adb5bd"; ctx.fillRect(x + 2, y + b, 3, 4); ctx.fillStyle = "#e9ecef"; ctx.fillRect(x + 2, y + b, 1, 3); }
+      else if (e.t === "ammo") { if (e.high) { ctx.fillStyle = "rgba(177,151,252,.35)"; ctx.fillRect(x - 5, y - 5, 17, 21); }
+        const b = Math.round(2 * Math.sin(S.t / 9 + e.i)), gl = 0.35 + 0.25 * Math.sin(S.t / 6 + e.i); ctx.fillStyle = `rgba(255,212,59,${gl})`; ctx.fillRect(x - 3, y - 3 + b, 13, 17); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x, y - 1 + b, 7, 12); ctx.fillStyle = "#e8a33d"; ctx.fillRect(x + 1, y + 4 + b, 5, 6); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 1, y + 4 + b, 2, 6); ctx.fillStyle = "#adb5bd"; ctx.fillRect(x + 2, y + b, 3, 4); ctx.fillStyle = "#e9ecef"; ctx.fillRect(x + 2, y + b, 1, 3); }
       else if (e.t === "sign") { const n = S.ents.find(q => q.t === "nest" && q.id === e.nest), left = n ? n.sentries.list.filter(s => s.alive).length : 0; ctx.fillStyle = "#5a3a22"; ctx.fillRect(x + 10, y - 20, 3, 20); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 15, y - 44, 54, 25); ctx.fillStyle = left ? "#ffd43b" : "#8ce99a"; ctx.fillRect(x - 14, y - 43, 52, 23); txt(ctx, left ? "NEST AHEAD" : "RIDGE CLEAR", x + 12, y - 34, 7, "#1b1b2f"); if (left) txt(ctx, `${left} SENTRIES`, x + 12, y - 24, 7, "#c92a2a"); }
       else if (e.t === "crate") { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 14); ctx.fillStyle = "#c97a3e"; ctx.fillRect(x, y, 12, 12); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 3, y + 4, 6, 4); }
       else if (e.t === "check") { ctx.fillStyle = "#5a3a22"; ctx.fillRect(x, y - 30, 2, 30); ctx.fillStyle = e.on ? "#40c057" : "#adb5bd"; ctx.fillRect(x + 2, y - 30, 12, 8); }
@@ -445,12 +515,23 @@ const PF = (() => {
       ctx.fillStyle = "#ff6b6b"; ctx.fillRect(b.l + 2, b.top + 4 * k, b.r - b.l - 4, 2 * k);
       if (s.flash > 0) { ctx.fillStyle = `rgba(255,255,255,${s.flash / 9})`; ctx.fillRect(b.l - 1, b.top - 1, b.r - b.l + 2, b.bot - b.top + 1); }
       if (s.boss) { ctx.fillStyle = "#ffd43b"; ctx.fillRect(b.l + 1, b.top - 4, 3, 4); ctx.fillRect(s.x - 1, b.top - 6, 3, 6); ctx.fillRect(b.r - 4, b.top - 4, 3, 4); }
-      if (s.state === "aim") { const f = 3 + 2 * Math.abs(Math.sin(S.t / 4)); ctx.fillStyle = "#ff2b2b"; ctx.fillRect(s.x - f * 2, b.top + 6, f * 4, 2); ctx.fillRect(s.x - 1, b.top + 6 - f * 2, 2, f * 4); }
+      if (s.state === "aim") {
+        const gl = (s.boss ? 70 : 95) - 10 * S.G.world, left = Math.max(0, 1 - s.st / (gl + 25)), f = 3 + 2 * Math.abs(Math.sin(S.t / 4));
+        ctx.fillStyle = "#343a40"; ctx.fillRect(s.x - 16, b.top + 7, 14, 3);
+        ctx.fillStyle = "#ff2b2b"; ctx.fillRect(s.x - 16 - f * 2, b.top + 8, f * 4, 2); ctx.fillRect(s.x - 17, b.top + 8 - f * 2, 2, f * 4);
+        ctx.strokeStyle = `rgba(255,59,59,${0.5 + 0.5 * (1 - left)})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(s.x - 16, b.top + 9, 6 + 26 * left, 0, 7); ctx.stroke();
+      }
     }
     for (const r of sc.nest.sentries.rocks) { ctx.fillStyle = "#6f6a63"; ctx.beginPath(); ctx.ellipse(r, FAR + 2, RW, RH, 0, Math.PI, 0); ctx.fill(); ctx.fillStyle = "#8d877e"; ctx.beginPath(); ctx.ellipse(r - 5, FAR - 3, RW - 9, RH - 8, 0, Math.PI, 0); ctx.fill(); }
     ctx.fillStyle = "#3b2f25"; ctx.fillRect(0, 244, VW, VH - 244);
     S.parts.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(Math.round(p.x), Math.round(p.y), 2, 2); });
-    if (sc.duck) { ctx.fillStyle = "rgba(5,8,20,.92)"; ctx.fillRect(0, 0, VW, VH); txt(ctx, "DUCKING…", VW / 2, VH / 2, 16, "#9fe7ff"); }
+    drawIncoming(ctx, sc.duck);
+    if (sc.duck) {
+      ctx.fillStyle = "rgba(5,8,20,.35)"; ctx.fillRect(0, 0, VW, VH);
+      for (let i = 0; i < 9; i++) { const x = i * 56 - 10; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, 149, 60, 34); ctx.fillStyle = i % 2 ? "#a68a5b" : "#b89a68"; ctx.fillRect(x, 150, 58, 16); ctx.fillStyle = i % 2 ? "#b89a68" : "#a68a5b"; ctx.fillRect(x + 28, 166, 58, 16); }
+      ctx.fillStyle = "#6b5a3a"; ctx.fillRect(0, 182, VW, VH - 182);
+      txt(ctx, "DUCKING behind the sandbags (let go of K to aim)", VW / 2, 215, 10, "#fff3bf");
+    }
     else {
       const [x, y] = sway(), R = 64;
       ctx.save(); ctx.beginPath(); ctx.rect(0, 0, VW, VH); ctx.arc(x, y, R, 0, Math.PI * 2, true); ctx.fillStyle = "rgba(5,8,20,.82)"; ctx.fill("evenodd"); ctx.restore();
@@ -470,21 +551,42 @@ const PF = (() => {
     const wind = sc.nest.sentries.wind;
     ctx.fillStyle = "rgba(10,12,30,.7)"; ctx.fillRect(0, 0, VW, 18);
     txt(ctx, `SNIPER ${S.rounds}`, 8, 13, 9, "#ffd43b", "left");
+    const ouch = S.hfx.find(f => f.k === "ouch" && f.lost);
     for (let i = 0; i < S.hearts; i++) { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(90 + i * 10, 6, 7, 6); }
+    if (ouch) { const t = ouch.t; ctx.fillStyle = `rgba(255,107,107,${1 - t / 50})`; ctx.fillRect(90 + S.hearts * 10 + Math.min(t, 20) * 0.3, 6 + t * 0.8, 7, 6); }
     if (S.shield) txt(ctx, "◆", 160, 13, 9, "#9fe7ff", "left");
     const left = sc.nest.sentries.list.filter(s => s.alive).length;
     const down = sc.nest.sentries.list.length - left;
     txt(ctx, sc.nest.boss ? `WARDEN ${"■".repeat(Math.max(0, sc.nest.sentries.list[0].hp))}` : `SENTRIES DOWN ${"●".repeat(down)}${"○".repeat(left)}`, VW / 2, 13, 9, "#fff");
     if (wind) txt(ctx, `WIND ${wind > 0 ? "→".repeat(wind) : "←".repeat(-wind)} ${Math.abs(wind)}: aim ${Math.abs(wind)} dot${Math.abs(wind) > 1 ? "s" : ""} ${wind > 0 ? "LEFT" : "RIGHT"}`, VW - 8, 13, 9, "#8ce99a", "right");
     const glint = sc.nest.sentries.list.some(s => s.alive && s.state === "aim");
-    if (glint && !sc.duck) txt(ctx, "RED GLINT! HOLD K TO DUCK", VW / 2, 36, 11, "#ff6b6b");
+    if (glint && !sc.duck && !S.incoming.length) txt(ctx, "RED GLINT: SHOOT THEM FIRST, OR GET READY TO DUCK (K)", VW / 2, 36, 10, "#ff6b6b");
     txt(ctx, "J fire · K duck · E leave", VW / 2, VH - 8, 9, "#ced4da");
     messages();
   }
   /* the hit effects: a hit marker (an X of four strokes round the impact), a burst ring on a headshot,
      a flying helmet, a puff for a miss, and big pop-up words that grow in, float up and fade */
+  /* a bullet coming at you: a bright tracer that grows as it gets closer; over your head if you duck */
+  function drawIncoming(ctx, duck) {
+    for (const b of S.incoming) {
+      const p = b.t / b.dur, tx = VW / 2, ty = duck ? 110 : VH / 2 + 30, x = b.x0 + (tx - b.x0) * p, y = b.y0 + (ty - b.y0) * p, r = 2 + 10 * p * p, q = Math.max(0, p - 0.25);
+      ctx.strokeStyle = `rgba(255,170,60,${0.3 + 0.5 * p})`; ctx.lineWidth = Math.max(1, r * 0.6); ctx.beginPath(); ctx.moveTo(b.x0 + (tx - b.x0) * q, b.y0 + (ty - b.y0) * q); ctx.lineTo(x, y); ctx.stroke();
+      ctx.fillStyle = "#fff3bf"; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.fillStyle = "#ff922b"; ctx.beginPath(); ctx.arc(x, y, r * 0.6, 0, 7); ctx.fill();
+      if (!duck && p > 0.3) txt(ctx, "INCOMING! HOLD K TO DUCK", VW / 2, 60, 13, S.t % 10 < 5 ? "#ff6b6b" : "#fff");
+    }
+  }
   function hitFx(ctx) {
     for (const f of S.hfx) {
+      if (f.k === "muzzle") { const a = 1 - f.t / 26; ctx.fillStyle = `rgba(255,212,59,${a})`; ctx.beginPath(); ctx.arc(f.x - 18, f.y + 3, Math.max(1, 6 - f.t * 0.15), 0, 7); ctx.fill(); continue; }
+      if (f.k === "whoosh") { const a = 1 - f.t / 26; ctx.strokeStyle = `rgba(255,255,255,${a})`; ctx.lineWidth = 2; for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(VW / 2 - 60 + f.t * 6, 100 + i * 8); ctx.lineTo(VW / 2 - 20 + f.t * 6, 100 + i * 8); ctx.stroke(); } continue; }
+      if (f.k === "ouch") {
+        const a = 1 - f.t / 50; ctx.fillStyle = f.lost ? `rgba(255,0,0,${0.45 * a})` : `rgba(80,180,255,${0.35 * a})`; ctx.fillRect(0, 0, VW, VH);
+        ctx.strokeStyle = `rgba(255,255,255,${a})`; ctx.lineWidth = 2; const cx = VW / 2 + 30, cy = VH / 2 + 20;
+        for (const [dx, dy] of [[40, -30], [-50, -10], [20, 45], [-30, 35], [55, 15]]) { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + dx * 0.5, cy + dy * 0.6); ctx.lineTo(cx + dx, cy + dy); ctx.stroke(); }
+        if (f.lost) { const g = f.t < 6 ? 1.6 - f.t * 0.1 : 1; txt(ctx, "-1 HEART", VW / 2, VH / 2 - 10 - Math.min(f.t, 30) * 0.6, Math.round(20 * g), "#ff6b6b"); }
+        else txt(ctx, "SHIELD BLOCKED IT", VW / 2, VH / 2 - 10, 14, "#9fe7ff");
+        continue;
+      }
       if (f.k === "mark") {
         const p = Math.min(1, f.t / 4), g = 4 + 8 * p, L = 7, a = f.t < 14 ? 1 : 1 - (f.t - 14) / 12;
         ctx.strokeStyle = `rgba(${f.head ? "255,59,59" : "255,255,255"},${a})`; ctx.lineWidth = f.head ? 3 : 2;
@@ -509,6 +611,11 @@ const PF = (() => {
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
     fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
+    toChest: () => { if (!S) return false; const c = S.ents.find(e => e.t === "chest" && !e.opened); if (!c) return false; S.P.x = c.x; S.P.y = c.y - 4; S.P.vx = S.P.vy = 0; return true; },
+    chests: () => S ? S.ents.filter(e => e.t === "chest").map(e => e.opened || "closed") : [], paused: () => !!(S && S.paused),
+    incoming: () => S ? S.incoming.length : 0,
+    forceAim: () => { if (!S || !S.scope) return; const s = S.scope.nest.sentries.list.find(q => q.alive); if (s) { s.x = s.at + s.side * (s.boss ? 42 : 36); s.state = "aim"; s.st = 0; s.hold = 9999; } },
+    kit: () => S && Object.assign({}, S.kit, { boots: !!S.P.boots, shield: S.shield, hearts: S.hearts, rounds: S.rounds, ammo: S.ammo }),
     ammo: () => S ? S.ents.filter(e => e.t === "ammo" && e.alive).map(e => ({ x: e.x, y: e.y })) : [],
     grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.x = s.at + s.side * (s.boss ? 42 : 36); const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
@@ -516,5 +623,5 @@ const PF = (() => {
     key: (k, down) => { KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
     hurt: () => S && hurt("test"), win: () => S && end(true), lose: () => { if (S) { S.hearts = 1; S.shield = 0; S.P.inv = 0; hurt("test"); } }
   };
-  return { start, stop, gen, reach, step, hook, THEMES };
+  return { start, stop, gen, reach, step, hook, THEMES, LOOT };
 })();

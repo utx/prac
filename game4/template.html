@@ -86,6 +86,14 @@ ul.clues, ol.sts { margin: 6px 0; } .gapline { font-size: 17px; }
 /* kit */
 .kitgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 12px 0; }
 .kit { background: var(--panel2); border: 3px solid #000; border-radius: 10px; padding: 10px; }
+.kitlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 8px; margin: 10px 0; }
+.kitrow { display: flex; gap: 10px; align-items: flex-start; background: var(--panel2); border: 3px solid #000; border-radius: 10px; padding: 8px 10px; }
+.kitrow .ki { font-size: 26px; width: 34px; text-align: center; } .kitrow .kv { color: var(--gold); } .kitrow.off { opacity: .55; } .kitrow small { color: var(--muted); }
+.modal { position: fixed; inset: 0; background: rgba(5,8,20,.78); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal .qcard { max-width: 1100px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; }
+.loot { text-align: center; padding: 10px; border: 3px solid #000; border-radius: 12px; background: linear-gradient(#fff9db, #ffe066); margin-top: 10px; animation: pop .35s ease-out; }
+.loot .li { font-size: 46px; } .loot .ln { font-size: 22px; font-weight: 900; }
+@keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .tip { background: #2c335c; border: 2px solid #000; border-radius: 8px; padding: 8px 12px; }
 .kit .v { font-size: 22px; font-weight: 800; color: var(--gold); } .kit.off { opacity: .5; } .kit small { color: var(--muted); display: block; }
 /* play */
@@ -313,24 +321,71 @@ function showKit() {
   const n = B.qs.length, k = kitFor(B.right, n, B.L.boss), best = kitFor(n, n, B.L.boss);
   B.kit = k; B.retries = 1;
   const rec = S.levels[B.L.id] || (S.levels[B.L.id] = {}); rec.best = Math.max(rec.best || 0, B.right); rec.last = B.right; save();
-  const item = (name, v, desc, on = true) => `<div class="kit ${on ? "" : "off"}"><div>${name}</div><div class="v">${v}</div><small>${desc}</small></div>`;
+  const rows = [
+    ["❤", "Hearts", k.hearts, true, "Every hit from spikes, a bot, a fall or a sniper bullet costs one heart. Lose them all and you start the level again.", `${best.hearts} with all right`],
+    ["◆", "Shield", k.shield ? "ON" : "off", k.shield, "Blocks the first hit completely: no heart lost.", "for all right"],
+    ["⤒", "Double-jump boots", k.boots ? "ON" : "off", k.boots, "Press jump again in mid-air: clear wide gaps and reach the <b style=\"color:#b197fc\">high gold bullets</b> (purple glow) that a normal jump can't.", "for ¾ right"],
+    ["〰", "Steady scope", k.steady ? "ON" : "off", k.steady, "At a sniper nest the crosshair sways half as much, so shots land where you aim.", "for half right"],
+    ["◎", "Sniper rounds", k.rounds, true, "One shot each at the nests. Knock out every sentry to open the laser gate. Gold bullets in the level add more.", `${best.rounds} with all right`],
+    ["✦", "Blaster", k.ammo, true, "Press J to shoot bots, hoppers, rollers and drones. Spiky rollers can't be stomped: blast them or jump over.", `${best.ammo} with all right`]];
   $("#scr-kit").innerHTML = `<div class="panel"><h2 class="px" style="font-size:14px;color:var(--gold)">YOUR KIT: ${B.right} OF ${n} RIGHT</h2>
-    <p>Every right answer made your kit better. ${B.right < n ? `With all ${n} right you would have had ${best.hearts} hearts, ${best.ammo} blaster shots, ${best.rounds} sniper rounds, boots and a shield.` : "A perfect briefing: you have everything!"}</p>
-    <div class="kitgrid">${item("❤ Hearts", k.hearts, "hits you can take")}${item("✦ Blaster", k.ammo, "shots for crawler bots and drones")}${item("◎ Sniper rounds", k.rounds, "for the sentries at each nest")}
-      ${item("〰 Steady scope", k.steady ? "YES" : "no", "less sway (half right or better)", k.steady)}${item("⤒ Double-jump boots", k.boots ? "YES" : "no", "jump again in the air (¾ right or better)", k.boots)}${item("◆ Shield", k.shield ? "YES" : "no", "blocks one hit (all right)", k.shield)}</div>
-    <p class="tip">◎ <b>Need more sniper rounds?</b> Grab the <b style="color:var(--gold)">gold bullets</b> in the level: over the gaps, on top of the pillars and beside the bots. Beaten bots sometimes drop one, and 3 in a row without being hit earns a bonus round. A sign before each nest says how many sentries are waiting.</p>
+    <p>Each right answer in the briefing bought you something for the level. Here is what you have and how it helps:</p>
+    <div class="kitlist">${rows.map(([ic, name, v, on, how, need]) => `<div class="kitrow ${on ? "" : "off"}"><div class="ki">${ic}</div><div><b>${name}: <span class="kv">${v}</span></b><br>${how}${on && !/with all/.test(need) ? "" : ` <small>(${on ? need : "you get this " + need})</small>`}</div></div>`).join("")}</div>
+    <p class="tip">🎁 <b>Treasure chests</b> wait in every level. Answer a bonus question from another skill to open one: a med kit, shield, boots, steady scope or more ammo. ◎ <b>Gold bullets</b> lie over gaps, on pillars and beside bots: each is one more sniper round.</p>
     <button class="btn grn" id="btn-play">Start the level ▶</button></div>`;
   $("#btn-play").onclick = () => play();
   coachKit();
   show("kit");
 }
 
+/* ================= treasure chests: a bonus question from another skill opens the loot ================= */
+let CH = null;
+function onChest(info, api) {
+  const others = ORDER.filter(t => t !== B.L.track), track = others[Math.floor(Math.random() * others.length)];
+  const steps = [[1, 2], [2, 3], [3, 3], [3, 4]][info.world - 1], rung = steps[Math.floor(Math.random() * steps.length)];
+  const q = pick(track, rung, []); if (!q) { api.lock(); api.resume(); return; }
+  S.seen[q.gen || q.id] = S.seed++; save();
+  CH = { q, info, api, done: false };
+  const t = TR[q.track], letters = "ABCDE", visual = q.visual || q.options.some(o => /<svg/.test(o));
+  const m = document.createElement("div"); m.className = "modal"; m.id = "chest";
+  m.innerHTML = `<div class="qcard"><div class="qhead"><span class="px">🎁 TREASURE CHEST: ONE GO TO OPEN IT</span><span class="note"><span class="tag ${t.subject}">${t.subject}</span> a bonus question: ${esc(t.name)}</span></div>
+    <div class="qgrid"><div class="left">${q.passage || ""}<div class="stem">${q.stem}</div></div>
+    <div class="right"><div class="opts ${visual ? "visual" : ""}">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><b class="l">${letters[i]}</b><span>${o}</span></button>`).join("")}</div>
+    <div class="after hidden" id="ch-after"></div><div id="ch-loot"></div><div class="explain hidden" id="ch-explain"></div></div></div></div>`;
+  document.body.appendChild(m);
+  m.querySelectorAll(".opt").forEach(b => b.onclick = () => chestAnswer(+b.dataset.i));
+  if (PRACTICE) coachQ(Object.assign({}, q, { role: "chest" }));
+}
+function chestAnswer(i) {
+  if (!CH || CH.done) return; CH.done = true;
+  const q = CH.q, ok = i === q.answer;
+  document.querySelectorAll("#chest .opt").forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add("right"); else if (k === i) b.classList.add("wrong"); });
+  let loot = "";
+  if (ok) { const r = CH.api.open(CH.info.pick); const change = r.before !== undefined ? ` (${r.key === "med" ? "hearts" : r.key === "ammo" ? "sniper rounds" : "blaster shots"} ${r.before} → ${r.after})` : "";
+    loot = `<div class="loot"><div class="li">${r.icon}</div><div class="ln">${esc(r.name)}!</div><div>${esc(r.what)}${change}</div></div>`; }
+  else CH.api.lock();
+  $("#ch-after").classList.remove("hidden");
+  $("#ch-after").innerHTML = `<p class="verdict ${ok ? "ok" : "no"}">${ok ? "✔ Right! The chest opens…" : `✘ The lock holds: the answer is ${"ABCDE"[q.answer]}.`}</p><button class="btn" id="ch-back">Back to the level ▶</button>`;
+  $("#ch-loot").innerHTML = loot;
+  const ex = $("#ch-explain"); ex.classList.remove("hidden"); ex.innerHTML = q.explain;
+  $("#ch-back").onclick = closeChest;
+  S.log.push([q.track, q.rung, ok ? 1 : 0]); save();
+}
+function closeChest() { if (!CH) return; const api = CH.api; CH = null; const m = $("#chest"); if (m) m.remove(); api.resume(); $("#cv").focus(); }
+addEventListener("keydown", e => {
+  if (!CH || e.ctrlKey || e.metaKey || e.altKey) return;
+  e.stopPropagation();
+  const k = e.key.toUpperCase(), i = "ABCDE".indexOf(k) >= 0 ? "ABCDE".indexOf(k) : "12345".indexOf(k);
+  if (!CH.done && k.length === 1 && i >= 0 && i < CH.q.options.length) { e.preventDefault(); chestAnswer(i); }
+  else if (CH.done && (e.key === "Enter" || e.key === "ArrowRight")) { e.preventDefault(); closeChest(); }
+}, true);
+
 /* ================= play ================= */
 let INV = false;
 function play() {
   show("play");
   $("#play-admin").classList.toggle("hidden", !PRACTICE);
-  PF.start({ canvas: $("#cv"), level: { world: B.L.world, boss: !!B.L.boss, seed: B.L.seed }, kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done });
+  PF.start({ canvas: $("#cv"), level: { world: B.L.world, boss: !!B.L.boss, seed: B.L.seed }, kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done, onChest });
   $("#cv").focus();
 }
 function done(res) {
@@ -383,8 +438,8 @@ function coachQ(q) {
   const t = TR[q.track], r = t.rungs[q.rung - 1], letters = "ABCDE";
   const prev = t.rungs[q.rung - 2], next = t.rungs[q.rung];
   const traps = Object.entries(q.traps || {}).map(([i, x]) => `<li><b>${letters[i]}</b>: ${esc(x)}</li>`).join("");
-  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · QUESTION ${B.i + 1}</h2>
-    <p><span class="tag ${t.subject}">${t.subject}</span> <b>${esc(t.name)}</b>, step ${q.rung} of 4: ${esc(r.title)}${q.role === "boss" ? " <i>(boss: mixed skills, still climbing, a transfer check)</i>" : ` <i>(question ${B.i + 1} of the climb)</i>`}.
+  $("#coach-body").innerHTML = `<h2 class="px">COACH NOTES · ${q.role === "chest" ? "TREASURE CHEST" : `QUESTION ${B.i + 1}`}</h2>
+    <p><span class="tag ${t.subject}">${t.subject}</span> <b>${esc(t.name)}</b>, step ${q.rung} of 4: ${esc(r.title)}${q.role === "boss" ? " <i>(boss: mixed skills, still climbing, a transfer check)</i>" : q.role === "chest" ? " <i>(a treasure-chest bonus question from another skill, so old skills stay fresh)</i>" : ` <i>(question ${B.i + 1} of the climb)</i>`}.
       Answer: <b>${letters[q.answer]}</b>.${q.gen ? ` A template (<code>${esc(q.gen)}</code>, form: ${esc(q.form || "")}): new numbers and context every play.` : ` Hand-written (<code>${esc(q.id)}</code>).`}</p>
     <h3>Sample questions it builds toward</h3>${samplesHtml(t, q.rung)}
     <h3>The underlying skill</h3><ul>${t.ideas.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
@@ -415,7 +470,7 @@ $("#adm-quit").onclick = () => { PF.stop(); renderMap(); show("map"); };
 if (PRACTICE) { document.body.classList.add("practice"); $("#hdr-practice").classList.remove("hidden"); }
 renderMap(); coachLevel(null); show("map");
 /* test hooks (tools/check_game4.js) */
-window.__rr = { S: () => S, LEVELS, TRACKS, briefing, startBrief: id => startBrief(LV[id]), B: () => B, answer, PF, kitFor, practice: PRACTICE,
+window.__rr = { chestAnswer: i => chestAnswer(i), closeChest: () => closeChest(), chest: () => CH && { answer: CH.q.answer, done: CH.done }, S: () => S, LEVELS, TRACKS, briefing, startBrief: id => startBrief(LV[id]), B: () => B, answer, PF, kitFor, practice: PRACTICE,
   preview: q => { B = { L: LEVELS[0], qs: [Object.assign({}, q, { role: "focus" })], i: 0, right: 0, res: [] }; renderQ(); } };
 </script>
 </body>

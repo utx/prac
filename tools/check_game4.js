@@ -258,6 +258,31 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     await p.evaluate(() => __rr.PF.hook.grab()); await p.waitForTimeout(150);
     const r1 = await p.evaluate(() => __rr.PF.hook.state().rounds); if (r1 !== r0 + 1) bad(`grabbing a gold bullet should add a sniper round (${r0} → ${r1})`);
     await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100); }
+  /* moving enemies of several kinds from world 1, and two treasure chests in every normal level */
+  const kinds = await p.evaluate(() => { const k = new Set(); for (const L of __rr.LEVELS.filter(L => L.world === 1 && !L.boss)) __rr.PF.gen({ world: 1, boss: false, seed: L.seed }).ents.forEach(e => k.add(e.t)); return [...k]; });
+  for (const t of ["walker", "hopper", "roller", "drone"]) if (!kinds.includes(t)) bad(`world 1 should have ${t} enemies`);
+  const noChest = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss && __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }).ents.filter(e => e.t === "chest").length !== 2).map(L => L.id));
+  if (noChest.length) bad(`levels without two treasure chests: ${noChest.join(", ")}`);
+  /* a chest: the game pauses, a right answer opens it and gives loot, the level carries on */
+  { await p.evaluate(() => __rr.PF.hook.key("leave", true)); await p.waitForTimeout(50); await p.evaluate(() => __rr.PF.hook.key("leave", false));
+    const k0 = await p.evaluate(() => __rr.PF.hook.kit());
+    await p.evaluate(() => __rr.PF.hook.toChest()); await p.waitForTimeout(250);
+    if (!(await p.isVisible("#chest")) || !(await p.evaluate(() => __rr.PF.hook.paused()))) bad("touching a chest should pause the level and ask a question");
+    if (shots) await p.screenshot({ path: path.join(shots, "rr-chest.png") });
+    await p.evaluate(() => __rr.chestAnswer(__rr.chest().answer)); await p.waitForTimeout(100);
+    if (!(await p.isVisible("#chest .loot"))) bad("a right answer should reveal the loot");
+    if (shots) await p.screenshot({ path: path.join(shots, "rr-loot.png") });
+    await p.keyboard.press("Enter"); await p.waitForTimeout(150);
+    const k1 = await p.evaluate(() => __rr.PF.hook.kit());
+    if (await p.isVisible("#chest")) bad("Enter should close the chest"); if (await p.evaluate(() => __rr.PF.hook.paused())) bad("the level should carry on after the chest");
+    if (JSON.stringify(k0) === JSON.stringify(k1)) bad("the loot should change the kit");
+    if ((await p.evaluate(() => __rr.PF.hook.chests()))[0] !== "open") bad("the chest should stay open");
+    await p.evaluate(() => __rr.PF.hook.toChest()); await p.waitForTimeout(250);
+    await p.evaluate(() => __rr.chestAnswer((__rr.chest().answer + 1) % 4)); await p.waitForTimeout(80);
+    if (await p.isVisible("#chest .loot")) bad("a wrong answer should leave the chest locked");
+    await p.evaluate(() => __rr.closeChest()); await p.waitForTimeout(80);
+    if ((await p.evaluate(() => __rr.PF.hook.chests()))[1] !== "locked") bad("a wrongly answered chest should stay locked");
+    await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100); }
   /* the gate after the nest stays shut (it blocks the hero) until the ridge is clear */
   if ((await p.evaluate(() => __rr.PF.hook.gates()[0].open))) bad("the laser gate should start shut");
   await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
@@ -285,6 +310,18 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const hp0 = await p.evaluate(() => __rr.PF.hook.state().hearts);
   await p.keyboard.down("KeyK"); await p.waitForTimeout(3500); await p.keyboard.up("KeyK");
   const hp1 = await p.evaluate(() => __rr.PF.hook.state().hearts); if (hp1 !== hp0) bad("holding K (duck) should dodge every sniper shot");
+  /* a sentry that aims fires a bullet you can see; standing up costs a heart, shooting it first stops the shot */
+  { await p.evaluate(() => { __rr.PF.hook.hurt = __rr.PF.hook.hurt; __rr.PF.hook.forceAim(); });
+    let seen = 0; for (let k = 0; k < 40 && !seen; k++) { await p.waitForTimeout(80); seen = await p.evaluate(() => __rr.PF.hook.incoming()); }
+    if (!seen) bad("an aiming sentry should fire a bullet you can see coming");
+    const h0 = await p.evaluate(() => __rr.PF.hook.state().hearts + __rr.PF.hook.state().shield);
+    for (let k = 0; k < 30 && (await p.evaluate(() => __rr.PF.hook.incoming())); k++) await p.waitForTimeout(60);
+    const h1 = await p.evaluate(() => __rr.PF.hook.state().hearts + __rr.PF.hook.state().shield);
+    if (h1 !== h0 - 1) bad(`a bullet that arrives while standing should cost a heart or the shield (${h0} → ${h1})`);
+    if (shots) await p.screenshot({ path: path.join(shots, "rr-ouch.png") });
+    await p.evaluate(() => __rr.PF.hook.forceAim()); await p.waitForTimeout(100);
+    await p.evaluate(() => { __rr.PF.hook.aimAt(0, "body"); __rr.PF.hook.fire(); }); await p.waitForTimeout(1500);
+    if (await p.evaluate(() => __rr.PF.hook.incoming())) bad("shooting an aiming sentry first should stop its shot"); }
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "body")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(80);
   /* losing: one retry with the same kit, then a new briefing */
   await p.evaluate(() => __rr.PF.hook.lose()); await p.waitForTimeout(900);
