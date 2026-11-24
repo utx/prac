@@ -1317,57 +1317,106 @@ gen("t-space-4", "space", 4, R => {
 });
 })();
 
-/* RIDGE RUNNER: hand-written thinking questions (A–D). Four per step; answer letters spread within each step. */
+/* RIDGE RUNNER: hand-written thinking questions (A–D). Eight per step, at test level from step 1; answer letters spread
+   evenly within each step (each letter twice). */
 const MIS = n => `Which statement shows the mistake ${n} has made?`;
 /* ---------- Spot the mistake ---------- */
-H("flaw", 1, "tf1a", { stem: `<p>Kit says: “My cousin adopted a puppy from Seaview Animal Rescue, and it was already perfectly trained. So every dog from Seaview Animal Rescue must be well trained.”</p><p>${MIS("Kit")}</p>`,
-  opts: [["Seaview Animal Rescue may charge less than other shelters do.", "true or not, the price says nothing about whether the dogs are trained"],
-    ["His cousin's puppy may have been one of the few trained dogs at the rescue.", null],
-    ["Kit may not want a puppy of his own.", "what Kit wants has nothing to do with his reasoning"],
-    ["Some families may prefer to buy a dog from a breeder instead of from a shelter.", "this is about other families' choices, not about the gap in Kit's reasoning"]],
-  body: "Kit takes ONE example (his cousin's puppy) as proof about EVERY dog at the rescue. One example can't prove that: the puppy may have been unusual." });
-H("flaw", 1, "tf1b", { stem: `<p>Priya says: “Everyone in my chess club thinks the school day should start later. So most students at our school must want a later start.”</p><p>${MIS("Priya")}</p>`,
-  opts: [["Starting later may mean finishing later in the afternoon.", "a true effect of starting later, but it doesn't show the gap in Priya's reasoning"],
-    ["Some teachers may also want the school day to start later.", "this would agree with Priya; it doesn't show her mistake"],
-    ["Priya may be tired in the mornings because she goes to bed late on school nights.", "this is about Priya, not about how she reached her conclusion"],
-    ["The chess club may not think the same way as the rest of the school.", null]],
-  body: "Priya judges the whole school from her own small group. A chess club is only a few students, and they may not be typical of everyone else." });
-H("flaw", 1, "tf1c", { stem: `<p>Leo says: “I've walked along this beach every Saturday morning for a year and I have never seen a dolphin. So dolphins never come to this beach.”</p><p>${MIS("Leo")}</p>`,
-  opts: [["Dolphins may visit the beach at times when Leo is not there.", null],
-    ["Leo may enjoy looking for shells more than looking for dolphins.", "what Leo enjoys doesn't show why his conclusion might be wrong"],
-    ["Other beaches nearby may have far more visitors on Saturday mornings than this beach does.", "the number of visitors at other beaches has nothing to do with whether dolphins come here"],
-    ["Dolphins may be harder to spot than seals are.", "comparing dolphins with seals doesn't touch Leo's reasoning"]],
-  body: "Leo goes only on Saturday mornings. Not seeing something at the times HE is there doesn't prove it never happens. Dolphins could come on other days or at other times." });
-H("flaw", 1, "tf1d", { stem: `<p>Whoever ate the last muffin left crumbs on a blue plate. Ava had her lunch on a blue plate today.</p><p>Max says: “So Ava must have eaten the last muffin.”</p><p>${MIS("Max")}</p>`,
-  opts: [["Ava may have been very hungry at lunchtime.", "this would make Max's idea seem MORE likely; it doesn't show his mistake"],
-    ["The muffins may have been bought at the bakery on the corner that morning.", "where the muffins came from doesn't matter to the reasoning"],
-    ["Other people in the house may also have used blue plates today.", null],
-    ["The last muffin may have been the biggest one in the box.", "the size of the muffin has nothing to do with who ate it"]],
-  body: "Max treats one matching detail (a blue plate) as proof. If other people also used blue plates, the crumbs could be theirs." });
-H("flaw", 2, "tf2a", { stem: `<p>To join the swim squad you must be able to swim 200 metres without stopping.</p><p>Mai says: “I can swim 200 metres without stopping, so I will get into the swim squad.”</p><p>${MIS("Mai")}</p>`,
-  opts: [["Mai may have learned to swim when she was very young.", "when she learned doesn't change the reasoning"],
-    ["The swim squad may train early in the morning before school.", "a fact about training times, not about Mai's mistake"],
-    ["Mai may also need to pass other tests, such as a timed race, to get in.", null],
-    ["Swimming 200 metres without stopping may be much harder than it sounds to most people.", "Mai can already do it, so this doesn't matter"]],
-  body: "Swimming 200 m is NEEDED, but that doesn't mean it is ENOUGH. There may be other things the squad also needs." });
-H("flaw", 2, "tf2b", { stem: `<p>Jack says: “Most of the apples on Grandpa's tree are sweet. So this apple I've just picked will definitely be sweet.”</p><p>${MIS("Jack")}</p>`,
-  opts: [["This apple may be one of the few on the tree that are not sweet.", null],
-    ["Grandpa's tree may grow more apples than he can eat.", "true or not, this doesn't touch Jack's reasoning"],
-    ["Some people may prefer sour apples for cooking.", "what other people like is beside the point"],
-    ["Apples bought from shops may be less sweet than apples picked straight from the tree.", "this compares shop apples, which Jack isn't talking about"]],
-  body: "“Most” is not “all”. Most apples being sweet only makes this one PROBABLY sweet, not definitely." });
-H("flaw", 2, "tf2c", { stem: `<p>Ruby says: “Plants need sunlight to grow. Our tomato plant gets lots of sunlight, so it is sure to grow well.”</p><p>${MIS("Ruby")}</p>`,
-  opts: [["Tomato plants may grow taller in some years than in others.", "this doesn't show what Ruby has assumed"],
-    ["Our garden may also have a lemon tree that gets plenty of sunlight.", "the lemon tree has nothing to do with Ruby's reasoning"],
-    ["Some plants may need less sunlight than tomato plants do.", "other plants' needs don't show her mistake"],
-    ["The plant may also need enough water and good soil to grow well.", null]],
-  body: "Sunlight is NEEDED, but it isn't a GUARANTEE. The plant also needs other things, like water and good soil." });
-H("flaw", 2, "tf2d", { stem: `<p>Most children at the holiday camp chose the canoe trip.</p><p>Tom's mum says: “Tom went to the camp, so he must have gone on the canoe trip.”</p><p>${MIS("Tom's mum")}</p>`,
-  opts: [["The canoe trip may have cost more than the other activities.", "the cost doesn't show the gap in the reasoning"],
-    ["Tom may have been one of the children who chose a different activity.", null],
-    ["Canoeing may be more fun on a warm day than on a cold one.", "true perhaps, but nothing to do with the reasoning"],
-    ["Some children may have wanted to try two or even three activities at the camp.", "this is about what children wanted, not about Tom's choice"]],
-  body: "“Most” chose the canoe trip, so some didn't. Tom might be one of them." });
+H("flaw", 1, "tf1a", { stem: `<p>Harrison bought a pair of Zoomfast running shoes. The very next day he ran his fastest time ever in the cross-country race.</p><p>Harrison says: “Zoomfast shoes make anyone who wears them run faster. Everyone in our team should buy a pair.”</p><p>${MIS("Harrison")}</p>`,
+  opts: [["Zoomfast shoes may cost more than the shoes most of the team already own.", "the price is a reason not to buy them, but it doesn't show the gap in his reasoning"],
+    ["Harrison's fast time may have had nothing to do with his new shoes.", null],
+    ["Some runners in the team may already own a pair of Zoomfast shoes.", "this is about who owns the shoes, not about how Harrison reached his conclusion"],
+    ["Harrison may run even faster once his new shoes are worn in.", "this agrees with Harrison; it doesn't show his mistake"]],
+  body: "Harrison takes ONE race as proof about EVERYONE. One fast run can't show the shoes caused it: he may have run fast for some other reason, and one person's result says nothing for sure about the whole team." });
+H("flaw", 1, "tf1b", { stem: `<p>Freya asked the eight girls in her netball team whether the school should replace the grass on the oval with artificial turf. Seven of them said yes.</p><p>Freya tells the principal: “Nearly all the students at our school want artificial turf on the oval.”</p><p>${MIS("Freya")}</p>`,
+  opts: [["Artificial turf may cost much more to put in than grass does.", "a reason against the turf, but it doesn't show the gap in how Freya reached her conclusion"],
+    ["The girl who said no may change her mind later.", "one girl's mind changing doesn't touch the real problem: who was asked"],
+    ["The netball team may not think the same way as the rest of the school.", null],
+    ["Artificial turf may stay green even in a dry summer when grass turns brown.", "a reason FOR the turf: it backs Freya up instead of showing her mistake"]],
+  body: "Freya judges the whole school from her own small group. Eight netball players are a tiny group, and they may not think like everyone else." });
+H("flaw", 1, "tf1c", { stem: `<p>Mr Dawson has bought his breakfast at the same café every weekday at 8 am for three years. He has never once seen it run out of croissants.</p><p>His friend needs croissants for a party on Saturday afternoon. Mr Dawson says: “Don't worry, that café never runs out of croissants.”</p><p>${MIS("Mr Dawson")}</p>`,
+  opts: [["The café's croissants may cost more than the ones at the supermarket.", "price has nothing to do with whether they run out"],
+    ["Mr Dawson may buy a croissant there every single morning before work.", "this only repeats what he has seen; it doesn't show the gap"],
+    ["His friend may want to serve something other than croissants at the party.", "what the friend serves doesn't touch Mr Dawson's reasoning"],
+    ["The café may run out at times when Mr Dawson is not there.", null]],
+  body: "Mr Dawson only ever goes at 8 am on weekdays. Never seeing something at the times HE is there doesn't prove it never happens, and a busy Saturday afternoon is a very different time." });
+H("flaw", 1, "tf1d", { stem: `<p>Someone has left muddy footprints across the kitchen floor. The prints have a zigzag pattern. Jonah's new sneakers have zigzag soles.</p><p>Jonah's sister says: “So Jonah must have made the muddy footprints.”</p><p>${MIS("Jonah's sister")}</p>`,
+  opts: [["Jonah may have been playing in the muddy garden this afternoon.", "this would make his sister's idea seem MORE likely; it doesn't show her mistake"],
+    ["Other shoes in the house may also have zigzag soles.", null],
+    ["The footprints may be hard to scrub off the kitchen floor.", "cleaning them up has nothing to do with who made them"],
+    ["Jonah's sneakers may have been a birthday present from his aunt.", "where the sneakers came from doesn't matter to the reasoning"]],
+  body: "She treats one matching detail (a zigzag pattern) as proof. If other shoes in the house also have zigzag soles, the prints could be someone else's." });
+H("flaw", 1, "tf1e", { stem: `<p>Ivy's grandmother never wore a bike helmet when she was a child, and she was never hurt riding her bike.</p><p>Ivy says: “So helmets aren't really needed when you ride a bike.”</p><p>${MIS("Ivy")}</p>`,
+  opts: [["Bike helmets may be lighter and more comfortable now than they were long ago.", "a fact about helmets, but it doesn't show what is wrong with Ivy's reasoning"],
+    ["Ivy's grandmother may simply have been lucky never to have a bad fall.", null],
+    ["Ivy's grandmother may have ridden her bike almost every day as a child.", "this makes the one example sound stronger; it doesn't show the gap"],
+    ["Ivy's grandmother may still ride her bike to the shops today.", "what she does now doesn't touch Ivy's reasoning"]],
+  body: "Ivy turns ONE person's luck into a rule for everyone. One rider who was never hurt can't show that helmets don't protect riders." });
+H("flaw", 1, "tf1f", { stem: `<p>Everyone in Kiran's family loves spicy food.</p><p>Kiran is planning the menu for the Year 4 picnic. He says: “Everyone likes spicy food, so let's make every dish extra hot.”</p><p>${MIS("Kiran")}</p>`,
+  opts: [["Spicy food may take longer to cook than plain food.", "cooking time doesn't show the gap in Kiran's reasoning"],
+    ["Some of the picnic food may be served cold rather than hot.", "this plays on the word “hot”: extra hot here means spicy, not warm"],
+    ["Kiran's family may eat spicy food several times every single week.", "this only repeats what Kiran knows about his family; it doesn't show his mistake"],
+    ["Kiran's family may not like the same food as most of Year 4.", null]],
+  body: "Kiran judges all of Year 4 by his own family. One family's taste can be very different from everyone else's." });
+H("flaw", 1, "tf1g", { stem: `<p>On Tuesday, Ruben printed one page in the school's computer room, and it came out perfectly.</p><p>Ruben says: “That printer never breaks down, so I can leave printing my project until five minutes before it is due on Friday afternoon.”</p><p>${MIS("Ruben")}</p>`,
+  opts: [["One page printing well may not show how the printer works on other days.", null],
+    ["The computer room may be busier on Tuesdays than on other days of the week.", "this uses a real detail, but how busy the room is doesn't show the gap about the printer"],
+    ["Ruben's page may have come out sharp and clear, with no smudges.", "this agrees with Ruben: it is the evidence he is relying on"],
+    ["The printer may print in colour as well as in black and white.", "a fact about the printer that has nothing to do with it breaking down"]],
+  body: "Ruben takes ONE good print as proof that the printer NEVER breaks down. One success can't show that: it could break down on a busy Friday." });
+H("flaw", 1, "tf1h", { stem: `<p>Talia read one book by the author Mira Stone and found it dull.</p><p>Talia says: “All of Mira Stone's books are boring, so I won't bother reading any of her others.”</p><p>${MIS("Talia")}</p>`,
+  opts: [["Many of Talia's friends may also have found that book dull.", "this agrees with Talia about ONE book; it doesn't show her mistake"],
+    ["Mira Stone's books may be kept in the library's adventure section.", "where the books are kept doesn't touch the reasoning"],
+    ["Her other books may be quite different from the one Talia read.", null],
+    ["Talia may prefer books with pictures to books without them.", "about Talia's taste, not about the gap in her reasoning"]],
+  body: "Talia judges ALL of an author's books from ONE. The others could be very different." });
+H("flaw", 2, "tf2a", { stem: `<p>To be chosen for the state science competition, a project must first win a ribbon at its school science fair. Ollie's worm-farm project won a blue ribbon at his school's fair.</p><p>Ollie's dad says: “So Ollie's worm farm will definitely be in the state competition!”</p><p>${MIS("Ollie's dad")}</p>`,
+  opts: [["Ollie's worm farm may have taken him most of the school holidays to build.", "how long it took doesn't show the gap in his dad's reasoning"],
+    ["The state judges may choose only some of the projects that won ribbons.", null],
+    ["A blue ribbon may be the highest ribbon given at the school fair.", "this makes Ollie's project sound better: it backs up his dad"],
+    ["Other schools' science fairs may give out ribbons in other colours.", "the colour of other schools' ribbons doesn't matter here"]],
+  body: "Winning a ribbon is NEEDED to be chosen, but that doesn't make it ENOUGH. The judges may still pick only some of the ribbon winners." });
+H("flaw", 2, "tf2b", { stem: `<p>Most of the books on the library's top shelf are for adults.</p><p>Jai says: “This book about dinosaurs came from the top shelf, so it must be a book for adults.”</p><p>${MIS("Jai")}</p>`,
+  opts: [["The library may also keep many more of its adult books on several other shelves.", "other shelves don't matter: Jai's book came from the top one"],
+    ["Jai may need a step to reach the top shelf.", "how Jai reaches the shelf has nothing to do with his reasoning"],
+    ["Books about dinosaurs may be enjoyed by readers of every age.", "who enjoys dinosaur books doesn't show the gap: “most” has been treated as “all”"],
+    ["This book may be one of the few top-shelf books that are not for adults.", null]],
+  body: "“Most” is not “all”. Most top-shelf books being for adults only makes this one PROBABLY for adults, not certainly." });
+H("flaw", 2, "tf2c", { stem: `<p>You need a passport to fly overseas. Grandma has just got a new passport.</p><p>Grandma says: “Now nothing can stop me flying to Italy next month.”</p><p>${MIS("Grandma")}</p>`,
+  opts: [["Grandma may also need other things, such as a plane ticket.", null],
+    ["Grandma's new passport may have a much better photo than her old passport had.", "the photo has nothing to do with whether she can fly"],
+    ["A passport may last for ten years once it has been issued.", "true perhaps, but it doesn't show what Grandma has assumed"],
+    ["Grandma may have flown to Italy several times before.", "her past trips don't touch the reasoning"]],
+  body: "A passport is NEEDED, but having it doesn't GUARANTEE the trip. She still needs a ticket, and other things could stop her too." });
+H("flaw", 2, "tf2d", { stem: `<p>In a survey at Banksia School, most students said they would like a longer lunch break.</p><p>The principal says: “If I make lunch longer, every single student will be happier.”</p><p>${MIS("the principal")}</p>`,
+  opts: [["Most students may spend their lunch break playing outside.", "about what students do at lunch, not about the gap in the reasoning"],
+    ["Some students may not want a longer lunch break at all.", null],
+    ["Nearly every student in the school may have answered the survey.", "this makes the survey sound more trustworthy; it backs the principal up"],
+    ["Teachers may also enjoy having a longer lunch break.", "this agrees with the plan; it doesn't show the mistake"]],
+  body: "“Most” students want it, so some don't. The principal has turned “most” into “every single student”." });
+H("flaw", 2, "tf2e", { stem: `<p>To enter the school bake-off, a cake must be made from scratch, without a packet mix. Ben made his cake from scratch.</p><p>Ben says: “So my cake is bound to win a prize.”</p><p>${MIS("Ben")}</p>`,
+  opts: [["Cakes made from scratch may take longer to bake than packet-mix cakes.", "baking time doesn't show the gap in Ben's reasoning"],
+    ["Ben's cake may be a chocolate cake with three layers.", "a detail about the cake, not about the reasoning"],
+    ["Meeting the entry rule may not be enough to win a prize.", null],
+    ["The judges may like cakes made from scratch better than packet-mix cakes.", "this backs Ben up instead of showing his mistake"]],
+  body: "Making it from scratch is NEEDED to enter. It is not a GUARANTEE of a prize: every cake in the bake-off meets that rule." });
+H("flaw", 2, "tf2f", { stem: `<p>Most of the trains on the Coast Line run on time.</p><p>Dad says: “Our train is on the Coast Line, so it will definitely get us to the concert on time.”</p><p>${MIS("Dad")}</p>`,
+  opts: [["The concert may start a few minutes after the time printed on the tickets.", "this is about the concert, not about the gap in Dad's reasoning"],
+    ["Trains on other lines may run late more often than Coast Line trains.", "this makes the Coast Line sound better: it backs Dad up"],
+    ["The Coast Line may have more trains than any other line in the city.", "the number of trains doesn't touch the reasoning"],
+    ["Their train may be one of the Coast Line trains that runs late.", null]],
+  body: "“Most” trains run on time, so some don't. Theirs could be one of them: “most” only gives “probably”, never “definitely”." });
+H("flaw", 2, "tf2g", { stem: `<p>A good camera is needed to take sharp photos of birds in flight. Mila has saved up and bought the best camera in the shop.</p><p>Mila says: “From now on, all my photos of flying birds will be sharp.”</p><p>${MIS("Mila")}</p>`,
+  opts: [["Mila may also need skill and patience to take sharp photos.", null],
+    ["The best camera in the shop may also be the most expensive one.", "the price doesn't show the gap in her reasoning"],
+    ["Mila may want to photograph other animals as well as birds.", "what else she photographs is beside the point"],
+    ["Mila may have saved her pocket money for more than a year.", "how she paid for it doesn't touch the reasoning"]],
+  body: "A good camera is NEEDED, but it isn't a GUARANTEE. Sharp photos of flying birds also take skill, practice and patience." });
+H("flaw", 2, "tf2h", { stem: `<p>Most children in Year 4 at Riverbend School can swim 50 metres.</p><p>Coach Dunn says: “So every Year 4 child will be able to swim in the 50-metre race at the carnival.”</p><p>${MIS("Coach Dunn")}</p>`,
+  opts: [["Some Year 4 children may swim faster than some of the Year 5 children.", "comparing year groups doesn't show the gap"],
+    ["A few Year 4 children may not be able to swim 50 metres yet.", null],
+    ["The carnival may also have races that are shorter than 50 metres.", "other races don't show what is wrong with the coach's reasoning"],
+    ["Lessons may have helped most of Year 4 learn to swim 50 metres.", "this only explains the fact the coach started from; it doesn't show his mistake"]],
+  body: "“Most” can swim 50 m, so a few may not. The coach has turned “most” into “every”." });
 H("flaw", 3, "tf3a", { stem: `<p>This season the Owls played 20 netball games and scored 300 goals. The Hawks played 10 games and scored 200 goals.</p><p>Coach Lee says: “The Owls scored more goals, so they are better at scoring than the Hawks.”</p><p>${MIS("Coach Lee")}</p>`,
   opts: [["The Hawks may have let in more goals than the Owls did this season.", "this is about defending, not scoring, so it doesn't touch the comparison"],
     ["The Owls may have scored more goals in the second half of the season than in the first.", "true or not, it doesn't show what is unfair about comparing the two teams"],
@@ -1417,56 +1466,152 @@ H("flaw", 4, "tf4d", { stem: `<p>Everyone who wins the art prize has a painting 
     ["Many children may have paintings in the show without having won the prize.", null]],
   body: "The rule is prize → painting in the show. Ruby's friend uses it backwards (painting in the show → prize). Lots of children can have paintings in the show without winning." });
 
+H("flaw", 3, "tf3e", { stem: `<p>Class 4B raised $240 for the animal shelter and Class 4C raised $180. There are 30 students in 4B and 18 students in 4C.</p><p>The principal says: “4B tried harder than 4C.”</p><p>${MIS("the principal")}</p>`,
+  opts: [["The animal shelter may need more money than both classes raised.", "about the shelter's needs, not about the unfair comparison"],
+    ["4B's total may be the most raised by any class this year.", "this makes 4B sound better: it agrees with the principal"],
+    ["Both classes may have raised their money by selling cakes and badges.", "if anything this makes the comparison fairer; it doesn't show the problem"],
+    ["4B may have raised more only because it has more students.", null]],
+  body: "Totals aren't a fair comparison when the groups are different sizes. Per student, 4B raised 240 ÷ 30 = $8 and 4C raised 180 ÷ 18 = $10, so 4C actually raised more each." });
+H("flaw", 3, "tf3f", { stem: `<p>Since a new bike shed was built at the start of last term, more students have been riding their bikes to school.</p><p>A parent says: “The new bike shed has made more students ride to school.”</p><p>${MIS("the parent")}</p>`,
+  opts: [["The new bike shed may have room for sixty bikes.", "a detail about the shed; it doesn't question whether the shed was the cause"],
+    ["A new bike path to the school may have opened at the same time.", null],
+    ["Riding to school may be good exercise for students.", "a good thing about riding, but nothing to do with the reasoning"],
+    ["Students and parents may have been asking for a bike shed for many years.", "this is about the past, not about why riding increased"]],
+  body: "The parent ignores another possible cause. If something else changed at the same time, such as a new bike path, that could explain the extra riders." });
+H("flaw", 3, "tf3g", { stem: `<p>Zoe wanted to find out which of her two paper-plane designs flies further. She threw Design 1 inside the school hall and Design 2 outside on the oval on a windy day. Design 2 flew twice as far.</p><p>Zoe says: “Design 2 is the better design.”</p><p>${MIS("Zoe")}</p>`,
+  opts: [["Design 2 may have taken Zoe longer to fold than Design 1.", "folding time has nothing to do with how far it flew"],
+    ["Zoe's friend may like the look of Design 1 better.", "liking the look isn't the point: the question is about the test"],
+    ["The wind on the oval may have carried Design 2 further.", null],
+    ["Zoe may want to enter Design 2 in the paper-plane contest.", "this is about her plans, not about the fairness of her test"]],
+  body: "The test wasn't fair: the planes were thrown in different places, and only one had the wind behind it. Zoe can't tell whether the design or the wind made the difference." });
+H("flaw", 3, "tf3h", { stem: `<p>In one week, Ethan read three books and Grace read one book.</p><p>Ethan says: “I'm a much keener reader than Grace.”</p><p>${MIS("Ethan")}</p>`,
+  opts: [["Ethan may also have read three books the week before.", "this backs Ethan up; it doesn't show what is unfair about the comparison"],
+    ["Grace's book may have been longer than all three of Ethan's.", null],
+    ["Grace may also enjoy drawing and painting in her spare time at home.", "her other hobbies don't touch the comparison"],
+    ["Ethan may have borrowed all three books from the library.", "where the books came from doesn't matter"]],
+  body: "Counting books is an unfair comparison: books can be very different lengths. One long book may take more reading than three short ones." });
+H("flaw", 4, "tf4e", { stem: `<p>Whenever there is a storm warning, the island ferry stops running. Today the ferry is not running.</p><p>Mira says: “So there must be a storm warning today.”</p><p>${MIS("Mira")}</p>`,
+  opts: [["Storm warnings may be given more often in winter than in summer.", "about how often warnings happen, not about Mira's reasoning"],
+    ["The ferry may have stopped for another reason, such as repairs.", null],
+    ["The ferry may stop running when there is a storm warning.", "this just repeats the rule; it doesn't show the mistake"],
+    ["Mira may have been hoping to visit the island today.", "what Mira wanted doesn't touch the reasoning"]],
+  body: "Mira turns the rule back to front. The rule is storm warning → no ferry. It doesn't say no ferry → storm warning: the ferry could stop for other reasons." });
+H("flaw", 4, "tf4f", { stem: `<p>The class guinea pig has escaped.</p><p>Lachie says: “Either the cage door was left open or the guinea pig chewed through the wire. The wire isn't chewed, so somebody must have left the door open.”</p><p>${MIS("Lachie")}</p>`,
+  opts: [["The guinea pig may have been out of its cage for hours.", "how long it was out doesn't show the gap"],
+    ["Somebody may have left the door open by accident.", "this agrees with Lachie's conclusion instead of showing his mistake"],
+    ["The wire may be far too strong for a guinea pig to chew through.", "this backs up the part of his reasoning that rules out chewing"],
+    ["There may be some other way the guinea pig could have got out.", null]],
+  body: "Lachie assumes there are only two possibilities. If there is a third way out, such as a gap under the cage, ruling out chewing doesn't prove the door was left open." });
+H("flaw", 4, "tf4g", { stem: `<p>Kirra's tomatoes grew very well this year.</p><p>Kirra says: “They grew well because I used a new plant food, so the extra rain this year can't have had anything to do with it.”</p><p>${MIS("Kirra")}</p>`,
+  opts: [["Both the plant food and the rain may have helped the tomatoes grow.", null],
+    ["The new plant food may have cost more than the old one.", "the cost doesn't touch the reasoning"],
+    ["The new plant food may have been the main reason the tomatoes grew well.", "this agrees with the first half of what Kirra says"],
+    ["Kirra's neighbour may have used the same plant food on her roses.", "the neighbour's roses don't show the gap"]],
+  body: "Kirra assumes that one cause rules out another. Things often happen for more than one reason: the plant food AND the rain could both have helped." });
+H("flaw", 4, "tf4h", { stem: `<p>Children who own lots of books are usually good readers.</p><p>Ava says: “If we buy my little brother lots of books, he will become a good reader.”</p><p>${MIS("Ava")}</p>`,
+  opts: [["Books may cost a lot of money to buy.", "a reason not to buy them, but it doesn't show the gap in her reasoning"],
+    ["Ava's brother may borrow plenty of books from the school library instead.", "where the books come from doesn't touch the reasoning"],
+    ["Ava's brother may already be quite good at reading.", "this doesn't show what Ava has assumed"],
+    ["Good readers may own lots of books because they love reading.", null]],
+  body: "Ava assumes that owning books CAUSES good reading. It may be the other way round: children who already love reading collect lots of books. Things that go together don't show which one causes the other." });
 /* ---------- Supports the claim ---------- */
 const SUP = n => `Which statement best supports ${n}'s claim?`;
-H("claim", 1, "tc1a", { stem: `<p>Ms Reyes: “Our class should plant a vegetable garden so that we learn where our food comes from.”</p><p>${SUP("Ms Reyes")}</p>`,
-  opts: [["Vegetable gardens need watering every day in summer.", "true about gardens, but it doesn't show they teach where food comes from (and it is a reason against)"],
-    ["Many supermarkets sell vegetables grown on big farms in other countries far away.", "about supermarkets, not about learning from a garden"],
-    ["Growing vegetables shows children how food grows from a seed into a meal.", null],
-    ["Our class won the poster prize last term.", "nothing to do with the garden or the goal"]],
-  body: "The claim is “do X (plant a garden) so that Y (we learn where food comes from)”. Only one option links the garden to learning where food comes from." });
-H("claim", 1, "tc1b", { stem: `<p>Coach Sam: “We should warm up before every training session so that fewer players get injured.”</p><p>${SUP("Coach Sam")}</p>`,
-  opts: [["Muscles that have been warmed up are less likely to be strained.", null],
-    ["Most of the team say they enjoy training on Saturday mornings more than weekdays.", "about enjoying training, not about injuries"],
-    ["A good warm-up takes about ten minutes.", "a fact about warm-ups, but it doesn't link them to fewer injuries"],
-    ["Injuries can stop players from training for weeks.", "this shows injuries are bad (Y), but not that warming up prevents them"]],
-  body: "X = warm up, Y = fewer injuries. The answer has to show that warming up leads to fewer injuries." });
-H("claim", 1, "tc1c", { stem: `<p>A council worker: “We should put more bins in the park so that there is less litter.”</p><p>${SUP("the council worker")}</p>`,
-  opts: [["The park is busiest on weekends and in the school holidays, especially in summer.", "about when the park is busy, not about bins"],
-    ["Litter in parks can harm birds and fish.", "this shows litter is bad (Y) but not that bins reduce it"],
-    ["New bins cost money to buy and to empty.", "a reason against, not a support"],
-    ["People are more likely to put rubbish in a bin when one is close by.", null]],
-  body: "X = more bins, Y = less litter. Only one option shows that having bins nearby leads to less litter." });
-H("claim", 1, "tc1d", { stem: `<p>Grandpa: “You should read a book before bed so that you fall asleep more easily.”</p><p>${SUP("Grandpa")}</p>`,
-  opts: [["The library has hundreds of books for children.", "about where to get books, not about sleep"],
-    ["Reading helps the mind slow down and relax, which makes sleep come more easily.", null],
-    ["Children need about ten hours of sleep every night.", "about sleep (Y) only; it doesn't involve reading"],
-    ["Some people like to read on a tablet or a phone instead of holding a paper book.", "about how people read, not about falling asleep"]],
-  body: "X = read before bed, Y = fall asleep more easily. The answer must connect reading to falling asleep." });
-H("claim", 2, "tc2a", { stem: `<p>The principal: “Our school should start a walking bus, where parents walk a group of children to school at a set time, so that fewer children are late.”</p><p>${SUP("the principal")}</p>`,
-  opts: [["Walking to school is good exercise for children.", "true about walking (X), but it supports a different goal (health), not being on time"],
-    ["The walking bus leaves at a set time, so children who join it arrive before the bell.", null],
-    ["Children who are late miss the start of the first lesson and have to sign in at the office.", "this shows being late is a problem (Y) but doesn't involve the walking bus"],
-    ["Some parents drive their children to school.", "nothing links this to being on time"]],
-  body: "Two options are true but only about one half: walking (X) or being late (Y). Only one links the walking bus to arriving on time." });
-H("claim", 2, "tc2b", { stem: `<p>Mia: “We should take a shopping list to the supermarket so that we spend less money.”</p><p>${SUP("Mia")}</p>`,
-  opts: [["A shopping list can be written on a phone.", "true about lists (X), but it doesn't show they save money"],
-    ["Supermarket prices go up a little every year, especially for fruit and vegetables.", "about prices, not about using a list"],
-    ["Some families shop only once a week.", "about how often people shop"],
-    ["People with a list tend to buy only what they need, not extra things they see.", null]],
-  body: "X = take a list, Y = spend less. The answer must show that a list leads to spending less: you buy only what's on it." });
-H("claim", 2, "tc2c", { stem: `<p>A librarian: “The library should stay open until 8 pm so that more adults who work during the day can borrow books.”</p><p>${SUP("the librarian")}</p>`,
-  opts: [["Many adults who work during the day finish after the library closes at 5 pm.", null],
-    ["Adults who read often say that it helps them relax.", "about reading being good for adults, not about opening later"],
-    ["The library also lends DVDs and board games.", "true, but it doesn't link opening later to more borrowing"],
-    ["Staying open later would cost the library more money in electricity and staff wages.", "a reason against the claim"]],
-  body: "X = open later, Y = more working adults borrow books. The link: those adults can't come before 5 pm now." });
-H("claim", 2, "tc2d", { stem: `<p>Dad: “We should hang the bird feeder outside the kitchen window so that we can watch the birds.”</p><p>${SUP("Dad")}</p>`,
-  opts: [["Birds eat more seed in winter than in summer.", "about how much birds eat, not about watching them"],
-    ["A bird feeder should be cleaned every week.", "about looking after a feeder, not where it goes"],
-    ["From the window we can see the feeder clearly without scaring the birds.", null],
-    ["Watching birds is a popular hobby in Australia, and many people keep a notebook of sightings.", "about watching birds in general (Y), but not about this window"]],
-  body: "X = hang it by the window, Y = watch the birds. Only one option links that place to watching." });
+H("claim", 1, "tc1a", { stem: `<p>Mr Hassan: “Our class should keep a reading log so that every student reads more books this term.”</p><p>${SUP("Mr Hassan")}</p>`,
+  opts: [["A reading log can be kept in a paper booklet or on a page on the class computer.", "true about the log (X), but it doesn't show the log leads to more reading"],
+    ["Students who record each book they finish often set goals and read more.", null],
+    ["Reading more books helps students learn lots of new words.", "this is a good result of reading more (Y), but it doesn't involve the log"],
+    ["The school library is open to students every lunchtime.", "about the library, not about the log or the goal"]],
+  body: "X = keep a reading log, Y = students read more. Only one option shows that keeping a log leads to reading more." });
+H("claim", 1, "tc1b", { stem: `<p>Mrs Ito: “We should spread a thick layer of mulch on the garden beds so that we use less water in summer.”</p><p>${SUP("Mrs Ito")}</p>`,
+  opts: [["Mulch can be made from wood chips, straw or dead leaves.", "a true fact about mulch (X), but it doesn't link mulch to using less water"],
+    ["Water bills are usually highest in the hottest months of the year.", "about water and summer (Y), but mulch isn't mentioned"],
+    ["Mulch shades the soil, so it stays damp for longer.", null],
+    ["Summer is a good time of year to grow tomatoes and beans.", "about gardens in summer, not about the claim"]],
+  body: "X = mulch, Y = use less water. The link: damp soil needs watering less often." });
+H("claim", 1, "tc1c", { stem: `<p>A park ranger: “Visitors should stay on the marked tracks so that the rare orchids in the forest are not damaged.”</p><p>${SUP("the ranger")}</p>`,
+  opts: [["Rangers clear and check the marked tracks every spring.", "true about the tracks (X), but it says nothing about the orchids"],
+    ["Some of the rare orchids flower for only a few days in the whole of each year.", "about the orchids (Y), but not about where visitors walk"],
+    ["Visitors to the forest often see lyrebirds and wallabies.", "about the forest, not about the claim"],
+    ["Most orchids grow just off the tracks, where they are easily trampled.", null]],
+  body: "X = stay on the tracks, Y = the orchids aren't damaged. The link: the orchids grow just off the tracks, where walkers would tread on them." });
+H("claim", 1, "tc1d", { stem: `<p>Aunt Bea: “You should rinse your paintbrushes straight after painting so that they last longer.”</p><p>${SUP("Aunt Bea")}</p>`,
+  opts: [["Paint left to dry in the bristles makes them stiff, so they snap.", null],
+    ["Good paintbrushes can be expensive to buy.", "this shows why lasting longer matters, but not that rinsing helps"],
+    ["Paintbrushes come in many shapes and sizes.", "a fact about brushes, not about rinsing them"],
+    ["Watercolour paint is much easier to wash out of brushes than some other paints.", "about washing paint, but it doesn't show rinsing makes brushes last"]],
+  body: "X = rinse straight away, Y = brushes last longer. The link: dried paint stiffens and breaks the bristles." });
+H("claim", 1, "tc1e", { stem: `<p>The school captain: “Every student should keep a water bottle on their desk so that they concentrate better in the afternoon.”</p><p>${SUP("the school captain")}</p>`,
+  opts: [["Reusable water bottles make less rubbish than bottled water.", "a good thing about bottles, but a different goal (less rubbish)"],
+    ["Afternoon lessons often include art, music and sport.", "about the afternoon, not about water or concentrating"],
+    ["Even a little thirst can make it harder to concentrate.", null],
+    ["Many students forget to bring their water bottles from home.", "about the bottles (X), and it works against the plan"]],
+  body: "X = water on the desk, Y = better concentration. The link: thirst makes concentrating harder, so sipping water helps." });
+H("claim", 1, "tc1f", { stem: `<p>A dentist: “Children should brush their teeth for two whole minutes so that they remove more plaque.”</p><p>${SUP("the dentist")}</p>`,
+  opts: [["Plaque is a sticky layer of germs that forms on teeth every day.", "this explains plaque (Y), but not why two minutes removes more"],
+    ["Many electric toothbrushes have a timer that buzzes after two minutes.", "about two minutes (X), but it doesn't show more plaque is removed"],
+    ["Most dentists say children should have a check-up twice a year.", "about dentists, not about the claim"],
+    ["Quick brushing often misses the plaque on the back teeth.", null]],
+  body: "X = brush for two minutes, Y = remove more plaque. The link: rushing misses plaque that a longer brush would reach." });
+H("claim", 1, "tc1g", { stem: `<p>A council worker: “We should plant shade trees along Main Street so that more people walk to the shops in summer.”</p><p>${SUP("the council worker")}</p>`,
+  opts: [["People are happier to walk when they can stay out of the hot sun.", null],
+    ["Trees give birds and possums a place to live.", "a good thing about trees, but a different goal"],
+    ["The shops along Main Street are always at their busiest in the weeks just before Christmas.", "about the shops, not about walking in the shade"],
+    ["Shade trees can take many years to grow tall.", "about the trees (X), and if anything it works against the plan"]],
+  body: "X = shade trees, Y = more people walk. The link: shade makes walking in summer bearable." });
+H("claim", 1, "tc1h", { stem: `<p>Mrs Kaur: “Our family should eat dinner together at the table so that we talk to each other more.”</p><p>${SUP("Mrs Kaur")}</p>`,
+  opts: [["Eating at the table means much less food ends up being spilt on the couch.", "a different benefit of eating at the table, not more talking"],
+    ["Sitting face to face, away from screens, makes chatting easy.", null],
+    ["Talking about problems helps families sort them out.", "a good result of talking (Y), but the table isn't involved"],
+    ["Our dining table has room for six people.", "a fact about the table (X), not about talking"]],
+  body: "X = eat together at the table, Y = talk more. The link: face to face and away from screens, people chat." });
+H("claim", 2, "tc2a", { stem: `<p>Ms Lin: “The school should replace the old bubblers with bottle-filling taps so that students drink more water during the day.”</p><p>${SUP("Ms Lin")}</p>`,
+  opts: [["Bottle-filling taps are easy to clean and cheap to run.", "true about the taps (X), but it doesn't show students would drink more"],
+    ["Drinking enough water helps students stay alert and focused during every lesson.", "a good result of drinking more (Y), but the taps aren't involved"],
+    ["The taps let students fill a bottle to sip from all day.", null],
+    ["Many students already bring a full bottle from home.", "this works against the claim: they don't need the new taps"]],
+  body: "X = bottle-filling taps, Y = students drink more. Only one option links them: a filled bottle goes back to class and gets sipped all day." });
+H("claim", 2, "tc2b", { stem: `<p>Coach Burke: “Our swimmers should practise their dives off the starting blocks every session so that they win more races.”</p><p>${SUP("Coach Burke")}</p>`,
+  opts: [["In short races, a quick start often decides who wins.", null],
+    ["The starting blocks are fixed firmly to the end of every lane in the pool.", "a true fact about the blocks (X), not a link to winning"],
+    ["Winning races makes swimmers feel more confident.", "what happens AFTER winning (Y), not how starts lead to wins"],
+    ["Our swimmers already train five mornings a week.", "about how much they train, not about starts"]],
+  body: "X = practise starts, Y = win more races. The link: a better start can decide a short race." });
+H("claim", 2, "tc2c", { stem: `<p>A museum guide: “The museum should let visitors hold some of the fossils so that children remember more of what they see.”</p><p>${SUP("the guide")}</p>`,
+  opts: [["Some of the fossils in the museum are millions of years old.", "a true fact about the fossils (X), not about remembering"],
+    ["School groups visit the museum nearly every week of term.", "about who visits, not about the claim"],
+    ["Some of the fossils are very fragile and could easily break if they were handled.", "a reason against the claim"],
+    ["Children remember things better when they can hold them, not just look.", null]],
+  body: "X = let children hold fossils, Y = they remember more. The link: handling things helps children remember them." });
+H("claim", 2, "tc2d", { stem: `<p>A bus company: “We should put a screen on every bus that shows the name of the next stop so that fewer passengers miss their stop.”</p><p>${SUP("the bus company")}</p>`,
+  opts: [["The screens could also show advertisements for local shops.", "a different benefit of the screens, not fewer missed stops"],
+    ["Passengers often miss their stop because they can't tell where they are.", null],
+    ["Passengers who miss their stop have to walk back or wait for another bus.", "this shows missing a stop is a nuisance (Y), but not how the screens help"],
+    ["Most passengers catch the bus at least five days a week.", "about how often people ride, not about the claim"]],
+  body: "X = a next-stop screen, Y = fewer missed stops. The link: people miss stops because they don't know where they are, and the screen tells them." });
+H("claim", 2, "tc2e", { stem: `<p>Theo: “Our class should switch off the lights when we go out to play so that the school's electricity bill is lower.”</p><p>${SUP("Theo")}</p>`,
+  opts: [["The school's electricity bill went up last year.", "about the bill (Y), but it doesn't involve switching off the lights"],
+    ["Our classroom has twelve lights in the ceiling.", "a fact about the lights (X), not a link to the bill"],
+    ["Switching off lights reminds students to care for the planet.", "a different goal from a lower bill"],
+    ["Lights left on in an empty room still use electricity.", null]],
+  body: "X = switch off the lights at playtime, Y = a lower bill. The link: lights left on in an empty room still use (and cost) electricity." });
+H("claim", 2, "tc2f", { stem: `<p>The librarian: “The library should set up a silent room so that more students come in to study for tests.”</p><p>${SUP("the librarian")}</p>`,
+  opts: [["Many students avoid the library before tests because it's too noisy.", null],
+    ["The library already has a meeting room that the book club uses.", "about a room (X), but nothing about more students coming"],
+    ["Students who study for tests usually get better marks.", "a good result of studying (Y), but the room isn't involved"],
+    ["Some students like to study in small groups and talk quietly about their work together.", "this works against a silent room"]],
+  body: "X = a silent room, Y = more students come to study. The link: noise is what keeps them away now." });
+H("claim", 2, "tc2g", { stem: `<p>A farmer: “I should put a fence around my vegetable patch so that the wallabies stop eating my lettuces.”</p><p>${SUP("the farmer")}</p>`,
+  opts: [["Wallabies mostly feed early in the morning and in the evening.", "about the wallabies (Y side), but not about the fence"],
+    ["A tall enough fence keeps wallabies away from the plants.", null],
+    ["Farms with fenced gardens often grow more vegetables than farms without them.", "this only shows two things go together; bigger farms may simply build more fences"],
+    ["Frightened wallabies can leap over a low fence.", "this works against the claim"]],
+  body: "X = a fence, Y = the wallabies stop eating the lettuces. Only one option shows the fence keeps them out." });
+H("claim", 2, "tc2h", { stem: `<p>Grandad: “You should write your name inside your new hat so that you get it back if you lose it.”</p><p>${SUP("Grandad")}</p>`,
+  opts: [["Permanent marker does not wash out.", "a fact about the pen (X), but not about getting the hat back"],
+    ["Lost hats are usually found lying on the oval or in the playground after lunch.", "about lost hats (Y), but not about the name"],
+    ["Wearing a hat outside protects you from the sun.", "a different goal from getting the hat back"],
+    ["Lost property is returned to the person whose name is in it.", null]],
+  body: "X = name in the hat, Y = get it back. The link: lost property is returned by the name written in it." });
 H("claim", 3, "tc3a", { stem: `<p>Coach Ana: “Our runners should eat breakfast before every race so that they run faster.”</p><p>${SUP("Coach Ana")}</p>`,
   opts: [["Runners who win races often say they ate a good breakfast that morning.", "this only shows winners and breakfast go together; they might win for other reasons"],
     ["Runners who eat a big, heavy meal just before a race can get a stomach ache and run slowly.", "this works AGAINST eating before a race"],
@@ -1516,55 +1661,151 @@ H("claim", 4, "tc4d", { stem: `<p>A librarian: “We should display the newest b
     ["Children often choose a book they see as soon as they walk in rather than searching the shelves.", null]],
   body: "X = display new books by the door, Y = more children borrow them. The link: children pick what they see first." });
 
+H("claim", 3, "tc3e", { stem: `<p>Mr Novak: “Our school should start a vegetable garden so that students eat more vegetables.”</p><p>${SUP("Mr Novak")}</p>`,
+  opts: [["Schools with vegetable gardens often have students who already like vegetables.", "this only shows the two go together: those students may have liked vegetables before the garden"],
+    ["Vegetable gardens need a lot of looking after in the school holidays.", "this works against the claim"],
+    ["Children are more willing to try vegetables they have grown themselves.", null],
+    ["Eating vegetables helps children grow strong and healthy.", "this shows why eating vegetables is good (Y), but not that the garden leads to it"]],
+  body: "X = a vegetable garden, Y = students eat more vegetables. Only one option explains HOW the garden leads to eating more. Two things going together is not the same as one causing the other." });
+H("claim", 3, "tc3f", { stem: `<p>Coach Mei: “Players should get at least nine hours' sleep before a game so that they make fewer mistakes.”</p><p>${SUP("Coach Mei")}</p>`,
+  opts: [["Tired players react more slowly and misjudge more passes.", null],
+    ["The best players in the league often say they go to bed early.", "this only shows good players and early nights go together; they might be good for other reasons"],
+    ["Some players find it hard to sleep the night before a big game.", "this works against the plan rather than supporting it"],
+    ["Mistakes in a game can cost the team points.", "this shows why mistakes matter (Y), not how sleep prevents them"]],
+  body: "X = nine hours' sleep, Y = fewer mistakes. The link: tiredness causes slow reactions and misjudged passes." });
+H("claim", 3, "tc3g", { stem: `<p>A principal: “We should not allow phones in the playground so that students play together more.”</p><p>${SUP("the principal")}</p>`,
+  opts: [["Schools that ban phones often also have bigger playgrounds.", "this shows two things go together, and bigger playgrounds could be the real reason for more play"],
+    ["Some parents want to be able to reach their children by phone at any time during the day.", "a reason against the ban"],
+    ["Playing together helps students make friends.", "a good result of playing together (Y), but phones aren't involved"],
+    ["At recess, students with phones often sit apart, staring at screens.", null]],
+  body: "X = no phones in the playground, Y = more playing together. The link: phones are what keep students sitting apart now." });
+H("claim", 3, "tc3h", { stem: `<p>Ms Obi: “Our class should keep a pet fish so that students learn to be responsible.”</p><p>${SUP("Ms Obi")}</p>`,
+  opts: [["Classes with pets often have the most responsible students in the school.", "this shows two things go together; responsible classes may be the ones given pets"],
+    ["A fish depends on students remembering to feed it and clean its tank.", null],
+    ["Fish can be left alone without food over a long weekend.", "this works against the claim: less for students to be responsible for"],
+    ["Being responsible is an important skill for life.", "this shows why responsibility matters (Y), not how the fish teaches it"]],
+  body: "X = a class fish, Y = students learn responsibility. The link: someone must remember to look after it, every day." });
+H("claim", 4, "tc4e", { stem: `<p>A town council: “We should put speed humps on School Road so that it is safer for children walking to school.”</p><p>${SUP("the council")}</p>`,
+  opts: [["Speed humps would also make School Road quieter for the people who live there.", "a different goal: quieter, not safer for children"],
+    ["Many children walk to school along School Road every day.", "this shows why safety matters there, but not that speed humps help"],
+    ["Speed humps make drivers slow down, and slower cars cause fewer injuries.", null],
+    ["Road safety is taught in primary schools across Australia.", "too general: nothing about speed humps"]],
+  body: "Several options sound helpful, but only one closes the gap from X (speed humps) to Y (safer for children): humps slow cars, and slower cars hurt fewer people." });
+H("claim", 4, "tc4f", { stem: `<p>The canteen manager: “We should let students order their lunch in the morning so that less food is thrown away.”</p><p>${SUP("the canteen manager")}</p>`,
+  opts: [["Ordering in the morning would also mean much shorter queues at the counter at lunchtime.", "a different goal: shorter queues, not less waste"],
+    ["Knowing the orders early means we won't cook more than is eaten.", null],
+    ["A great deal of food is thrown away in Australia every year.", "too general: it shows waste is a problem, not that ordering early fixes it at the canteen"],
+    ["Students who order early often choose healthier meals.", "a different goal, and it only shows two things going together"]],
+  body: "X = order in the morning, Y = less food thrown away. The link: if the canteen knows the numbers, it cooks only what will be eaten." });
+H("claim", 4, "tc4g", { stem: `<p>The librarian: “Our library should run a holiday building-blocks club so that more children join the library.”</p><p>${SUP("the librarian")}</p>`,
+  opts: [["Building with blocks helps children solve problems.", "a different goal: problem-solving, not joining the library"],
+    ["Many children already visit the library in the holidays.", "this doesn't show the club would bring in NEW members"],
+    ["The library has plenty of space for a club like this in its large meeting room upstairs.", "this shows the club is possible, not that it would bring in members"],
+    ["Only library members can come to the club, and lots of children want to.", null]],
+  body: "X = a holiday club, Y = more children join. The link: you have to join to come, and lots of children want to come." });
+H("claim", 4, "tc4h", { stem: `<p>Grandma: “You should learn to cook a few simple meals so that you can look after yourself when you leave home.”</p><p>${SUP("Grandma")}</p>`,
+  opts: [["When you leave home, there may be no one else to cook your meals.", null],
+    ["Learning to cook teaches you to follow instructions carefully.", "a different goal: following instructions, not looking after yourself"],
+    ["Young people who can cook often feel more confident when they leave home.", "this only shows two things go together: confident people may be the ones who learn to cook"],
+    ["Simple home-cooked meals are often much cheaper than buying takeaway food.", "a different goal: saving money, not being able to look after yourself"]],
+  body: "X = learn to cook, Y = look after yourself after leaving home. The link: once you've left, no one else may cook for you." });
 /* ---------- Rules and reasoning ---------- */
-H("rule", 1, "tr1a", { stem: `<p>At Hilltop School, every child in the choir sings at the Friday assembly. Omar is in the choir.</p><p>Which of these <b>must</b> be true?</p>`,
-  opts: [["Everyone who sings at the Friday assembly is in the choir.", "this turns the rule around; others might sing at assembly too"],
-    ["Omar sings at the Friday assembly.", null],
-    ["Omar does not sing at any other assembly.", "the rule says nothing about other assemblies"],
-    ["Most children at Hilltop School are in the choir.", "the rule doesn't tell us how many are in the choir"]],
-  body: "The rule is an arrow: in the choir → sings on Friday. Omar is in the choir, so go forwards along the arrow: he sings on Friday." });
-H("rule", 1, "tr1b", { stem: `<p>If the pool is open, the flag on its gate is green. Today the flag is <b>not</b> green.</p><p>Which of these <b>must</b> be true?</p>`,
-  opts: [["The pool is closed every day this week.", "we only know about today"],
-    ["If the flag is green, the pool is open.", "this turns the rule around; the rule doesn't say it"],
-    ["The flag is red today.", "the flag might be another colour, or not there at all"],
-    ["The pool is not open today.", null]],
-  body: "Open → green flag. If the pool were open today, the flag would be green. It isn't, so the pool can't be open." });
-H("rule", 1, "tr1c", { stem: `<p>Every bus on the Red Line stops at the museum. Bus 12 is on the Red Line.</p><p>Which of these <b>cannot</b> be true?</p>`,
-  opts: [["Bus 12 does not stop at the museum.", null],
-    ["Bus 12 also stops at the zoo.", "the rule doesn't stop Red Line buses going to other places too, so this could be true"],
-    ["Some buses that stop at the museum are not on the Red Line.", "the rule only talks about Red Line buses; other buses could stop there too"],
-    ["Bus 7 stops at the museum.", "we know nothing about Bus 7, so this could be true"]],
-  body: "Red Line → stops at the museum. Bus 12 is on the Red Line, so it MUST stop at the museum. The statement that says it doesn't cannot be true." });
-H("rule", 1, "tr1d", { stem: `<p>Anyone who scores 10 out of 10 in the spelling quiz gets a gold star. Ella did <b>not</b> get a gold star.</p><p>Which of these <b>must</b> be true?</p>`,
-  opts: [["Ella scored 9 out of 10.", "too exact: she might have scored any number below 10"],
-    ["Ella will get a gold star next time.", "nothing tells us about next time"],
-    ["Ella did not score 10 out of 10.", null],
-    ["Only children who score 10 out of 10 get gold stars.", "the rule doesn't say gold stars can't be given for anything else"]],
-  body: "10 out of 10 → gold star. If Ella had scored 10, she would have a star. She has none, so she didn't score 10." });
-H("rule", 2, "tr2a", { stem: `<p>Only children who have returned a permission note can go on the excursion. Kai has returned his note.</p><p>Which of these is correct?</p>`,
-  opts: [["Kai will definitely go on the excursion.", "the note is NEEDED but not a promise: he might be sick, or need to pay too"],
-    ["Kai cannot go on the excursion.", "he has done what is needed, so nothing rules him out"],
-    ["Kai has done something he needs, but that alone does not make it certain he will go.", null],
-    ["Everyone who returned a permission note has already paid for the excursion and packed their lunch.", "nothing in the rule mentions paying"]],
-  body: "“Only children with a note” means the note is NEEDED. Needed isn't the same as guaranteed." });
-H("rule", 2, "tr2b", { stem: `<p>You must be at least 140 cm tall to go on the Thunder ride. Lena is 145 cm tall.</p><p>Which of these <b>must</b> be true?</p>`,
-  opts: [["Lena is tall enough for the Thunder ride.", null],
-    ["Lena will go on the Thunder ride.", "being tall enough is needed, but she might not want to go or might not have a ticket"],
-    ["Everyone taller than 140 cm enjoys the Thunder ride.", "the rule says nothing about enjoying it"],
-    ["Lena's younger brother is too short for the ride.", "we know nothing about her brother"]],
-  body: "The height rule tells us who is ALLOWED, not who will go. Lena meets the height rule, and that's all we know." });
-H("rule", 2, "tr2c", { stem: `<p>To play in the final, a team must first win its semi-final. The Rockets are playing in the final.</p><p>Which of these <b>must</b> be true?</p>`,
-  opts: [["The Rockets will win the final.", "being in the final doesn't mean winning it"],
-    ["The Rockets have never lost a game.", "they might have lost earlier games"],
-    ["The Rockets won the final last year.", "nothing tells us about last year"],
-    ["The Rockets won their semi-final.", null]],
-  body: "Winning a semi-final is NEEDED to be in the final. The Rockets are in the final, so they must have won their semi-final." });
-H("rule", 2, "tr2d", { stem: `<p>Seeds need water to sprout. Ivy watered her seeds every day.</p><p>Which of these is correct?</p>`,
-  opts: [["Ivy's seeds will certainly sprout.", "water is needed but not a guarantee; the seeds might be old, or need warmth too"],
-    ["Ivy gave her seeds something they need, but they may still not sprout.", null],
-    ["Seeds that are watered every single day always grow into tall, healthy plants by the end of summer.", "far more than the rule says"],
-    ["Ivy's seeds did not need any sunlight.", "the rule says nothing about sunlight either way"]],
-  body: "A need is not a promise. Water is needed; it doesn't make sprouting certain." });
+H("rule", 1, "tr1a", { stem: `<p>At the Wattle Hill dog show, every dog that wins a ribbon has its photo in the <i>Gazette</i>. Every dog whose photo is in the <i>Gazette</i> gets a free bag of dog food. Pepper won a ribbon at the show.</p><p>Which of these <b>must</b> be true?</p>`,
+  opts: [["Every dog that got a free bag of dog food won a ribbon.", "this goes backwards along the arrows: dogs could get dog food for other reasons"],
+    ["Pepper will get a free bag of dog food.", null],
+    ["Pepper won first prize at the show.", "too exact: a ribbon need not be for first place"],
+    ["Dogs without a ribbon do not get any dog food.", "the rules never say what happens to dogs without ribbons"]],
+  body: "Chain the arrows: ribbon → photo in the <i>Gazette</i> → free dog food. Pepper has a ribbon, so go forwards along both arrows: she gets the dog food." });
+H("rule", 1, "tr1b", { stem: `<p>If it rains on Saturday, the market moves into the town hall. When the market is in the town hall, there are no pony rides. Last Saturday there were pony rides at the market.</p><p>Which of these <b>must</b> be true?</p>`,
+  opts: [["It was sunny all day last Saturday.", "too much: we only know it didn't rain, and it could have been cloudy"],
+    ["The market was in the town hall last Saturday.", "impossible: there are no pony rides when it is in the hall"],
+    ["It did not rain last Saturday.", null],
+    ["There are pony rides every Saturday when it doesn't rain.", "this turns the rule around; the rules don't promise pony rides"]],
+  body: "Rain → hall → no pony rides. There WERE pony rides, so the market can't have been in the hall, so it can't have rained." });
+H("rule", 1, "tr1c", { stem: `<p>Every student in the robotics club is also in the maths club. Nobody in the maths club is in the drama club. Ari is in the robotics club.</p><p>Which of these <b>must</b> be true?</p>`,
+  opts: [["Everyone in the maths club is also in the robotics club.", "this turns the first rule around"],
+    ["Ari is the best at maths in the robotics club.", "nothing tells us how good Ari is"],
+    ["Nobody in the robotics club enjoys drama.", "the rules are about being IN the drama club, not enjoying drama"],
+    ["Ari is not in the drama club.", null]],
+  body: "Robotics → maths → not drama. Ari is in robotics, so he is in maths, so he can't be in drama." });
+H("rule", 1, "tr1d", { stem: `<p>Every ticket for the Sunday concert is blue. Every blue ticket costs $12. Maya has a ticket for the Sunday concert.</p><p>Which of these <b>cannot</b> be true?</p>`,
+  opts: [["Maya's ticket cost $15.", null],
+    ["Maya's friend has a blue ticket for a different concert.", "could be true: the rules don't say ONLY Sunday tickets are blue"],
+    ["Some $12 tickets are for the Saturday concert.", "could be true: the rules don't say every $12 ticket is for Sunday"],
+    ["Maya bought her ticket online.", "could be true: the rules say nothing about how tickets are bought"]],
+  body: "Sunday → blue → $12. Maya's ticket is for Sunday, so it MUST be blue and cost $12. A $15 ticket is impossible." });
+H("rule", 1, "tr1e", { stem: `<p>Everyone who finishes the fun run gets a medal. Nobody who gets a medal pays for the barbecue lunch. Ken paid for the barbecue lunch.</p><p>Which of these <b>must</b> be true?</p>`,
+  opts: [["Ken did not enter the fun run.", "too much: he might have entered and not finished"],
+    ["Ken did not finish the fun run.", null],
+    ["Ken got a medal for the fun run.", "impossible: medal winners don't pay for lunch"],
+    ["Everyone who didn't finish paid for the barbecue lunch.", "the rules don't say that; this turns them around"]],
+  body: "Finish → medal → doesn't pay. Ken paid, so he can't have had a medal, so he can't have finished." });
+H("rule", 1, "tr1f", { stem: `<p>In Kim's family, the TV is switched off at 8 pm on every school night. Tonight the TV is still on at 9 pm.</p><p>If the family follows its rule, which of these <b>must</b> be true?</p>`,
+  opts: [["Tonight is a Saturday.", "too exact: it could be a Friday, or a night in the holidays"],
+    ["Kim's parents have forgotten the rule tonight.", "the question says the family follows its rule"],
+    ["On nights that aren't school nights, the TV stays on until 9 pm.", "the rule says nothing about other nights; this turns it around"],
+    ["Tonight is not a school night.", null]],
+  body: "School night → TV off at 8. The TV is on at 9, so tonight can't be a school night. Which other night it is, we can't tell." });
+H("rule", 1, "tr1g", { stem: `<p>Every book on the Staff Picks shelf has a green sticker. Every book with a green sticker can be borrowed for three weeks. Leah is borrowing a book that can only be kept for one week.</p><p>Which of these <b>must</b> be true?</p>`,
+  opts: [["Leah's book is not from the Staff Picks shelf.", null],
+    ["Leah's book has a green sticker.", "impossible: green-sticker books can be kept for three weeks"],
+    ["Leah's book is a brand-new book.", "nothing in the rules is about new books"],
+    ["Every book without a green sticker can be kept for only one week.", "the rules don't say what happens to books without stickers"]],
+  body: "Staff Picks → green sticker → three weeks. Leah's book can't be kept three weeks, so it has no green sticker, so it isn't a Staff Pick." });
+H("rule", 1, "tr1h", { stem: `<p>Every player in the Comets team wears red socks. Some players in the Comets team are left-handed. Sam wears red socks.</p><p>Which of these <b>cannot</b> be true?</p>`,
+  opts: [["Sam is not in the Comets team.", "could be true: other people can wear red socks too"],
+    ["Sam is left-handed.", "could be true: nothing rules it out"],
+    ["A left-handed Comets player wears blue socks.", null],
+    ["Some people who wear red socks are not left-handed.", "this could be true (in fact it must be, if any Comets player is right-handed)"]],
+  body: "Comets → red socks, for EVERY player, left-handed or not. So a Comets player in blue socks is impossible. Sam's red socks don't tell us whether he is a Comet: that would be going backwards." });
+H("rule", 2, "tr2a", { stem: `<p>Only members of the swimming club can use the pool on Sunday mornings. Ellie used the pool last Sunday morning.</p><p>Which of these <b>must</b> be true?</p>`,
+  opts: [["Every member of the swimming club uses the pool on Sunday mornings.", "this turns the rule around: being a member allows it, it doesn't make it happen"],
+    ["Ellie swims at the pool every Sunday morning.", "we know about one Sunday only"],
+    ["Ellie is a member of the swimming club.", null],
+    ["People who are not members can use the pool on Sunday afternoons.", "the rule says nothing about afternoons"]],
+  body: "“Only members” means being a member is NEEDED. Ellie did use the pool, so she must have what was needed: she is a member." });
+H("rule", 2, "tr2b", { stem: `<p>You need at least 30 points to reach Level 5 in the reading challenge. Zane has 34 points.</p><p>Which of these <b>must</b> be true?</p>`,
+  opts: [["Zane meets the points rule for Level 5.", null],
+    ["Zane has reached Level 5.", "the points are NEEDED, but there may be other things needed too"],
+    ["Zane has read more books than anyone with 30 points.", "points and books aren't the same, and we know nothing about others"],
+    ["Anyone with fewer than 34 points is below Level 5.", "the line is at 30, not 34"]],
+  body: "30 points is needed, and Zane has 34, so he meets the points rule. That's all we can say: a need is not a promise that he has reached the level." });
+H("rule", 2, "tr2c", { stem: `<p>A sunflower seed will sprout only if it is kept warm. Pip's sunflower seeds have sprouted.</p><p>Which of these <b>must</b> be true?</p>`,
+  opts: [["Any sunflower seed that is kept warm will sprout.", "this turns the rule around: warmth is needed, not a promise"],
+    ["Pip watered his seeds every day.", "the rule doesn't mention water"],
+    ["Seeds that sprout are always planted in spring.", "nothing in the rule is about seasons"],
+    ["Pip's seeds were kept warm.", null]],
+  body: "“Only if it is kept warm” means warmth is NEEDED. Pip's seeds sprouted, so they must have had what was needed." });
+H("rule", 2, "tr2d", { stem: `<p>To ride the Big Dipper, you must be at least 130 cm tall <b>and</b> have an adult with you. Noah is 135 cm tall.</p><p>Which of these is correct?</p>`,
+  opts: [["Noah can ride the Big Dipper on his own.", "he is tall enough, but he still needs an adult"],
+    ["Noah can ride only if an adult is with him.", null],
+    ["Noah is too short to ride the Big Dipper.", "135 cm is more than 130 cm"],
+    ["Noah will definitely ride the Big Dipper today.", "meeting the rules doesn't mean he will go on it"]],
+  body: "Two things are NEEDED: the height and an adult. Noah has one of them, so he still needs the other." });
+H("rule", 2, "tr2e", { stem: `<p>Only students who passed the swimming test may go kayaking at camp. Ruby did not go kayaking.</p><p>Which of these is correct?</p>`,
+  opts: [["We can't tell whether Ruby passed the swimming test.", null],
+    ["Ruby did not pass the swimming test.", "this goes backwards: she might have passed and chosen not to go"],
+    ["Ruby passed the test but was too afraid to go kayaking.", "possible, but nothing tells us this"],
+    ["Everyone who passed the test went kayaking.", "passing is needed, not a promise that they went"]],
+  body: "Passing is NEEDED to go. Not going doesn't tell us whether she passed: she might have passed and still not gone." });
+H("rule", 2, "tr2f", { stem: `<p>A bike must have working lights to be ridden on the school path after dark. Leo's bike has working lights.</p><p>Which of these <b>must</b> be true?</p>`,
+  opts: [["Leo is allowed to ride on the school path after dark.", "lights are NEEDED, but there may be other rules too, such as a helmet"],
+    ["Bikes without lights may be ridden on the path only in daytime.", "the rule says nothing about daytime"],
+    ["Leo's bike meets the rule about lights.", null],
+    ["Leo rides on the school path every night.", "nothing tells us when or how often he rides"]],
+  body: "The rule tells us one thing that is needed. Leo's bike has it, so it meets that rule, and that's all we know." });
+H("rule", 2, "tr2g", { stem: `<p>To play in the grand final, a player must have played in at least three games this season. Mia played in five games this season.</p><p>Which of these is correct?</p>`,
+  opts: [["Mia will play in the grand final.", "she has played enough games, but she may not be picked"],
+    ["Players who have played five games are always picked for the final.", "the rule says nothing about who is picked"],
+    ["Mia was the team's best player this season.", "nothing tells us how well she played"],
+    ["Mia could play in the final, but she might not be picked.", null]],
+  body: "Three games is NEEDED. Mia has five, so she COULD play, but a need met is not a promise." });
+H("rule", 2, "tr2h", { stem: `<p>Only Year 6 students can be library monitors.</p><p>Which of these <b>cannot</b> be true?</p>`,
+  opts: [["Some Year 6 students are not library monitors.", "could be true: being in Year 6 is needed, not a promise"],
+    ["Jack, who is in Year 5, is a library monitor.", null],
+    ["Tess, a library monitor, is in Year 6.", "this must be true, so it CAN be true"],
+    ["A Year 5 student helps the librarian at lunch.", "could be true: helping isn't the same as being a monitor"]],
+  body: "“Only Year 6” means Year 6 is NEEDED to be a monitor. A monitor in Year 5 breaks the rule." });
 const WHOSE = (a, b) => [[`${a} only`], [`${b} only`], [`Both ${a} and ${b}`], [`Neither ${a} nor ${b}`]];
 const whose = (track, rung, id, a, b, rule, sa, sb, right, why, body) => {
   const o = WHOSE(a, b).map((x, i) => [x[0], i === right ? null : why[i]]);
@@ -1608,67 +1849,160 @@ H("rule", 4, "tr4d", { stem: `<p>A drawer holds 5 black socks and 5 white socks,
     ["6", "after all 5 white socks, one more gives only one black sock"],
     ["7", null]],
   body: "Worst case: the first 5 socks are all white. Then he needs 2 more to be sure of two black: 5 + 2 = 7." });
+whose("rule", 3, "tr3e", "Jade", "Omar", "Only members of the art club can enter the poster competition.",
+  "Lena entered the poster competition, so she must be a member of the art club.", "Kai is a member of the art club, so he must have entered the poster competition.", 0,
+  ["", "Omar turns the rule around: being a member lets you enter, it doesn't mean you did", "Omar's reasoning is not correct", "Jade's reasoning IS correct"],
+  "“Only members” means membership is NEEDED to enter. Jade: Lena entered, so she must be a member. Correct. Omar: being a member doesn't mean Kai entered. Only Jade is right.");
+whose("rule", 3, "tr3f", "Lou", "Raj", "If a library book is returned late, the borrower must pay a 50-cent fine. Fines are also charged for books that come back damaged.",
+  "Max paid a 50-cent fine, so he must have returned a book late.", "Sara returned her book on time, so she didn't have to pay any fine.", 3,
+  ["Lou goes backwards: Max could have been fined for something else, such as a damaged book", "Raj goes beyond the rule: Sara could still be fined for something else, such as a damaged book", "both of them go beyond the rule", ""],
+  "The rule is late → fine. Lou goes backwards (fine → late). Raj says not late → no fine, but the box says damaged books are fined too, so being on time doesn't rule out a fine. Neither is correct.");
+whose("rule", 3, "tr3g", "Kai", "Bella", "Every student who gets full marks in the spelling test gets a merit card.",
+  "Tom didn't get a merit card, so he didn't get full marks.", "Ana got full marks, so she got a merit card.", 2,
+  ["Bella is correct too", "Kai is correct too", "", "both of them are correct"],
+  "Full marks → merit card. Bella goes forwards. Kai: if Tom HAD got full marks he would have a card; he has none, so he didn't. Both are correct.");
+whose("rule", 3, "tr3h", "Tia", "Sam", "Everyone at camp who goes rock climbing must wear a helmet.",
+  "Josh is wearing a helmet, so he must be going rock climbing.", "Mei is going rock climbing, so she must be wearing a helmet.", 1,
+  ["Tia goes backwards: Josh could be wearing a helmet to ride a bike", "", "Tia's reasoning is not correct", "Sam's reasoning IS correct"],
+  "Climbing → helmet. Sam goes forwards along the arrow. Tia goes backwards (helmet → climbing), and helmets are worn for other things too.");
+whose("rule", 4, "tr4e", "Ella", "Finn", "Most of the children at the beach clean-up were from Pine Street School.",
+  "Zoe was at the beach clean-up, so she is probably from Pine Street School.", "Leo is from Pine Street School, so he was probably at the beach clean-up.", 0,
+  ["", "Finn turns it around: most of the helpers came from Pine Street, but most Pine Street children may have stayed home", "Finn's reasoning is not correct", "Ella's reasoning IS correct"],
+  "Ella uses “most” the right way: at the clean-up → probably Pine Street. Finn goes backwards. A school can have hundreds of children, and only a few of them may have come.");
+H("rule", 4, "tr4f", { stem: `<p>A box holds 6 lemon, 4 orange and 3 lime ice blocks. Without looking, Fin takes ice blocks out one at a time.</p><p>What is the smallest number he must take to be <b>certain</b> of getting at least one orange ice block?</p>`,
+  opts: [["2", "the best case is not enough: the first two could both be lemon"],
+    ["9", "after 9 he might still have only lemon and lime: one more is needed"],
+    ["10", null],
+    ["13", "he doesn't need to take them all"]],
+  body: "Worst case: he takes every ice block that ISN'T orange first: 6 lemon + 3 lime = 9. The next one must be orange: 9 + 1 = 10." });
+H("rule", 4, "tr4g", { stem: `<p>Most of the apples in a crate are Pink Lady apples. Most of the Pink Lady apples in the crate are sweet.</p><p>Which of these is the best conclusion?</p>`,
+  opts: [["Most of the apples in the crate are sweet.", "“most of most” can be fewer than half: for example 6 out of 10 are Pink Lady and 4 of those 6 are sweet"],
+    ["We can't be sure that most of the apples are sweet.", null],
+    ["Any apple taken from the crate is probably a sweet Pink Lady.", "chaining two “mosts” doesn't give a “probably”: there may be only 4 sweet Pink Ladies out of 10 apples"],
+    ["Every sweet apple in the crate is a Pink Lady apple.", "the other apples could be sweet too"]],
+  body: "Try numbers. 10 apples, 6 Pink Lady (most), 4 of those sweet (most of 6). That's only 4 sweet Pink Ladies out of 10, and we know nothing about the other 4 apples. So we can't be sure." });
+whose("rule", 4, "tr4h", "Kofi", "Ana", "A jar holds 5 red and 5 yellow jellybeans. Lena takes jellybeans out without looking.",
+  "If Lena takes 3, she is certain to have two of the same colour.", "If Lena takes 6, she is certain to have two red ones.", 0,
+  ["", "Ana forgets the worst case: 5 yellow and 1 red is 6 jellybeans with only one red", "Ana's reasoning is not correct", "Kofi's reasoning IS correct"],
+  "Kofi: with only two colours, 3 jellybeans must include two the same. Correct. Ana: the worst case is all 5 yellow first, then 1 red, so 6 gives only one red. She would need 7.");
 
 /* RIDGE RUNNER: hand-written reading questions (A–D). All texts are our own.
-   Short texts build one reading skill at a time; four per step, answer letters spread within each step. */
+   Each text builds one reading skill at a time, at test level from step 1 (story extracts of about 80–150 words);
+   eight per step, answer letters spread evenly within each step (each letter twice). */
 const P = t => `<div class="passage">${t}</div>`;
 /* ---------- Reading between the lines ---------- */
-H("infer", 1, "ri1a", { passage: P(`<p>Hana stood at the end of the diving board for a long time. She looked down at the water, then back at the ladder. When her coach called her name, she wiped her hands on her towel for the third time.</p>`),
-  stem: `<p>How does Hana feel?</p>`,
-  opts: [["Excited and eager to dive", "the long wait could look like excitement, but she keeps looking back at the ladder, as if thinking of climbing down"],
-    ["Nervous about diving", null],
-    ["Bored of waiting for her turn", "it is already her turn; she is the one making the wait"],
-    ["Annoyed with her coach", "nothing she does is aimed at the coach"]],
-  body: "The writer never says “nervous”. She SHOWS it: Hana waits, looks back at the ladder (a way out) and keeps wiping her hands (sweaty palms)." });
-H("infer", 1, "ri1b", { passage: P(`<p>When the parcel arrived, Mr Okafor did not open it. He turned it over twice, read the postmark from his old village, and set it carefully on the mantelpiece beside the photograph of his brother. Then he sat down and looked at it for a long while.</p>`),
-  stem: `<p>What do Mr Okafor's actions show?</p>`,
-  opts: [["He is worried that the parcel is broken.", "he handles it carefully, but there's no sign he thinks it is damaged"],
-    ["He doesn't like receiving parcels.", "the opposite: he treats it as precious"],
-    ["He has forgotten who sent it.", "he reads the postmark and places it by his brother's photo, so he seems to know"],
-    ["The parcel means a great deal to him.", null]],
-  body: "He doesn't rush to open it; he places it carefully next to a family photo and just looks at it. Those actions show the parcel matters deeply to him." });
-H("infer", 1, "ri1c", { passage: P(`<p>Tom slid his report card across the kitchen table without a word and stared at the salt shaker. When Mum began to smile, he let out a breath he hadn't known he was holding.</p>`),
-  stem: `<p>How does Tom feel when Mum smiles?</p>`,
-  opts: [["Relieved", null],
-    ["Proud of every mark", "nothing shows pride; he couldn't even look at her"],
-    ["Unconcerned about what Mum thinks", "he was holding his breath, so he cared a lot"],
-    ["Cross that Mum is smiling", "letting out a held breath shows release, not anger"]],
-  body: "Holding his breath and staring at the salt shaker show worry; letting the breath out when she smiles shows relief." });
-H("infer", 1, "ri1d", { passage: P(`<p>The new girl ate her lunch on the bench by the library. Each time a group of laughing children went past, she looked up, half-raised her hand, and then pretended to search her lunch box for something.</p>`),
-  stem: `<p>What is the girl feeling?</p>`,
-  opts: [["She would rather be on her own.", "she half-raises her hand, so part of her wants to join in"],
-    ["She has lost something in her lunch box.", "she only PRETENDS to search; it covers her shyness"],
-    ["She wants to join in but feels too shy.", null],
-    ["She is upset with the other children.", "nothing suggests she blames them"]],
-  body: "The half-raised hand shows she wants to join in; pretending to search her lunch box hides that she lost her nerve." });
-H("infer", 2, "ri2a", { passage: P(`<p>The old fishing boat had been painted many times. Under the chipped blue you could see patches of green, and under the green, a faded red.</p>`),
-  stem: `<p>Why does the writer mention the colours under the blue paint?</p>`,
-  opts: [["To show the boat has been badly looked after and left to fall apart", "the chips are real, but the layers show it was repainted again and again, which is care"],
-    ["To show the owner's favourite colour is blue", "the boat has been three colours, so this doesn't follow"],
-    ["To suggest the boat has had a long life with many repaintings", null],
-    ["To suggest the boat is dangerous to sail", "nothing about paint layers points to danger"]],
-  body: "Each layer is an older coat of paint. The detail tells us the boat is old and has been looked after over many years." });
-H("infer", 2, "ri2b", { passage: P(`<p>Before the race, Rafi tied and retied his shoelaces four times, though they were already tight.</p>`),
-  stem: `<p>Why does the writer include this detail?</p>`,
-  opts: [["To show that Rafi is anxious about the race", null],
-    ["To show that Rafi's shoes are new", "nothing says the shoes are new"],
-    ["To show that the laces keep coming undone", "the laces were already tight, so that isn't the reason"],
-    ["To show that Rafi is wasting time on purpose", "there's no hint he is trying to delay the race"]],
-  body: "Retying laces that are already tight is something people do when they are nervous. The detail shows his feelings without naming them." });
-H("infer", 2, "ri2c", { passage: P(`<p>For forty years the farmer filled his weather diary with neat lines about rainfall, frosts and the price of wool. On the page for the day his daughter was born, beside the date, he had drawn a small star: the only drawing in the whole book.</p>`),
-  stem: `<p>Why does the writer mention the star?</p>`,
-  opts: [["To show the farmer enjoyed drawing", "it is the ONLY drawing in forty years, so he didn't draw often"],
-    ["To show the sky was clear that night", "the star is drawn in a book, not seen in the sky"],
-    ["To show he was careless with his records", "his book is neat; the star is the one exception"],
-    ["To show how special that day was to him", null]],
-  body: "A man who wrote only plain facts for forty years broke his habit once. That one star shows how much his daughter's birth meant to him." });
-H("infer", 2, "ri2d", { passage: P(`<p>Grandma kept the key to the garden shed on a long red ribbon. “Because I lose everything small,” she said, “and I have never once lost this.”</p>`),
-  stem: `<p>Why does the writer mention the ribbon?</p>`,
-  opts: [["It shows that red is Grandma's favourite colour.", "the colour isn't the point; the length and brightness make the key easy to find"],
-    ["It explains how Grandma stops herself losing the key.", null],
-    ["It shows the shed is full of valuable things.", "nothing tells us what is in the shed"],
-    ["It shows that Grandma never loses anything, however small it is.", "she says she loses everything small; the ribbon is why this key is different"]],
-  body: "Grandma tells us she loses small things; the long ribbon makes the key big and easy to spot, which is why she never loses it." });
+H("infer", 1, "ri1a", { passage: P(`<p>The high ropes course began with a ladder that ran straight up the trunk of a gum tree. Callum let the two boys behind him go first. “You go,” he said. “I'm still fixing my harness.” He had already checked the buckles three times.</p><p>When the instructor clipped him onto the safety line, Callum kept his eyes on the bark in front of his nose and counted the rungs under his breath. Halfway up, a magpie warbled somewhere above him. He did not look up to see where it was.</p>`),
+  stem: `<p>Which of these best describes how Callum feels as he begins the climb?</p>`,
+  opts: [["He is excited and can't wait to reach the top.", "he lets the others go first, which is the opposite of being eager"],
+    ["He is annoyed that the other boys pushed in front of him.", "nobody pushes in: Callum TELLS them to go first"],
+    ["He is frightened of the height but trying not to show it.", null],
+    ["He is more interested in the birds than in the climb.", "he hears the magpie but doesn't even look up"]],
+  body: "The writer never says “scared”, but SHOWS it: Callum makes an excuse to go last, checks his buckles again and again, and won't look anywhere but the bark in front of him." });
+H("infer", 1, "ri1b", { passage: P(`<p>Aunt Fen had knitted the jumper herself. It was mustard yellow, with a brown reindeer across the front whose antlers did not quite match.</p><p>“Do you love it?” she asked, her hands clasped under her chin.</p><p>Mei held it up and smiled so widely that her cheeks ached. “It's so … warm,” she said.</p><p>Later, when Aunt Fen had gone home, Mei folded the jumper very neatly and pushed it to the back of her bottom drawer, under her swimming costume. Then, after a moment, she took it out again and laid it on top.</p>`),
+  stem: `<p>What does the passage suggest about Mei?</p>`,
+  opts: [["She loves the jumper and wants to keep it safe.", "she folds it neatly, but she hides it at the back of a drawer at first"],
+    ["She dislikes the jumper but cares about her aunt's feelings.", null],
+    ["She is planning to give the jumper away to someone else in her family.", "nothing suggests that; she keeps it in her own drawer"],
+    ["She is upset that her aunt has gone home.", "the passage is about the jumper; nothing shows she misses her aunt"]],
+  body: "The forced smile and the pause before “warm” show she doesn't like it. Taking it out again and putting it on top shows she feels bad about hiding a present her aunt made with love." });
+H("infer", 1, "ri1c", { passage: P(`<p>“You'll be fine,” said Mum, pulling on her coat. “We're only next door, and the number's on the fridge.”</p><p>When the front door closed, Arlo stood very still in the hallway. His cousin Bea, who was four, looked up at him and waited.</p><p>Arlo cleared his throat. “Right,” he said, in a deep voice that didn't sound like his own. “Bath, story, bed.” He read the list on the fridge twice, although he had written it himself that afternoon. Then he checked that the back door was locked, and checked it again.</p>`),
+  stem: `<p>How does Arlo feel about looking after Bea?</p>`,
+  opts: [["He is cross that Mum has left him on his own.", "he stands still, but nothing he does is aimed at Mum"],
+    ["He is confident because he has done it many times before.", "he writes a list and checks it twice, which doesn't fit someone who has done it often"],
+    ["He is bored and wants Bea to go to bed quickly.", "“Bath, story, bed” is his plan, not a sign of boredom"],
+    ["He is unsure of himself but trying to sound in charge.", null]],
+  body: "The deep voice that “didn't sound like his own” shows he is putting on a grown-up act; reading the list twice and checking the lock twice show how nervous he really is." });
+H("infer", 1, "ri1d", { passage: P(`<p>When the judge announced that the other school had won the debate, Priya clapped along with everyone else. She shook hands with the other team and told their captain that her final speech had been brilliant.</p><p>On the bus home, Priya sat by the window and said she was fine, thanks, just tired. But when her friend offered her half a chocolate bar, she shook her head, and for the rest of the trip she watched the paddocks go past without really seeing any of them.</p>`),
+  stem: `<p>How does Priya really feel after the debate?</p>`,
+  opts: [["Disappointed, though she hides it", null],
+    ["Pleased that the better team won", "she praises the other captain politely, but her actions on the bus show she is far from pleased"],
+    ["Simply tired, as she tells her friend", "that is what she SAYS; the writer shows something else"],
+    ["Angry with the judge for being unfair", "nothing she does is aimed at the judge"]],
+  body: "She does all the polite things, but turning down chocolate and staring out without “really seeing” anything show she is quietly disappointed." });
+H("infer", 1, "ri1e", { passage: P(`<p>Jack's little sister won the art prize for her painting of a whale. At assembly, everyone clapped as she walked up to the stage, and Mum took eleven photos. Jack clapped too.</p><p>At home, he said that the whale's tail was a bit wonky, really, and that the judges probably felt sorry for the little kids. That night, though, when he thought nobody was looking, he stood in front of the painting on the fridge for a long time. Then he straightened it, very carefully, so that it hung exactly level.</p>`),
+  stem: `<p>What does the last part of the passage suggest about Jack?</p>`,
+  opts: [["He still thinks the painting is not very good.", "that is what he said earlier; what he does when alone shows something different"],
+    ["He is secretly proud of his sister.", null],
+    ["He wants to paint a whale of his own.", "nothing suggests he wants to paint"],
+    ["He is worried the painting will fall off the fridge.", "takes the straightening too literally"]],
+  body: "In front of others Jack picks at the painting, but alone he gazes at it and carefully straightens it. His private actions show pride he won't say out loud." });
+H("infer", 1, "ri1f", { passage: P(`<p>Lucia saw the balloons tied to Ana's chair before she even reached the classroom door, and her stomach dropped. She had circled the date on her calendar weeks ago. Then the circle had disappeared under a pile of homework.</p><p>All morning Lucia smiled whenever Ana looked her way, and talked a little too much about the weekend. At lunch she slipped away to the library, tore a page from the back of her exercise book, and spent the whole break drawing, folding and writing in her neatest letters.</p>`),
+  stem: `<p>Why does Lucia go to the library at lunch?</p>`,
+  opts: [["To finish the homework she had not done", "homework is mentioned, but only as the reason she lost track of the date"],
+    ["To keep away from Ana because the two of them have had an argument", "she smiles at Ana all morning; there's no sign of an argument"],
+    ["To make a birthday card because she forgot Ana's birthday", null],
+    ["To find a book to give Ana as a present", "she uses a page from her own exercise book, not a library book"]],
+  body: "The balloons, her stomach dropping and the date lost under homework show she forgot Ana's birthday. Drawing, folding and writing neatly show she is making a card to make up for it." });
+H("infer", 1, "ri1g", { passage: P(`<p>Mr Bellamy washed the old blue ute one last time on the morning it was sold. He even cleaned the hubcaps with a toothbrush.</p><p>When the young couple came to collect it, he showed them how the passenger door needed a bump with your hip to close, and where the spare key was hidden under the mat. He took their money without counting it. Then he stood at the end of the driveway, his hand half-raised, until the ute had turned the corner and the sound of its engine had faded away.</p>`),
+  stem: `<p>How does Mr Bellamy feel about selling the ute?</p>`,
+  opts: [["Glad to be rid of a car with a door that sticks", "the sticking door is a real detail, but he explains it fondly, like a habit of an old friend"],
+    ["Worried that the couple have not paid him enough", "he doesn't even count the money"],
+    ["Proud of how much money he has made", "the money hardly seems to matter to him"],
+    ["Sad to see it go, because it means a lot to him", null]],
+  body: "He cleans it with great care, hands over its little secrets, ignores the money and watches until it is out of sight and sound. Every action shows how much the ute meant to him." });
+H("infer", 1, "ri1h", { passage: P(`<p>At nine o'clock Zara's friends were still giggling over a board game, but Zara had gone quiet. She said she was just going to get a glass of water, and then stood for a long time in the dark kitchen, looking at the phone on the wall. Twice she picked it up. Twice she put it down again.</p><p>When she came back, she laughed at a joke a moment after everyone else did, and for the rest of the night she held her pillow tightly against her chest.</p>`),
+  stem: `<p>What is Zara most likely feeling?</p>`,
+  opts: [["Homesick, but not wanting to admit it", null],
+    ["Thirsty, so she goes for a drink of water", "the water is only her excuse: she spends the time looking at the phone"],
+    ["Left out because her friends won't let her play", "nobody leaves her out; she is the one who goes quiet"],
+    ["Bored, because she doesn't like board games", "laughing late shows her mind is elsewhere, not that she is bored by the game"]],
+  body: "She makes an excuse to leave, nearly phones home twice but stops herself, and clutches her pillow. She wants to go home but doesn't want the others to know." });
+H("infer", 2, "ri2a", { passage: P(`<p>Grandpa's workshop smelled of sawdust and oil. Every tool hung on the pegboard wall inside its own outline, drawn in black marker, so that a missing hammer left a hammer-shaped gap.</p><p>Only one outline had stood empty for as long as I could remember: the shape of a small saw. “Lent it to your father in 1998,” Grandpa said, every time I asked. “He'll bring it back one day.”</p><p>On my tenth birthday, Dad finally found the saw at the back of our garage. Grandpa hung it up without a word, but he whistled all afternoon.</p>`),
+  stem: `<p>Why does the writer describe the outlines drawn on the wall?</p>`,
+  opts: [["To show that Grandpa had too many tools to remember", "the outlines show exactly where each tool goes, the opposite of forgetting"],
+    ["To set up the gap that shows the saw is still missing", null],
+    ["To show that Grandpa was fussy and hard to please", "the outlines show he is orderly, but he is patient about the saw for years, not hard to please"],
+    ["To show that Grandpa enjoyed drawing far more than doing woodwork", "takes the drawing too literally"]],
+  body: "The outlines mean any missing tool leaves a gap you can see. That sets up the saw-shaped gap, which has been waiting for years, and makes its return feel special." });
+H("infer", 2, "ri2b", { passage: P(`<p>Tomasz arrived in the middle of term with a pencil case that still had its shop label on. At recess he stood beside the bubblers and read the notices on the wall, one after another, as if each one was very interesting.</p><p>On Thursday, Ms Ruiz asked who could help her carry some books, and his hand went up before she had finished the question. By Friday afternoon he was teaching three boys a card trick, and nobody remembered that he had ever stood alone by the bubblers.</p>`),
+  stem: `<p>Why does the writer say Tomasz read the notices “as if each one was very interesting”?</p>`,
+  opts: [["To show that he was a keen reader who loved learning", "takes it literally; the words “as if” suggest he wasn't really interested"],
+    ["To show that the notices at this school were unusually interesting ones", "again too literal: the point is about Tomasz, not the notices"],
+    ["To explain how Tomasz learned his card trick", "the card trick comes later and has nothing to do with the notices"],
+    ["To suggest he was pretending to be busy because he was alone", null]],
+  body: "“As if” tells us he only looked interested. Reading notice after notice alone at recess is something a new student does to look busy when he has no friends yet." });
+H("infer", 2, "ri2c", { passage: P(`<p>When Ms Adeyemi's class moved into the old building, every desk had a lid that lifted up. Inside Nikhil's, someone had scratched “R.T. 1974” into the wood, and underneath, in different handwriting, “J.T. 1999”.</p><p>At dinner, Nikhil wondered aloud who R.T. might have been, and whether J.T. had sat at the same desk. His father put down his fork.</p><p>“Robert Tan,” he said slowly. “My father. He went to that school.” He was quiet for a moment. “And J.T. is me.”</p>`),
+  stem: `<p>Why does the writer include the detail that Nikhil's father “put down his fork”?</p>`,
+  opts: [["To show that Nikhil's question has suddenly stopped him in surprise", null],
+    ["To show that he has finished his dinner", "takes the action literally; it marks a sudden pause"],
+    ["To show that he is about to tell Nikhil off for scratching the desk", "Nikhil didn't scratch it, and his father answers gently"],
+    ["To show that he doesn't want to talk about his school days", "he does talk about them, and tells Nikhil something important"]],
+  body: "Putting down the fork mid-meal shows the question has stopped him in his tracks: he has recognised the initials. The slow answer and the silence that follows show it moves him." });
+H("infer", 2, "ri2d", { passage: P(`<p>The lifeguard tower on North Beach is painted the same bright yellow as the lifeguards' shirts. Each morning, before the first swimmers arrive, the lifeguards push two red-and-yellow flags into the sand.</p><p>They move the flags several times a day. Visitors sometimes grumble about having to walk further along the beach to swim between them. But the flags are not put there at random. They mark the part of the beach where the lifeguards have checked the water for rips, the strong currents that can drag a swimmer out to sea, and where they can watch every swimmer at once.</p>`),
+  stem: `<p>Why does the writer mention that visitors “grumble”?</p>`,
+  opts: [["To show that the lifeguards are unfriendly to visitors", "the visitors grumble, not the lifeguards, and nothing unfriendly happens"],
+    ["To suggest that the flags are moved for no good reason", "the writer says the opposite: they are “not put there at random”"],
+    ["To set up the reason the flags are placed where they are", null],
+    ["To show that the beach is far too crowded for anyone to swim safely", "nothing in the passage mentions crowds"]],
+  body: "The writer raises the complaint (“Why walk further?”) and then answers it with “But …”: the flags mark the safe, watched water. The grumble is there so the explanation can follow." });
+H("infer", 2, "ri2e", { passage: P(`<p>The clock on the town hall stopped at twenty past four on the afternoon of the great flood, when brown water rose all the way to the hall's front steps.</p><p>The water went down after three days. The mud was scraped from the shops, and the council could easily have had the clock repaired. Instead, they left its hands exactly where they were. Every year on the anniversary, people gather on the steps beneath it with candles, and someone reads out the names of the streets that went under water.</p>`),
+  stem: `<p>Why did the council leave the clock's hands where they were?</p>`,
+  opts: [["Because the clock was too badly damaged to repair", "the passage says it could “easily” have been repaired"],
+    ["Because the council could not afford a repair", "the passage says it could “easily” have been fixed; money isn't mentioned"],
+    ["To show people exactly what time the yearly gathering starts", "the gathering is on the anniversary; nothing says it starts at twenty past four"],
+    ["So the clock would help the town remember the flood", null]],
+  body: "A clock frozen at the moment of the flood, with a yearly gathering beneath it, works as a memorial. The detail that it “could easily” have been fixed shows the choice was on purpose." });
+H("infer", 2, "ri2f", { passage: P(`<p>For eight months, Hamish dropped every coin he earned into a jar labelled GUITAR. He mowed lawns, washed Mrs Pike's car and once spent a whole Saturday pulling weeds for two dollars an hour.</p><p>When his little brother's bike was stolen from outside the shops, Hamish was quiet all through dinner. The next morning the jar on his shelf was empty, and in the garage stood a second-hand bike with a big red bow on the handlebars. The label on the jar had been carefully peeled off.</p>`),
+  stem: `<p>Why does the writer mention that Hamish once weeded “for two dollars an hour”?</p>`,
+  opts: [["To show that Mrs Pike did not pay him fairly", "the weeding wasn't for Mrs Pike, and the point isn't who paid"],
+    ["To suggest that Hamish was not very good at gardening jobs", "low pay doesn't mean he weeded badly"],
+    ["To show how hard he worked for the money he gave up", null],
+    ["To explain why guitars cost so much money", "the price of guitars is never mentioned"]],
+  body: "A whole Saturday for very little money shows how slowly and painfully the savings grew. That makes it mean more when he spends all of it on his brother's bike." });
+H("infer", 2, "ri2g", { passage: P(`<p>Each winter, humpback whales swim thousands of kilometres north from the icy waters of Antarctica to the warm seas off the coast of Queensland, where many of their calves are born.</p><p>For most of the journey the mothers eat almost nothing. They live off the thick layer of blubber they built up over summer. A newborn calf drinks large amounts of very rich milk and grows quickly, while its mother grows thinner. By the time they head south again in spring, the calf has built up a layer of blubber of its own for the cold Antarctic water.</p>`),
+  stem: `<p>Why does the writer mention that the mother “grows thinner”?</p>`,
+  opts: [["To suggest that she is sick after the long journey", "nothing suggests illness; thinning is the normal cost of feeding a calf"],
+    ["To show that she feeds her calf from her own body", null],
+    ["To show that humpback whales don't like eating in warm water", "the passage doesn't say why they don't eat; it says what they live on instead"],
+    ["To explain why the whales leave Antarctica in winter", "the thinning happens after they arrive, so it doesn't explain why they leave"]],
+  body: "The mother hardly eats, yet makes rich milk. Placing “grows thinner” right beside the calf growing quickly shows that the calf's growth comes from her blubber." });
+H("infer", 2, "ri2h", { passage: P(`<p>In the final of the 800 metres, Leila was in second place with one lap to go. Ahead of her, the girl in the lead clipped the edge of the track and fell hard.</p><p>Leila slowed. For a moment she seemed to look past the fallen runner to the finish line, where her whole class was shouting her name. Then she stopped, held out her hand and pulled the other girl to her feet. They crossed the line together, last and second-last.</p><p>Leila's coach, who had trained her all year for this race, was the first to start clapping.</p>`),
+  stem: `<p>Why does the writer say that Leila “seemed to look past the fallen runner to the finish line”?</p>`,
+  opts: [["To show that she was checking how far she still had left to run to finish", "too literal: the look is about a choice, not a distance"],
+    ["To show that she did not notice the girl had fallen", "she slows down because of the fall, so she did notice"],
+    ["To show that her class wanted her to stop and help", "her class was cheering her on to the finish, not asking her to stop"],
+    ["To show she was tempted to keep running before choosing to help", null]],
+  body: "The look towards the finish line, with her class shouting, shows the win she is giving up. That moment of temptation makes her choice to stop more powerful." });
 H("infer", 3, "ri3a", { passage: P(`<p>The puppy bulldozed through the flower bed.</p>`),
   stem: `<p>What does the word “bulldozed” suggest about the puppy?</p>`,
   opts: [["It ran in quickly but stepped neatly between the flowers.", "keeps the speed but misses the damage a bulldozer does"],
@@ -1697,6 +2031,34 @@ H("infer", 3, "ri3d", { passage: P(`<p>Dad looked at the blackened toast on his 
     ["He is trying hard to sound cheerful.", "the opposite: a flat voice has no cheer in it at all"],
     ["He is too tired to say much.", "he does speak; the word describes HOW, with no feeling"]],
   body: "“Flatly” means with no feeling in the voice. Saying “lovely” flatly about burnt toast shows he means the opposite." });
+H("infer", 3, "ri3e", { passage: P(`<p>The old car coughed twice, shuddered and fell silent. Dad patted the steering wheel. “Come on, old girl,” he whispered. “Just one more trip.”</p>`),
+  stem: `<p>What do the words “Come on, old girl” suggest about Dad?</p>`,
+  opts: [["He is whispering so that he doesn't wake his passengers.", "takes the whisper literally: no passengers are mentioned, and he is speaking TO the car"],
+    ["He is fond of the car and treats it like a person.", null],
+    ["He is calling the car old because he is annoyed with it.", "“old girl” sounds like a complaint, but he pats the wheel and coaxes it gently"],
+    ["He is calm because he knows the car always starts in the end.", "“Just one more trip” is a plea: he isn't sure it will start at all"]],
+  body: "Patting the wheel and coaxing it in a whisper, Dad speaks to the car like an old friend. “Old girl” is a fond nickname, not a complaint." });
+H("infer", 3, "ri3f", { passage: P(`<p>All night the wind sharpened its teeth on the iron roof, and none of us slept.</p>`),
+  stem: `<p>What does “sharpened its teeth on the iron roof” suggest about the wind?</p>`,
+  opts: [["It had cut the roof so that its edges were sharp.", "takes the image literally"],
+    ["An animal was scratching about on the roof.", "teeth belong to animals, but here the words describe the wind"],
+    ["It was harsh and noisy, scraping at the roof.", null],
+    ["It was soft and soothing, helping everyone in the house to sleep.", "the opposite: “none of us slept”"]],
+  body: "The wind is pictured as a beast grinding its teeth: a harsh, scraping, frightening sound that kept everyone awake." });
+H("infer", 3, "ri3g", { passage: P(`<p>When the principal walked in, the noisy classroom wilted into silence.</p>`),
+  stem: `<p>What does the word “wilted” suggest about the class?</p>`,
+  opts: [["The students suddenly felt unwell.", "takes “wilted” too literally, as if the students were sick plants"],
+    ["The class's lively mood drooped as their nerve failed.", null],
+    ["The silence came instantly and all at once, like flicking a switch.", "wilting is a drooping, not a snap"],
+    ["The students grew hot and sleepy in the warm room.", "plants wilt in heat, but nothing here is about the temperature"]],
+  body: "A wilting plant droops and loses its life. The class's noise and energy sag the same way when the principal appears." });
+H("infer", 3, "ri3h", { passage: P(`<p>“What a lovely surprise,” said Mrs Vance, when she found the class's pet mice loose in the staffroom. Her smile did not reach her eyes.</p>`),
+  stem: `<p>What does “her smile did not reach her eyes” suggest?</p>`,
+  opts: [["She was only pretending to be pleased.", null],
+    ["She was pleased, but too surprised to show it fully.", "a real surprise would show in the eyes too; her words are polite cover"],
+    ["She was trying hard not to laugh at the mice.", "holding back a laugh would make the eyes smile, not stay cold"],
+    ["She was glad the lost mice had been found safely.", "this believes her words, but the cold eyes show she doesn't mean them"]],
+  body: "A real smile lights up the eyes as well as the mouth. Hers stayed on her mouth only, so “What a lovely surprise” is polite, not sincere." });
 H("infer", 4, "ri4a", { passage: P(`<p>My first day at drama club went like this. I arrived early, which was good. I sat in the director's chair, which was bad. I opened my folder and found my sister's maths homework instead of my script, which was worse.</p><p>The director, a tall woman with a pencil behind each ear, peered at me over her glasses. “Interesting choice,” she said. Twenty actors turned to look.</p><p>I read the maths homework aloud as my lines for the whole rehearsal. Nobody asked me to. Nobody asked me to stop, either. At the end the director said I had “a lot of nerve”, and I still don't know whether that was good.</p>`),
   stem: `<p>What is the main effect of the way the writer lists what happened (“which was good … bad … worse”)?</p>`,
   opts: [["It turns an embarrassing day into a funny story by building up each disaster.", null],
@@ -1725,33 +2087,84 @@ H("infer", 4, "ri4d", { passage: P(`<p>“Chess is boring,” I told Grandpa. He
     ["To tease Grandpa because the writer won every game after that", "the writer trapped his queen once; nothing says every game was won"],
     ["As a joke: by now the writer loves chess, and Grandpa knows it", null]],
   body: "The same words mean the opposite at the end. The grin and Grandpa's laughter show it is a shared joke: the writer's mind has completely changed." });
-
+H("infer", 4, "ri4e", { passage: P(`<p>Every summer the small ones come and sit in my shade with their lunch boxes. They carve their names into my skin, which tickles, and every autumn I drop my leaves on them so that they shriek and throw them at one another.</p><p>Some of the small ones grow tall and stop coming. Years later a few come back with small ones of their own and point at the old names, which have stretched wider as I have grown.</p><p>Last spring a man with a clipboard tied a red ribbon around my middle and frowned up at my branches. The small ones have not stopped crying since.</p>`),
+  stem: `<p>What has most likely happened at the end of the passage?</p>`,
+  opts: [["The tree has won a prize for being the oldest in the school.", "a ribbon can mean a prize, but the frown and the crying don't fit"],
+    ["The children are crying because the leaves are falling on them.", "the leaves fall in autumn and make them shriek with fun, not cry"],
+    ["The tree is to be cut down, and the children are upset.", null],
+    ["The man is measuring the tree to see how much it has grown.", "he has a clipboard, but measuring wouldn't make the children cry"]],
+  body: "The narrator is a tree in a schoolyard (shade, carved names, falling leaves). A man frowning at it and tying on a ribbon, then children who can't stop crying, together suggest the tree is to be cut down." });
+H("infer", 4, "ri4f", { passage: P(`<p>Gran said the bus would come at eight. Eight o'clock came, and so did the rain. Gran said it would come at half past. Half past came, and so did a man selling umbrellas. Gran said it would surely come by nine. Nine o'clock came, and so did Grandad, in his old white car, with a thermos of hot chocolate and a look on his face that said he had heard all about this bus before.</p>`),
+  stem: `<p>What is the main effect of the pattern “Gran said … came, and so did …”?</p>`,
+  opts: [["It shows that Gran is always right about the bus.", "the opposite: every time she names a time, the bus doesn't come"],
+    ["It shows that the weather grew worse every half hour.", "the rain only arrives once; the other arrivals are a seller and Grandad"],
+    ["It builds a joke in which everything turns up except the bus.", null],
+    ["It shows that the narrator is frightened of waiting in the dark.", "nothing suggests fear; the tone is comic"]],
+  body: "Each round repeats the same shape and adds a new arrival that isn't the bus. The pattern builds to a punchline, and Grandad's look adds one more joke: this happens every time." });
+H("infer", 4, "ri4g", { passage: P(`<p>Uncle Theo arrived for Christmas with no presents and a suitcase full of jokes. He taught the twins to whistle with two fingers, which Mum did not thank him for. He burnt the pudding, set it alight anyway and called it “a special recipe”.</p><p>When the power went out on Boxing Day, it was Uncle Theo who found the candles, told ghost stories until even Grandpa jumped, and lay on the floor making shadow animals on the ceiling. He left on the twenty-seventh, as suddenly as he had come, and the house felt too quiet for a week.</p>`),
+  stem: `<p>Which word best describes Uncle Theo as he is shown in the whole passage?</p>`,
+  opts: [["Careless", "he burns the pudding, but the whole passage shows him making fun out of everything"],
+    ["Mean", "he brings no presents, but he gives everyone a great deal of fun"],
+    ["Brave", "he takes charge in the blackout, but nothing he does is dangerous"],
+    ["Fun-loving", null]],
+  body: "Jokes, whistling lessons, a flaming pudding, ghost stories and shadow animals: every example is about fun, and the quiet house after he leaves shows how much life he brought." });
+H("infer", 4, "ri4h", { passage: P(`<p>Imagine walking up a window and across the ceiling, upside down, without a drop of glue. Geckos do it every night.</p><p>The secret is on their toes, which are covered in millions of tiny hairs, each one splitting into even tinier tips. The tips get so close to a surface that a very weak pulling force acts between them. On its own, each pull is far too small to notice, but millions of them together are strong enough to hold up the gecko. To let go, the gecko simply peels its toes off, the way you would peel off a sticky label.</p>`),
+  stem: `<p>Why does the writer compare the gecko's toes to “a sticky label” at the end?</p>`,
+  opts: [["To help the reader picture how a gecko lets go of a surface", null],
+    ["To show that a gecko's feet are covered in glue", "the passage says “without a drop of glue”"],
+    ["To suggest that a gecko's toes are as flat and smooth as a label", "the toes are covered in millions of tiny hairs, so they are not smooth"],
+    ["To suggest that a gecko's grip, like a label's, works only once", "nothing says the grip wears out: geckos climb every night"]],
+  body: "The writer explains a hard idea with something familiar: just as a label comes away when peeled from one edge, the gecko peels its toes off rather than pulling straight away." });
 /* ---------- The right word ---------- */
 const GAP = s => `<p class="gapline">${s.replace("___", '<span class="blank">________</span>')}</p><p>Which word best fills the gap?</p>`;
-H("word", 1, "rw1a", { stem: GAP("After the long, hot hike, the children ___ their water bottles in a few seconds."),
-  opts: [["sipped", "sipping is slow, small drinks; “in a few seconds” needs the opposite"], ["drained", null], ["tasted", "tasting is just a little; they were thirsty and finished them"], ["poured", "pouring is tipping out, not drinking"]],
-  body: "“In a few seconds” after a hot hike means they drank everything fast: drained." });
-H("word", 1, "rw1b", { stem: GAP("The tiny kitten ___ in the corner of the shed, shaking with fright."),
-  opts: [["lounged", "lounging is lying lazily and relaxed, not frightened"], ["sprawled", "sprawling is stretched out loosely, not afraid"], ["strutted", "strutting is walking proudly"], ["cowered", null]],
-  body: "“Shaking with fright” needs a word for crouching down in fear: cowered." });
-H("word", 1, "rw1c", { stem: GAP("The museum guard ___ at the boy who was reaching out to touch the painting."),
-  opts: [["glared", null], ["glanced", "a glance is a quick look, with no warning in it"], ["peeked", "peeking is looking secretly"], ["gazed", "gazing is a long, dreamy look"]],
-  body: "A guard stopping someone touching a painting would give an angry, warning look: glared." });
-H("word", 1, "rw1d", { stem: GAP("Our victory was ___: we won every game by a large margin."),
-  opts: [["narrow", "a narrow win is a close one, the opposite of a large margin"], ["lucky", "winning every game easily doesn't suggest luck"], ["decisive", null], ["modest", "modest means small, which doesn't match a large margin"]],
-  body: "Winning every game by a lot is a clear, convincing victory: decisive." });
-H("word", 2, "rw2a", { stem: GAP("Mum told us to ___ our steps to the last place we had seen the keys."),
-  opts: [["follow", "we don't say “follow our steps” for going back the way we came"], ["return", "“return our steps” isn't the fixed phrase"], ["retrace", null], ["reverse", "“reverse” goes with a car, not with steps"]],
-  body: "The fixed expression is “retrace your steps”: go back the same way." });
-H("word", 2, "rw2b", { stem: GAP("The firefighters ___ the alarm as soon as they saw smoke coming from the roof."),
-  opts: [["raised", null], ["lifted", "close in meaning, but we never say “lifted the alarm”"], ["increased", "that would mean making an alarm louder or bigger"], ["grew", "grow doesn't go with alarm at all"]],
-  body: "“Raise the alarm” is the fixed expression for warning people of danger." });
-H("word", 2, "rw2c", { stem: GAP("It was a ___ of luck that we found Gran's ring in the sand."),
-  opts: [["hit", "“a hit” can be a success, but not “a hit of luck”"], ["blow", "a blow is a shock or a setback, the opposite"], ["strike", "“strike” doesn't partner with luck"], ["stroke", null]],
-  body: "The fixed partner is “a stroke of luck”. Only one word goes with “of luck”." });
-H("word", 2, "rw2d", { stem: GAP("The lost hikers were overjoyed when they caught ___ of the rescue helicopter."),
-  opts: [["a look", "you “take” a look; you don't “catch” one"], ["a glimpse", null], ["a view", "you “get” or “have” a view"], ["a sight", "we say “catch sight of”, with no “a”"]],
-  body: "The partners are “catch a glimpse of” (or “catch sight of”, without “a”)." });
+H("word", 1, "rw1a", { stem: GAP("The detective ___ every page of the diary, searching for even the smallest clue."),
+  opts: [["skimmed", "skimming is reading quickly for the gist, the opposite of searching for the smallest clue"], ["glimpsed", "a glimpse is a brief look"], ["scrutinised", null], ["surveyed", "surveying is looking over the whole of something, not studying every detail"]],
+  body: "“Searching for even the smallest clue” needs a word for examining closely and carefully: scrutinised." });
+H("word", 1, "rw1b", { stem: GAP("After weeks without rain, the once-mighty river had ___ to a thin, muddy trickle."),
+  opts: [["flourished", "flourishing is growing strongly, the opposite"], ["dwindled", null], ["plummeted", "plummeting is a sudden fall, but this happened slowly over weeks"], ["condensed", "condensing is a gas turning into liquid, which isn't what happened"]],
+  body: "Shrinking gradually over weeks, from mighty to a trickle: dwindled." });
+H("word", 1, "rw1c", { stem: GAP("The audience sat ___ as the magician slowly lifted the cloth from the empty cage."),
+  opts: [["restless", "restless means fidgety and impatient, not gripped"], ["drowsy", "drowsy is sleepy, not gripped by the trick"], ["oblivious", "oblivious means not noticing, but they are watching closely"], ["spellbound", null]],
+  body: "A slow, tense reveal holds the audience completely still and fascinated: spellbound." });
+H("word", 1, "rw1d", { stem: GAP("Although the storm had passed, the sea was still ___, with huge grey waves crashing over the breakwater."),
+  opts: [["turbulent", null], ["placid", "placid means calm, the opposite of crashing waves"], ["stagnant", "stagnant water is still and stale"], ["shallow", "about depth, not the wild waves"]],
+  body: "“Huge grey waves crashing” describes wild, churning water: turbulent." });
+H("word", 1, "rw1e", { stem: GAP("Mia gave such a ___ answer that nobody could tell whether she had agreed to come or not."),
+  opts: [["blunt", "a blunt answer is very direct, so everyone would know"], ["prompt", "prompt means quick, which doesn't explain the confusion"], ["vague", null], ["cheerful", "a cheerful answer could still be clear"]],
+  body: "Nobody could tell what she meant, so the answer was unclear: vague." });
+H("word", 1, "rw1f", { stem: GAP("The old sailor's tales were so ___ that many people refused to believe them."),
+  opts: [["mundane", "mundane means dull and ordinary, which nobody would doubt"], ["far-fetched", null], ["accurate", "accurate stories are true, the opposite of unbelievable"], ["modest", "modest stories are low-key, not hard to believe"]],
+  body: "People refused to believe them, so the stories must have been hard to believe: far-fetched." });
+H("word", 1, "rw1g", { stem: GAP("The ___ smell of fresh bread drew a long queue of customers out onto the footpath."),
+  opts: [["pungent", "pungent means sharp and strong, usually unpleasant"], ["faint", "a faint smell wouldn't draw a long queue"], ["stale", "stale doesn't fit fresh bread"], ["enticing", null]],
+  body: "A smell that pulls customers in is attractive and tempting: enticing." });
+H("word", 1, "rw1h", { stem: GAP("The new library was an ___ building of glass and steel that towered over the old shops around it."),
+  opts: [["imposing", null], ["unassuming", "unassuming means modest and plain, not towering"], ["inviting", "inviting is about seeming friendly, not about towering size"], ["unsightly", "unsightly means ugly, but nothing in the sentence says it was ugly"]],
+  body: "A huge glass-and-steel building that towers over its neighbours is grand and impressive: imposing. (The “an” before the gap also needs a word that starts with a vowel sound, and all four do, so only the meaning decides.)" });
+H("word", 2, "rw2a", { stem: GAP("After a long argument, the two teams agreed to ___ their differences and work together."),
+  opts: [["solve", "you solve a problem, but you don't “solve differences”"], ["mend", "you mend a friendship, but not “differences”"], ["settle", null], ["close", "you close a gap, but not “differences”"]],
+  body: "The fixed partner is “settle your differences”: sort out a disagreement." });
+H("word", 2, "rw2b", { stem: GAP("After a long meeting, the council finally ___ a decision about the new swimming pool."),
+  opts: [["reached", null], ["arrived", "“arrived” needs “at”: arrived AT a decision"], ["got", "“got a decision” would mean received one from someone else"], ["did", "you don't “do” a decision"]],
+  body: "You “reach a decision” (or “arrive at” one). Only “reached” fits without another word." });
+H("word", 2, "rw2c", { stem: GAP("The grass fire spread so quickly that it was soon out of ___."),
+  opts: [["order", "“out of order” means broken, like a lift"], ["reach", "“out of reach” means too far away to touch"], ["danger", "“out of danger” means safe, the opposite"], ["control", null]],
+  body: "Something that can no longer be managed is “out of control”." });
+H("word", 2, "rw2d", { stem: GAP("Please ___ close attention to the safety instructions before the ride begins."),
+  opts: [["spend", "“spend” goes with time or money, not attention"], ["pay", null], ["take", "you take notice, but you PAY attention"], ["put", "“put attention” isn't used"]],
+  body: "The fixed partner is “pay attention”." });
+H("word", 2, "rw2e", { stem: GAP("The scientist's discovery shed new ___ on how dinosaurs might have moved."),
+  opts: [["sight", "you catch sight of something; you don't shed it"], ["view", "you can take a new view, but you don't shed one"], ["light", null], ["glow", "close in meaning, but “shed glow” isn't the expression"]],
+  body: "“Shed light on” means help explain. Only “light” goes with “shed … on”." });
+H("word", 2, "rw2f", { stem: GAP("Mr Ito ___ his promise and was sitting in the front row for his daughter's concert."),
+  opts: [["held", "you hold your breath or your nerve, not a promise"], ["saved", "you save money or time, not a promise"], ["kept", null], ["made", "making a promise is giving it; the sentence shows he carried it out"]],
+  body: "Doing what you promised is “keeping” your promise. “Made” is the trap: he made it earlier, and this sentence shows him keeping it." });
+H("word", 2, "rw2g", { stem: GAP("The climbers had a ___ escape when the rock face crumbled moments after they reached the ledge."),
+  opts: [["thin", "close in meaning, but “a thin escape” isn't the expression"], ["slim", "“slim” goes with chance, not escape"], ["tight", "“tight” goes with squeeze, not escape"], ["narrow", null]],
+  body: "Escaping danger only just in time is a “narrow escape”." });
+H("word", 2, "rw2h", { stem: GAP("The council has ___ a ban on fireworks during the dry season."),
+  opts: [["imposed", null], ["inflicted", "you inflict pain or damage, not a ban"], ["committed", "you commit a crime or a mistake"], ["dealt", "you deal a blow or cards, not a ban"]],
+  body: "Rules and bans are “imposed”: put in place by someone with the power to do it." });
 H("word", 3, "rw3a", { stem: GAP("Lily insisted ___ paying for everyone's ice cream."),
   opts: [["to", "“insisted to paying” breaks the sentence"], ["for", "“insisted for” isn't used"], ["at", "“insisted at” isn't used"], ["on", null]],
   body: "“Insist” takes “on”: insisted on paying." });
@@ -1764,6 +2177,18 @@ H("word", 3, "rw3c", { stem: GAP("The scientist was famous ___ her work on rainf
 H("word", 3, "rw3d", { stem: GAP("The teacher ___ the class that the excursion had been cancelled."),
   opts: [["informed", null], ["announced", "you announce something TO the class, not “announced the class”"], ["explained", "you explain TO someone"], ["said", "you say something TO someone"]],
   body: "Only “informed” can be followed straight away by the people and then “that…”." });
+H("word", 3, "rw3e", { stem: GAP("The scientists were intent ___ finding the cause of the mysterious illness."),
+  opts: [["to", "“intent to” is a noun phrase (“with intent to”), not what follows “were intent”"], ["for", "“intent for” isn't used"], ["at", "“intent at” isn't used"], ["on", null]],
+  body: "Being determined to do something is being “intent on” it: intent on finding." });
+H("word", 3, "rw3f", { stem: GAP("Ms Daly ___ that we bring a hat and a water bottle on the excursion."),
+  opts: [["wanted", "“wanted that we bring” breaks the grammar: we say “wanted us to bring”"], ["suggested", null], ["told", "“told” needs a person first: “told us that …”"], ["let", "“let” needs a person and a plain verb: “let us bring”"]],
+  body: "Only “suggested” can be followed straight away by “that we bring …”." });
+H("word", 3, "rw3g", { stem: GAP("The firefighters were praised ___ their bravery during the bushfire."),
+  opts: [["of", "“praised of” isn't used"], ["for", null], ["with", "“praised with” would mean the praise came along with something else"], ["about", "“praised about” isn't used"]],
+  body: "You are praised FOR something you did." });
+H("word", 3, "rw3h", { stem: GAP("Although he was furious, the coach refrained ___ shouting at the referee."),
+  opts: [["from", null], ["to", "“refrained to” breaks the grammar"], ["of", "“refrained of” isn't used"], ["against", "“against” sounds right for holding back, but “refrain” takes “from”"]],
+  body: "“Refrain” (hold yourself back) takes “from” + an -ing word: refrained from shouting." });
 H("word", 4, "rw4a", { stem: `<p class="gapline">Ruby had expected the old house to be gloomy. Instead, the rooms were <span class="blank">________</span>, with sunlight pouring through tall windows onto white walls.</p><p>Which word best fills the gap?</p>`,
   opts: [["airy", null], ["dim", "dim is close to gloomy, but “Instead” says the rooms were the opposite"], ["cosy", "cosy suggests small and snug, not tall windows and pouring light"], ["musty", "musty is stale and old-smelling, which matches gloomy, not the sunlight"]],
   body: "“Instead” signals the opposite of gloomy, and the sunlight, tall windows and white walls describe light, open, fresh rooms: airy." });
@@ -1776,37 +2201,100 @@ H("word", 4, "rw4c", { stem: `<p class="gapline">Most of the class finished the 
 H("word", 4, "rw4d", { stem: `<p class="gapline">Mia was sure the test would be easy, so she barely studied. When she read the first question, she realised she had been far too <span class="blank">________</span>.</p><p>Which word best fills the gap?</p>`,
   opts: [["careful", "barely studying is the opposite of careful"], ["nervous", "she was sure it would be easy, so she wasn't nervous before"], ["modest", "being sure of yourself is the opposite of modest"], ["confident", null]],
   body: "The clue is the sentence before: she was “sure the test would be easy” and “barely studied”. Her mistake was being too confident." });
-
+H("word", 4, "rw4e", { stem: `<p class="gapline">Everyone had expected the visiting speaker to be dull. Yet her talk was so <span class="blank">________</span> that the whole hall burst into laughter again and again.</p><p>Which word best fills the gap?</p>`,
+  opts: [["solemn", "solemn is serious, which matches “dull”, but “Yet” signals the opposite"], ["witty", null], ["lengthy", "a long talk wouldn't make the hall laugh"], ["informative", "it fits a talk, but it doesn't explain the laughter"]],
+  body: "“Yet” turns away from “dull”, and “burst into laughter again and again” shows a clever, funny talk: witty." });
+H("word", 4, "rw4f", { stem: `<p class="gapline">The garden had once been the pride of the street. Now, after years of neglect, it was <span class="blank">________</span> with weeds and broken pots.</p><p>Which word best fills the gap?</p>`,
+  opts: [["adorned", "adorned means decorated, which is positive, but the garden has been neglected"], ["bordered", "a border is only round the edge; weeds after years of neglect fill everything"], ["overrun", null], ["planted", "planting is done on purpose; neglect means nobody was caring for it"]],
+  body: "“Once the pride … Now, after years of neglect” sets up a contrast: weeds have spread everywhere. That is “overrun”." });
+H("word", 4, "rw4g", { stem: `<p class="gapline">Toby is always the first to volunteer for anything. So when he sat silently at the back while the teacher asked for helpers, his friends were <span class="blank">________</span>.</p><p>Which word best fills the gap?</p>`,
+  opts: [["unsurprised", "the first sentence says he ALWAYS volunteers, so this is the opposite of what they would expect"], ["puzzled", null], ["delighted", "nothing suggests his friends were happy he stayed quiet"], ["relieved", "relief would need a reason, such as not wanting him to help"]],
+  body: "The first sentence sets up what is normal for Toby, and “So” shows the friends reacting to the change. Seeing him act out of character, they would be puzzled." });
+H("word", 4, "rw4h", { stem: `<p class="gapline">The old letters had survived a house fire and a hundred years in a damp cellar. Nobody had read them for decades. When the museum finally received them, they were too <span class="blank">________</span> to be handled at all, so every page was photographed instead.</p><p>Which word best fills the gap?</p>`,
+  opts: [["tattered", "tattered means ragged and torn at the edges; torn paper can still be handled with care"], ["weathered", "weathered means worn by time and weather, which fits their history but doesn't stop anyone touching them"], ["musty", "musty means smelling of damp, which fits the cellar, but a smell doesn't stop anyone handling paper"], ["brittle", null]],
+  body: "All four words could describe old paper, so decide by the shade of meaning. “Too … to be handled at all” needs paper that would break if touched, and the first sentence explains why: fire dried it and damp weakened it. Paper so dry and hard that it snaps or crumbles is “brittle”." });
 /* ---------- Linking sentences ---------- */
-H("link", 1, "rl1a", { passage: P(`<p>Honeybees tell each other where to find flowers by dancing. This is called the waggle dance.</p>`),
+H("link", 1, "rl1a", { passage: P(`<p>Coral reefs are built by tiny animals called coral polyps. Each polyp builds a hard skeleton of limestone around its soft body. When it dies, the skeleton remains, and new polyps grow on top. Over thousands of years, the skeletons pile up into a reef.</p>`),
+  stem: `<p>In “When it dies”, what does “it” refer to?</p>`,
+  opts: [["The limestone skeleton", "this is the nearest noun, but the skeleton “remains”, so it isn't the thing that dies"], ["The coral reef", "the reef is still being built; it isn't what dies"], ["A coral polyp", null], ["The sea", "the sea isn't mentioned, and it can't die"]],
+  body: "Read on: “When it dies, the skeleton remains”. So “it” must be something living that HAS a skeleton: the polyp." });
+H("link", 1, "rl1b", { passage: P(`<p>Mum's old car and Dad's new one were both parked in the driveway. The former had a dent in one door and a faded sticker on the back window; the latter still smelled of the showroom.</p>`),
+  stem: `<p>What does “The former” refer to?</p>`,
+  opts: [["Dad's new car", "that is “the latter”: the second one mentioned"], ["Mum's old car", null], ["The driveway", "a driveway doesn't have doors or windows"], ["The door with the dent", "the dented door belongs to “the former”, so it can't be the former itself"]],
+  body: "“The former” means the first of two things just mentioned, and “the latter” means the second. Mum's old car came first." });
+H("link", 1, "rl1c", { passage: P(`<p>Some people believe that bats are blind. This is not true: bats can see, and many kinds also use echoes to find their way in the dark.</p>`),
   stem: `<p>What does “This” refer to?</p>`,
-  opts: [["The flowers", "flowers don't dance; “This” points to the whole idea before it"], ["The way the bees dance to show where flowers are", null], ["The honeybees themselves, wherever in the world they live", "the waggle dance is something bees DO, not the bees themselves"], ["The hive", "the hive isn't mentioned at all"]],
-  body: "“This” points back to the whole idea of the sentence before: bees dancing to show where flowers are." });
-H("link", 1, "rl1b", { passage: P(`<p>My grandparents moved to the coast when they retired. There, they bought a small boat and learned to sail.</p>`),
-  stem: `<p>What does “There” refer to?</p>`,
-  opts: [["The boat", "they bought the boat there, so “there” must be a place"], ["The sailing club", "no sailing club is mentioned"], ["Their old house", "they had moved away from it"], ["The coast", null]],
-  body: "“There” points back to a place in the sentence before: the coast." });
-H("link", 1, "rl1c", { passage: P(`<p>Explorers once believed that a huge southern land must exist to balance the lands in the north. They searched for it for hundreds of years.</p>`),
-  stem: `<p>Who does “They” refer to?</p>`,
-  opts: [["The explorers", null], ["The lands in the north", "lands can't search"], ["The huge southern land", "that is “it”, the thing they searched for"], ["People today", "the passage is about long ago"]],
-  body: "“They” must be people who could search: the explorers. The southern land is “it”." });
-H("link", 1, "rl1d", { passage: P(`<p>Penguins cannot fly, but such birds are not helpless: they are among the best swimmers in the ocean.</p>`),
-  stem: `<p>What does “such birds” mean here?</p>`,
-  opts: [["All birds that live near the sea", "the sentence is about one kind of bird, not all sea birds"], ["Birds that are helpless", "the sentence says they are NOT helpless"], ["Birds that cannot fly", null], ["The fastest penguins", "nothing singles out fast ones"]],
-  body: "“Such” points back to what was just said about them: birds that cannot fly." });
+  opts: [["The fact that bats can see", "that is what the writer says IS true; “This” is what is not true"], ["Bats using echoes to find their way", "that comes after “This”, and the writer says it is true"], ["The people who believe it", "people can't be “not true”"], ["The idea that bats are blind", null]],
+  body: "“This is not true” points back to the belief in the sentence before: that bats are blind." });
+H("link", 1, "rl1d", { passage: P(`<p>Lena's grandmother taught her to sew, and her great-aunt taught her to knit. Years later, she still uses both skills every winter.</p>`),
+  stem: `<p>Who does “she” refer to?</p>`,
+  opts: [["Lena", null], ["Lena's great-aunt", "she is the nearest woman mentioned, but she only knew how to knit"], ["Lena's grandmother", "she taught sewing, not knitting"], ["Both of the older women", "“she” means one person, and only one person learned BOTH skills"]],
+  body: "“Both skills” is the clue: only Lena learned to sew AND to knit." });
+H("link", 1, "rl1e", { passage: P(`<p>Tom begged his parents to let him stay up to watch the eclipse. They said no at first, but when he promised to do his chores before dinner, they finally agreed to it.</p>`),
+  stem: `<p>In “they finally agreed to it”, what does “it” refer to?</p>`,
+  opts: [["Tom doing his chores before dinner", "the chores are the nearest idea, but they are Tom's promise, not what his parents agreed to"], ["The eclipse", "you can't agree to an eclipse"], ["Tom staying up late", null], ["Dinner", "dinner isn't something they were asked about"]],
+  body: "What did Tom ask for? To stay up for the eclipse. That is what his parents first refused and then agreed to." });
+H("link", 1, "rl1f", { passage: P(`<p>Emus, cassowaries and kiwis are all birds that cannot fly, but only the first two are found in the wild in Australia.</p>`),
+  stem: `<p>Which birds does “the first two” refer to?</p>`,
+  opts: [["Cassowaries and kiwis", "these are the LAST two in the list"], ["Emus and kiwis", "these are the first and the third"], ["All birds that cannot fly", "“the first two” picks out two birds from the list"], ["Emus and cassowaries", null]],
+  body: "Count along the list: emus (1), cassowaries (2), kiwis (3). The first two are emus and cassowaries; kiwis live in New Zealand." });
+H("link", 1, "rl1g", { passage: P(`<p>Our class wrote to the council asking for a pedestrian crossing outside the school. Three weeks later a reply arrived, together with a map of the street. It said that work would begin in the spring.</p>`),
+  stem: `<p>What does “It” refer to?</p>`,
+  opts: [["The map", "the map is the nearest noun, but a map shows places; it doesn't say when work will begin"], ["The reply", null], ["The crossing", "a crossing can't say anything"], ["The council", "the council sent the reply, but the thing that arrived and “said” this is the reply itself"]],
+  body: "Something that “said” work would begin must contain words: the reply to the class's letter." });
+H("link", 1, "rl1h", { passage: P(`<p>In 1969, hundreds of millions of people watched on television as astronauts walked on the Moon. Many of them still remember exactly where they were at that moment.</p>`),
+  stem: `<p>Who does “them” refer to?</p>`,
+  opts: [["The astronauts", "they are the nearest people, but they walked on the Moon; it is the viewers who remember where they were watching"], ["People today", "the sentence is about people who were alive in 1969"], ["The people who watched on television", null], ["The people who made the television show", "they aren't mentioned"]],
+  body: "“Many of them still remember where they were” only makes sense for the viewers at home, who were in many different places." });
 const NEXT = `<p>Which sentence would best come next?</p>`;
-H("link", 2, "rl2a", { passage: P(`<p>Some animals use tools. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["Animals need food and water to survive.", "true, but it doesn't follow on from tools"], ["Tools can be dangerous if they are used carelessly.", "about tools in general, not animals using them"], ["Sea otters, for example, crack open shells with stones.", null], ["Many of the tools that people use every day are made of metal or plastic.", "this drifts away to people's tools"]],
-  body: "A general statement (some animals use tools) is usually followed by an example. “For example” and the otter's stone fit exactly." });
-H("link", 2, "rl2b", { passage: P(`<p>Many inventions came about by accident. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["The microwave oven was invented after a scientist noticed a chocolate bar melting near a machine.", null], ["Inventors often work very long hours in busy laboratories filled with expensive and complicated equipment.", "on the topic of inventors, but not an accident"], ["Some inventions are very expensive to buy.", "about cost, not about accidents"], ["Accidents can happen at home as well as at work.", "shares the word “accident” but changes the subject"]],
-  body: "The first sentence makes a general claim; the next should give an example of an accidental invention." });
-H("link", 2, "rl2c", { passage: P(`<p>Our cat has a strange habit. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["Cats can sleep for up to sixteen hours a day, often in the sunniest spot they can find.", "a fact about all cats, not OUR cat's habit"], ["Most people in our street own a pet.", "about other people, not the habit"], ["Cats were kept as pets in ancient Egypt.", "history, not the habit"], ["Every morning she drinks from the bathroom tap instead of her bowl.", null]],
-  body: "“A strange habit” needs to be explained next: what the habit is." });
-H("link", 2, "rl2d", { passage: P(`<p>The bridge had to be closed for repairs. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["Bridges are found all over the world.", "too general; doesn't explain the closure"], ["Cracks had been found in two of its supports.", null], ["The river below is popular for fishing.", "about the river, not the repairs"], ["Some bridges can lift up to let ships pass underneath.", "about other bridges"]],
-  body: "After saying the bridge was closed, the text should give the reason: the cracks." });
+H("link", 2, "rl2a", { passage: P(`<p>Camels are remarkably well suited to life in the desert. <span class="blank">________</span></p>`), stem: NEXT,
+  opts: [["Camels were brought to Australia in the 1800s to carry goods across the outback.", "true and about camels, but it doesn't show how they suit the desert"],
+    ["Their broad, padded feet stop them sinking into soft sand.", null],
+    ["Deserts can be freezing at night, even when the days are hot.", "about deserts, not about camels"],
+    ["Some tourists ride camels along the beach at Broome.", "about camel rides, not about desert life"]],
+  body: "A general claim (camels suit the desert) should be followed by an example or a reason. Their feet are one." });
+H("link", 2, "rl2b", { passage: P(`<p>Not every invention is a success. <span class="blank">________</span></p>`), stem: NEXT,
+  opts: [["The telephone was invented in the 1870s and changed the way the whole world talks.", "this is a famous success, the opposite of what the first sentence leads into"],
+    ["Inventors often fill notebooks with drawings and ideas.", "about inventors, not about inventions that failed"],
+    ["Many new gadgets are forgotten within a year because nobody buys them.", null],
+    ["Some inventions are thought up by children.", "about who invents, not about failure"]],
+  body: "“Not every invention is a success” leads into examples of failures: gadgets nobody buys." });
+H("link", 2, "rl2c", { passage: P(`<p>Our town's library is much more than a place to borrow books. <span class="blank">________</span></p>`), stem: NEXT,
+  opts: [["Books can be borrowed for up to three weeks at a time.", "this is about borrowing books, the very thing the first sentence says it is MORE than"],
+    ["The library was built in 1952 and still has its original red tiled roof.", "history and looks, not what else it offers"],
+    ["Many people now prefer to buy their books online.", "about buying books, not about the library"],
+    ["It also runs homework clubs, lends out cake tins and shows films.", null]],
+  body: "“Much more than a place to borrow books” needs to be followed by the other things it offers." });
+H("link", 2, "rl2d", { passage: P(`<p>The school concert had to be moved to the following week. <span class="blank">________</span></p>`), stem: NEXT,
+  opts: [["A storm had damaged the roof of the hall the night before.", null],
+    ["The concert will include songs from every class in the school.", "about the concert, but not why it was moved"],
+    ["Concerts are a good way for parents to see what students have learned.", "about concerts in general"],
+    ["Tickets will cost five dollars for adults.", "about tickets, not the change of date"]],
+  body: "After saying the concert was moved, the text should give the reason: storm damage to the hall." });
+H("link", 2, "rl2e", { passage: P(`<p>Ice is lighter than the same amount of liquid water. <span class="blank">________</span></p>`), stem: NEXT,
+  opts: [["Water boils at 100 degrees Celsius at sea level.", "a true fact about water, but it doesn't follow on from ice being lighter"],
+    ["That is why ice cubes float in a drink.", null],
+    ["Ice-skating is a popular sport in cold countries.", "about ice, but not about it being lighter"],
+    ["Glaciers move very slowly down mountains.", "about ice, but it doesn't follow on"]],
+  body: "The first sentence gives a fact; the next gives its result. “That is why” points back to it: lighter things float." });
+H("link", 2, "rl2f", { passage: P(`<p>Grandpa is a man of very few words. <span class="blank">________</span></p>`), stem: NEXT,
+  opts: [["He loves telling long stories about his years in the navy.", "the opposite: long stories don't fit a man of few words"],
+    ["He grew up on a dairy farm near Bega.", "about Grandpa, but not about how little he says"],
+    ["When I showed him my report, he just nodded and tapped one mark.", null],
+    ["Many grandparents enjoy spending lots of time with their grandchildren after school.", "about grandparents in general"]],
+  body: "A statement about someone's character is usually followed by an example. A nod and a tap, with no words, shows a man of few words." });
+H("link", 2, "rl2g", { passage: P(`<p>Some animals change colour with the seasons to match their surroundings. <span class="blank">________</span></p>`), stem: NEXT,
+  opts: [["Colours can be warm, like red, or cool, like blue.", "about colours, not animals"],
+    ["Many small animals are hunted by bigger ones.", "it explains why hiding helps, but it isn't the example the sentence leads into"],
+    ["Red foxes were brought to Australia from England in the 1800s for hunting.", "shares the word “fox” with the right answer, but it doesn't follow on"],
+    ["The Arctic fox, for example, is white in winter and brown in summer.", null]],
+  body: "A general statement is followed by an example: “for example” and the Arctic fox's changing coat fit exactly." });
+H("link", 2, "rl2h", { passage: P(`<p>Finishing the jigsaw puzzle took far longer than we had planned. <span class="blank">________</span></p>`), stem: NEXT,
+  opts: [["Half the pieces were plain blue sky, all looking the same.", null],
+    ["Jigsaws are a good way to pass a rainy afternoon.", "about jigsaws in general, not why this one was slow"],
+    ["Jigsaw puzzles were first made in England more than two hundred years ago.", "history, not a reason"],
+    ["My sister prefers board games to puzzles.", "about the sister's taste, not the puzzle"]],
+  body: "After saying it took longer than planned, the next sentence should explain why: pieces that all look alike." });
 const SIG = `<p>Which word or phrase best fills the gap?</p>`;
 H("link", 3, "rl3a", { passage: P(`<p>The forecast promised sunshine all day. <span class="blank">________</span>, it rained all afternoon.</p>`), stem: SIG,
   opts: [["Therefore", "“therefore” means “because of that”, but sunshine doesn't cause rain"], ["Also", "“also” adds a similar idea, but rain is the opposite of what was promised"], ["For example", "rain isn't an example of sunshine"], ["Instead", null]],
@@ -1820,6 +2308,18 @@ H("link", 3, "rl3c", { passage: P(`<p>Many people think owls are especially wise
 H("link", 3, "rl3d", { passage: P(`<p>The cake sank in the middle and was burnt at the edges. <span class="blank">________</span> the whole family asked for a second slice.</p>`), stem: SIG,
   opts: [["Even so,", null], ["As a result,", "a burnt, sunken cake wouldn't CAUSE people to want more"], ["For example,", "asking for more isn't an example of the cake sinking"], ["Instead,", "“instead” would need a replaced action"]],
   body: "Despite the problems, they still wanted more: a contrast against expectations. “Even so” fits." });
+H("link", 3, "rl3e", { passage: P(`<p>The sunflower seeds were planted in poor, rocky soil. <span class="blank">________</span>, they grew into the tallest sunflowers in the street.</p>`), stem: SIG,
+  opts: [["Consequently", "“consequently” means “because of that”, but poor soil wouldn't CAUSE tall flowers"], ["Similarly", "“similarly” adds a matching idea, but the second idea is a surprise"], ["Nevertheless", null], ["For instance", "tall sunflowers aren't an example of poor soil"]],
+  body: "Poor soil would make you expect weak plants; instead they grew tallest. A surprising result despite the first idea needs “Nevertheless”." });
+H("link", 3, "rl3f", { passage: P(`<p>Lions usually hunt at night. <span class="blank">________</span>, cheetahs do most of their hunting during the day.</p>`), stem: SIG,
+  opts: [["Therefore", "“therefore” shows a result, but lions hunting at night doesn't cause cheetahs to hunt by day"], ["In contrast", null], ["For example", "cheetahs aren't an example of lions"], ["As a result", "this shows a result, which doesn't fit two separate facts"]],
+  body: "Two animals are being set against each other: night and day. The link must show contrast: “In contrast”." });
+H("link", 3, "rl3g", { passage: P(`<p>A fallen tree was blocking the main road. <span class="blank">________</span>, the bus had to take a much longer route.</p>`), stem: SIG,
+  opts: [["On the other hand", "this sets up a contrast, but the second idea follows from the first"], ["Nevertheless", "“nevertheless” means “despite that”, but the longer route happened BECAUSE of the tree"], ["In other words", "the second sentence doesn't say the same thing again"], ["Consequently", null]],
+  body: "The blocked road caused the longer route. A link that shows a result is needed: “Consequently”." });
+H("link", 3, "rl3h", { passage: P(`<p>Tasmanian devils look fierce and make terrifying screeches at night. <span class="blank">________</span>, they are shy animals that usually keep away from people.</p>`), stem: SIG,
+  opts: [["However", null], ["Therefore", "“therefore” shows a result, but looking fierce doesn't make them shy"], ["Furthermore", "“furthermore” adds a similar idea, but shy is the opposite of fierce"], ["Because of this", "their shyness isn't caused by how they look"]],
+  body: "Fierce looks, but shy behaviour: two ideas that pull against each other need a contrast word: “However”." });
 const FILL = `<p>Which sentence best fills the gap?</p>`;
 H("link", 4, "rl4a", { passage: P(`<p>The leafy sea dragon is a relative of the seahorse that lives off the southern coast of Australia. <span class="blank">________</span> These flaps are not used for swimming at all; they simply help it hide among the seaweed.</p>`), stem: FILL,
   opts: [["Its body is covered in leaf-shaped flaps of skin.", null], ["It swims very slowly using tiny, almost see-through fins.", "on topic, but then “These flaps” would point to nothing"], ["Seahorses are also found in many other oceans.", "this leaves “These flaps” with nothing to refer to"], ["Divers travel from far away to see it.", "doesn't introduce any flaps"]],
@@ -1833,35 +2333,114 @@ H("link", 4, "rl4c", { passage: P(`<p>Some birds travel astonishing distances. <
 H("link", 4, "rl4d", { passage: P(`<p>Long ago, sailors had no reliable way of telling the exact time at sea, which made it very hard to work out where they were. <span class="blank">________</span> His clocks kept good time even on a rolling ship.</p>`), stem: FILL,
   opts: [["Ships today use satellites to find their position.", "on topic, but “His clocks” would have no “he” to refer to"], ["The sea can be very rough in winter.", "no person for “His” to point to"], ["This problem was finally solved by building bigger and faster ships with much taller sails.", "“This problem” fits, but bigger ships don't tell the time and there's still no “he”"], ["In the 1700s, a carpenter named John Harrison set out to solve the problem.", null]],
   body: "“His clocks” needs a man to be named just before. Only one sentence introduces him." });
-
+H("link", 4, "rl4e", { passage: P(`<p>Saturn is the sixth planet from the Sun. <span class="blank">________</span> They are made of billions of pieces of ice and rock, some as small as grains of sand and others as big as houses.</p>`), stem: FILL,
+  opts: [["It is a giant planet made mostly of gas.", "on topic, but then “They” would have nothing to point to"],
+    ["Its many moons travel around it at different speeds.", "“They” could point to the moons, but moons are not as small as grains of sand"],
+    ["It is best known for its bright, wide rings.", null],
+    ["People have been studying it through telescopes for centuries.", "people aren't made of ice and rock"]],
+  body: "“They” after the gap needs something plural that is made of pieces of ice and rock, some tiny, some huge. Only Saturn's rings fit." });
+H("link", 4, "rl4f", { passage: P(`<p>Starting a compost heap is easy. First, lay down some twigs to let air in at the bottom. <span class="blank">________</span> Keep adding layers like this, and turn the whole heap with a garden fork every few weeks.</p>`), stem: FILL,
+  opts: [["Compost helps plants grow strong and healthy.", "on topic, but it breaks the step-by-step instructions"],
+    ["Next, add a layer of kitchen scraps.", null],
+    ["Turn the heap with a fork to let in more air.", "turning comes at the end, and “Keep adding layers like this” still needs a layer first"],
+    ["Soon worms will arrive to help break everything down.", "worms don't come before the heap has been built"]],
+  body: "The steps go in order (First … Next … Keep adding), and “layers like this” needs a layer to have been described just before it. Only the kitchen-scraps sentence does both." });
+H("link", 4, "rl4g", { passage: P(`<p>In 1928, a scientist named Alexander Fleming came back from a holiday to find mould growing on one of his dishes of germs. <span class="blank">________</span> This was the first step towards penicillin, a medicine that has since saved millions of lives.</p>`), stem: FILL,
+  opts: [["Fleming worked at a hospital in London.", "true, but working in London isn't a “first step” towards a medicine"],
+    ["Mould often grows on old bread and fruit.", "on topic, but mould on bread isn't the discovery that “This” points to"],
+    ["Penicillin is still given to patients by doctors all over the world today.", "it jumps ahead to penicillin before the discovery has been described"],
+    ["He saw that the germs near the mould had died.", null]],
+  body: "“This was the first step” needs a discovery just before it. Seeing that the mould killed the germs around it is that discovery." });
+H("link", 4, "rl4h", { passage: P(`<p>Ms Okoro's class wanted to raise money for a new school garden. <span class="blank">________</span> By the end of term they had sold more than three hundred of them, and the garden was paid for.</p>`), stem: FILL,
+  opts: [["So they made bookmarks from pressed flowers.", null],
+    ["A garden gives students a peaceful place to learn and relax outside in the fresh air.", "on topic, but “sold three hundred of them” would have nothing to point to"],
+    ["First, they asked the principal for permission.", "a sensible step, but you can't sell three hundred principals"],
+    ["Many parents offered to help dig the garden beds.", "“them” can't be the parents: nobody sells parents"]],
+  body: "“Sold more than three hundred of them” needs something to sell, mentioned just before. Only the bookmarks sentence gives one." });
 /* ---------- Same idea, different words ---------- */
 const MEANS = s => `<p>Which sentence means the same as:</p><p class="quote">“${s}”</p>`;
-H("same", 1, "rs1a", { stem: MEANS("Hardly anyone came to the meeting."),
-  opts: [["The meeting was hard to find.", "shares the word “hard”, but not the meaning"], ["Very few people came to the meeting.", null], ["People worked hard at the meeting.", "again “hard”, but a different idea"], ["Everyone came late to the meeting that day.", "“hardly anyone” means few, not late"]],
-  body: "“Hardly anyone” means almost nobody: very few people." });
-H("same", 1, "rs1b", { stem: MEANS("The plan was abandoned before it had properly begun."),
-  opts: [["The plan was left somewhere and lost.", "takes “abandoned” too literally"], ["The plan began properly after a while.", "the opposite"], ["The plan was finished before anyone else had even started theirs.", "abandoned means given up, not finished"], ["They gave up on the plan almost at the start.", null]],
-  body: "Abandoned = given up on; before it had properly begun = near the start." });
-H("same", 1, "rs1c", { stem: MEANS("Not one of the runners managed to beat the record."),
-  opts: [["Every runner was slower than the record.", null], ["Only one runner beat the record.", "“not one” means none, not one only"], ["The runners did not try to beat the record.", "they may have tried; they didn't manage"], ["The record was set by one of the runners.", "nothing says who set the record"]],
-  body: "If not one beat the record, every runner was slower than it." });
-H("same", 1, "rs1d", { stem: MEANS("Her kindness did not go unnoticed."),
-  opts: [["Nobody noticed that she was kind.", "the two “not” words cancel out, so this is the opposite"], ["She was kind without being noticed.", "the opposite again"], ["People noticed how kind she was.", null], ["She noticed that other people were kind.", "turns the meaning around"]],
-  body: "“Did not go unnoticed” has two negatives that cancel: people DID notice." });
-const BREAD = `<div class="extracts"><p><b>Extract A</b> Every Saturday my grandfather baked bread before anyone else was awake. By the time I came downstairs the whole house smelled warm and golden, and there would be a crust waiting for me on the bench, still too hot to hold.</p>
-<p><b>Extract B</b> Yeast is a tiny living thing. When it is mixed with flour and water, it feeds on the sugars and gives off bubbles of gas. The bubbles are trapped in the stretchy dough, which is why the loaf grows.</p>
-<p><b>Extract C</b> Sliced bread from the supermarket is convenient, but it cannot compare with a loaf from a local baker. Buying from small bakeries keeps an old craft alive and gives a town its heart.</p>
-<p><b>Extract D</b> In ancient Egypt, bread was so important that the workers who built the pyramids were partly paid in loaves. Archaeologists have even found the remains of large bakeries near the building sites.</p></div>`;
+H("same", 1, "rs1a", { stem: MEANS("The new rule was met with widespread disapproval."),
+  opts: [["The new rule was approved by many people.", "shares the word “approv(al)”, but “disapproval” is the opposite"],
+    ["The new rule was spread widely so that everyone knew it.", "shares “wide” and “spread”, but not the meaning"],
+    ["Many people did not like the new rule.", null],
+    ["A few people did not like the new rule.", "“widespread” means many people, not a few"]],
+  body: "Widespread = across many people; disapproval = not liking it. So many people disliked the rule." });
+H("same", 1, "rs1b", { stem: MEANS("Few of the guests stayed until the end of the party."),
+  opts: [["Most of the guests left before the party ended.", null],
+    ["A few guests left early, but most stayed until the end.", "“few” (without “a”) means hardly any stayed, the opposite"],
+    ["The party ended early because only a few guests came.", "shares “few”, but it is about how many came, not how many stayed"],
+    ["Not one of the guests stayed until the end of the party.", "too strong: “few” means some stayed, just not many"]],
+  body: "“Few stayed” means hardly any stayed, so most left before the end." });
+H("same", 1, "rs1c", { stem: MEANS("It was not until the rain stopped that the match could begin."),
+  opts: [["The match stopped as soon as the rain began.", "this swaps stopping and starting around"],
+    ["The match began even though it was still raining.", "the opposite: the match had to wait for the rain to stop"],
+    ["The match could begin only after the rain had stopped.", null],
+    ["The rain stopped because the match was about to begin.", "this turns the cause around"]],
+  body: "“Not until X … could Y” means Y had to wait for X: the match began only once the rain stopped." });
+H("same", 1, "rs1d", { stem: MEANS("Hardly had we sat down when the phone rang."),
+  opts: [["We could hardly sit down because the phone kept ringing.", "shares “hardly” and “sat down”, but not the meaning"],
+    ["We sat down a long time after the phone rang.", "the opposite order and timing"],
+    ["The phone rang, so we sat down to answer it.", "swaps the order and adds a reason"],
+    ["The phone rang almost as soon as we sat down.", null]],
+  body: "“Hardly had we … when …” means the second thing happened straight after the first." });
+H("same", 1, "rs1e", { stem: MEANS("Her explanation was anything but clear."),
+  opts: [["Her explanation was very confusing.", null],
+    ["Her explanation made everything clear.", "“anything but” means “not at all”, so this is the opposite"],
+    ["Her explanation was clearer than anything else.", "misreads “anything but” as a comparison"],
+    ["She could explain anything clearly.", "shares the words, but not the meaning"]],
+  body: "“Anything but clear” means not clear at all, so it was confusing." });
+H("same", 1, "rs1f", { stem: MEANS("The team's victory was by no means certain."),
+  opts: [["The team was certain to win by a large margin.", "“by no means” is the opposite of certain"],
+    ["It was far from sure that the team would win.", null],
+    ["The team won, but only by a few points.", "shares the word “by”, but it is about the score"],
+    ["There was no way at all that the team could win.", "too strong: not certain doesn't mean impossible"]],
+  body: "“By no means certain” means not at all sure: they might well lose, though they might also win." });
+H("same", 1, "rs1g", { stem: MEANS("Tom is no less talented than his older brother."),
+  opts: [["Tom is less talented than his older brother.", "this ignores the word “no”"],
+    ["Tom has no talent, unlike his older brother.", "misreads “no less” as “no talent”"],
+    ["Tom is at least as talented as his older brother.", null],
+    ["Tom's older brother is much more talented than he is.", "the opposite"]],
+  body: "“No less talented than” means not less: just as talented, or more." });
+H("same", 1, "rs1h", { stem: MEANS("The museum is seldom crowded on weekday mornings."),
+  opts: [["The museum is always crowded on weekday mornings.", "“seldom” means hardly ever, the opposite of always"],
+    ["The museum is closed on most weekday mornings.", "not crowded doesn't mean closed"],
+    ["The museum is crowded on weekday mornings, but not at weekends.", "this says the opposite about weekday mornings, and weekends aren't mentioned"],
+    ["On weekday mornings there are rarely many people at the museum.", null]],
+  body: "“Seldom” means rarely, so on weekday mornings the museum is hardly ever busy." });
+const SHOES = `<div class="extracts"><p><b>Extract A</b> When I was six I was given a pair of red sandals with a buckle shaped like a daisy. I refused to take them off, even in the bath, and in the end Mum gave up and let me wear them to bed for a week.</p>
+<p><b>Extract B</b> The oldest known leather shoe was found in a cave in Armenia in 2008. It is about 5500 years old and was stuffed with grass, perhaps to keep its shape, or perhaps to keep its owner's foot warm.</p>
+<p><b>Extract C</b> Schools should let students wear runners every day. Stiff black school shoes pinch and rub, and a child who is limping by lunchtime will not enjoy sport, or anything else.</p>
+<p><b>Extract D</b> The cobbler held the boot up to the window and frowned at the hole in its sole. “Walked a long way in this,” he said. The traveller only nodded, and counted his last few coins onto the counter.</p></div>`;
 const EX = ["Extract A", "Extract B", "Extract C", "Extract D"];
 const ext = (track, rung, id, passage, q, right, why, body) => H(track, rung, id, { passage, stem: `<p>${q}</p>`, opts: EX.map((x, i) => [x, i === right ? null : why[i]]), body });
-ext("same", 2, "rs2a", BREAD, "Which extract argues that people should buy from a particular kind of shop?", 2,
-  ["Grandfather bakes at home; no one is told where to shop", "this explains how bread rises", "", "this is history, not advice"], "Extract C says a local baker's loaf is better and that buying from small bakeries matters. That is an argument for a kind of shop.");
-ext("same", 2, "rs2b", BREAD, "Which extract describes something done very early in the day?", 0,
-  ["", "no time of day is mentioned", "no time of day is mentioned", "the workers' time of day isn't mentioned"], "“Before anyone else was awake” means very early in the day, though the words “early” or “morning” never appear.");
-ext("same", 2, "rs2c", BREAD, "Which extract mentions bread being used in place of money?", 3,
-  ["the crust is a treat, not a payment", "this is about yeast", "this mentions buying bread, which is the opposite: money used to get bread", ""], "Workers “paid in loaves” were given bread instead of money.");
-ext("same", 2, "rs2d", BREAD, "Which extract explains why something gets bigger?", 1,
-  ["the bread is described, but not why it grows", "", "this is an opinion, not an explanation", "the bakeries were large, but nothing explains growth"], "Extract B explains that gas bubbles trapped in the dough make the loaf grow. “Gets bigger” = grows/rises.");
+ext("same", 2, "rs2a", SHOES, "Which extract describes something being worn in places where you would not expect it?", 0,
+  ["", "the shoe was FOUND in a cave, not worn there", "runners at school is what the writer wants, and it isn't surprising", "the boot has been worn on a long walk, which is just what boots are for"],
+  "Sandals in the bath and in bed are not where anyone expects shoes to be worn.");
+ext("same", 2, "rs2b", SHOES, "Which extract suggests that someone has very little money left?", 3,
+  ["no money is mentioned", "no money is mentioned", "the writer talks about school shoes, not money", ""],
+  "Counting out his “last few coins” shows the traveller has almost no money left, though the word “poor” is never used.");
+ext("same", 2, "rs2c", SHOES, "Which extract admits that the reason for something is not known for certain?", 1,
+  ["Mum's reason for giving up is clear: the child refused", "", "the writer is sure about why runners are better", "the hole has an obvious cause: walking a long way"],
+  "“Perhaps … or perhaps …” shows nobody knows for sure why the shoe was stuffed with grass.");
+ext("same", 2, "rs2d", SHOES, "Which extract argues that a change would make people more comfortable?", 2,
+  ["the child chooses her own shoes; nothing is argued", "this gives facts about the past", "", "the traveller's boot needs mending, but nobody argues for a change"],
+  "Extract C argues for a change (runners every day) because school shoes “pinch and rub”: runners would be more comfortable.");
+const SAND = `<div class="extracts"><p><b>Extract A</b> Every summer, Dad and I build a sandcastle where the waves can reach it, and then we sit and wait. When I was little I used to cry when the sea knocked it down. Now, waiting for the first wave is my favourite part.</p>
+<p><b>Extract B</b> Not all sand is the same. The pale sand on many Australian beaches is mostly tiny grains of quartz, but some beaches in Hawaii are black, because their sand is made from volcanic rock.</p>
+<p><b>Extract C</b> To make a sand timer, pour dry sand into a small plastic bottle until it is a third full. Tape a second bottle to it, neck to neck, with a piece of card between them that has a small hole in the middle.</p>
+<p><b>Extract D</b> Cars should be banned from our beaches. Their tyres crush the eggs of shorebirds that nest in the sand, and families should not have to keep watch for four-wheel drives while their children play.</p></div>`;
+ext("same", 2, "rs2e", SAND, "Which extract explains why something is a particular colour?", 1,
+  ["the sandcastle's colour is never mentioned", "", "the instructions don't mention colour", "the extract is about cars and birds, not colour"],
+  "Extract B explains that some Hawaiian sand is black “because” it is made from volcanic rock.");
+ext("same", 2, "rs2f", SAND, "Which extract describes how the writer's feelings have changed?", 0,
+  ["", "this is all facts, with no feelings", "instructions, with no feelings", "the writer has strong feelings, but they don't change"],
+  "“I used to cry … Now, waiting for the first wave is my favourite part”: the writer's feelings have changed completely.");
+ext("same", 2, "rs2g", SAND, "Which extract is written so that the reader could follow it at home?", 2,
+  ["the sandcastle is described, but the reader isn't told how to build one", "it tells you what sand is made of; there is nothing to do", "", "it says what the government should do, not something a reader can follow"],
+  "Extract C is a set of instructions (pour, tape) for making a sand timer: something a reader can follow at home.");
+ext("same", 2, "rs2h", SAND, "Which extract mentions a danger to wildlife?", 3,
+  ["the waves knock down a sandcastle, not an animal", "no animals are mentioned", "no animals are mentioned", ""],
+  "Extract D says tyres “crush the eggs of shorebirds”.");
 const RAIN = `<div class="extracts"><p><b>Extract A</b> If you are caught outside in a thunderstorm, stay away from tall trees and open fields. Crouch down low, keep your feet together and wait until thirty minutes after the last thunder before you move on.</p>
 <p><b>Extract B</b> The rain arrived like a crowd of tiny drummers on the tin roof, and the dry garden seemed to sigh and stretch.</p>
 <p><b>Extract C</b> Rainy days are the best days of the year. Nothing beats a good book, a blanket and the sound of rain on the window, and anyone who says otherwise has simply never tried it.</p>
@@ -1874,6 +2453,22 @@ ext("same", 3, "rs3c", RAIN, "Which extract presents a personal opinion as if no
   ["this is advice, not an opinion", "this describes a scene; it doesn't argue", "", "this states facts"], "“The best days of the year … anyone who says otherwise has simply never tried it” is an opinion stated as if it were beyond argument.");
 ext("same", 3, "rs3d", RAIN, "Which extract tells the reader what to do?", 0,
   ["", "it describes; it gives no advice", "it says what the writer likes, not what the reader should do", "it gives facts"], "Extract A gives instructions: stay away, crouch down, keep your feet together, wait.");
+const MOON = `<div class="extracts"><p><b>Extract A</b> The moon hung over the paddock like a lantern someone had forgotten to take inside, and the sheep's shadows stretched long and blue across the grass.</p>
+<p><b>Extract B</b> The Moon is about 384 000 kilometres from Earth. If you could drive there at 100 kilometres an hour without ever stopping, the trip would take about 160 days.</p>
+<p><b>Extract C</b> Why do we spend billions of dollars sending rockets to the Moon when there are so many problems to fix here on Earth? Surely that money would do more good in our hospitals and schools.</p>
+<p><b>Extract D</b> Monday: half moon. Tuesday: a little fatter. Wednesday: cloudy, saw nothing. Thursday: nearly round. I'm drawing it every night for my science project, and Mum says bedtime is still eight o'clock, full moon or not.</p></div>`;
+ext("same", 3, "rs3e", MOON, "Which extract uses a comparison to describe how something looks?", 0,
+  ["", "it compares the Moon's distance with a car trip, which is about how far, not how it looks", "it compares spending on rockets with hospitals, not how anything looks", "the moon is described plainly (“a little fatter”), with no comparison"],
+  "“Like a lantern someone had forgotten to take inside” compares the moon's look to a lantern.");
+ext("same", 3, "rs3f", MOON, "Which extract uses a calculation to help the reader imagine a distance?", 1,
+  ["it describes long shadows, not a distance", "", "it mentions money, not distance", "it records the moon's shape, not its distance"],
+  "Extract B turns 384 000 km into a car trip: 384 000 ÷ 100 = 3840 hours, about 160 days. The calculation makes the distance easier to imagine.");
+ext("same", 3, "rs3g", MOON, "Which extract asks a question that it does not expect the reader to answer?", 2,
+  ["there is no question", "there is no question", "", "there is no question; it is a list of notes"],
+  "Extract C opens with “Why do we spend …?” and then gives its own answer. The question is there to make a point, not to be answered.");
+ext("same", 3, "rs3h", MOON, "Which extract records how something changes over several days?", 3,
+  ["it describes one night only", "it gives one fixed distance, not a change", "it argues about money, not changes", ""],
+  "Extract D is a diary of the moon's shape from Monday to Thursday.");
 const MOVE = `<div class="extracts"><p><b>Extract A</b> On my first day at the new school, a girl with a gap in her teeth handed me half her orange without saying a word. I never learned her name, but I remember the taste of that orange better than anything I was taught that week.</p>
 <p><b>Extract B</b> Grandad says that when his family arrived in the street in 1965, the neighbours watched from behind their curtains for a month before anyone said hello. “We were the most interesting thing in the street,” he jokes, “but not interesting enough to talk to.”</p>
 <p><b>Extract C</b> The flat was smaller than our old house, and from my bedroom I could see only the brick wall of the next building. I told myself I didn't mind, and stuck a poster of the sea over the glass.</p>
@@ -1886,12 +2481,28 @@ ext("same", 4, "rs4c", MOVE, "Which extract suggests that people were curious ab
   ["the girl comes up to the writer straight away", "", "no neighbours appear here", "the aunt is the one who keeps her distance, from places"], "Watching from behind curtains shows curiosity; taking a month to say hello shows they kept their distance.");
 ext("same", 4, "rs4d", MOVE, "Which extract suggests someone has found a way to protect herself from feeling sad?", 3,
   ["this is about a happy memory", "Grandad jokes about it, but this isn't about protecting himself from sadness", "the writer covers the window, but the question is about a habit that makes goodbyes easier", ""], "The aunt leaves boxes unpacked so that “saying goodbye isn't so hard”: a way to protect herself from sadness.");
+const LOST = `<div class="extracts"><p><b>Extract A</b> For years after Grandpa died, Gran kept his reading glasses on the bedside table, folded, as if he might need them in the morning. She dusted carefully around them every Sunday.</p>
+<p><b>Extract B</b> When I lost my bus pass, I searched my bag four times, then my pockets, then my bag again. By the time I found it inside my lunch box, the bus had gone, and so had my temper.</p>
+<p><b>Extract C</b> The council's lost-property office holds more than two thousand umbrellas. “People will spend twenty minutes describing a watch,” says the manager, “but hardly anyone ever comes back for an umbrella.”</p>
+<p><b>Extract D</b> Mira told everyone that the bracelet didn't matter. It was only plastic, she said. But every afternoon that week she walked home the long way, past the park, with her eyes on the grass.</p></div>`;
+ext("same", 4, "rs4e", LOST, "Which extract suggests that someone has not let go of a person who has gone?", 0,
+  ["", "this is about a lost bus pass, not a person", "nobody here is missing a person", "Mira misses a bracelet, not a person"],
+  "Gran keeps Grandpa's glasses ready “as if he might need them in the morning” and dusts AROUND them for years: she hasn't let go of him.");
+ext("same", 4, "rs4f", LOST, "Which extract suggests that people don't bother much about cheap things they lose?", 2,
+  ["the glasses are kept for love, not because of their price", "the writer searches hard for the pass", "", "Mira says the bracelet was cheap, but she keeps searching for it"],
+  "Thousands of umbrellas are never collected, while people describe a watch at length: they don't bother with cheaper things.");
+ext("same", 4, "rs4g", LOST, "Which extract suggests that someone is pretending not to care about a loss?", 3,
+  ["Gran doesn't pretend: she openly keeps the glasses", "the writer openly loses their temper", "the people who leave umbrellas really don't care", ""],
+  "Mira SAYS the bracelet doesn't matter, but she searches the grass every afternoon. Her actions show she does care.");
+ext("same", 4, "rs4h", LOST, "Which extract suggests that someone ended up frustrated and cross?", 1,
+  ["Gran is quietly sad, not cross", "", "the manager sounds amused, not cross", "Mira is quietly searching, not cross"],
+  "“The bus had gone, and so had my temper”: the writer lost both the bus and their patience.");
 
 /* RIDGE RUNNER: finish the hand-written questions.
    Each step gets its own shuffle of answer letters, so no letter pattern repeats from step to step, while the
-   answers inside a step stay on different letters (the target letter depends on each question's place in its step,
-   not on where the answer was written). Options that must stay in order (Extract A–D,
-   "X only / Y only / Both / Neither", plain numbers) keep their places. Then the explanation is built:
+   answers inside a step are spread evenly: each letter at most ceil(n / 4) times, so exactly twice in a step of 8 (the
+   target letter depends on each question's place in its step, not on where the answer was written). Options that must
+   stay in order (Extract A–D, "X only / Y only / Both / Neither", plain numbers) keep their places. Then the explanation is built:
    the track's method + the body + why each trap is wrong. */
 (() => {
   const fixedOrder = q => /^(Extract|Both|Neither|\w+ only$)/.test(q.opts[0][0]) || q.opts.some(o => /^(Both|Neither)/.test(o[0])) || q.opts.every(o => /^\d+$/.test(o[0]));
@@ -1903,16 +2514,17 @@ ext("same", 4, "rs4d", MOVE, "Which extract suggests someone has found a way to 
   for (const [key, list] of Object.entries(steps)) {
     let h = 17; for (const c of key) h = (h * 131 + c.charCodeAt(0)) % 100003;
     const ans = r => r.q.opts.findIndex(o => o[1] === null);
-    let chosen = PERMS[0];
-    for (let k = 0; k < 24; k++) {
-      const p = PERMS[(h + k * 7) % 24], seen = new Set();
-      let ok = true;
-      list.forEach((r, i) => { const a = fixedOrder(r.q) ? ans(r) : p[i % 4]; if (seen.has(a)) ok = false; seen.add(a); });
-      if (ok) { chosen = p; break; }
-    }
+    /* each letter is used at most ceil(n / 4) times in a step (exactly twice in a step of 8): fixed-order questions keep
+       their letters, and the others fill the letters still free, round by round in this step's own shuffled order */
+    const cap = Math.ceil(list.length / 4), free = [cap, cap, cap, cap];
+    list.forEach(r => { if (fixedOrder(r.q)) free[ans(r)]--; });
+    const slots = [];
+    for (let round = 0; round < cap; round++) for (const a of PERMS[(h + round * 7) % 24]) if (free[a] > 0) { slots.push(a); free[a]--; }
+    let next = 0;
+    const target = list.map(r => fixedOrder(r.q) ? ans(r) : slots[next++]);
     list.forEach((r, i) => {
       let opts = r.q.opts;
-      if (!fixedOrder(r.q)) { const a = ans(r), k = ((a - chosen[i % 4]) % 4 + 4) % 4; opts = opts.slice(k).concat(opts.slice(0, k)); }
+      if (!fixedOrder(r.q)) { const a = ans(r), k = ((a - target[i]) % 4 + 4) % 4; opts = opts.slice(k).concat(opts.slice(0, k)); }
       const options = opts.map(o => o[0]), answer = opts.findIndex(o => o[1] === null), traps = {};
       opts.forEach((o, i) => { if (o[1] !== null) traps[i] = o[1]; });
       const method = TRACKS.find(t => t.id === r.track).method;
