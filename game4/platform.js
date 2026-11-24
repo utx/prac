@@ -160,7 +160,9 @@ const PF = (() => {
   const KEYS = {};
   const keyMap = { ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right", ArrowUp: "up", KeyW: "up", Space: "jump", ArrowDown: "down", KeyS: "down", KeyE: "use", KeyJ: "fire", KeyX: "fire", KeyK: "duck", KeyC: "duck", Escape: "leave", KeyQ: "leave" };
   function onKey(e, down) {
-    if (!S) return; const k = keyMap[e.code]; if (!k) return;
+    if (!S) return;
+    if (down && S.scope && S.scope.nest.sentries.card) { S.anyKey = true; e.preventDefault(); return; }   /* any key closes the ridge report */
+    const k = keyMap[e.code]; if (!k) return;
     e.preventDefault();
     if (down && !KEYS[k]) KEYS[k + "P"] = true;
     KEYS[k] = down;
@@ -227,6 +229,7 @@ const PF = (() => {
     ss.list.push({ at, side: Math.random() < .5 ? -1 : 1, x: at, tx: at, state: "hide", st: 0, hp: 1, alive: true, range: ss.ranges[Math.floor(Math.random() * ss.ranges.length)], boss: false, rocks: ss.rocks, hold: 30 + Math.random() * 40 });
   }
   function enterNest(n) {
+    if (S.rounds <= 0 && n.sentries.gate && !n.boss) { msg("Out of sniper rounds: grab gold bullets, then come back for a higher score", 140, "#ffd43b"); return; }
     n.sentries.card = null;
     S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0 };
     S.msgs = [];                                                        // the platform's messages would clutter the scope
@@ -279,6 +282,8 @@ const PF = (() => {
   }
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
+    { const ss = sc.nest.sentries;                                             /* the ridge report: wait for any key, nothing else moves */
+      if (ss.card && !sc.nest.boss) { const any = S.anyKey || Object.keys(KEYS).some(k => k.endsWith("P") && KEYS[k]); S.anyKey = false; if (any && ss.card.t > 20) { closeCard(); for (const k in KEYS) KEYS[k] = false; } else if (any) for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; return; } }
     for (const b of S.incoming) {                                              /* bullets flying at you */
       b.t++;
       if (b.t === b.dur) {
@@ -294,7 +299,6 @@ const PF = (() => {
       if (pressed("fire")) scopeFire();
     }
     const ss = sc.nest.sentries;
-    if (ss.card && !sc.nest.boss) { if (pressed("leave") || pressed("use") || pressed("fire") || pressed("jump")) closeCard(); return; }
     if (pressed("leave") || pressed("use")) { if (sc.nest.boss) { S.scope = null; return; } ss.card = cardFor(ss); return; }
     ss.respawn = ss.respawn.map(t => t - 1); while (ss.respawn.length && ss.respawn[0] <= 0) { ss.respawn.shift(); spawnSentry(ss); }
     ss.list = ss.list.filter(q => q.alive || (q.koT || 0) < 100);
@@ -459,7 +463,7 @@ const PF = (() => {
     rows.forEach(([k, v], i) => { const show = c.t > 10 + i * 8; if (!show) return; txt(ctx, k, 110, 82 + i * 18, 10, "#ced4da", "left"); txt(ctx, String(v), 370, 82 + i * 18, 11, "#fff", "right"); });
     if (c.t > 56) { txt(ctx, "SCORE", 110, 186, 12, "#ffd43b", "left"); txt(ctx, String(Math.min(c.score, Math.round(c.score * (c.t - 56) / 20))), 370, 188, 16, "#ffd43b", "right"); }
     if (c.t > 80) { if (c.isBest) txt(ctx, c.t % 20 < 12 ? "NEW HIGH SCORE!" : "", VW / 2, 212, 14, "#ff922b"); else txt(ctx, `BEST ON THIS LEVEL: ${c.ridgeBest}`, VW / 2, 212, 9, "#adb5bd"); }
-    if (c.t > 90) txt(ctx, "Press E or J to carry on", VW / 2, 230, 8, "#ced4da");
+    if (c.t > 20) txt(ctx, "Press any key to carry on", VW / 2, 230, 8, S.t % 40 < 26 ? "#fff" : "#868e96");
     ctx.restore();
   }
   /* every second beaten bot drops a bullet (the drop is decided by the bot, so it is the same each play) */
@@ -671,7 +675,7 @@ const PF = (() => {
     grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.hideIn = 0; s.x = s.at + s.side * (s.boss ? 42 : 36); S.stop = 0; const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
-    key: (k, down) => { KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
+    key: (k, down) => { if (down && S && S.scope && S.scope.nest.sentries.card) { S.anyKey = true; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
     hurt: () => S && hurt("test"), win: () => S && end(true), lose: () => { if (S) { S.hearts = 1; S.shield = 0; S.P.inv = 0; hurt("test"); } }
   };
   return { start, stop, gen, reach, step, hook, THEMES, LOOT };
