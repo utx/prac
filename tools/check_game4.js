@@ -290,7 +290,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.keyboard.press("KeyE"); await p.waitForTimeout(150);
   if (!(await p.evaluate(() => __rr.PF.hook.nests()[0].card))) bad("E should show the ridge report");
   if (shots) await p.screenshot({ path: path.join(shots, "rr-report.png") });
-  await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
+  await p.waitForTimeout(500); await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
   if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("E again should leave the scope");
   await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.gates()[0].col - 3)); await p.keyboard.down("ArrowRight"); await p.waitForTimeout(900); await p.keyboard.up("ArrowRight");
   const gx = await p.evaluate(() => __rr.PF.hook.state().x), gcol = await p.evaluate(() => __rr.PF.hook.gates()[0].col);
@@ -309,6 +309,11 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   if (!((await p.evaluate(() => __rr.PF.hook.nests()[0].score)) > sc0)) bad("shots after the gate opens should keep adding to the score");
   await p.evaluate(() => __rr.PF.hook.setRounds(0)); await p.waitForTimeout(700);
   if (!(await p.evaluate(() => __rr.PF.hook.nests()[0].card))) bad("running out of rounds after the gate opens should show the ridge report");
+  /* any key closes the report (J here), and an empty rifle can't reopen an open ridge */
+  await p.waitForTimeout(500); await p.keyboard.press("KeyJ"); await p.waitForTimeout(150);
+  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("any key (J) should close the ridge report");
+  await p.keyboard.press("KeyE"); await p.waitForTimeout(150);
+  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("with no rounds left, an open ridge shouldn't show its report again");
   await p.waitForTimeout(800);
   /* reach the flag */
   await p.evaluate(() => __rr.PF.hook.exitScope());
