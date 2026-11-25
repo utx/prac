@@ -242,7 +242,7 @@ const PF = (() => {
     if (lv.boss) { msg(`${G.theme.name}: ${(lv.bossName || "the boss")} waits at the end`, 160); msg("Run to the arena!", 200, "#ffd43b"); }
     else { msg(G.theme.name + (lv.stages > 1 ? `, stage ${lv.stage + 1} of ${lv.stages}: reach the flag` : ": reach the flag"), 160); msg("Grab the gold bullets: every one is a sniper round!", 200, "#ffd43b"); }
   }
-  function stop() { cancelAnimationFrame(raf); removeEventListener("keydown", kd); removeEventListener("keyup", ku); for (const k in KEYS) KEYS[k] = false; S = null; }
+  function stop() { if (S && S.opts.onCard) S.opts.onCard(null); cancelAnimationFrame(raf); removeEventListener("keydown", kd); removeEventListener("keyup", ku); for (const k in KEYS) KEYS[k] = false; S = null; }
   const msg = (t, d = 90, c = "#fff") => S.msgs.push({ t, d, c });
   const burst = (x, y, c, n = 8) => { for (let i = 0; i < n; i++) S.parts.push({ x, y, vx: (Math.random() - .5) * 3, vy: -Math.random() * 3, d: 30, c }); };
   function hurt(why) {
@@ -372,8 +372,17 @@ const PF = (() => {
     ctx.restore();
     if (v.aim && !v.dead) { const f2 = 2 + 2 * Math.abs(Math.sin(S.t / 3)); ctx.fillStyle = "#ff2b2b"; ctx.fillRect(v.x + v.dir * 14 - f2 * 2, v.y, f2 * 4, 2); ctx.fillRect(v.x + v.dir * 14 - 1, v.y + 1 - f2 * 2, 2, f2 * 4); }
   }
+  /* the page draws the gear card and the ridge report over the canvas (modern cards with the item art); the canvas only dims */
+  const cardOut = (kind, data) => { if (S && S.opts.onCard) S.opts.onCard(kind, data); };
+  function gearInfo(sc) {
+    const ss = sc.nest.sentries, w = S.G.world, k = S.kit;
+    return { nest: sc.nest.id + 1, world: w, rounds: S.rounds, min: ss.min, steady: !!k.steady, hearts: S.hearts, shield: !!S.shield, boots: !!k.boots, wind: w >= 3 ? ss.wind : null, dots: w >= 2,
+      threats: vehKinds(w) };
+  }
+  function dimOnly(ctx, t, n) { ctx.fillStyle = `rgba(5,8,20,${0.6 * Math.min(1, t / n)})`; ctx.fillRect(0, 0, VW, VH); }
   /* the gear card before the shooting starts: what the briefing earned, and what each thing does */
   function drawIntro(ctx, sc) {
+    if (S.opts.onCard) { sc.intro.t++; return dimOnly(ctx, sc.intro.t, 10); }
     const it = sc.intro, ss = sc.nest.sentries, w = S.G.world, k = S.kit; it.t++; const g = Math.min(1, it.t / 10);
     ctx.fillStyle = `rgba(5,8,20,${0.85 * g})`; ctx.fillRect(0, 0, VW, VH);
     ctx.save(); ctx.translate(VW / 2, VH / 2); ctx.scale(0.7 + 0.3 * g, 0.7 + 0.3 * g); ctx.translate(-VW / 2, -VH / 2);
@@ -399,6 +408,7 @@ const PF = (() => {
     for (const k in KEYS) KEYS[k] = false;
     S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0, intro: !n.boss && !n.briefed && !window.__noIntro ? { t: 0 } : null };
     n.briefed = true;
+    if (S.scope.intro) cardOut("gear", gearInfo(S.scope));
     S.msgs = [];                                                        // the platform's messages would clutter the scope
     msg(n.boss ? "BOSS: the Warden is on the far ridge!" : `SCORE ATTACK! Knock out ${n.sentries.min} to open the gate, then as many as your rounds allow`, 160, "#ffe066");
     if (S.kit.steady && !S.tipSteady) { S.tipSteady = true; msg("STEADY SCOPE: half the sway, from your briefing", 140, "#8ce99a"); }
@@ -450,7 +460,7 @@ const PF = (() => {
   }
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
-    if (sc.intro) { const go = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (go && sc.intro.t > 12) { sc.intro = null; for (const k in KEYS) KEYS[k] = false; beep(660, .08, "triangle"); } return; }   /* the gear card: nothing moves */
+    if (sc.intro) { const go = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (go && sc.intro.t > 12) { sc.intro = null; cardOut(null); for (const k in KEYS) KEYS[k] = false; beep(660, .08, "triangle"); } return; }   /* the gear card: nothing moves */
     { const ss = sc.nest.sentries;                                             /* the ridge report: wait for SPACE, nothing else moves */
       if (ss.card && !sc.nest.boss) { const any = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (any && ss.card.t > 20) { closeCard(); for (const k in KEYS) KEYS[k] = false; } return; } }
     for (const b of S.incoming) {                                              /* bullets flying at you */
@@ -822,9 +832,12 @@ const PF = (() => {
     const st = ss.stat, acc = st.shots ? Math.round(100 * st.hits / st.shots) : 0;
     const ridgeBest = S.opts.bestRidge || 0, isBest = st.score > ridgeBest && st.score > 0;
     if (isBest) { S.newRidgeBest = st.score; beep(523, .1, "triangle"); beep(659, .1, "triangle"); beep(1046, .25, "triangle"); }
-    return Object.assign({}, st, { acc, isBest, ridgeBest, t: 0, roast: roast(Object.assign({}, st, { acc, gate: ss.gate, min: ss.min })) });
+    const m = mood(Object.assign({}, st, { acc, gate: ss.gate, min: ss.min }));
+    const c = Object.assign({}, st, { acc, isBest, ridgeBest, t: 0, mood: m, gate: ss.gate, min: ss.min, roast: pickOne(ROASTS[m]) });
+    cardOut("report", c);
+    return c;
   }
-  function closeCard() { const ss = S.scope.nest.sentries; S.scope = null; ss.card = null; if (!ss.gate) msg("The gate is still shut: come back with more rounds", 120, "#ffb3b3"); }
+  function closeCard() { const ss = S.scope.nest.sentries; S.scope = null; ss.card = null; cardOut(null); if (!ss.gate) msg("The gate is still shut: come back with more rounds", 120, "#ffb3b3"); }
   /* the level's sniper totals, added up from every nest once at the end (so nothing is counted twice) */
   function snipeTotals() {
     const t = { score: 0, ko: 0, head: 0, shots: 0, hits: 0, best: 0, first: 0, ridgeMax: 0 };
@@ -842,16 +855,18 @@ const PF = (() => {
     veh: ["You knocked things out of the SKY. The pilots would like a word.", "Planes, choppers, tanks... is there anything you won't shoot?", "That tank had a very bad day. You're welcome, sentries."],
     heads: ["So many headshots the sentries are ordering bigger helmets.", "Headshot after headshot. The helmet shop is sold out."],
     perfect: ["Every shot hit! Did you bribe the sentries?", "100% accuracy. Now try being this accurate with your spelling.", "Perfect aim. The sentries have filed a complaint. It was ignored."] };
-  function roast(st) {
-    const pickOne = a => a[Math.floor(Math.random() * a.length)];
-    if (!st.shots) return pickOne(ROASTS.none);
-    if (!st.hits) return pickOne(ROASTS.zero);
-    if (st.gate === false && st.ko < st.min) return pickOne(ROASTS.shut);
-    if (st.acc >= 100 && st.hits >= 3) return pickOne(ROASTS.perfect);
-    if ((st.veh || 0) >= 2) return pickOne(ROASTS.veh);
-    if (st.head >= 3 && st.head >= st.ko / 2) return pickOne(ROASTS.heads);
-    return pickOne(st.acc < 35 ? ROASTS.bad : st.acc < 65 ? ROASTS.ok : ROASTS.good);
+  const pickOne = a => a[Math.floor(Math.random() * a.length)];
+  /* which kind of roast fits (the page shows a matching emoji) */
+  function mood(st) {
+    if (!st.shots) return "none";
+    if (!st.hits) return "zero";
+    if (st.gate === false && st.ko < st.min) return "shut";
+    if (st.acc >= 100 && st.hits >= 3) return "perfect";
+    if ((st.veh || 0) >= 2) return "veh";
+    if (st.head >= 3 && st.head >= st.ko / 2) return "heads";
+    return st.acc < 35 ? "bad" : st.acc < 65 ? "ok" : "good";
   }
+  function roast(st) { return pickOne(ROASTS[mood(st)]); }
   /* wrapped, centred text on the canvas */
   function wrap(ctx, s, cx, y, w, size, c) {
     ctx.font = `bold ${size}px "Courier New", monospace`; const words = s.split(" "), lines = []; let line = "";
@@ -859,6 +874,7 @@ const PF = (() => {
     lines.push(line); lines.slice(0, 2).forEach((l, i) => txt(ctx, l, cx, y + i * (size + 2) - (lines.length > 1 ? 5 : 0), size, c));
   }
   function drawCard(ctx, c) {
+    if (S.opts.onCard) { c.t++; return dimOnly(ctx, c.t, 12); }
     c.t++; const g = Math.min(1, c.t / 12);
     ctx.fillStyle = `rgba(5,8,20,${0.8 * g})`; ctx.fillRect(0, 0, VW, VH);
     ctx.save(); ctx.translate(VW / 2, VH / 2); ctx.scale(0.6 + 0.4 * g, 0.6 + 0.4 * g); ctx.translate(-VW / 2, -VH / 2);
@@ -1079,7 +1095,7 @@ const PF = (() => {
     nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length, ko: e.sentries.stat.ko, score: e.sentries.stat.score, min: e.sentries.min, gate: e.sentries.gate, card: !!e.sentries.card })) : [],
     snipe: () => S && snipeTotals(),
     quiet: () => { if (!S || !S.scope) return; const ss = S.scope.nest.sentries; ss.respawn = []; S.incoming = []; ss.list.forEach((q, i) => { if (i && q.alive) { q.state = "hide"; q.st = 0; q.hold = 99999; } }); },
-    exitScope: () => { if (S && S.scope) { S.scope.nest.sentries.card = null; S.scope = null; } },
+    exitScope: () => { if (S && S.scope) { S.scope.nest.sentries.card = null; S.scope = null; cardOut(null); } },
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
     fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
@@ -1235,5 +1251,5 @@ const PF = (() => {
     if (T.flash) { ctx.fillStyle = `rgba(255,255,255,${T.flash / 16})`; ctx.fillRect(0, 0, VW, VH); }
     if (T.go) { ctx.fillStyle = `rgba(255,255,255,${Math.min(1, T.go / 30)})`; ctx.fillRect(0, 0, VW, VH); }
   }
-  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
+  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, mood, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
 })();
