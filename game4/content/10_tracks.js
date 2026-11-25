@@ -264,23 +264,6 @@ const TRACKS = [
     { title: "Views of a model", builds: "From a plan with stack heights, picking the view from the front or side.", traps: "the view from the other side; the view from the back (mirror); the top view." }] },
 
 /* ======================= READING ======================= */
-{ id: "infer", subject: "reading", name: "Reading between the lines", icon: "❝", cat: "Feelings & inference",
-  ideas: ["Writers SHOW feelings through actions, words and small details instead of naming them.",
-    "Ask: why did the writer include this detail? What does it make us think?",
-    "The right answer is usually an implication, not a repeat of the words in the text.",
-    "Wrong answers often use a real detail from the text attached to the wrong idea, or go too far."],
-  method: "Find the exact words in the text. Ask 'what does this show?' and pick the answer the words prove, not one that just repeats them.",
-  transfer: "Every story and poem question about feelings, attitudes, why a detail is there, what a word suggests, and the whole-text questions about technique and viewpoint (Reading Q1–6 and Q15–19 in every paper).",
-  samples: [
-    { ref: "PT1–PT3 Reading Q1–6", what: "story questions: what a detail shows, feelings shown not stated", rungs: [1, 2, 3, 4] },
-    { ref: "PT1–PT3 Reading Q15–19", what: "poem questions: comparisons, word choice, what a group of lines does", rungs: [3, 4] },
-    { ref: "Last question of each story and poem", what: "technique and its effect, viewpoint, overall impression", rungs: [4] }],
-  rungs: [
-    { title: "Feelings shown, not told", builds: "Short scenes where actions and words reveal a feeling that is never named.", traps: "the opposite feeling; a feeling that is too strong." },
-    { title: "Why is this detail here?", builds: "Choosing what a detail makes the reader understand.", traps: "a real detail attached to the wrong idea; a literal reading." },
-    { title: "What a word suggests", builds: "One word or phrase that changes the meaning: an adverb, a comparison, an image.", traps: "the dictionary meaning instead of the meaning here; taking a comparison literally." },
-    { title: "The whole passage", builds: "Technique and effect, viewpoint and overall impression from a longer extract.", traps: "an answer true of one sentence but not the whole." }] },
-
 { id: "word", subject: "reading", name: "The right word", icon: "Aa", cat: "Vocabulary & idioms",
   ideas: ["Near-synonyms are not interchangeable: the context decides the shade of meaning.",
     "Some words come in fixed partnerships (teeming WITH, the culmination OF).",
@@ -297,33 +280,4 @@ const TRACKS = [
     { title: "Grammar fit", builds: "Only one verb or adjective takes the following preposition or object.", traps: "a word that means the right thing but breaks the sentence." },
     { title: "Clues from the passage", builds: "Short passages where the deciding clue is in another sentence.", traps: "a word that fits its own sentence but not the passage." }] },
 
-{ id: "link", subject: "reading", name: "Linking sentences", icon: "⛓", cat: "Sentence links",
-  ideas: ["Reference words (this, they, it, here, such) point back to something just said.",
-    "Texts move from a general statement to an example, or from a claim to its reason.",
-    "Signal words (however, instead, not that, so) show a contrast or a result.",
-    "A sentence can be on the right topic and still not fit: check the words around the gap."],
-  method: "Read the sentence before AND after the gap. Find the pointing words (this, they, however) and check they have something to point to.",
-  transfer: "The missing-sentences task (Reading Q20–25 in every paper), and understanding how any passage is built.",
-  samples: [
-    { ref: "PT1–PT3 Reading Q20–25", what: "missing sentences chosen by reference words, examples and contrast", rungs: [1, 2, 3, 4] }],
-  rungs: [
-    { title: "What does 'this' point to?", builds: "Finding what a reference word refers to.", traps: "the nearest noun, which isn't the one meant." },
-    { title: "General, then example", builds: "Choosing the sentence that gives an example or a reason for the one before.", traps: "a sentence on the topic that doesn't follow on." },
-    { title: "Signal words", builds: "Contrast and result: however, instead, not that, so.", traps: "a signal that points the wrong way." },
-    { title: "Fill the gap", builds: "A short passage with a gap and four sentences, one of them on topic but with nothing to point to.", traps: "the on-topic sentence that fails on its reference." }] },
-
-{ id: "same", subject: "reading", name: "Same idea, different words", icon: "⇋", cat: "Main idea",
-  ideas: ["The question and the right extract say the same thing in DIFFERENT words.",
-    "Match the idea, not a repeated word: a shared word is often a trap.",
-    "Some questions ask about HOW a text is written (an opinion, figurative language), not what it is about.",
-    "Every extract usually answers at least one question."],
-  method: "Put the question into your own words, then look for the extract that means it, even if it uses none of the same words.",
-  transfer: "The four-extracts task (Reading Q26–33 in every paper), and any question that says an idea from the text in new words.",
-  samples: [
-    { ref: "PT1–PT3 Reading Q26–33", what: "which extract says, suggests or reveals an idea", rungs: [1, 2, 3, 4] }],
-  rungs: [
-    { title: "Say it another way", builds: "Matching a sentence to the one that means the same.", traps: "a sentence that shares a word but not the meaning." },
-    { title: "Which extract mentions it?", builds: "Four short extracts on one theme; find the one that mentions an idea in other words.", traps: "the extract that shares a word with the question." },
-    { title: "How is it written?", builds: "Opinion, comparison, figurative language, advice: the extract's technique.", traps: "the extract about the right topic but written the wrong way." },
-    { title: "What does it suggest?", builds: "Inference across four extracts: which one suggests or reveals something it never says outright.", traps: "an extract that states something similar outright about a different thing." }] }
 ];

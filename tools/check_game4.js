@@ -6,7 +6,7 @@
       (at most twice each in a step of 8).
    2. Templates: 300 seeds each; every answer is worked out again HERE by a separate method from `data`
       (or from the picture itself for the spatial ones); options are all different; every wrong option names a trap.
-   3. In a real browser: all 64 levels can be finished (the hero's own physics, no double jump); a level is played
+   3. In a real browser: all 52 stages and boss runs can be finished (the hero's own physics, no double jump); a level is played
       from the map through the briefing, kit, platform, nest and scope (body shot, headshot, ducking a glint), clearing
       it unlocks the next and survives a reload; losing offers one retry then a new briefing; a boss is beaten;
       practice mode (admin) unlocks everything, shows the coach sidebar with sample references and saves nothing;
@@ -31,7 +31,7 @@ const { GENS, HAND, TRACKS } = C;
 const build = fs.readFileSync(path.join(ROOT, "tools", "build.py"), "utf8");
 const cats = sec => JSON.parse(build.match(new RegExp(`"${sec}": (\\[[^\\]]*\\])`, "s"))[1].replace(/\s+/g, " "));
 const CATS = { reading: cats("reading"), thinking: cats("thinking"), maths: cats("maths") };
-if (TRACKS.length !== 15) bad(`expected 15 tracks, found ${TRACKS.length}`);
+if (TRACKS.length !== 12) bad(`expected 12 tracks, found ${TRACKS.length}`);
 for (const t of TRACKS) {
   if (t.rungs.length !== 4) bad(`${t.id}: needs 4 steps`);
   if (!CATS[t.subject] || !CATS[t.subject].includes(t.cat)) bad(`${t.id}: unknown question type "${t.cat}"`);
@@ -231,10 +231,10 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   /* every level can be finished */
   /* every stage of every big level, and every boss run, as the game builds them */
   await p.evaluate(() => { window.__stages = __rr.LEVELS.flatMap(L => (L.boss ? [0] : [0, 1, 2]).map(st => Object.assign({ id: `${L.id}#${st + 1}` }, __rr.levelFor(L, st)))); });
-  const nStages = await p.evaluate(() => __stages.length); if (nStages !== 64) bad(`expected 60 stages and 4 boss runs (got ${nStages})`);
+  const nStages = await p.evaluate(() => __stages.length); if (nStages !== 52) bad(`expected 48 stages and 4 boss runs (got ${nStages})`);
   const stuck = await p.evaluate(() => __stages.filter(L => !__rr.PF.reach(L).ok).map(L => L.id));
   if (stuck.length) bad(`stages that can't be finished: ${stuck.join(", ")}`);
-  const seeds = await p.evaluate(() => new Set(__stages.map(L => L.seed)).size); if (seeds !== 64) bad("every stage should have its own map");
+  const seeds = await p.evaluate(() => new Set(__stages.map(L => L.seed)).size); if (seeds !== 52) bad("every stage should have its own map");
   /* every level has its sniper nests (2 in worlds 1–2, 3 in worlds 3–4), each with a laser gate after it */
   const nestBad = await p.evaluate(() => __stages.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen(L), n = G.ents.filter(e => e.t === "nest").length, g = G.ents.filter(e => e.t === "gate").length; return n !== (L.world <= 2 ? 2 : 3) || g !== n; }).map(L => L.id));
   if (nestBad.length) bad(`stages without the right number of nests and gates: ${nestBad.join(", ")}`);
@@ -247,7 +247,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const arenaBad = await p.evaluate(() => __stages.filter(L => L.boss).filter(L => { const G = __rr.PF.gen(L), a = G.ents.find(e => e.t === "arena"); if (!a) return true; let ledges = 0; for (let c = a.col; c < a.col + 30; c++) if (G.map[9][c] === 2) ledges++; return ledges < 8 || G.ents.some(e => e.t === "nest"); }).map(L => L.id));
   if (arenaBad.length) bad(`boss runs without a proper arena: ${arenaBad.join(", ")}`);
   const nodes = await p.$$eval(".node", n => n.length), locked = await p.$$eval(".node.lock", n => n.length);
-  if (nodes !== 6 || locked !== 5) bad(`world 1 should show 5 big levels and the boss, with only the first open (shows ${nodes}, ${locked} locked)`);
+  if (nodes !== 5 || locked !== 4) bad(`world 1 should show 4 big levels and the boss, with only the first open (shows ${nodes}, ${locked} locked)`);
   /* play level 1 from the map */
   await p.click('.node[data-l="1-L1"]'); await p.click("#btn-go");
   const n1 = await p.evaluate(() => __rr.B().qs.length); if (n1 !== 4) bad(`a briefing should have 4 questions (has ${n1})`);
@@ -380,7 +380,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   }
   if (!/LEVEL CLEAR/.test(await p.textContent("#scr-result"))) bad("the third stage should clear the whole level");
   const rec = await p.evaluate(() => __rr.S().levels["1-L1"]); if (!rec || !rec.cleared || rec.stars !== 2 || rec.at) bad(`10 of 12 right over the three stages should clear the level with 2 stars (${JSON.stringify(rec)})`);
-  await p.reload(); const open2 = await p.$$eval(".node.lock", n => n.length); if (open2 !== 4) bad("after a reload level 2 should be open");
+  await p.reload(); const open2 = await p.$$eval(".node.lock", n => n.length); if (open2 !== 3) bad("after a reload level 2 should be open");
   /* ducking a glint and the shells */
   await p.evaluate(() => __rr.startBrief("2-L1", 1));
   for (let i = 0; i < 4; i++) { await p.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await p.click("#btn-next"); }
@@ -469,7 +469,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.evaluate(() => __rr.startBrief("1-boss"));
   if ((await p.evaluate(() => __rr.B().qs.length)) !== 6) bad("a boss briefing has 6 questions");
   const subs = await p.evaluate(() => __rr.B().qs.map(q => __rr.TRACKS.find(t => t.id === q.track).subject).sort().join(","));
-  if (subs !== "maths,maths,reading,reading,thinking,thinking") bad(`a boss briefing mixes 2 of each subject (${subs})`);
+  if (subs !== "maths,maths,maths,reading,thinking,thinking") bad(`a boss briefing mixes 3 maths, 2 thinking and 1 cloze (${subs})`);
   const bossSteps = await p.evaluate(() => __rr.B().qs.map(q => q.rung).join(","));
   if (bossSteps !== "1,2,3,3,4,4") bad(`a boss briefing should climb 1, 2, 3, 3, 4, 4 (got ${bossSteps})`);
   for (let i = 0; i < 6; i++) { await p.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await p.click("#btn-next"); }
@@ -516,10 +516,12 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     if (names.join() !== "FROSTGEAR,THORNBARK,THE STORM WARDEN") bad(`worlds 2–4 should each have their own boss (${names.join()})`); }
   /* progress from the first layout (one level per skill) carries over */
   { const pm = await open({ width: 1280, height: 800 });
-    await pm.evaluate(() => localStorage.setItem("prac4.v1", JSON.stringify({ v: 1, levels: { "1-frac": { cleared: true, stars: 3, best: 4 }, "1-flaw": { cleared: true, stars: 2, best: 3 }, "1-infer": { cleared: true, stars: 3, best: 4 }, "1-data": { cleared: true, stars: 1, best: 2 } }, seen: {}, seed: 5, coins: 9, sound: true, world: 1, log: [] })));
+    await pm.evaluate(() => localStorage.setItem("prac4.v1", JSON.stringify({ v: 1, levels: { "1-frac": { cleared: true, stars: 3, best: 4 }, "1-flaw": { cleared: true, stars: 2, best: 3 }, "1-word": { cleared: true, stars: 3, best: 4 }, "1-data": { cleared: true, stars: 1, best: 2 }, "1-L2": { cleared: true, stars: 3 } }, seen: {}, seed: 5, coins: 9, sound: true, world: 1, log: [] })));
     await pm.reload();
     const r = await pm.evaluate(() => __rr.S().levels["1-L1"]), lk = await pm.$$eval(".node.lock", n => n.length);
-    if (!r || !r.cleared || r.stars !== 2 || lk !== 4) bad(`old progress should carry over: level 1 cleared (all its skills were) with the lowest stars, level 2 open (${JSON.stringify(r)}, ${lk} locked)`);
+    if (!r || !r.cleared || r.stars !== 2 || lk !== 3) bad(`old progress should carry over: level 1 cleared (all its skills were) with the lowest stars, level 2 open (${JSON.stringify(r)}, ${lk} locked)`);
+    /* a big-level record from the five-level layout held other skills: it is dropped (level 2 now needs data, claim and time) */
+    if (await pm.evaluate(() => __rr.S().levels["1-L2"])) bad("a level record from the old five-level layout should be dropped");
     await pm.evaluate(() => localStorage.clear()); await pm.close(); }
   /* practice mode: everything open, coach notes, nothing saved */
   const saved = await p.evaluate(() => localStorage.getItem("prac4.v1"));
