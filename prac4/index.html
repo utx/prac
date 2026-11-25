@@ -43,6 +43,7 @@ main { min-width: 0; }
 #splash { position: fixed; inset: 0; z-index: 50; background: #0b0820; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 #splash.hidden { display: none; }
 #splash canvas { width: min(100vw, calc(100vh * 16 / 9)); height: auto; max-height: 100vh; image-rendering: pixelated; image-rendering: crisp-edges; }
+.snipe .roast { margin: 10px 0 0; font-style: italic; color: #fff3bf; font-size: 15px; }
 .node.boss { background: #ffe066; border-left: 10px solid #e03131; }
 .node.big { min-height: 150px; border-left: 10px solid #ffd43b; }
 .node .sk { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
@@ -141,7 +142,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 </style>
 </head>
 <body>
-<div id="splash" class="hidden" role="button" tabindex="0" aria-label="Ridge Runner: press any key or tap to start"><canvas id="tcv" width="480" height="270"></canvas></div>
+<div id="splash" class="hidden" role="button" tabindex="0" aria-label="Ridge Runner: press space or tap to start"><canvas id="tcv" width="480" height="270"></canvas></div>
 <header>
   <h1 class="px">RIDGE RUNNER</h1>
   <span class="chip" id="hdr-stars">★ 0</span><span class="chip" id="hdr-coins">● 0</span>
@@ -2720,7 +2721,7 @@ const PF = (() => {
   const keyMap = { ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right", ArrowUp: "up", KeyW: "up", Space: "jump", ArrowDown: "down", KeyS: "down", KeyE: "use", KeyJ: "fire", KeyX: "fire", KeyK: "duck", KeyC: "duck", Escape: "leave", KeyQ: "leave" };
   function onKey(e, down) {
     if (!S) return;
-    if (down && S.scope && S.scope.nest.sentries.card) { S.anyKey = true; e.preventDefault(); return; }   /* any key closes the ridge report */
+    if (S.scope && S.scope.nest.sentries.card) { if (down && e.code === "Space") S.anyKey = true; if (e.code === "Space" || keyMap[e.code]) e.preventDefault(); return; }   /* SPACE closes the ridge report */
     const k = keyMap[e.code]; if (!k) return;
     e.preventDefault();
     if (down && !KEYS[k]) KEYS[k + "P"] = true;
@@ -2844,7 +2845,7 @@ const PF = (() => {
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
     { const ss = sc.nest.sentries;                                             /* the ridge report: wait for any key, nothing else moves */
-      if (ss.card && !sc.nest.boss) { const any = S.anyKey || Object.keys(KEYS).some(k => k.endsWith("P") && KEYS[k]); S.anyKey = false; if (any && ss.card.t > 20) { closeCard(); for (const k in KEYS) KEYS[k] = false; } else if (any) for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; return; } }
+      if (ss.card && !sc.nest.boss) { const any = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (any && ss.card.t > 20) { closeCard(); for (const k in KEYS) KEYS[k] = false; } return; } }
     for (const b of S.incoming) {                                              /* bullets flying at you */
       b.t++;
       if (b.t === b.dur) {
@@ -3200,7 +3201,7 @@ const PF = (() => {
     const st = ss.stat, acc = st.shots ? Math.round(100 * st.hits / st.shots) : 0;
     const ridgeBest = S.opts.bestRidge || 0, isBest = st.score > ridgeBest && st.score > 0;
     if (isBest) { S.newRidgeBest = st.score; beep(523, .1, "triangle"); beep(659, .1, "triangle"); beep(1046, .25, "triangle"); }
-    return Object.assign({}, st, { acc, isBest, ridgeBest, t: 0 });
+    return Object.assign({}, st, { acc, isBest, ridgeBest, t: 0, roast: roast(Object.assign({}, st, { acc, gate: ss.gate, min: ss.min })) });
   }
   function closeCard() { const ss = S.scope.nest.sentries; S.scope = null; ss.card = null; if (!ss.gate) msg("The gate is still shut: come back with more rounds", 120, "#ffb3b3"); }
   /* the level's sniper totals, added up from every nest once at the end (so nothing is counted twice) */
@@ -3209,6 +3210,31 @@ const PF = (() => {
     for (const n of S.ents.filter(e => e.t === "nest")) { const st = n.sentries.stat; for (const k of ["score", "ko", "head", "shots", "hits", "first"]) t[k] += st[k]; t.best = Math.max(t.best, st.best); t.ridgeMax = Math.max(t.ridgeMax, st.score); }
     return t;
   }
+  /* the commentator: a playful roast after every ridge, whether it went badly or well */
+  const ROASTS = {
+    none: ["You didn't fire a single shot. Very peaceful. Very strange.", "Zero shots. Are you a sniper or a bird-watcher?", "The rifle wants to know if it did something wrong."],
+    zero: ["Zero hits! The sentries are still laughing. Were you aiming at the clouds?", "Not one hit. The rocks say thanks for leaving them alone.", "Your bullets went on a holiday. Nobody knows where.", "Missed them all! Even the sentries felt sorry for you."],
+    shut: ["The gate's still shut and the sentries are doing a happy dance.", "Not enough knockouts to open the gate. The sentries say 'nice try, kiddo'."],
+    bad: ["That aim was so wobbly the scope got seasick.", "You hit more rocks than a landslide does.", "The sentries asked if you were shooting with your eyes shut.", "Some hits! Mostly misses. The misses are winning."],
+    ok: ["Half hits, half misses. Perfectly... medium.", "Not bad! Not great either. A solid 'meh' from the sentries.", "Some of your shots hit. The others are still flying somewhere."],
+    good: ["Okay, okay, you're good. Don't let it go to your head (your bullets did).", "Sharp shooting! The sentries want a rematch. And a hug.", "Nice! Your teacher would give that a sticker. A small one."],
+    heads: ["So many headshots the sentries are ordering bigger helmets.", "Headshot after headshot. The helmet shop is sold out."],
+    perfect: ["Every shot hit! Did you bribe the sentries?", "100% accuracy. Now try being this accurate with your spelling.", "Perfect aim. The sentries have filed a complaint. It was ignored."] };
+  function roast(st) {
+    const pickOne = a => a[Math.floor(Math.random() * a.length)];
+    if (!st.shots) return pickOne(ROASTS.none);
+    if (!st.hits) return pickOne(ROASTS.zero);
+    if (st.gate === false && st.ko < st.min) return pickOne(ROASTS.shut);
+    if (st.acc >= 100 && st.hits >= 3) return pickOne(ROASTS.perfect);
+    if (st.head >= 3 && st.head >= st.ko / 2) return pickOne(ROASTS.heads);
+    return pickOne(st.acc < 35 ? ROASTS.bad : st.acc < 65 ? ROASTS.ok : ROASTS.good);
+  }
+  /* wrapped, centred text on the canvas */
+  function wrap(ctx, s, cx, y, w, size, c) {
+    ctx.font = `bold ${size}px "Courier New", monospace`; const words = s.split(" "), lines = []; let line = "";
+    for (const wd of words) { const t2 = line ? line + " " + wd : wd; if (ctx.measureText(t2).width > w && line) { lines.push(line); line = wd; } else line = t2; }
+    lines.push(line); lines.slice(0, 2).forEach((l, i) => txt(ctx, l, cx, y + i * (size + 2) - (lines.length > 1 ? 5 : 0), size, c));
+  }
   function drawCard(ctx, c) {
     c.t++; const g = Math.min(1, c.t / 12);
     ctx.fillStyle = `rgba(5,8,20,${0.8 * g})`; ctx.fillRect(0, 0, VW, VH);
@@ -3216,10 +3242,13 @@ const PF = (() => {
     ctx.fillStyle = "#1b1b2f"; ctx.fillRect(86, 34, 308, 206); ctx.fillStyle = "#2c335c"; ctx.fillRect(90, 38, 300, 198); ctx.fillStyle = "#ffd43b"; ctx.fillRect(90, 38, 300, 22);
     txt(ctx, "RIDGE REPORT", VW / 2, 54, 12, "#1b1b2f");
     const rows = [["KNOCKED OUT", c.ko], ["HEADSHOTS", c.head], ["SHOT FIRST", c.first], ["ACCURACY", c.acc + "%"], ["BEST STREAK", c.best]];
-    rows.forEach(([k, v], i) => { const show = c.t > 10 + i * 8; if (!show) return; txt(ctx, k, 110, 82 + i * 18, 10, "#ced4da", "left"); txt(ctx, String(v), 370, 82 + i * 18, 11, "#fff", "right"); });
-    if (c.t > 56) { txt(ctx, "SCORE", 110, 186, 12, "#ffd43b", "left"); txt(ctx, String(Math.min(c.score, Math.round(c.score * (c.t - 56) / 20))), 370, 188, 16, "#ffd43b", "right"); }
-    if (c.t > 80) { if (c.isBest) txt(ctx, c.t % 20 < 12 ? "NEW HIGH SCORE!" : "", VW / 2, 212, 14, "#ff922b"); else txt(ctx, `BEST ON THIS LEVEL: ${c.ridgeBest}`, VW / 2, 212, 9, "#adb5bd"); }
-    if (c.t > 20) txt(ctx, "Press any key to carry on", VW / 2, 230, 8, S.t % 40 < 26 ? "#fff" : "#868e96");
+    rows.forEach(([k, v], i) => { const show = c.t > 10 + i * 8; if (!show) return; txt(ctx, k, 110, 76 + i * 14, 9, "#ced4da", "left"); txt(ctx, String(v), 370, 76 + i * 14, 10, "#fff", "right"); });
+    if (c.t > 56) { txt(ctx, "SCORE", 110, 150, 11, "#ffd43b", "left"); txt(ctx, String(Math.min(c.score, Math.round(c.score * (c.t - 56) / 20))), 370, 152, 15, "#ffd43b", "right"); }
+    if (c.t > 66) { if (c.isBest) txt(ctx, c.t % 20 < 12 ? "NEW HIGH SCORE!" : "", VW / 2, 168, 12, "#ff922b"); else txt(ctx, `BEST ON THIS LEVEL: ${c.ridgeBest}`, VW / 2, 167, 8, "#adb5bd"); }
+    /* the commentator has something to say (playfully) */
+    if (c.t > 76) { const g2 = Math.min(1, (c.t - 76) / 8); ctx.globalAlpha = g2; ctx.fillStyle = "#ffd43b"; ctx.fillRect(100, 176, 280, 40); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(102, 178, 276, 36);
+      wrap(ctx, c.roast, VW / 2, 192, 260, 10, "#fff3bf"); ctx.globalAlpha = 1; }
+    if (c.t > 20) txt(ctx, "Press SPACE to carry on", VW / 2, 230, 9, S.t % 40 < 26 ? "#fff" : "#868e96");
     ctx.restore();
   }
   /* every second beaten bot drops a bullet (the drop is decided by the bot, so it is the same each play) */
@@ -3434,7 +3463,8 @@ const PF = (() => {
     grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.hideIn = 0; s.x = s.at + s.side * (s.boss ? 42 : 36); S.stop = 0; const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
-    key: (k, down) => { if (down && S && S.scope && S.scope.nest.sentries.card) { S.anyKey = true; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
+    key: (k, down) => { if (S && S.scope && S.scope.nest.sentries.card) { if (down && k === "jump") S.anyKey = true; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
+    tap: () => { if (S && S.scope && S.scope.nest.sentries.card) S.anyKey = true; },
     /* the boss */
     toArena: () => { if (!S) return false; const a = S.ents.find(e => e.t === "arena"); if (!a) return false; S.P.x = a.x + 4 * TS; S.P.y = a.y - PH.h; S.P.vx = S.P.vy = 0; return true; },
     boss: () => S && S.boss && { hp: S.boss.hp, max: S.boss.max, phase: S.boss.phase, state: S.boss.state, core: S.boss.core, ball: S.boss.ball, x: S.boss.x, name: S.boss.info.name, waves: S.waves.length, orbs: S.orbs.length },
@@ -3560,14 +3590,14 @@ const PF = (() => {
     const done = t > T.letters[T.letters.length - 1].at + 30;
     if (done) {
       txt(ctx, "ANSWER  ·  GEAR UP  ·  RUN", VW / 2, 164, 10, "#fff3bf");
-      if (!T.go ? t % 50 < 34 : t % 6 < 3) { ctx.fillStyle = "rgba(10,8,30,.6)"; ctx.fillRect(VW / 2 - 98, 180, 196, 22); txt(ctx, "PRESS ANY KEY TO START", VW / 2, 195, 11, "#ffffff"); }
+      if (!T.go ? t % 50 < 34 : t % 6 < 3) { ctx.fillStyle = "rgba(10,8,30,.6)"; ctx.fillRect(VW / 2 - 98, 180, 196, 22); txt(ctx, "PRESS SPACE TO START", VW / 2, 195, 11, "#ffffff"); }
       if (T.got) txt(ctx, `◎ ${T.got}`, VW - 14, 16, 10, "#ffd43b", "right");
     }
     ctx.restore();
     if (T.flash) { ctx.fillStyle = `rgba(255,255,255,${T.flash / 16})`; ctx.fillRect(0, 0, VW, VH); }
     if (T.go) { ctx.fillStyle = `rgba(255,255,255,${Math.min(1, T.go / 30)})`; ctx.fillRect(0, 0, VW, VH); }
   }
-  return { start, stop, gen, reach, step, hook, THEMES, LOOT, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
+  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
 })();
 
 </script>
@@ -3840,7 +3870,8 @@ function done(res) {
   rec.snipeBest = Math.max(prevBest, sn.score || 0); rec.ridgeBest = Math.max(rec.ridgeBest || 0, sn.ridgeMax || 0); S.snipeBest = Math.max(S.snipeBest || 0, sn.score || 0);
   const acc = sn.shots ? Math.round(100 * sn.hits / sn.shots) : 0;
   const snipeCard = sn.shots ? `<div class="snipe"><div class="px">SNIPER SCORE</div><div class="big2">${sn.score}</div>${newBest ? `<div class="nhs">NEW HIGH SCORE!</div>` : `<div class="note2">Best on this level: ${prevBest}</div>`}
-    <div class="stats">${[["Knocked out", sn.ko], ["Headshots", sn.head], ["Shot first", sn.first], ["Accuracy", acc + "%"], ["Best streak", sn.best]].map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join("")}</div></div>` : "";
+    <div class="stats">${[["Knocked out", sn.ko], ["Headshots", sn.head], ["Shot first", sn.first], ["Accuracy", acc + "%"], ["Best streak", sn.best]].map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join("")}</div>
+    <p class="roast">🎙 ${esc(PF.roast(Object.assign({}, sn, { acc })))}</p></div>` : "";
   const last = B.stage >= STAGES(L) - 1;
   if (res.win && !last) {
     /* a stage of a big level is done: save where we are, then the next stage's briefing */
@@ -3924,16 +3955,17 @@ document.querySelectorAll("#pads .pad").forEach(b => {
   const k = b.dataset.k, on = e => { e.preventDefault(); PF.hook.key(k, true); }, off = e => { e.preventDefault(); PF.hook.key(k, false); };
   b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointerleave", off); b.addEventListener("pointercancel", off);
 });
+$("#cv").addEventListener("pointerdown", () => PF.hook.tap());
 $("#adm-win").onclick = () => PF.hook.win();
 $("#adm-inv").onclick = () => { INV = !INV; $("#adm-inv").textContent = "Invincible: " + (INV ? "on" : "off"); };
 $("#adm-quit").onclick = () => { PF.stop(); renderMap(); show("map"); };
 if (PRACTICE) { document.body.classList.add("practice"); $("#hdr-practice").classList.remove("hidden"); }
 renderMap(); coachLevel(null); show("map");
-/* the title screen: shown when the game opens; any key, click or tap starts */
+/* the title screen: shown when the game opens; SPACE (or Enter), a click or a tap starts */
 function splash() {
   const el = $("#splash"); el.classList.remove("hidden"); el.focus();
   const go = e => { if (e) e.preventDefault(); PF.titleGo(); };
-  const key = e => { if (e.ctrlKey || e.metaKey || e.altKey) return; go(e); };
+  const key = e => { if (e.ctrlKey || e.metaKey || e.altKey) return; if (e.code === "Space" || e.key === " " || e.key === "Enter") go(e); };
   addEventListener("keydown", key); el.addEventListener("pointerdown", go);
   PF.title({ canvas: $("#tcv"), sound: S.sound, onGo: () => { removeEventListener("keydown", key); el.removeEventListener("pointerdown", go); el.classList.add("hidden"); window.scrollTo(0, 0); } });
 }
