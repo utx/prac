@@ -597,10 +597,13 @@ function checkLayout(M, where, GAP) {
     if (g.P.emote) bad(`practice ${label}: moving should stop the emote`);
     await A("foe", "emote", { emote: "spin" }); await A("step", 2); g = await A("get");
     if (g.F.state !== "emote" || g.F.emote !== "spin") bad(`practice ${label}: the opponent should be able to dance`);
-    await A("foe", "throw"); await A("step", 130); g = await A("get");
+    /* the opponent is held still once its grenade is in the air: after a throw its own timer would otherwise let it
+       attack again at a random moment while we wait, and that extra hit made this check fail now and then */
+    const throwOne = async () => { await A("foe", "throw"); for (let n = 0; n < 60; n++) { await A("step", 1); g = await A("get"); if (g.nades.length) { await A("foe", "hold"); break; } } };
+    await throwOne(); await A("step", 110); g = await A("get");
     const hit = g.stats.taken;
     if (!hit) bad(`practice ${label}: standing on a grenade should hurt`);
-    await A("foe", "throw");
+    await throwOne();
     for (let n = 0; n < 200; n++) { await A("step", 1); g = await A("get"); if (g.nades.length && g.nades[0].fuse > 0 && g.nades[0].fuse <= 10) break; }
     await press("ArrowUp"); await A("step", 40); g = await A("get");
     if (g.stats.taken !== hit || !g.stats.dodged) bad(`practice ${label}: jumping should dodge the grenade (${JSON.stringify(g.stats)})`);
