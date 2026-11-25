@@ -14,6 +14,20 @@ const PF = (() => {
     { name: "Silver Cliffs", sky: ["#8fb8de", "#dceaf6"], far: "#9aa9bd", mid: "#7586a0", top: "#d7e3ef", dirt: "#5f6f86", dirt2: "#526178", block: "#8a9bb5", deco: "pine" },
     { name: "Gold Forest", sky: ["#141b3a", "#2c3a6b"], far: "#22304f", mid: "#1b2a3a", top: "#3f8f4a", dirt: "#3b2f2a", dirt2: "#2f2521", block: "#6b5a3a", deco: "tree" },
     { name: "Storm Fortress", sky: ["#2a1840", "#5b3b7a"], far: "#3d2a57", mid: "#2b1d40", top: "#9a7fc4", dirt: "#3a3046", dirt2: "#2e2638", block: "#6d5a86", deco: "spire" }];
+  /* every big level is its own place, with its own look and its own hazard (David, Nov 2026: "the levels all look too samey … make them much
+     more different and challenging right from the start"). All drawn in code, our own. */
+  const BIOMES = {
+    canyon:  { name: "Dusty Canyon",   sky: ["#f6a86b", "#fbe0b8"], far: "#d98a55", mid: "#b65f36", top: "#e8a33d", dirt: "#9c5a32", dirt2: "#874a27", block: "#c97a3e", bg: "mesa",    pieces: ["boulders", "boulders", "crumble"], tip: "Boulders roll down at you: jump them!" },
+    ice:     { name: "Frozen Caves",   sky: ["#0f2a4a", "#3d7bb0"], far: "#2a5680", mid: "#1c3f63", top: "#dff4ff", dirt: "#4f7fa8", dirt2: "#44729a", block: "#9fd3f5", bg: "icecave", pieces: ["iceRun", "iceRun", "icicles"], ice: true, tip: "ICE! You slide. Icicles drop as you pass." },
+    jungle:  { name: "Vine Jungle",    sky: ["#0d3b2e", "#4f9a5a"], far: "#1f5c3a", mid: "#164a2e", top: "#6fcf4a", dirt: "#5a3d22", dirt2: "#4d331c", block: "#8a6a3a", bg: "jungle",  pieces: ["spring", "spring", "thorns", "swoop"], rain: true, tip: "Mushroom pads bounce you high. Thorns hurt!" },
+    foundry: { name: "Lava Foundry",   sky: ["#2a0f0a", "#7a2a12"], far: "#4a1f16", mid: "#33150f", top: "#ff8a3d", dirt: "#4a3b36", dirt2: "#3e312d", block: "#7a6a64", bg: "foundry", pieces: ["jets", "jets", "belts"], lava: true, tip: "Fire jets blast on and off. Mind the lava!" },
+    roofs:   { name: "Neon Rooftops",  sky: ["#0b0b2a", "#3b2a6b"], far: "#1c1a45", mid: "#141236", top: "#7af0ff", dirt: "#2e2f4f", dirt2: "#272844", block: "#5a5f9a", bg: "skyline", pieces: ["belts", "belts", "mover", "gapRun"], tip: "Conveyor belts push you: jump off in time." },
+    peaks:   { name: "Gale Peaks",     sky: ["#6fa8dc", "#e3f1ff"], far: "#a7bfd8", mid: "#7a93b3", top: "#ffffff", dirt: "#6b7d96", dirt2: "#5f7088", block: "#b8c8dc", bg: "peaks",   pieces: ["gapRun", "mover", "crumble"], wind: true, tip: "Wind gusts push you: watch for the arrows!" },
+    mine:    { name: "Lantern Mine",   sky: ["#120d08", "#2b1f14"], far: "#2a2016", mid: "#1e170f", top: "#c9a46a", dirt: "#4a3824", dirt2: "#3f301f", block: "#7a5a32", bg: "mine",    pieces: ["icicles", "crumble", "stones"], dark: true, tip: "It's DARK. Rocks fall from the roof!" },
+    storm:   { name: "Thunder Ridge",  sky: ["#1a1030", "#4b2f6b"], far: "#33224d", mid: "#24183a", top: "#b197fc", dirt: "#3a3046", dirt2: "#2e2638", block: "#6d5a86", bg: "storm",   pieces: ["gapRun", "stones", "mover"], bolts: true, tip: "Lightning hits the glowing mark: move!" } };
+  const BIOME_ORDER = [["canyon", "ice", "jungle", "foundry"], ["roofs", "peaks", "mine", "storm"], ["ice", "foundry", "canyon", "jungle"], ["mine", "storm", "peaks", "roofs"]];
+  const BOSS_BIOME = ["canyon", "peaks", "jungle", "storm"];
+  const biomeOf = L => BIOMES[L.biome || (L.boss ? BOSS_BIOME[L.world - 1] : BIOME_ORDER[L.world - 1][(L.k != null ? L.k : (L.seed >>> 3)) % 4])];
 
   /* ---------------- level generation (seeded) ---------------- */
   function rng(seed) { let a = seed >>> 0 || 1; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -27,7 +41,7 @@ const PF = (() => {
     /* the ground enemies, mixed from world 1: crawler bots, hopper bots and spiky rollers */
     const foe = (c) => { const k = r(), t = k < 0.4 ? "walker" : k < 0.7 ? "hopper" : "roller"; ents.push({ t, x: c * TS, y: gh * TS - 10, y0: gh * TS - 10 }); };
     const flat = (n, opt = {}) => { for (let i = 0; i < n; i++) ground(x + i, gh); if (opt.walker && n >= 5) foe(x + Math.floor(n / 2)); if (opt.coins) for (let i = 1; i < n - 1; i += 2) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 2) * TS + 4 }); x += n; };
-    const maxGap = 3, maxStep = w >= 3 ? 3 : 2, walkerP = 0.45 + 0.1 * w;
+    const maxGap = 3, maxStep = w >= 3 ? 3 : 2, walkerP = 0.6 + 0.08 * w, B = biomeOf(L);
     /* the trickier pieces (David, Nov 2026: the start "seems too basic … let's start with some challenge") */
     const reachCells = [];
     const piece = name => {
@@ -49,7 +63,30 @@ const PF = (() => {
         const n = int(3, 3 + (w >= 2 ? 1 : 0)); flat(1);
         for (let p = 0; p < n; p++) { for (let i = 0; i < 3; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } map[gh - 3][x + 1] = 2; ents.push({ t: p === n - 1 ? "ammo" : "coin", x: (x + 1) * TS + 4, y: (gh - 5) * TS }); x += 3; }
         flat(int(3, 4));
-      } else if (name === "tiers") {                /* a choice: the high road (blocks, bullets) or the low road (bots) */
+      } else if (name === "iceRun") {               /* a long sheet of ice ending at a gap: slide, then jump at the right moment */
+        flat(1); const n = int(6, 8 + w); for (let i = 0; i < n; i++) { ground(x + i, gh); map[gh][x + i] = 7; }
+        if (r() < 0.5) ents.push({ t: "icicle", x: (x + Math.floor(n / 2)) * TS + 4, y: Math.max(1, gh - 7) * TS, y0: Math.max(1, gh - 7) * TS });
+        x += n; const g = int(2, 3); for (let i = 0; i < g; i++) air(x + i); ents.push({ t: "coin", x: (x + 1) * TS + 4, y: (gh - 3) * TS }); x += g; flat(int(3, 4));
+      } else if (name === "icicles") {              /* things hang from the roof and drop when you pass under */
+        const n = int(7, 9); flat(n, { walker: r() < 0.4 });
+        for (let i = 0; i < 1 + (w >= 2 ? 1 : 0) + (r() < 0.5 ? 1 : 0); i++) { const c = x - n + 2 + i * 3; ents.push({ t: "icicle", x: c * TS + 4, y: Math.max(1, gh - 7) * TS, y0: Math.max(1, gh - 7) * TS, rock: B.dark }); }
+      } else if (name === "thorns") {               /* a thorn patch with a mushroom pad to bounce over it */
+        flat(1); map[gh][x] = 5; for (let y = gh + 1; y < ROWS; y++) map[y][x] = 1; for (let y = 0; y < gh; y++) map[y][x] = 0; x++;
+        const n = int(3, 4); for (let i = 0; i < n; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } ents.push({ t: "coin", x: (x + 1) * TS + 4, y: (gh - 6) * TS }); x += n; flat(int(3, 4));
+      } else if (name === "swoop") { flat(int(6, 8), { walker: true }); ents.push({ t: "swooper", x: (x - 3) * TS, y: (gh - 6) * TS, y0: (gh - 6) * TS, x0: (x - 3) * TS }); }
+      else if (name === "jets") {                   /* fire jets blast up through the floor, on and off */
+        flat(2); const n = 2 + (w >= 3 ? 1 : 0);
+        for (let i = 0; i < n; i++) { flat(1); ents.push({ t: "jet", x: x * TS, y: gh * TS, ph: i * 40 + int(0, 30) }); flat(2); }
+        flat(2);
+      } else if (name === "belts") {                /* a conveyor belt that carries you towards a gap or spikes */
+        flat(1); const n = int(6, 8), d = r() < 0.6 ? 1 : -1; for (let i = 0; i < n; i++) { ground(x + i, gh); map[gh][x + i] = d > 0 ? 9 : 8; }
+        x += n; if (d > 0) { const g = int(2, 3); for (let i = 0; i < g; i++) air(x + i); ents.push({ t: "coin", x: (x + 1) * TS + 4, y: (gh - 3) * TS }); x += g; }
+        else { ground(x, gh); map[gh - 1][x] = 3; x++; } flat(int(3, 4));
+      } else if (name === "gapRun") {               /* three gaps in a row with short landings */
+        for (let k = 0; k < 3; k++) { const g = int(2, maxGap); for (let i = 0; i < g; i++) air(x + i); ents.push({ t: "coin", x: (x + 1) * TS + 4, y: (gh - 3) * TS }); x += g; const h = Math.max(8, Math.min(14, gh + int(-1, 1))); gh = h; for (let i = 0; i < 2; i++) ground(x + i, gh); x += 2; }
+        flat(2);
+      } else if (name === "boulders") { flat(int(7, 9)); ents.push({ t: "boulder", x: (x - 1) * TS, y: (gh - 1) * TS - 2, x0: (x - 1) * TS, y0: (gh - 1) * TS - 2 }); }
+      else if (name === "tiers") {                /* a choice: the high road (blocks, bullets) or the low road (bots) */
         const x0 = x; flat(11, { walker: true });
         map[gh - 2][x0 + 1] = 2; for (let i = 3; i <= 9; i++) map[gh - 4][x0 + i] = 2;
         for (let i = 4; i <= 8; i += 2) ents.push({ t: i === 6 ? "ammo" : "coin", x: (x0 + i) * TS + 4, y: (gh - 6) * TS });
@@ -59,7 +96,7 @@ const PF = (() => {
     flat(6);
     ents.push({ t: "check", x: 2 * TS, y: gh * TS });
     /* the opening challenge: every stage starts with a moving platform and a crumbling bridge (boss runs too) */
-    piece("mover"); piece("crumble");
+    piece("mover"); piece("crumble"); piece(B.pieces[0]);          /* … and straight away, this place's own hazard */
     let chests = 0, sinceCheck = 0, nests = 0, wantNests = L.boss ? 0 : w <= 2 ? 2 : 3, sinceNest = 0;
     while (x < len - 14) {
       const k = r();
@@ -102,9 +139,10 @@ const PF = (() => {
         if (w >= 2 && r() < 0.6) ents.push({ t: "swooper", x: (x - 1) * TS, y: (gh - 6) * TS, y0: (gh - 6) * TS, x0: (x - 1) * TS });
       } else if (k < 0.66) { flat(int(6, 8), { walker: true, coins: true }); ents.push({ t: "ammo", x: (x - 4) * TS + 4, y: (gh - 3) * TS }); if (w >= 2) foe(x - 2);
         ents.push({ t: "ammo", high: true, x: (x - 6) * TS + 4, y: (gh - 6) * TS });             /* only a double jump reaches this one */ }
-      else if (k < 0.74) piece("mover");
-      else if (k < 0.81) piece("crumble");
-      else if (k < 0.88) piece("spring");
+      else if (k < 0.70) piece(B.pieces[int(0, B.pieces.length - 1)]);   /* this place's own hazards come often */
+      else if (k < 0.76) piece("mover");
+      else if (k < 0.82) piece("crumble");
+      else if (k < 0.88) piece(B.ice || B.lava ? B.pieces[0] : "spring");
       else if (k < 0.94) piece("stones");
       else piece("tiers");
       sinceCheck += 6; sinceNest += 6;
@@ -127,15 +165,17 @@ const PF = (() => {
     for (let y = 0; y < ROWS; y++) for (let c = 0; c < cols; c++) map[y][c] = map[y][c] || 0;
     /* hearts: one spare in the middle of longer levels */
     const mid = ents.filter(e => e.t === "check")[1]; if (mid) ents.push({ t: "heart", x: mid.x + 24, y: mid.y - 40 });
-    return { map, ents, cols, theme: THEMES[w - 1], world: w, reachCells };
+    if (B.dark) for (const e of ents.filter(e => e.t === "check" || e.t === "nest" || e.t === "chest")) ents.push({ t: "lantern", x: e.x + 8, y: e.y - 40 });
+    return { map, ents, cols, theme: B, biome: B, world: w, reachCells };
   }
-  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2 || t === 5 || (t === 6 && !(G.broken && G.broken[c + "," + r])) || (t === 4 && !G.open && !(G.gateOpen && G.gateOpen[c])); };
+  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2 || t === 5 || t === 7 || t === 8 || t === 9 || (t === 6 && !(G.broken && G.broken[c + "," + r])) || (t === 4 && !G.open && !(G.gateOpen && G.gateOpen[c])); };
   const spikeAt = (G, c, r) => c >= 0 && c < G.cols && r >= 0 && r < ROWS && G.map[r][c] === 3;
 
   /* one physics step for a body {x, y, vx, vy, ground} with input {dir, jump (held), jumpPressed} */
   function step(G, b, inp) {
-    const a = b.ground ? PH.acc : PH.air;
-    if (inp.dir) b.vx = Math.max(-PH.max, Math.min(PH.max, b.vx + inp.dir * a)); else { b.vx *= b.ground ? PH.fric : 0.92; if (Math.abs(b.vx) < 0.05) b.vx = 0; }
+    const ice = b.ground && b.under === 7, a = b.ground ? (ice ? 0.08 : PH.acc) : PH.air;
+    if (inp.dir) b.vx = Math.max(-PH.max, Math.min(PH.max, b.vx + inp.dir * a)); else { b.vx *= b.ground ? (ice ? 0.985 : PH.fric) : 0.92; if (Math.abs(b.vx) < 0.05) b.vx = 0; }
+    const belt = b.ground ? (b.under === 9 ? 0.9 : b.under === 8 ? -0.9 : 0) : 0;
     if (b.ground) b.coy = PH.coyote; else b.coy = Math.max(0, (b.coy || 0) - 1);
     if (inp.jumpPressed) b.buf = PH.buffer; else b.buf = Math.max(0, (b.buf || 0) - 1);
     if (b.buf > 0 && b.coy > 0) { b.vy = PH.jump; b.coy = 0; b.buf = 0; b.ground = false; b.jumped = true; }
@@ -144,14 +184,14 @@ const PF = (() => {
     if (b.vy >= 0) b.spring = false;
     b.vy = Math.min(PH.fall, b.vy + PH.grav);
     /* move x */
-    b.x += b.vx;
+    const dx = b.vx + belt + (b.push || 0); b.x += dx;
     const top = Math.floor(b.y / TS), bot = Math.floor((b.y + PH.h - 1) / TS);
-    if (b.vx > 0) { const c = Math.floor((b.x + PH.w - 1) / TS); for (let r = top; r <= bot; r++) if (solidAt(G, c, r)) { b.x = c * TS - PH.w; b.vx = 0; break; } }
-    else if (b.vx < 0) { const c = Math.floor(b.x / TS); for (let r = top; r <= bot; r++) if (solidAt(G, c, r)) { b.x = (c + 1) * TS; b.vx = 0; break; } }
+    if (dx > 0) { const c = Math.floor((b.x + PH.w - 1) / TS); for (let r = top; r <= bot; r++) if (solidAt(G, c, r)) { b.x = c * TS - PH.w; b.vx = 0; break; } }
+    else if (dx < 0) { const c = Math.floor(b.x / TS); for (let r = top; r <= bot; r++) if (solidAt(G, c, r)) { b.x = (c + 1) * TS; b.vx = 0; break; } }
     /* move y */
     b.y += b.vy; b.ground = false;
     const l = Math.floor(b.x / TS), rr = Math.floor((b.x + PH.w - 1) / TS);
-    if (b.vy > 0) { const r = Math.floor((b.y + PH.h) / TS); for (let c = l; c <= rr; c++) if (solidAt(G, c, r) && r < ROWS) { b.y = r * TS - PH.h; b.vy = 0; b.ground = true; b.usedDbl = false;
+    if (b.vy > 0) { const r = Math.floor((b.y + PH.h) / TS); for (let c = l; c <= rr; c++) if (solidAt(G, c, r) && r < ROWS) { b.y = r * TS - PH.h; b.vy = 0; b.ground = true; b.usedDbl = false; b.under = G.map[r][c];
       if (G.map[r][c] === 5) { b.vy = PH.spring; b.ground = false; b.spring = true; b.bounced = true; } break; } }
     else if (b.vy < 0) { const r = Math.floor(b.y / TS); for (let c = l; c <= rr; c++) if (solidAt(G, c, r)) { b.y = (r + 1) * TS; b.vy = 0; break; } }
     b.onSpike = false;
@@ -537,6 +577,8 @@ const PF = (() => {
     /* moving platforms: they move first, and carry the hero standing on them */
     for (const e of S.ents) if (e.t === "mover") { e.dx = e.v; e.x += e.v; if (e.x <= e.x0 || e.x >= e.x1) { e.x = Math.max(e.x0, Math.min(e.x1, e.x)); e.v = -e.v; } }
     if (P.onMover) P.x += P.onMover.dx;
+    hazardTick(P, G);
+    if (!S || S.over) return;
     const footY = P.y + PH.h;
     step(G, P, { dir, jump: KEYS.jump || KEYS.up, jumpPressed: jp });
     P.onMover = null;
@@ -632,6 +674,46 @@ const PF = (() => {
     S.cam = S.arena ? S.arena.L : Math.max(0, Math.min(G.cols * TS - VW, P.x - VW * 0.4));
   }
   const FOES = ["walker", "drone", "hopper", "roller", "swooper"];
+  /* each place's own hazards: fire jets, icicles and falling rocks, boulders, wind gusts and lightning */
+  function hazardTick(P, G) {
+    const B = G.biome, hit = (x, y, w, h) => P.x < x + w && P.x + PH.w > x && P.y < y + h && P.y + PH.h > y;
+    if (!S.tipBiome && S.t === 90) { S.tipBiome = true; msg(B.name.toUpperCase(), 220, "#ffffff"); msg(B.tip, 220, "#ffd43b"); }
+    for (const e of S.ents) {
+      if (!e.alive && e.alive !== undefined) continue;
+      if (e.t === "jet") {                                           /* 90 off (sputters for the last 30), then 50 of flame 3 tiles high */
+        const c = (S.t + e.ph) % 140; e.on = c >= 90; e.warn = c >= 60 && c < 90;
+        if (e.on && c === 90 && Math.abs(P.x - e.x) < 200) beep(110, .15, "sawtooth", .04);
+        if (e.on && hit(e.x + 2, e.y - 3 * TS, TS - 4, 3 * TS)) hurt("Scorched by a fire jet: wait for it to stop!");
+      } else if (e.t === "icicle") {                                 /* shakes when you come close, then drops */
+        if (!e.st) { if (Math.abs(P.x + 5 - e.x) < 34 && P.y > e.y) { e.st = 1; beep(900, .05, "square", .02); } }
+        else if (e.st < 30) e.st++;
+        else if (!e.done) { e.vy = (e.vy || 0) + 0.35; e.y += e.vy; const rr = Math.floor((e.y + 10) / TS);
+          if (hit(e.x - 3, e.y, 6, 12)) { hurt(e.rock ? "A rock fell on you!" : "An icicle fell on you!"); e.done = true; e.alive = false; burst(e.x, e.y + 8, e.rock ? "#8c6a4a" : "#dff4ff", 10); }
+          else if (solidAt(G, Math.floor(e.x / TS), rr) || e.y > ROWS * TS) { e.done = true; e.alive = false; burst(e.x, e.y + 8, e.rock ? "#8c6a4a" : "#dff4ff", 12); beep(e.rock ? 90 : 1200, .08, "triangle", .03); } }
+      } else if (e.t === "boulder") {                                /* rolls at you when you come near, then comes back again */
+        if (!e.roll) { if (P.x > e.x - 200 && P.x < e.x) { e.roll = true; e.vx = -1.6 - 0.2 * G.world; e.vy = 0; } }
+        else { e.vy += 0.3; e.x += e.vx; e.y += e.vy; e.spin = (e.spin || 0) + e.vx * 0.12;
+          const c = Math.floor((e.x + 7) / TS), rr = Math.floor((e.y + 14) / TS); if (e.vy > 0 && solidAt(G, c, rr)) { e.y = rr * TS - 14; e.vy = 0; }
+          if (solidAt(G, Math.floor(e.x / TS), Math.floor((e.y + 6) / TS)) || e.y > ROWS * TS || e.x < S.cam - 40) { e.roll = false; e.x = e.x0; e.y = e.y0; e.vx = 0; }
+          if (hit(e.x + 1, e.y + 1, 12, 12)) { hurt("Flattened by a boulder: jump it!"); e.roll = false; e.x = e.x0; e.y = e.y0; } }
+      }
+    }
+    /* wind gusts: a warning, then a push for about two seconds */
+    P.push = 0;
+    if (B.wind) {
+      S.gust = S.gust || { t: 220, dir: 1 }; const g = S.gust; g.t--;
+      if (g.t === 60) { g.dir = Math.random() < 0.5 ? -1 : 1; msg(g.dir > 0 ? "GUST →  brace!" : "←  GUST  brace!", 60, "#e7f5ff"); }
+      if (g.t <= 0 && g.t > -130) P.push = g.dir * (0.45 + 0.08 * G.world) * (P.ground ? 1 : 1.4);
+      if (g.t <= -130) g.t = 200 + Math.floor(Math.random() * 160);
+    }
+    /* lightning: a glowing mark on the ground, then a strike */
+    if (B.bolts) {
+      S.zap = S.zap || { t: 160 }; const z = S.zap; z.t--;
+      if (z.t === 70) { z.x = P.x + 5 + P.vx * 40 + (Math.random() - .5) * 40; z.y = groundBelow(z.x); }
+      if (z.t === 0) { S.zapF = 8; S.shake = 8; beep(70, .3, "sawtooth", .07); burst(z.x, z.y, "#e5dbff", 16); if (Math.abs(P.x + 5 - z.x) < 14 && P.y + PH.h > z.y - 40) hurt("Struck by lightning: move away from the glowing mark!"); }
+      if (z.t <= -12) z.t = 150 + Math.floor(Math.random() * 90) - 20 * G.world;
+    }
+  }
   /* ---------- the boss: a giant golem in an arena one screen wide (our own design, drawn in code) ----------
      Classic-platformer rules: learn its moves, dodge them, and hit it when it is open.
      Stomp → a shockwave runs along the floor both ways (jump it), then its chest core glows open for a moment.
@@ -907,37 +989,87 @@ const PF = (() => {
   function dropAmmo(e) { if (e.i % 2) return; const x = e.x + 3; S.ents.push({ t: "ammo", x, y: groundBelow(x) - 12, alive: true, i: S.ents.length, ph: 0 }); S.totalAmmo++; msg("It dropped a bullet!", 50, "#ffd43b"); }
   const groundBelow = x => { const c = Math.floor(x / TS); for (let r = 0; r < ROWS; r++) if (solidAt(S.G, c, r)) return r * TS; return ROWS * TS; };
 
-  /* ---------- surprise visitors (David, Nov 2026: "random stuff running across the screen rarely, like dogs or dinosaurs or an old man on a bike") ----------
-     Every 20 to 40 seconds or so, something runs across the far hills behind the level. Just for fun: it can't hurt you and you can't hit it. Our own drawings. */
-  const CRITTERS = { dog: { v: 2.3, says: ["Was that a dog?!", "Good boy! Where's he going?", "A dog on the run!"] }, dino: { v: 1.3, says: ["Was that a DINOSAUR?!", "A dinosaur! Nobody will believe this.", "Stomp, stomp, stomp…"] },
-    bike: { v: 1.0, says: ["An old man on a bike? Out here?", "Ding ding! Coming through!", "Grandpa's out for a ride!"] } };
-  const hillY = x => { const wx = x + S.cam * 0.45; return 190 + Math.round(18 * Math.sin(wx / 45) + 9 * Math.sin(wx / (45 * 0.37))); };
-  function spawnCritter(kind) {
+  /* ---------- surprise visitors (David, Nov 2026: "random stuff running across the screen rarely, like dogs or dinosaurs or an old man on a bike";
+     then: they "blend in with the ground … I also want you to die if they hit you") ----------
+     Every 20 to 40 seconds or so a warning flashes at the edge of the screen, then a dog, a dinosaur or an old man on a bike charges along
+     the level itself, bright and outlined. Jump over it: touching it knocks you out (a shield saves you once). Our own drawings. */
+  const CRITTERS = {
+    dog:  { v: 2.4, w: 22, h: 16, name: "DOG",       says: ["Out of the way of the dog!", "A runaway dog!"],          ko: "Bowled over by a runaway dog!" },
+    dino: { v: 1.5, w: 34, h: 26, name: "DINOSAUR",  says: ["Was that a DINOSAUR?!", "Stomp, stomp, stomp…"],          ko: "Squashed by a dinosaur!" },
+    bike: { v: 1.9, w: 30, h: 26, name: "BIKE",      says: ["Ding ding! Grandpa's coming through!", "Look out for the bike!"], ko: "Run over by Grandpa's bike!" } };
+  function spawnCritter(kind, dir) {
     kind = kind || ["dog", "dino", "bike"][Math.floor(Math.random() * 3)];
-    const dir = Math.random() < 0.5 ? 1 : -1;
-    S.critter = { k: kind, dir, x: dir > 0 ? -40 : VW + 40, t: 0 };
-    if (Math.random() < 0.6) msg(CRITTERS[kind].says[Math.floor(Math.random() * 3)], 90, "#fff3bf");
-    if (kind === "bike") beep(1568, .06, "triangle", .03), setTimeout(() => beep(1568, .08, "triangle", .03), 140);
+    dir = dir || (Math.random() < 0.7 ? -1 : 1);                          // most come at you from ahead; some from behind
+    S.critWarn = { k: kind, dir, t: 0 };
+    beep(880, .08, "square", .04); setTimeout(() => beep(880, .08, "square", .04), 160);
+  }
+  function landCritter(c) {                                              // start on solid ground near its x (step outwards past any pit)
+    const top = c2 => { for (let r = Math.max(0, Math.floor(S.P.y / TS) - 4); r < ROWS; r++) if (solidAt(S.G, c2, r)) return r; return -1; };
+    let col = Math.floor(c.x / TS);
+    for (let k = 0; k < 14 && top(col) < 0; k++) col -= c.dir;
+    c.x = col * TS + TS / 2; c.y = Math.max(0, top(col)) * TS;
   }
   function critterTick() {
     if (S.critT === undefined) S.critT = 700 + Math.floor(Math.random() * 900);
+    const w = S.critWarn;
+    if (w) {                                                               /* 1.2 s of warning, then it charges in from that edge */
+      if (++w.t >= 72) { const K = CRITTERS[w.k], c = { k: w.k, dir: w.dir, x: w.dir < 0 ? S.cam + VW + K.w : S.cam - K.w, y: 0, vy: 0, t: 0, hit: false };
+        landCritter(c); S.critter = c; S.critWarn = null; const say = K.says[Math.floor(Math.random() * K.says.length)]; msg(say, 80, "#ffd43b");
+        if (c.k === "bike") { beep(1568, .06, "triangle", .04); setTimeout(() => beep(1568, .08, "triangle", .04), 140); } else beep(c.k === "dino" ? 90 : 300, .2, "sawtooth", .05); }
+      return;
+    }
     const c = S.critter;
-    if (c) { c.t++; c.x += c.dir * CRITTERS[c.k].v; if (c.x < -60 || c.x > VW + 60) S.critter = null; return; }
+    if (c) {
+      const K = CRITTERS[c.k]; c.t++;
+      c.x += c.dir * K.v; c.vy = Math.min(7, c.vy + 0.4); c.y += c.vy;
+      const col = Math.floor(c.x / TS), row = Math.floor(c.y / TS);
+      if (c.vy >= 0 && solidAt(S.G, col, row) && !solidAt(S.G, col, row - 1)) { c.y = row * TS; c.vy = 0; c.ground = true; } else c.ground = false;
+      const ahead = Math.floor((c.x + c.dir * (K.w / 2 + 2)) / TS);
+      if (c.ground && solidAt(S.G, ahead, Math.floor((c.y - 6) / TS))) c.vy = -6.5;   // hop up a step
+      else if (c.ground && ![0, 1, 2, 3].some(d => solidAt(S.G, ahead, row + d))) c.vy = -6.8;   // leap a pit
+      if (c.ground && c.t % 90 === 45 && c.k === "dino") S.shake = Math.max(S.shake, 3);
+      if (c.y > VH + 60 || c.x < S.cam - 120 || c.x > S.cam + VW + 120) { S.critter = null; return; }
+      /* touching it knocks you out; jumping over it is the way past */
+      const P = S.P;
+      if (!c.hit && !S.over && P.x < c.x + K.w / 2 && P.x + PH.w > c.x - K.w / 2 && P.y < c.y && P.y + PH.h > c.y - K.h) {
+        c.hit = true;
+        if (S.invincible || P.inv > 0) return;
+        if (S.shield) { S.shield = 0; P.inv = 90; P.vy = -4; msg("Shield saved you from the " + K.name.toLowerCase() + "!", 90, "#9fe7ff"); beep(600, .1, "triangle"); return; }
+        S.lost += S.hearts; S.hearts = 0; S.shake = 14; burst(P.x + 5, P.y + 6, "#ff6b6b", 20); beep(120, .4, "sawtooth", .07); msg(K.ko, 120, "#ffb3b3"); end(false);
+      }
+      return;
+    }
     if (window.__noCritter) return;
     if (--S.critT <= 0) { spawnCritter(); S.critT = 1200 + Math.floor(Math.random() * 1200); }
   }
-  function drawCritter(ctx, c) {
+  /* the picture is drawn into a small canvas first, so it can get a thick black outline and stand out from the ground */
+  let critCv = null, critMask = null;
+  function drawCritter(ctx, c, ox) {
+    if (!critCv) { critCv = document.createElement("canvas"); critCv.width = 120; critCv.height = 90; critMask = document.createElement("canvas"); critMask.width = 120; critMask.height = 90; }
+    const x = critCv.getContext("2d"); x.clearRect(0, 0, 120, 90); x.save(); x.translate(60, 84); x.scale(c.dir * 1.5, 1.5);
+    drawCritterBody(x, c); x.restore();
+    const m = critMask.getContext("2d"); m.clearRect(0, 0, 120, 90); m.globalCompositeOperation = "source-over"; m.drawImage(critCv, 0, 0); m.globalCompositeOperation = "source-in"; m.fillStyle = "#000"; m.fillRect(0, 0, 120, 90);
+    const X = Math.round(c.x) + ox - 60, Y = Math.round(c.y) - 84;
+    for (const [dx, dy] of [[-2, 0], [2, 0], [0, -2], [0, 2], [-1, -1], [1, 1], [-1, 1], [1, -1]]) ctx.drawImage(critMask, X + dx, Y + dy);
+    ctx.drawImage(critCv, X, Y);
+  }
+  function drawCritterWarn(ctx) {
+    const w = S.critWarn; if (!w || S.t % 16 < 6) return;
+    const K = CRITTERS[w.k], right = w.dir < 0, x = right ? VW - 70 : 70;
+    ctx.fillStyle = "rgba(201,42,42,.9)"; ctx.fillRect(x - 62, 108, 124, 30); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x - 60, 110, 120, 26);
+    txt(ctx, `${right ? "" : "◀ "}${K.name}!${right ? " ▶" : ""}`, x, 122, 11, "#1b1b2f"); txt(ctx, "JUMP IT!", x, 133, 8, "#c92a2a");
+  }
+  function drawCritterBody(ctx, c) {
     const R = (x, y, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(x, y, w, h); };
-    const base = hillY(c.x), step = Math.floor(c.t / 6) % 2;
-    ctx.save(); ctx.translate(Math.round(c.x), base); ctx.scale(c.dir * 1.5, 1.5);
+    const step = Math.floor(c.t / 5) % 2;
     if (c.k === "dog") {          /* a scruffy brown dog, ears flapping */
       const hop = step ? -1 : 0;
-      R(-9, -9 + hop, 16, 6, "#1b1b2f"); R(-8, -8 + hop, 14, 4, "#a0682f");                        // body
-      R(5, -13 + hop, 7, 6, "#1b1b2f"); R(6, -12 + hop, 5, 4, "#a0682f"); R(11, -10 + hop, 2, 2, "#1b1b2f");   // head and nose
-      R(6, -14 + hop - step, 2, 3, "#5a3a1a"); R(8, -11 + hop, 1, 1, "#fff");                      // ear, eye
-      R(-11, -10 + hop - (step ? 2 : 0), 3, 2, "#a0682f");                                       // wagging tail
+      R(-9, -9 + hop, 16, 6, "#1b1b2f"); R(-8, -8 + hop, 14, 4, "#f8f9fa");                        // body
+      R(5, -13 + hop, 7, 6, "#1b1b2f"); R(6, -12 + hop, 5, 4, "#f8f9fa"); R(11, -10 + hop, 2, 2, "#1b1b2f");   // head and nose
+      R(6, -14 + hop - step, 2, 3, "#8c5a2b"); R(8, -11 + hop, 1, 1, "#fff");                      // ear, eye
+      R(-11, -10 + hop - (step ? 2 : 0), 3, 2, "#f8f9fa");                                       // wagging tail
       const L = step ? [[-7, 2], [4, -1]] : [[-6, -1], [3, 2]];
-      for (const [lx, d] of L) { R(lx, -4 + hop, 2, 4 + d, "#5a3a1a"); R(lx + 3, -4 + hop, 2, 4 - d, "#5a3a1a"); }
+      for (const [lx, d] of L) { R(lx, -4 + hop, 2, 4 + d, "#8c5a2b"); R(lx + 3, -4 + hop, 2, 4 - d, "#8c5a2b"); }
     } else if (c.k === "dino") {  /* a long-necked green dinosaur, plodding */
       const bob = step;
       R(-18, -16 + bob, 26, 10, "#1b1b2f"); R(-17, -15 + bob, 24, 8, "#5fae4f"); R(-14, -15 + bob, 18, 3, "#7fcf6a");          // body
@@ -959,7 +1091,74 @@ const PF = (() => {
       const pd = step ? [[-1, -12], [2, -8]] : [[2, -12], [-1, -8]];
       R(-1, -18 + wob, 2, 4, "#495057"); R(pd[0][0], pd[0][1], 2, 4, "#495057"); R(pd[1][0], pd[1][1], 2, 3, "#495057");    // legs pedalling
     }
-    ctx.restore();
+  }
+
+  /* ---------- each place's backdrop (parallax) ---------- */
+  function drawBG(ctx, G, th) {
+    const B = G.biome, cam = S.cam, R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+    const g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
+    const loop = (par, span, fn) => { const off = (cam * par) % span; for (let x = -off - span; x < VW + span; x += span) fn(x, Math.floor((cam * par + x + off) / span)); };
+    const hills = (col, par, h, amp, f) => { ctx.fillStyle = col; for (let x = 0; x < VW; x += 4) { const wx = x + cam * par; const y = h + Math.round(amp * Math.sin(wx / f) + amp * 0.5 * Math.sin(wx / (f * 0.37))); ctx.fillRect(x, y, 4, VH - y); } };
+    const hsh = i => { let h = (i * 2654435761) >>> 0; return (h % 1000) / 1000; };
+    switch (B.bg) {
+      case "mesa":                                     /* flat-topped mesas and cacti under a hot sun */
+        R(380, 40, 26, 26, "#fff3bf"); R(384, 44, 18, 18, "#ffe066");
+        loop(0.15, 150, (x, i) => { const w = 70 + hsh(i) * 50, h = 50 + hsh(i + 7) * 50; R(x, 190 - h, w, h + 80, th.far); R(x - 6, 190 - h, w + 12, 6, "#e8a070"); });
+        loop(0.4, 110, (x, i) => { const h = 18 + hsh(i) * 14; R(x, 210 - h, 6, h + 60, th.mid); if (hsh(i + 3) > 0.4) { R(x - 6, 200 - h + 6, 6, 3, th.mid); R(x - 6, 200 - h, 3, 8, th.mid); R(x + 6, 200 - h + 10, 6, 3, th.mid); R(x + 9, 200 - h + 4, 3, 9, th.mid); } });
+        hills(th.mid, 0.45, 215, 10, 50); break;
+      case "icecave":                                  /* a cave of blue ice: crystals below, teeth of ice above */
+        loop(0.2, 60, (x, i) => { const h = 40 + hsh(i) * 60; ctx.fillStyle = th.far; ctx.beginPath(); ctx.moveTo(x, VH); ctx.lineTo(x + 18, VH - h - 60); ctx.lineTo(x + 36, VH); ctx.fill(); });
+        loop(0.35, 46, (x, i) => { const h = 20 + hsh(i) * 40; ctx.fillStyle = "#cfe9ff"; ctx.globalAlpha = .35; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 12, h); ctx.lineTo(x + 24, 0); ctx.fill(); ctx.globalAlpha = 1; });
+        R(0, 0, VW, 10, th.mid); hills(th.mid, 0.45, 205, 14, 40);
+        for (let i = 0; i < 14; i++) { const t2 = (S.t * 0.3 + i * 40) % VH; R((i * 73 + cam * 0.1) % VW, t2, 1, 1, "#e7f5ff"); } break;
+      case "jungle":                                   /* huge trees, hanging vines and a dark canopy */
+        loop(0.2, 90, (x, i) => { R(x + 30, 40, 22, VH, th.far); ctx.fillStyle = th.far; ctx.beginPath(); ctx.arc(x + 41, 50, 46 + hsh(i) * 14, 0, 7); ctx.fill(); });
+        loop(0.45, 70, (x, i) => { R(x + 10, 0, 2, 40 + hsh(i) * 70, "#2b8a3e"); R(x + 8, 40 + hsh(i) * 70, 6, 4, "#40c057"); });
+        R(0, 0, VW, 18, "#0b2a1e"); hills(th.mid, 0.45, 200, 16, 30); break;
+      case "foundry":                                  /* smokestacks, glowing furnaces and drifting smoke */
+        ctx.fillStyle = "rgba(255,120,40,.35)"; ctx.fillRect(0, 170, VW, 100);
+        loop(0.2, 120, (x, i) => { const h = 90 + hsh(i) * 70; R(x, VH - h, 24, h, th.far); R(x - 3, VH - h, 30, 6, "#5a2a1e"); const sm = (S.t * 0.4 + i * 30) % 60; ctx.fillStyle = "rgba(90,70,70,.5)"; ctx.beginPath(); ctx.arc(x + 12 + sm * 0.3, VH - h - sm, 6 + sm / 6, 0, 7); ctx.fill(); });
+        loop(0.45, 80, (x, i) => { R(x, 180, 50, 90, th.mid); R(x + 16, 200, 18, 12, hsh(i) > 0.5 ? "#ff922b" : "#c92a2a"); }); break;
+      case "skyline":                                  /* a city at night: lit windows and a big moon */
+        R(70, 30, 30, 30, "#fff9db"); R(78, 34, 6, 6, "#f1e7b0");
+        for (let i = 0; i < 40; i++) R((i * 97 + 13) % VW, (i * 53) % 110, 1, 1, "#fff");
+        loop(0.2, 60, (x, i) => { const h = 70 + hsh(i) * 90, w = 44; R(x, VH - h, w, h, th.far); for (let yy = VH - h + 8; yy < VH - 10; yy += 12) for (let xx = x + 6; xx < x + w - 6; xx += 10) if (hsh(i * 31 + yy + xx) > 0.55) R(xx, yy, 4, 5, "#ffe066"); });
+        loop(0.45, 50, (x, i) => { const h = 40 + hsh(i + 9) * 40; R(x, VH - h, 40, h, th.mid); R(x + 18, VH - h - 12, 2, 12, "#7af0ff"); if (S.t % 40 < 20) R(x + 17, VH - h - 14, 4, 3, "#ff6b6b"); }); break;
+      case "peaks":                                    /* sharp snowy peaks and fast clouds */
+        loop(0.15, 130, (x, i) => { const h = 100 + hsh(i) * 60; ctx.fillStyle = th.far; ctx.beginPath(); ctx.moveTo(x - 20, VH); ctx.lineTo(x + 65, VH - h - 40); ctx.lineTo(x + 150, VH); ctx.fill(); ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.moveTo(x + 50, VH - h - 18); ctx.lineTo(x + 65, VH - h - 40); ctx.lineTo(x + 80, VH - h - 18); ctx.fill(); });
+        for (let i = 0; i < 6; i++) { const cx = ((i * 140 - S.t * (0.6 + i * 0.1) * (S.gust && S.gust.t <= 0 ? S.gust.dir * 4 : 1)) % (VW + 120) + VW + 120) % (VW + 120) - 60; R(cx, 30 + i * 18, 50, 10, "rgba(255,255,255,.8)"); R(cx + 10, 24 + i * 18, 26, 8, "rgba(255,255,255,.8)"); }
+        hills(th.mid, 0.45, 205, 18, 40); break;
+      case "mine":                                     /* rock walls and wooden supports */
+        R(0, 0, VW, VH, th.far);
+        loop(0.3, 40, (x, i) => { for (let y = 0; y < VH; y += 24) R(x + hsh(i + y) * 20, y + hsh(i * 3 + y) * 10, 10, 6, th.mid); });
+        loop(0.6, 140, (x) => { R(x, 40, 8, VH, "#5a3d22"); R(x + 70, 40, 8, VH, "#5a3d22"); R(x - 4, 36, 86, 8, "#6b4a2a"); }); break;
+      case "storm":                                    /* dark spires and rolling thunderclouds */
+        loop(0.2, 100, (x, i) => { const h = 80 + hsh(i) * 80; R(x + 20, VH - h, 18, h, th.far); ctx.fillStyle = th.far; ctx.beginPath(); ctx.moveTo(x + 16, VH - h); ctx.lineTo(x + 29, VH - h - 24); ctx.lineTo(x + 42, VH - h); ctx.fill(); if (S.t % 50 < 25) R(x + 27, VH - h - 8, 4, 4, "#e599f7"); });
+        for (let i = 0; i < 8; i++) { const cx = ((i * 90 - S.t * 0.3) % (VW + 100) + VW + 100) % (VW + 100) - 50; ctx.fillStyle = "rgba(20,10,40,.7)"; ctx.beginPath(); ctx.arc(cx, 20 + (i % 3) * 10, 30, 0, 7); ctx.fill(); }
+        if (S.t % 240 < 4) { ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0, 0, VW, VH); }
+        hills(th.mid, 0.45, 205, 18, 45); break;
+      default: hills(th.far, 0.2, 150, 26, 70); hills(th.mid, 0.45, 190, 18, 45);
+    }
+  }
+  /* rain, wind, lightning marks and the dark of the mine, drawn over the level */
+  function drawWeather(ctx, G, ox) {
+    const B = G.biome, P = S.P;
+    if (B.rain) { ctx.strokeStyle = "rgba(200,230,255,.45)"; ctx.lineWidth = 1; ctx.beginPath(); for (let i = 0; i < 60; i++) { const x = (i * 53 + S.t * 3) % (VW + 40) - 20, y = (i * 37 + S.t * 7) % VH; ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 8); } ctx.stroke(); }
+    if (B.wind && S.gust) { const g = S.gust;
+      if (g.t <= 60 && g.t > 0 && S.t % 10 < 6) txt(ctx, g.dir > 0 ? "→ → →" : "← ← ←", VW / 2, 84, 16, "#e7f5ff");
+      if (g.t <= 0) { ctx.fillStyle = "rgba(255,255,255,.6)"; for (let i = 0; i < 24; i++) { const x = ((i * 61 + S.t * 9 * g.dir) % VW + VW) % VW, y = (i * 29) % VH; ctx.fillRect(x, y, 14, 1); } } }
+    if (B.bolts && S.zap && S.zap.x !== undefined) { const z = S.zap, x = Math.round(z.x) + ox;
+      if (z.t > 0 && z.t <= 70) { const a = 0.4 + 0.4 * Math.abs(Math.sin(S.t / 3)); ctx.fillStyle = `rgba(229,153,247,${a})`; ctx.fillRect(x - 14, z.y - 3, 28, 3); ctx.fillRect(x - 1, z.y - 10, 2, 7); }
+      if (z.t <= 0 && z.t > -12) { ctx.fillStyle = "#f8f0ff"; let yy = 0, xx = x; while (yy < z.y) { const nx = xx + (Math.random() - .5) * 10; ctx.fillRect(Math.min(xx, nx), yy, Math.abs(nx - xx) + 3, 14); xx = nx; yy += 14; } } }
+    if (S.zapF > 0) { S.zapF--; ctx.fillStyle = `rgba(255,255,255,${S.zapF / 12})`; ctx.fillRect(0, 0, VW, VH); }
+    if (B.dark) {                                    /* only a circle round the hero (and the lanterns) is lit */
+      const cv = S.darkCv || (S.darkCv = document.createElement("canvas")); cv.width = VW; cv.height = VH; const d = cv.getContext("2d");
+      d.fillStyle = "rgba(5,3,0,.93)"; d.fillRect(0, 0, VW, VH); d.globalCompositeOperation = "destination-out";
+      const hole = (x, y, r) => { const gr = d.createRadialGradient(x, y, r * 0.35, x, y, r); gr.addColorStop(0, "rgba(0,0,0,1)"); gr.addColorStop(1, "rgba(0,0,0,0)"); d.fillStyle = gr; d.fillRect(x - r, y - r, r * 2, r * 2); };
+      hole(P.x + 5 + ox, P.y + 6, 78 - 6 * G.world);
+      for (const e of S.ents) if (e.t === "lantern") { const x = e.x + ox; if (x > -80 && x < VW + 80) hole(x, e.y + 4, 64); }
+      d.globalCompositeOperation = "source-over"; ctx.drawImage(cv, 0, 0);
+    }
   }
 
   /* ---------- drawing ---------- */
@@ -967,12 +1166,7 @@ const PF = (() => {
     if (!S) return; const { ctx, G } = S, th = G.theme;
     if (S.scope) return drawScope();
     ctx.save(); if (S.shake > 0) ctx.translate(Math.round((Math.random() - .5) * S.shake), Math.round((Math.random() - .5) * S.shake));
-    const g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
-    if (G.world === 3) { ctx.fillStyle = "#f8f3d0"; ctx.fillRect(390, 30, 18, 18); ctx.fillStyle = th.sky[0]; ctx.fillRect(396, 28, 14, 14); for (let i = 0; i < 30; i++) { ctx.fillStyle = "#fff"; ctx.fillRect((i * 97 + 13) % VW, (i * 53) % 120, 1, 1); } }
-    if (G.world === 4 && S.t % 240 < 4) { ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0, 0, VW, VH); }
-    const hills = (col, par, h, amp, f) => { ctx.fillStyle = col; for (let x = 0; x < VW; x += 4) { const wx = x + S.cam * par; const y = h + Math.round(amp * Math.sin(wx / f) + amp * 0.5 * Math.sin(wx / (f * 0.37))); ctx.fillRect(x, y, 4, VH - y); } };
-    hills(th.far, 0.2, 150, 26, 70); hills(th.mid, 0.45, 190, 18, 45);
-    if (S.critter) drawCritter(ctx, S.critter);
+    drawBG(ctx, G, th);
     const c0 = Math.floor(S.cam / TS), c1 = c0 + Math.ceil(VW / TS) + 1, ox = -Math.round(S.cam);
     for (let c = c0; c <= c1 && c < G.cols; c++) for (let r = 0; r < ROWS; r++) {
       const t = G.map[r][c], x = c * TS + ox, y = r * TS;
@@ -980,11 +1174,30 @@ const PF = (() => {
       else if (t === 2) { ctx.fillStyle = th.block; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = "rgba(255,255,255,.25)"; ctx.fillRect(x, y, TS, 2); ctx.fillStyle = "rgba(0,0,0,.3)"; ctx.fillRect(x, y + TS - 2, TS, 2); ctx.fillRect(x + 7, y + 2, 2, TS - 4); }
       else if (t === 5) { ctx.fillStyle = (c + r) % 2 ? th.dirt : th.dirt2; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = th.top; ctx.fillRect(x, y, TS, 2); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1, y + 1, TS - 2, 6); ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 2, y + 2, TS - 4, 4); ctx.fillStyle = "#ced4da"; for (let k = 0; k < 3; k++) ctx.fillRect(x + 3 + k * 4, y + 6, 2, 4); }
       else if (t === 6) { const key = c + "," + r; if (!(G.broken && G.broken[key])) { const sh = G.crumbT && G.crumbT[key] > 8 ? Math.round((Math.random() - .5) * 2) : 0; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + sh, y, TS, 7); ctx.fillStyle = "#b08050"; ctx.fillRect(x + 1 + sh, y + 1, TS - 2, 5); ctx.fillStyle = "#7a5230"; ctx.fillRect(x + 5 + sh, y + 1, 1, 5); ctx.fillRect(x + 10 + sh, y + 3, 1, 3); ctx.fillStyle = "#5a3a22"; ctx.fillRect(x + 3, y + 7, 2, 5); ctx.fillRect(x + 11, y + 7, 2, 5); } }
+      else if (t === 7) { ctx.fillStyle = "#9fd8ff"; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = "#e7f8ff"; ctx.fillRect(x, y, TS, 3); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.fillRect(x + 3 + (c % 3) * 3, y + 5, 4, 1); ctx.fillStyle = "#5fa8d8"; ctx.fillRect(x, y + TS - 2, TS, 2); }
+      else if (t === 8 || t === 9) { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = "#495057"; ctx.fillRect(x, y + 1, TS, 6); ctx.fillStyle = "#ffd43b";
+        const sh = ((S.t * (t === 9 ? 1 : -1)) % 8 + 8) % 8; for (let k = -8; k < TS; k += 8) { const xx = x + k + sh; if (xx >= x && xx < x + TS - 3) { if (t === 9) { ctx.fillRect(xx, y + 2, 2, 1); ctx.fillRect(xx + 1, y + 3, 2, 1); ctx.fillRect(xx, y + 4, 2, 1); } else { ctx.fillRect(xx + 1, y + 2, 2, 1); ctx.fillRect(xx, y + 3, 2, 1); ctx.fillRect(xx + 1, y + 4, 2, 1); } } }
+        ctx.fillStyle = "#868e96"; ctx.fillRect(x, y + 8, TS, TS - 8); ctx.fillStyle = "#343a40"; ctx.fillRect(x + 3, y + 10, 3, 3); ctx.fillRect(x + 10, y + 10, 3, 3); }
+      else if (t === 3 && G.biome.lava) { const f = (S.t / 6 + c) % 2 < 1; ctx.fillStyle = "#c92a2a"; ctx.fillRect(x, y + 6, TS, TS - 6); ctx.fillStyle = f ? "#ff922b" : "#ffd43b"; ctx.fillRect(x, y + 6, TS, 3); ctx.fillRect(x + (c * 5) % 12, y + 3 + (f ? 0 : 1), 3, 3); }
+      else if (t === 3 && G.biome.bg === "jungle") { ctx.fillStyle = "#2b8a3e"; for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(x + k * 4, y + TS); ctx.lineTo(x + k * 4 + 2, y + 5); ctx.lineTo(x + k * 4 + 4, y + TS); ctx.fill(); } ctx.fillStyle = "#c92a2a"; ctx.fillRect(x + 1, y + 7, 2, 2); ctx.fillRect(x + 9, y + 6, 2, 2); }
       else if (t === 3) { ctx.fillStyle = "#d3d9e3"; for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(x + k * 4, y + TS); ctx.lineTo(x + k * 4 + 2, y + 6); ctx.lineTo(x + k * 4 + 4, y + TS); ctx.fill(); } }
     }
+    if (G.biome.lava) for (let c = c0; c <= c1 && c < G.cols; c++) if (!G.map[ROWS - 1][c]) { const x = c * TS + ox, f = Math.sin(S.t / 10 + c) * 2;     /* lava at the bottom of every pit */
+      ctx.fillStyle = "#c92a2a"; ctx.fillRect(x, (ROWS - 2) * TS + 4 + f, TS, 2 * TS); ctx.fillStyle = "#ff922b"; ctx.fillRect(x, (ROWS - 2) * TS + 4 + f, TS, 4); ctx.fillStyle = "#ffe066"; ctx.fillRect(x + (c * 7) % 12, (ROWS - 2) * TS + 5 + f, 3, 2); }
     for (const e of S.ents) {
       if (!e.alive) continue; const x = Math.round(e.x) + ox, y = Math.round(e.y);
       if (x < -40 || x > VW + 40) continue;
+      if (e.t === "jet") { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 2, y - 4, TS - 4, 4); ctx.fillStyle = e.warn || e.on ? "#ff6b6b" : "#868e96"; ctx.fillRect(x + 3, y - 3, TS - 6, 2);
+        if (e.warn && S.t % 6 < 3) { ctx.fillStyle = "#ffa94d"; ctx.fillRect(x + 6, y - 8, 4, 4); }
+        if (e.on) { const h = 3 * TS, fl = S.t % 4 < 2; ctx.fillStyle = "#e8590c"; ctx.fillRect(x + 2, y - h, TS - 4, h - 4); ctx.fillStyle = fl ? "#ffd43b" : "#ffa94d"; ctx.fillRect(x + 4, y - h + 6, TS - 8, h - 10); ctx.fillStyle = "#fff3bf"; ctx.fillRect(x + 6, y - h + 14, 4, h - 20); }
+        continue; }
+      if (e.t === "icicle") { const sh = e.st && e.st < 30 ? Math.round((Math.random() - .5) * 2) : 0;
+        if (e.rock) { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 5 + sh, y - 1, 10, 11); ctx.fillStyle = "#8c6a4a"; ctx.fillRect(x - 4 + sh, y, 8, 9); ctx.fillStyle = "#b08a64"; ctx.fillRect(x - 3 + sh, y + 1, 3, 2); }
+        else { ctx.fillStyle = "#1b1b2f"; ctx.beginPath(); ctx.moveTo(x - 5 + sh, y - 1); ctx.lineTo(x + 5 + sh, y - 1); ctx.lineTo(x + sh, y + 14); ctx.fill(); ctx.fillStyle = "#dff4ff"; ctx.beginPath(); ctx.moveTo(x - 4 + sh, y); ctx.lineTo(x + 4 + sh, y); ctx.lineTo(x + sh, y + 12); ctx.fill(); }
+        if (!e.st) { ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.fillRect(x - 1, 0, 2, y); }
+        continue; }
+      if (e.t === "boulder") { ctx.save(); ctx.translate(x + 7, y + 7); ctx.rotate(e.spin || 0); ctx.fillStyle = "#1b1b2f"; ctx.beginPath(); ctx.arc(0, 0, 8, 0, 7); ctx.fill(); ctx.fillStyle = "#a07a5a"; ctx.beginPath(); ctx.arc(0, 0, 7, 0, 7); ctx.fill(); ctx.fillStyle = "#7a5a3e"; ctx.fillRect(-4, -2, 3, 3); ctx.fillRect(1, 2, 3, 2); ctx.fillRect(2, -5, 2, 2); ctx.restore(); continue; }
+      if (e.t === "lantern") { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 12, 2, 12); ctx.fillRect(x - 4, y, 8, 9); ctx.fillStyle = S.t % 20 < 10 ? "#ffd43b" : "#ffe066"; ctx.fillRect(x - 3, y + 1, 6, 7); continue; }
       if (e.t === "mover") { const w2 = e.wd; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, w2 + 2, 9); ctx.fillStyle = th.block; ctx.fillRect(x, y, w2, 7); ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(x, y, w2, 2); ctx.fillStyle = "#ffd43b"; for (let k = 4; k < w2 - 4; k += 8) ctx.fillRect(x + k, y + 3, 4, 2); continue; }
       if (e.t === "coin") { const w = 2 + Math.abs(Math.round(3 * Math.sin(S.t / 8 + e.i))); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 4 - w, y, w * 2, 8); ctx.fillStyle = "#e67700"; ctx.fillRect(x + 4 - w, y + 7, w * 2, 1); }
       else if (e.t === "walker") { const f = Math.floor(S.t / 8) % 2; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 10); ctx.fillStyle = "#8a6a4a"; ctx.fillRect(x, y, 12, 8); ctx.fillStyle = "#b08a62"; ctx.fillRect(x + 1, y, 10, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + (e.vx < 0 ? 2 : 7), y + 3, 3, 3); ctx.fillStyle = "#e03131"; ctx.fillRect(x + (e.vx < 0 ? 3 : 8), y + 4, 1, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1 + f * 2, y + 8, 3, 2); ctx.fillRect(x + 8 - f * 2, y + 8, 3, 2); }
@@ -1011,6 +1224,7 @@ const PF = (() => {
     if (S.arena) { drawArena(ctx, ox); drawBoss(ctx, ox); }
     for (const sh of S.shells) { const x = sh.x + ox; ctx.fillStyle = sh.d % 10 < 5 ? "#ff3b3b" : "#ffd43b"; ctx.fillRect(x - 8, sh.y - 2, 16, 2); ctx.fillRect(x - 1, sh.y - 10, 2, 8); }
     for (const b of S.bolts) { ctx.fillStyle = "#9fe7ff"; ctx.fillRect(Math.round(b.x) + ox, Math.round(b.y), 6, 2); }
+    if (S.critter) drawCritter(ctx, S.critter, ox);
     const P = S.P;
     if (!(P.inv > 0 && S.t % 6 < 3)) {
       const legs = !P.ground ? "jump" : Math.abs(P.vx) > 0.3 ? (Math.floor(S.t / 6) % 2 ? "run1" : "run2") : "idle";
@@ -1019,6 +1233,7 @@ const PF = (() => {
       if (S.shield) { ctx.strokeStyle = "rgba(159,231,255,.8)"; ctx.strokeRect(Math.round(P.x) + ox - 3, Math.round(P.y) - 4, 16, 20); }
     }
     S.parts.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(Math.round(p.x) + ox, Math.round(p.y), 2, 2); });
+    drawWeather(ctx, G, ox);
     ctx.restore();
     S.camOx = ox; hud(); if (S.boss) bossBar(ctx); messages();
   }
@@ -1038,7 +1253,7 @@ const PF = (() => {
     if (S.kit.steady) { txt(ctx, "STEADY", x, 13, 9, "#8ce99a", "left"); }
     txt(ctx, `● ${S.coins}`, VW - 8, 13, 9, "#ffd43b", "right");
   }
-  function messages() { S.msgs.slice(-2).forEach((m, i) => txt(S.ctx, m.t, VW / 2, 44 + i * 16, 11, m.c)); }
+  function messages() { S.msgs.slice(-2).forEach((m, i) => txt(S.ctx, m.t, VW / 2, 44 + i * 16, 11, m.c)); if (!S.scope) drawCritterWarn(S.ctx); }
   function drawScope() {
     const { ctx } = S, sc = S.scope, w = S.G.world, th = S.G.theme;
     ctx.save(); if (S.shake > 0) ctx.translate(Math.round((Math.random() - .5) * S.shake), Math.round((Math.random() - .5) * S.shake));
@@ -1179,7 +1394,7 @@ const PF = (() => {
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
     fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
-    critter: k => { if (!S) return null; if (k) spawnCritter(k); return S.critter && { k: S.critter.k, x: S.critter.x, dir: S.critter.dir }; },
+    critter: (k, dir) => { if (!S) return null; if (k === "onHero") { if (S.critter) { S.critter.x = S.P.x + PH.w / 2; S.critter.y = S.P.y + PH.h; S.critter.vy = 0; } return null; } if (k) spawnCritter(k, dir); const c = S.critter; return S.critWarn ? { warn: S.critWarn.k } : c && { k: c.k, x: c.x, y: c.y, dir: c.dir, hit: c.hit }; },
     toChest: () => { if (!S) return false; const c = S.ents.find(e => e.t === "chest" && !e.opened); if (!c) return false; S.P.x = c.x; S.P.y = c.y - 4; S.P.vx = S.P.vy = 0; return true; },
     chests: () => S ? S.ents.filter(e => e.t === "chest").map(e => e.opened || "closed") : [], paused: () => !!(S && S.paused),
     incoming: () => S ? S.incoming.length : 0,
@@ -1332,5 +1547,5 @@ const PF = (() => {
     if (T.flash) { ctx.fillStyle = `rgba(255,255,255,${T.flash / 16})`; ctx.fillRect(0, 0, VW, VH); }
     if (T.go) { ctx.fillStyle = `rgba(255,255,255,${Math.min(1, T.go / 30)})`; ctx.fillRect(0, 0, VW, VH); }
   }
-  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, mood, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
+  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, mood, BIOMES, biomeOf, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
 })();

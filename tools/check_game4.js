@@ -234,6 +234,18 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const nStages = await p.evaluate(() => __stages.length); if (nStages !== 52) bad(`expected 48 stages and 4 boss runs (got ${nStages})`);
   const stuck = await p.evaluate(() => __stages.filter(L => !__rr.PF.reach(L).ok).map(L => L.id));
   if (stuck.length) bad(`stages that can't be finished: ${stuck.join(", ")}`);
+  /* every big level is its own place (David: "the levels all look too samey"): 4 different places in each world, each stage with its own hazard */
+  { const places = await p.evaluate(() => [1, 2, 3, 4].map(w => __rr.LEVELS.filter(L => L.world === w && !L.boss).map(L => L.name)));
+    for (const [i, ps] of places.entries()) if (new Set(ps).size !== 4) bad(`world ${i + 1} should have 4 different places (${ps.join(", ")})`);
+    const missing = await p.evaluate(() => __stages.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen(L), B = G.biome, has = t => G.map.some(row => row.includes(t)), ent = k => G.ents.some(e => e.t === k);
+      return !({ "Dusty Canyon": ent("boulder"), "Frozen Caves": has(7), "Vine Jungle": has(5), "Lava Foundry": ent("jet"), "Neon Rooftops": has(8) || has(9), "Gale Peaks": B.wind, "Lantern Mine": ent("lantern") && ent("icicle"), "Thunder Ridge": B.bolts }[B.name]); }).map(L => L.id));
+    if (missing.length) bad(`stages missing their place's own hazard: ${missing.join(", ")}`);
+    /* ice slides further than rock; a belt carries you */
+    const phys = await p.evaluate(() => { const mk = t => { const map = [...Array(17)].map((_, r) => Array(40).fill(r === 12 ? t : r > 12 ? 1 : 0)); return { map, cols: 40 }; };
+      const slide = t => { const G = mk(t), b = { x: 50, y: 12 * 16 - 14, vx: 2, vy: 0, ground: true, under: t }; for (let f = 0; f < 120; f++) __rr.PF.step(G, b, { dir: 0, jump: false, jumpPressed: false }); return b.x - 50; };
+      return { rock: slide(1), ice: slide(7), belt: slide(9) - slide(1) }; });
+    if (!(phys.ice > phys.rock * 3)) bad(`ice should be slippery (slid ${Math.round(phys.ice)} px, rock ${Math.round(phys.rock)} px)`);
+    if (!(phys.belt > 60)) bad(`a conveyor belt should carry you (${Math.round(phys.belt)} px)`); }
   const seeds = await p.evaluate(() => new Set(__stages.map(L => L.seed)).size); if (seeds !== 52) bad("every stage should have its own map");
   /* every level has its sniper nests (2 in worlds 1–2, 3 in worlds 3–4), each with a laser gate after it */
   const nestBad = await p.evaluate(() => __stages.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen(L), n = G.ents.filter(e => e.t === "nest").length, g = G.ents.filter(e => e.t === "gate").length; return n !== (L.world <= 2 ? 2 : 3) || g !== n; }).map(L => L.id));
@@ -403,19 +415,28 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     await p.evaluate(() => { __rr.PF.hook.aimAt(0, "body"); __rr.PF.hook.fire(); __rr.PF.hook.quiet(); }); await p.waitForTimeout(1500);
     if (await p.evaluate(() => __rr.PF.hook.incoming())) bad("shooting an aiming sentry first should stop its shot"); }
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "body")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(80);
-  /* surprise visitors: a dog, a dinosaur or an old man on a bike now and then runs across the far hills; harmless */
+  /* surprise visitors: a warning, then a dog, a dinosaur or an old man on a bike charges along the level; touching one knocks you out */
   { const pc = await open({ width: 1280, height: 800 });
-    await pc.evaluate(() => { __rr.startBrief("1-L1", 0); }); for (let i = 0; i < 4; i++) { await pc.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await pc.click("#btn-next"); }
-    await pc.click("#btn-play"); await pc.waitForTimeout(300);
+    const toLevel = async (wrong = 0) => { await pc.evaluate(() => { __rr.startBrief("1-L1", 0); }); for (let i = 0; i < 4; i++) { await pc.evaluate(w => { const B = __rr.B(), q = B.qs[B.i]; __rr.answer(B.i < w ? (q.answer + 1) % q.options.length : q.answer); }, wrong); await pc.click("#btn-next"); } await pc.click("#btn-play"); await pc.waitForTimeout(300); };
+    await toLevel();
     for (const k of ["dog", "dino", "bike"]) {
-      const c0 = await pc.evaluate(k => __rr.PF.hook.critter(k), k);
-      if (!c0 || c0.k !== k) bad(`a ${k} should be able to run across the hills`);
-      await pc.waitForTimeout(600); const c1 = await pc.evaluate(() => __rr.PF.hook.critter());
-      if (!c1 || Math.sign(c1.x - c0.x) !== c0.dir) bad(`the ${k} should run across the screen (${JSON.stringify([c0, c1])})`);
+      const w = await pc.evaluate(k => __rr.PF.hook.critter(k, -1), k);
+      if (!w || w.warn !== k) bad(`a ${k} should be announced with a warning first`);
+      if (shots && k === "dino") await pc.screenshot({ path: path.join(shots, "rr-critter-warn.png") });
+      await pc.waitForTimeout(1500); const c0 = await pc.evaluate(() => __rr.PF.hook.critter());
+      if (!c0 || c0.k !== k) { bad(`after the warning a ${k} should charge in (${JSON.stringify(c0)})`); continue; }
+      await pc.waitForTimeout(500); const c1 = await pc.evaluate(() => __rr.PF.hook.critter());
+      if (!c1 || !(c1.x < c0.x)) bad(`the ${k} should run along the level (${JSON.stringify([c0, c1])})`);
+      if (c1 && !(c1.y > 0 && c1.y < 272)) bad(`the ${k} should be on the ground (y ${c1 && c1.y})`);
       if (shots && k === "dino") await pc.screenshot({ path: path.join(shots, "rr-critter.png") });
-      for (let i = 0; i < 80 && (await pc.evaluate(() => __rr.PF.hook.critter())); i++) await pc.waitForTimeout(150);
-      if (await pc.evaluate(() => __rr.PF.hook.critter())) bad(`the ${k} should leave the screen`);
+      await pc.evaluate(() => __rr.PF.stop()); await toLevel();
     }
+    /* touching one knocks you out, even with hearts to spare (no shield: one briefing answer wrong) */
+    await pc.evaluate(() => __rr.PF.stop()); await toLevel(1);
+    await pc.evaluate(() => __rr.PF.hook.critter("dog", -1)); await pc.waitForTimeout(1300);
+    const hit = await pc.evaluate(() => { const c = __rr.PF.hook.critter(); if (c) __rr.PF.hook.critter("onHero"); return !!c; });
+    for (let i = 0; i < 20 && !(await pc.isVisible("#scr-result")); i++) await pc.waitForTimeout(150);
+    if (!hit || !/OUT OF HEARTS/.test(await pc.textContent("#scr-result"))) bad("touching a runaway visitor should knock you out");
     await pc.evaluate(() => localStorage.clear()); await pc.close(); }
   /* the gear card before the shooting, and the vehicles (with both switched back on) */
   { const pv = await open({ width: 1280, height: 800 });

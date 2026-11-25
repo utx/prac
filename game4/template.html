@@ -252,11 +252,12 @@ const WORLDS = [
   { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", boss: "the Storm Warden", sub: "The last round of new questions, the hardest levels and ridges, and the Storm Warden itself." }];
 /* four big levels a world, three skills each (one stage per skill), then the boss */
 const GROUPS = [["frac", "flaw", "word"], ["data", "claim", "time"], ["scale", "rule", "back"], ["order", "space", "shape"]];
-const LNAMES = ["Dusty Trail", "High Ledges", "Rope Bridges", "Long Climb"];
+/* every level is its own place (PF.BIOMES): its name, look and hazard */
+const placeOf = (w, k) => PF.biomeOf({ world: w, k });
 const hash = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };
 const LEVELS = [];
 for (const W of WORLDS) {
-  GROUPS.forEach((g, k) => LEVELS.push({ id: `${W.n}-L${k + 1}`, world: W.n, k, tracks: g, name: LNAMES[k], seed: hash(`${W.n}-L${k + 1}`) }));
+  GROUPS.forEach((g, k) => LEVELS.push({ id: `${W.n}-L${k + 1}`, world: W.n, k, tracks: g, name: placeOf(W.n, k).name, place: placeOf(W.n, k), seed: hash(`${W.n}-L${k + 1}`) }));
   LEVELS.push({ id: `${W.n}-boss`, world: W.n, k: GROUPS.length, boss: true, tracks: [], name: W.boss, seed: hash(`${W.n}-boss`) });
 }
 const STAGES = L => L.boss ? 1 : L.tracks.length;
@@ -370,6 +371,7 @@ function levelCard(L) {
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
   const at = rec.at || 0;
   return `<div class="lvhead">${IMG(ART.bus)}<h3 class="px">Level ${L.k + 1}: ${esc(L.name)}</h3></div><p>A big level in three stages. Each stage starts with a briefing of four questions on one skill that climb from a warm-up to test level, then a long stretch of platforms and sniper nests:</p>
+    <p class="tip">⚠ <span><b>${esc(L.place.name)}:</b> ${esc(L.place.tip)}</span></p>
     <ol class="climb">${L.tracks.map((t, i) => `<li class="${i < at ? "done2" : ""}"><span class="tag ${TR[t].subject}">${TR[t].subject}</span> <b>${esc(TR[t].name)}</b>${i < at ? " ✔" : ""}</li>`).join("")}</ol>
     ${rec.cleared ? `<p>${stars(rec.stars || 0)}${rec.snipeBest ? ` · 🎯 sniper best <b style="color:var(--gold)">${rec.snipeBest}</b>` : ""}</p>` : ""}
     <button class="btn" id="btn-go">${at ? `Carry on: stage ${at + 1}` : "Start stage 1"}</button>${at ? ` <button class="btn alt" id="btn-restart">Start again from stage 1</button>` : ""}`;
@@ -509,7 +511,7 @@ const curTrack = () => B && !B.L.boss ? B.L.tracks[B.stage] : null;
 /* the skill's own record (best briefing per world), kept under the skill's id as before */
 const skillRec = (L, stage) => S.levels[`${L.world}-${L.tracks[stage]}`] || (S.levels[`${L.world}-${L.tracks[stage]}`] = {});
 /* each stage of a big level is its own stretch of platforms (its own seed); the boss is one run and the arena */
-const levelFor = (L, stage) => ({ world: L.world, boss: !!L.boss, seed: L.boss ? L.seed : hash(`${L.id}-s${stage}`), stage, stages: STAGES(L), bossName: L.boss ? L.name : "" });
+const levelFor = (L, stage) => ({ world: L.world, k: L.boss ? null : L.k, boss: !!L.boss, seed: L.boss ? L.seed : hash(`${L.id}-s${stage}`), stage, stages: STAGES(L), bossName: L.boss ? L.name : "" });
 let INV = false;
 function play() {
   show("play");
