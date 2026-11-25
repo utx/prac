@@ -170,7 +170,7 @@ const PF = (() => {
   const keyMap = { ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right", ArrowUp: "up", KeyW: "up", Space: "jump", ArrowDown: "down", KeyS: "down", KeyE: "use", KeyJ: "fire", KeyX: "fire", KeyK: "duck", KeyC: "duck", Escape: "leave", KeyQ: "leave" };
   function onKey(e, down) {
     if (!S) return;
-    if (S.scope && S.scope.nest.sentries.card) { if (down && e.code === "Space") S.anyKey = true; if (e.code === "Space" || keyMap[e.code]) e.preventDefault(); return; }   /* SPACE closes the ridge report */
+    if (S.scope && (S.scope.nest.sentries.card || S.scope.intro)) { if (down && e.code === "Space") S.anyKey = true; if (e.code === "Space" || keyMap[e.code]) e.preventDefault(); return; }   /* SPACE closes the ridge report */
     const k = keyMap[e.code]; if (!k) return;
     e.preventDefault();
     if (down && !KEYS[k]) KEYS[k + "P"] = true;
@@ -232,17 +232,136 @@ const PF = (() => {
     const list = [];
     for (let i = 0; i < n; i++) list.push({ at: rocks[i % rocks.length], side: i % 2 ? -1 : 1, x: rocks[i % rocks.length], tx: rocks[i % rocks.length], state: "hide", st: 40 + i * 50, hp: boss ? 6 : 1, alive: true, range: boss ? 300 : ranges[(i + nest.id) % ranges.length], boss, rocks, hold: 60 + i * 40 });
     return { list, rocks, ranges, n, wind: w >= 3 ? [-2, -1, 1, 2][(nest.id + w) % 4] : 0, min: boss ? 1 : w === 1 ? 2 : 3,
-      stat: { ko: 0, head: 0, shots: 0, hits: 0, streak: 0, best: 0, first: 0, score: 0 }, respawn: [], gate: false, card: null };
+      stat: { ko: 0, head: 0, shots: 0, hits: 0, streak: 0, best: 0, first: 0, score: 0, veh: 0 }, respawn: [], gate: false, card: null, chutes: [], veh: null, vehOff: boss || !!window.__noVeh };
   }
   /* a fresh sentry drops in at a rock nobody is using */
   function spawnSentry(ss) {
     const used = ss.list.filter(q => q.alive).map(q => q.at), free = ss.rocks.filter(r => !used.includes(r)), at = (free.length ? free : ss.rocks)[Math.floor(Math.random() * (free.length || ss.rocks.length))];
     ss.list.push({ at, side: Math.random() < .5 ? -1 : 1, x: at, tx: at, state: "hide", st: 0, hp: 1, alive: true, range: ss.ranges[Math.floor(Math.random() * ss.ranges.length)], boss: false, rocks: ss.rocks, hold: 30 + Math.random() * 40 });
   }
+  /* ---------- vehicles at the nests (our own pixel art): planes drop paratroopers, helicopters zoom in and fire,
+     tanks roll up behind the rocks and shell you. Each one down counts as a knockout and scores big. ---------- */
+  const VEH = { plane: { hp: 2, pts: 200, name: "PLANE DOWN!" }, heli: { hp: 3, pts: 400, name: "CHOPPER DOWN!" }, tank: { hp: 4, pts: 300, name: "TANK DOWN!" } };
+  const vehKinds = w => w === 1 ? ["plane", "heli"] : ["plane", "heli", "tank"];
+  function spawnVeh(ss, kind) {
+    const w = S.G.world, dir = Math.random() < .5 ? 1 : -1, k = kind || vehKinds(w)[Math.floor(Math.random() * vehKinds(w).length)], x = dir > 0 ? -50 : VW + 50;
+    const v = { k, dir, x, hp: VEH[k].hp, st: 0, flash: 0 };
+    if (k === "plane") { v.y = 46 + Math.random() * 18; v.vx = dir * (1.5 + 0.15 * w); v.drops = [0, 1, 2].slice(0, w >= 3 ? 2 : 1).map(() => 110 + Math.random() * 260); }
+    if (k === "heli") { v.y = 96 + Math.random() * 24; v.hx = 120 + Math.random() * 240; v.state = "in"; }
+    if (k === "tank") { v.y = FAR - 2; v.hx = 100 + Math.random() * 280; v.state = "in"; v.shots = 0; }
+    ss.veh = v; msg({ plane: "A PLANE! Shoot the paratroopers before they land", heli: "CHOPPER INCOMING! Shoot it before it fires", tank: "A TANK! Hit the hatch on top for double damage" }[k], 110, "#ffd43b"); beep(180, .2, "sawtooth", .04);
+  }
+  function vehTick(ss) {
+    const w = S.G.world;
+    if (!ss.veh && !ss.vehOff) { if (ss.vt === undefined) ss.vt = 200 + Math.floor(Math.random() * 160); if (--ss.vt <= 0) { spawnVeh(ss); ss.vt = 420 - 40 * w + Math.floor(Math.random() * 220); } }
+    const v = ss.veh;
+    if (v) {
+      v.st++; if (v.flash > 0) v.flash--;
+      if (v.dead) { v.vy = (v.vy || 0) + 0.15; v.y += v.vy; v.x += v.dir * 0.8; v.rot = (v.rot || 0) + 0.08 * v.dir; if (S.t % 4 === 0) burst(v.x, v.y, "#495057", 3); if (v.y > FAR + 10 || (v.k === "tank" && v.st > 60)) { burst(v.x, FAR - 4, "#ff922b", 20); S.shake = 8; ss.veh = null; } }
+      else if (v.k === "plane") {
+        v.x += v.vx; v.drops = v.drops.filter(dx => { if ((v.dir > 0 && v.x >= dx) || (v.dir < 0 && v.x <= dx)) { ss.chutes.push({ x: v.x, y: v.y + 8, t: 0 }); beep(600, .05, "triangle"); return false; } return true; });
+        if (v.x < -60 || v.x > VW + 60) ss.veh = null;
+      } else if (v.k === "heli") {
+        if (v.state === "in") { v.x += v.dir * 3.2; if ((v.dir > 0 && v.x >= v.hx) || (v.dir < 0 && v.x <= v.hx)) { v.state = "hover"; v.st = 0; } }
+        else if (v.state === "hover") { v.y += Math.sin(v.st / 12) * 0.3; const aimAt = 50, fireAt = aimAt + 95 - 10 * w; v.aim = v.st >= aimAt && v.st < fireAt;
+          if (v.st === fireAt) { S.incoming.push({ x0: v.x - v.dir * 14, y0: v.y + 4, t: 0, dur: Math.max(26, 44 - 4 * w) }); beep(240, .08, "sawtooth"); S.hfx.push({ k: "muzzle", x: v.x - v.dir * 6, y: v.y, t: 0 }); }
+          if (v.st > fireAt + 40) { v.state = "out"; v.aim = false; } }
+        else { v.x += v.dir * 4; v.y -= 0.6; if (v.x < -60 || v.x > VW + 60) ss.veh = null; }
+      } else if (v.k === "tank") {
+        if (v.state === "in") { v.x += v.dir * (0.6 + 0.1 * w); if ((v.dir > 0 && v.x >= v.hx) || (v.dir < 0 && v.x <= v.hx)) { v.state = "fire"; v.st = 0; } }
+        else if (v.state === "fire") { const at = 70 + 110 * v.shots; v.aim = v.st >= at - 60 && v.st < at;
+          if (v.st === at) { v.shots++; S.incoming.push({ x0: v.x, y0: v.y - 14, t: 0, dur: Math.max(28, 48 - 4 * w) }); beep(70, .3, "sawtooth", .07); S.shake = 6; S.hfx.push({ k: "muzzle", x: v.x + 12, y: v.y - 16, t: 0 }); }
+          if (v.shots >= 2 && v.st > at + 50) { v.state = "out"; v.aim = false; v.dir = -v.dir; } }
+        else { v.x += v.dir * 1.2; if (v.x < -60 || v.x > VW + 60) ss.veh = null; }
+      }
+    }
+    /* paratroopers drift down; one that lands becomes a sentry behind the nearest rock */
+    for (const c of ss.chutes) { c.t++; c.y += 0.45 + 0.05 * w; c.x += Math.sin(c.t / 30) * 0.3;
+      if (c.y >= FAR - 26) { c.gone = true; const at = ss.rocks.slice().sort((a, b) => Math.abs(a - c.x) - Math.abs(b - c.x))[0]; ss.list.push({ at, side: c.x < at ? -1 : 1, x: c.x, tx: at + (c.x < at ? -36 : 36), state: "run", st: 0, hp: 1, alive: true, range: ss.ranges[0], boss: false, rocks: ss.rocks, hold: 40 }); msg("A paratrooper landed: one more sentry!", 70, "#ffb3b3"); } }
+    ss.chutes = ss.chutes.filter(c => !c.gone);
+  }
+  /* a shot at a vehicle or paratrooper (they are close: no bullet drop, but wind still counts) */
+  function vehHit(ss, x, y) {
+    const st = ss.stat, v = ss.veh;
+    for (const c of ss.chutes) if (x > c.x - 9 && x < c.x + 9 && y > c.y - 22 && y < c.y + 14) {
+      c.gone = true; const pts = 150 + (st.streak >= 2 ? 25 * (st.streak + 1) : 0); st.hits++; st.streak++; st.best = Math.max(st.best, st.streak); st.ko++; st.veh = (st.veh || 0) + 1; st.score += pts; S.coins += 2;
+      burst(c.x, c.y, "#ffd43b", 14); S.hfx.push({ k: "mark", x, y, head: false, t: 0 }, { k: "pop", x: c.x, y: c.y - 30, text: "SKY SHOT!", sub: `+${pts}`, c: "#74c0fc", t: 0 }); S.stop = 6; S.shake = 6; beep(988, .07, "triangle", .06); beep(1319, .12, "triangle", .05);
+      ss.chutes = ss.chutes.filter(q => !q.gone); return true;
+    }
+    if (!v || v.dead) return false;
+    const box = v.k === "plane" ? [v.x - 24, v.y - 8, v.x + 24, v.y + 8] : v.k === "heli" ? [v.x - 20, v.y - 12, v.x + 20, v.y + 10] : [v.x - 22, v.y - 27, v.x + 22, v.y];
+    if (!(x > box[0] && x < box[2] && y > box[1] && y < box[3])) return false;
+    const hatch = v.k === "tank" && y < v.y - 16 && Math.abs(x - v.x) < 7, dmg = hatch ? 2 : 1;
+    v.hp -= dmg; v.flash = 8; st.hits++; st.streak++; st.best = Math.max(st.best, st.streak); S.coins += 1;
+    let pts = hatch ? 100 : 50;
+    if (v.aim) { pts += 50; st.first++; v.aim = false; if (v.k === "heli") { v.state = "out"; } S.hfx.push({ k: "pop", x: v.x, y: v.y - 40, text: "SHOT FIRST! +50", c: "#8ce99a", t: -4 }); }
+    if (v.hp <= 0) { v.dead = true; v.st = 0; pts += VEH[v.k].pts; st.ko++; st.veh = (st.veh || 0) + 1; S.coins += 5; S.hfx.push({ k: "pop", x: v.x, y: v.y - 26, text: VEH[v.k].name, c: "#9be15d", t: -6 }); beep(110, .4, "sawtooth", .07); S.shake = 14; burst(v.x, v.y, "#ff922b", 24); }
+    st.score += pts;
+    S.hfx.push({ k: "mark", x, y, head: hatch, t: 0 }, { k: "pop", x: v.x, y: v.y - 14, text: hatch ? "HATCH HIT! x2" : "HIT!", sub: `+${pts}`, c: hatch ? "#ff4d4d" : "#fff", t: 0 });
+    burst(x, y, "#ffd43b", 10); S.stop = 5; S.shake = Math.max(S.shake, 6); beep(784, .07, "triangle", .06);
+    return true;
+  }
+  function drawVeh(ctx, ss, layer) {
+    const v = ss.veh, f = v && v.flash > 0 && v.flash % 4 < 2, C = c => f ? "#fff" : c;
+    if (layer === "ground" && v && v.k === "tank") {
+      ctx.save(); ctx.translate(Math.round(v.x), Math.round(v.y)); if (v.dead) ctx.rotate(v.rot || 0); ctx.scale(v.dir, 1);
+      ctx.fillStyle = "#1b1b2f"; ctx.fillRect(-23, -11, 46, 11); ctx.fillStyle = C("#3d4a2a"); ctx.fillRect(-22, -10, 44, 9);
+      ctx.fillStyle = "#212529"; for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.arc(-17 + i * 7, -4, 3, 0, 7); ctx.fill(); }
+      ctx.fillStyle = C("#5c6b3a"); ctx.fillRect(-20, -16, 40, 7); ctx.fillStyle = C("#6b7d44"); ctx.fillRect(-10, -22, 20, 7);
+      ctx.fillStyle = C("#4b5a30"); ctx.fillRect(8, -20, 18, 3); ctx.fillStyle = C("#ffd43b"); ctx.fillRect(-4, -25, 8, 3);   /* barrel and hatch */
+      ctx.restore();
+      if (v.aim) { ctx.fillStyle = S.t % 8 < 4 ? "#ff3b3b" : "#ffd43b"; ctx.fillRect(v.x + v.dir * 26 - 2, v.y - 21, 4, 4); }
+      return;
+    }
+    if (layer !== "sky") return;
+    for (const c of ss.chutes) {
+      const x = Math.round(c.x), y = Math.round(c.y);
+      ctx.fillStyle = "#1b1b2f"; ctx.beginPath(); ctx.arc(x, y - 14, 11, Math.PI, 0); ctx.fill();
+      for (let i = 0; i < 4; i++) { ctx.fillStyle = i % 2 ? "#fff" : "#ff6b6b"; ctx.beginPath(); ctx.moveTo(x, y - 14); ctx.arc(x, y - 14, 10, Math.PI + i * Math.PI / 4, Math.PI + (i + 1) * Math.PI / 4); ctx.fill(); }
+      ctx.strokeStyle = "#ced4da"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x - 10, y - 14); ctx.lineTo(x, y); ctx.moveTo(x + 10, y - 14); ctx.lineTo(x, y); ctx.stroke();
+      ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 4, y - 1, 8, 13); ctx.fillStyle = "#2b8a3e"; ctx.fillRect(x - 3, y + 3, 6, 8); ctx.fillStyle = "#495057"; ctx.fillRect(x - 3, y, 6, 3);
+    }
+    if (!v || v.k === "tank") return;
+    ctx.save(); ctx.translate(Math.round(v.x), Math.round(v.y)); if (v.dead) ctx.rotate(v.rot || 0); ctx.scale(v.dir, 1);
+    if (v.k === "plane") {
+      ctx.fillStyle = "#1b1b2f"; ctx.fillRect(-25, -6, 50, 12); ctx.fillStyle = C("#7a8a96"); ctx.fillRect(-24, -5, 46, 10); ctx.fillStyle = C("#9aa9b5"); ctx.fillRect(-24, -5, 46, 3);
+      ctx.fillStyle = C("#5b6b78"); ctx.fillRect(-6, -2, 18, 4); ctx.fillRect(-26, -14, 8, 10); ctx.fillStyle = C("#e03131"); ctx.fillRect(-25, -13, 6, 3);
+      ctx.fillStyle = "#74c0fc"; ctx.fillRect(16, -3, 5, 3); ctx.fillStyle = "#adb5bd"; const p = S.t % 4 < 2; ctx.fillRect(24, p ? -9 : -2, 2, p ? 18 : 4);
+    } else {
+      ctx.fillStyle = "#1b1b2f"; ctx.fillRect(-16, -9, 30, 17); ctx.fillStyle = C("#3b5a3a"); ctx.fillRect(-15, -8, 28, 15); ctx.fillStyle = "#74c0fc"; ctx.fillRect(4, -6, 8, 7);
+      ctx.fillStyle = C("#2f4a2f"); ctx.fillRect(-34, -5, 20, 4); ctx.fillStyle = "#adb5bd"; ctx.fillRect(-36, -9 + (S.t % 4 < 2 ? 0 : 3), 3, 9);
+      ctx.fillStyle = "#495057"; ctx.fillRect(-12, 8, 22, 2); ctx.fillRect(-9, 6, 2, 3); ctx.fillRect(5, 6, 2, 3);
+      ctx.fillStyle = "#1b1b2f"; ctx.fillRect(-1, -13, 3, 4); const rw = 14 + 12 * Math.abs(Math.sin(S.t / 2)); ctx.fillStyle = "#ced4da"; ctx.fillRect(-rw, -14, rw * 2, 2);
+    }
+    ctx.restore();
+    if (v.aim && !v.dead) { const f2 = 2 + 2 * Math.abs(Math.sin(S.t / 3)); ctx.fillStyle = "#ff2b2b"; ctx.fillRect(v.x + v.dir * 14 - f2 * 2, v.y, f2 * 4, 2); ctx.fillRect(v.x + v.dir * 14 - 1, v.y + 1 - f2 * 2, 2, f2 * 4); }
+  }
+  /* the gear card before the shooting starts: what the briefing earned, and what each thing does */
+  function drawIntro(ctx, sc) {
+    const it = sc.intro, ss = sc.nest.sentries, w = S.G.world, k = S.kit; it.t++; const g = Math.min(1, it.t / 10);
+    ctx.fillStyle = `rgba(5,8,20,${0.85 * g})`; ctx.fillRect(0, 0, VW, VH);
+    ctx.save(); ctx.translate(VW / 2, VH / 2); ctx.scale(0.7 + 0.3 * g, 0.7 + 0.3 * g); ctx.translate(-VW / 2, -VH / 2);
+    ctx.fillStyle = "#1b1b2f"; ctx.fillRect(26, 8, 428, 254); ctx.fillStyle = "#24305e"; ctx.fillRect(30, 12, 420, 246); ctx.fillStyle = "#ffd43b"; ctx.fillRect(30, 12, 420, 20);
+    txt(ctx, `SNIPER NEST ${sc.nest.id + 1}: YOUR GEAR`, VW / 2, 26, 11, "#1b1b2f");
+    const rows = [
+      ["◎", `SNIPER ROUNDS: ${S.rounds}`, true, `One shot each. Knock out ${ss.min} to open the gate, then keep going for a high score.`],
+      ["〰", `STEADY SCOPE: ${k.steady ? "ON" : "OFF"}`, k.steady, k.steady ? "Your crosshair sways half as much: easier to hit." : "Big sway. Get half the briefing right to earn it."],
+      ["❤", `HEARTS: ${S.hearts}${S.shield ? " + SHIELD" : ""}`, true, "Each enemy shot that hits costs one. Hold K to duck when you see a red glint."],
+      ["⤒", `BOOTS: ${k.boots ? "ON" : "OFF"}`, k.boots, k.boots ? "A second jump in mid-air on the way to the next nest." : "Get ¾ of the briefing right for double-jump boots."]];
+    if (w >= 2) rows.push(["⋮", "DROP DOTS", true, "Far targets: aim 1 dot high for 200 m, 2 dots for 300 m."]);
+    if (w >= 3) rows.push(["≋", `WIND: ${ss.wind > 0 ? "→".repeat(ss.wind) : "←".repeat(-ss.wind)}`, true, "Aim against the wind, one green dot per arrow."]);
+    rows.forEach(([ic, h, on, d], i) => { const y = 50 + i * 26, show = it.t > 6 + i * 5; if (!show) return;
+      txt(ctx, ic, 48, y + 4, 12, on ? "#ffd43b" : "#868e96", "left"); txt(ctx, h, 66, y, 10, on ? "#8ce99a" : "#adb5bd", "left"); txt(ctx, d, 66, y + 12, 8, "#dee2e6", "left"); });
+    const threats = ["SENTRIES"].concat(vehKinds(w).map(v => ({ plane: "PLANES + PARATROOPERS", heli: "HELICOPTERS", tank: "TANKS" }[v])));
+    if (it.t > 40) txt(ctx, `WATCH OUT FOR: ${threats.join(" · ")}`, VW / 2, 50 + rows.length * 26 + 4, 8, "#ffa8a8");
+    if (it.t > 20) txt(ctx, "Press SPACE to start shooting", VW / 2, 250, 10, S.t % 40 < 26 ? "#fff" : "#868e96");
+    ctx.restore();
+  }
   function enterNest(n) {
     if (S.rounds <= 0 && n.sentries.gate && !n.boss) { msg("Out of sniper rounds: grab gold bullets, then come back for a higher score", 140, "#ffd43b"); return; }
     n.sentries.card = null;
-    S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0 };
+    S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0, intro: !n.boss && !n.briefed && !window.__noIntro ? { t: 0 } : null };
+    n.briefed = true;
     S.msgs = [];                                                        // the platform's messages would clutter the scope
     msg(n.boss ? "BOSS: the Warden is on the far ridge!" : `SCORE ATTACK! Knock out ${n.sentries.min} to open the gate, then as many as your rounds allow`, 160, "#ffe066");
     if (S.kit.steady && !S.tipSteady) { S.tipSteady = true; msg("STEADY SCOPE: half the sway, from your briefing", 140, "#8ce99a"); }
@@ -261,6 +380,7 @@ const PF = (() => {
     let tgt = null, bd = 1e9;
     for (const s of sc.nest.sentries.list) if (s.alive) { const d = Math.abs(s.x - ax); if (d < bd) { bd = d; tgt = s; } }
     const drop = tgt ? (tgt.range / 100 - 1) * 8 : 0;
+    if (vehHit(sc.nest.sentries, ax + w * 8, ay)) { sc.fx = ax + w * 8; sc.fy = ay; return; }
     const x = ax + w * 8, y = ay + drop; sc.fx = x; sc.fy = y;
     if (inRock(sc, x, y)) { burst(x, y, "#c8c0b0"); msg("ROCK!", 30, "#ffd8a8"); st.streak = 0; return; }
     for (const s of sc.nest.sentries.list) {
@@ -293,7 +413,8 @@ const PF = (() => {
   }
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
-    { const ss = sc.nest.sentries;                                             /* the ridge report: wait for any key, nothing else moves */
+    if (sc.intro) { const go = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (go && sc.intro.t > 12) { sc.intro = null; beep(660, .08, "triangle"); } return; }   /* the gear card: nothing moves */
+    { const ss = sc.nest.sentries;                                             /* the ridge report: wait for SPACE, nothing else moves */
       if (ss.card && !sc.nest.boss) { const any = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (any && ss.card.t > 20) { closeCard(); for (const k in KEYS) KEYS[k] = false; } return; } }
     for (const b of S.incoming) {                                              /* bullets flying at you */
       b.t++;
@@ -306,13 +427,14 @@ const PF = (() => {
     sc.duck = !!KEYS.duck;
     if (!sc.duck) {
       const v = 2.4; if (KEYS.left) sc.x -= v; if (KEYS.right) sc.x += v; if (KEYS.up || KEYS.jump) sc.y -= v; if (KEYS.down) sc.y += v;
-      sc.x = Math.max(16, Math.min(VW - 16, sc.x)); sc.y = Math.max(60, Math.min(VH - 30, sc.y));
+      sc.x = Math.max(16, Math.min(VW - 16, sc.x)); sc.y = Math.max(24, Math.min(VH - 30, sc.y));
       if (pressed("fire")) scopeFire();
     }
     const ss = sc.nest.sentries;
     if (pressed("leave") || pressed("use")) { if (sc.nest.boss) { S.scope = null; return; } ss.card = cardFor(ss); return; }
     ss.respawn = ss.respawn.map(t => t - 1); while (ss.respawn.length && ss.respawn[0] <= 0) { ss.respawn.shift(); spawnSentry(ss); }
     ss.list = ss.list.filter(q => q.alive || (q.koT || 0) < 100);
+    if (!sc.nest.boss) vehTick(ss);
     /* out of rounds: the report card once the gate is open, a supply drop if not (never stuck) */
     if (!sc.nest.boss && S.rounds <= 0 && sc.cd === 0 && !S.incoming.length && ss.gate) { ss.card = cardFor(ss); return; }
     if (sc.cd > 0) sc.cd--; if (sc.flash > 0) sc.flash--;
@@ -656,7 +778,7 @@ const PF = (() => {
   /* the level's sniper totals, added up from every nest once at the end (so nothing is counted twice) */
   function snipeTotals() {
     const t = { score: 0, ko: 0, head: 0, shots: 0, hits: 0, best: 0, first: 0, ridgeMax: 0 };
-    for (const n of S.ents.filter(e => e.t === "nest")) { const st = n.sentries.stat; for (const k of ["score", "ko", "head", "shots", "hits", "first"]) t[k] += st[k]; t.best = Math.max(t.best, st.best); t.ridgeMax = Math.max(t.ridgeMax, st.score); }
+    for (const n of S.ents.filter(e => e.t === "nest")) { const st = n.sentries.stat; for (const k of ["score", "ko", "head", "shots", "hits", "first", "veh"]) t[k] = (t[k] || 0) + (st[k] || 0); t.best = Math.max(t.best, st.best); t.ridgeMax = Math.max(t.ridgeMax, st.score); }
     return t;
   }
   /* the commentator: a playful roast after every ridge, whether it went badly or well */
@@ -667,6 +789,7 @@ const PF = (() => {
     bad: ["That aim was so wobbly the scope got seasick.", "You hit more rocks than a landslide does.", "The sentries asked if you were shooting with your eyes shut.", "Some hits! Mostly misses. The misses are winning."],
     ok: ["Half hits, half misses. Perfectly... medium.", "Not bad! Not great either. A solid 'meh' from the sentries.", "Some of your shots hit. The others are still flying somewhere."],
     good: ["Okay, okay, you're good. Don't let it go to your head (your bullets did).", "Sharp shooting! The sentries want a rematch. And a hug.", "Nice! Your teacher would give that a sticker. A small one."],
+    veh: ["You knocked things out of the SKY. The pilots would like a word.", "Planes, choppers, tanks... is there anything you won't shoot?", "That tank had a very bad day. You're welcome, sentries."],
     heads: ["So many headshots the sentries are ordering bigger helmets.", "Headshot after headshot. The helmet shop is sold out."],
     perfect: ["Every shot hit! Did you bribe the sentries?", "100% accuracy. Now try being this accurate with your spelling.", "Perfect aim. The sentries have filed a complaint. It was ignored."] };
   function roast(st) {
@@ -675,6 +798,7 @@ const PF = (() => {
     if (!st.hits) return pickOne(ROASTS.zero);
     if (st.gate === false && st.ko < st.min) return pickOne(ROASTS.shut);
     if (st.acc >= 100 && st.hits >= 3) return pickOne(ROASTS.perfect);
+    if ((st.veh || 0) >= 2) return pickOne(ROASTS.veh);
     if (st.head >= 3 && st.head >= st.ko / 2) return pickOne(ROASTS.heads);
     return pickOne(st.acc < 35 ? ROASTS.bad : st.acc < 65 ? ROASTS.ok : ROASTS.good);
   }
@@ -690,8 +814,8 @@ const PF = (() => {
     ctx.save(); ctx.translate(VW / 2, VH / 2); ctx.scale(0.6 + 0.4 * g, 0.6 + 0.4 * g); ctx.translate(-VW / 2, -VH / 2);
     ctx.fillStyle = "#1b1b2f"; ctx.fillRect(86, 34, 308, 206); ctx.fillStyle = "#2c335c"; ctx.fillRect(90, 38, 300, 198); ctx.fillStyle = "#ffd43b"; ctx.fillRect(90, 38, 300, 22);
     txt(ctx, "RIDGE REPORT", VW / 2, 54, 12, "#1b1b2f");
-    const rows = [["KNOCKED OUT", c.ko], ["HEADSHOTS", c.head], ["SHOT FIRST", c.first], ["ACCURACY", c.acc + "%"], ["BEST STREAK", c.best]];
-    rows.forEach(([k, v], i) => { const show = c.t > 10 + i * 8; if (!show) return; txt(ctx, k, 110, 76 + i * 14, 9, "#ced4da", "left"); txt(ctx, String(v), 370, 76 + i * 14, 10, "#fff", "right"); });
+    const rows = [["KNOCKED OUT", c.ko], ["HEADSHOTS", c.head], ["VEHICLES + SKY SHOTS", c.veh || 0], ["SHOT FIRST", c.first], ["ACCURACY", c.acc + "%"], ["BEST STREAK", c.best]];
+    rows.forEach(([k, v], i) => { const show = c.t > 10 + i * 7; if (!show) return; txt(ctx, k, 110, 72 + i * 12, 9, "#ced4da", "left"); txt(ctx, String(v), 370, 72 + i * 12, 10, "#fff", "right"); });
     if (c.t > 56) { txt(ctx, "SCORE", 110, 150, 11, "#ffd43b", "left"); txt(ctx, String(Math.min(c.score, Math.round(c.score * (c.t - 56) / 20))), 370, 152, 15, "#ffd43b", "right"); }
     if (c.t > 66) { if (c.isBest) txt(ctx, c.t % 20 < 12 ? "NEW HIGH SCORE!" : "", VW / 2, 168, 12, "#ff922b"); else txt(ctx, `BEST ON THIS LEVEL: ${c.ridgeBest}`, VW / 2, 167, 8, "#adb5bd"); }
     /* the commentator has something to say (playfully) */
@@ -811,7 +935,9 @@ const PF = (() => {
         ctx.strokeStyle = `rgba(255,59,59,${0.5 + 0.5 * (1 - left)})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(s.x - 16, b.top + 9, 6 + 26 * left, 0, 7); ctx.stroke();
       }
     }
+    drawVeh(ctx, sc.nest.sentries, "ground");
     for (const r of sc.nest.sentries.rocks) { ctx.fillStyle = "#6f6a63"; ctx.beginPath(); ctx.ellipse(r, FAR + 2, RW, RH, 0, Math.PI, 0); ctx.fill(); ctx.fillStyle = "#8d877e"; ctx.beginPath(); ctx.ellipse(r - 5, FAR - 3, RW - 9, RH - 8, 0, Math.PI, 0); ctx.fill(); }
+    drawVeh(ctx, sc.nest.sentries, "sky");
     ctx.fillStyle = "#3b2f25"; ctx.fillRect(0, 244, VW, VH - 244);
     S.parts.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(Math.round(p.x), Math.round(p.y), 2, 2); });
     drawIncoming(ctx, sc.duck);
@@ -838,6 +964,7 @@ const PF = (() => {
     hitFx(ctx);
     ctx.restore();
     if (sc.nest.sentries.card) { drawCard(ctx, sc.nest.sentries.card); return; }
+    if (sc.intro) { drawIntro(ctx, sc); return; }
     const wind = sc.nest.sentries.wind;
     ctx.fillStyle = "rgba(10,12,30,.7)"; ctx.fillRect(0, 0, VW, 18);
     txt(ctx, `SNIPER ${S.rounds}`, 8, 13, 9, "#ffd43b", "left");
@@ -912,11 +1039,17 @@ const PF = (() => {
     grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.hideIn = 0; s.x = s.at + s.side * (s.boss ? 42 : 36); S.stop = 0; const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
-    key: (k, down) => { if (S && S.scope && S.scope.nest.sentries.card) { if (down && k === "jump") S.anyKey = true; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
-    tap: () => { if (S && S.scope && S.scope.nest.sentries.card) S.anyKey = true; },
+    key: (k, down) => { if (S && S.scope && (S.scope.nest.sentries.card || S.scope.intro)) { if (down && k === "jump") S.anyKey = true; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
+    tap: () => { if (S && S.scope && (S.scope.nest.sentries.card || S.scope.intro)) S.anyKey = true; },
     /* the boss */
     toArena: () => { if (!S) return false; const a = S.ents.find(e => e.t === "arena"); if (!a) return false; S.P.x = a.x + 4 * TS; S.P.y = a.y - PH.h; S.P.vx = S.P.vy = 0; return true; },
     boss: () => S && S.boss && { hp: S.boss.hp, max: S.boss.max, phase: S.boss.phase, state: S.boss.state, core: S.boss.core, ball: S.boss.ball, x: S.boss.x, name: S.boss.info.name, waves: S.waves.length, orbs: S.orbs.length },
+    /* nests: the gear card and the vehicles */
+    intro: () => !!(S && S.scope && S.scope.intro),
+    spawnVeh: k => { if (S && S.scope) { const ss = S.scope.nest.sentries; spawnVeh(ss, k); if (k === "plane") ss.veh.drops = [VW / 2]; } },
+    vehicles: () => S && S.scope && { veh: S.scope.nest.sentries.veh && { k: S.scope.nest.sentries.veh.k, hp: S.scope.nest.sentries.veh.hp, dead: !!S.scope.nest.sentries.veh.dead, x: S.scope.nest.sentries.veh.x, y: S.scope.nest.sentries.veh.y, state: S.scope.nest.sentries.veh.state }, chutes: S.scope.nest.sentries.chutes.map(c => ({ x: c.x, y: c.y })), stat: Object.assign({}, S.scope.nest.sentries.stat) },
+    vehOff: on => { if (S && S.scope) S.scope.nest.sentries.vehOff = on; },
+    aimPoint: (x, y) => { if (!S || !S.scope) return; const w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; S.stop = 0; S.scope.x = x - w * 8 - a * Math.sin((S.t + 1) / 23); S.scope.y = y - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; },
     bossDo: st => { if (S && S.boss) { S.boss.state = st; S.boss.st = 0; } },
     bossHp: n => { if (S && S.boss) S.boss.hp = n; },
     stompBoss: () => { if (!S || !S.boss) return; const B = S.boss, b = bossBox(B); S.P.x = B.x + BW / 2 - PH.w / 2; S.P.y = b.top - PH.h - 4; S.P.vy = 2; S.P.vx = 0; },
