@@ -242,20 +242,22 @@ const GENS = [], HAND = [];
 <script>
 "use strict";
 /* ================= levels ================= */
-const ORDER = ["frac", "flaw", "infer", "data", "claim", "word", "time", "rule", "link", "scale", "order", "same", "back", "space", "shape"];
+/* reading is the cloze skill only (David, Nov 2026: "drop everything apart from the cloze … keep everything else maths or thinking skills") */
+const ORDER = ["frac", "flaw", "word", "data", "claim", "time", "scale", "rule", "back", "order", "space", "shape"];
 const TR = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 const WORLDS = [
-  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", boss: "Rustjaw", sub: "Five big levels, then Rustjaw, the canyon crusher. Every stage starts with a briefing that climbs from a warm-up to test level." },
+  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", boss: "Rustjaw", sub: "Four big levels, then Rustjaw, the canyon crusher. Every stage starts with a briefing that climbs from a warm-up to test level." },
   { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", boss: "Frostgear", sub: "Every skill again, with new questions. Your scope now has drop dots for range. Frostgear guards the pass." },
   { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", boss: "Thornbark", sub: "New questions again. Night falls, and wind pushes your shots. Thornbark waits in the dark." },
   { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", boss: "the Storm Warden", sub: "The last round of new questions, the hardest levels and ridges, and the Storm Warden itself." }];
-/* five big levels a world, three skills each (one stage per skill), then the boss */
-const GROUPS = [["frac", "flaw", "infer"], ["data", "claim", "word"], ["time", "rule", "link"], ["scale", "order", "same"], ["back", "space", "shape"]];
-const LNAMES = ["Dusty Trail", "High Ledges", "Rope Bridges", "Lookout Ridge", "Long Climb"];
+/* four big levels a world, three skills each (one stage per skill), then the boss */
+const GROUPS = [["frac", "flaw", "word"], ["data", "claim", "time"], ["scale", "rule", "back"], ["order", "space", "shape"]];
+/* every level is its own place (PF.BIOMES): its name, look and hazard */
+const placeOf = (w, k) => PF.biomeOf({ world: w, k });
 const hash = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };
 const LEVELS = [];
 for (const W of WORLDS) {
-  GROUPS.forEach((g, k) => LEVELS.push({ id: `${W.n}-L${k + 1}`, world: W.n, k, tracks: g, name: LNAMES[k], seed: hash(`${W.n}-L${k + 1}`) }));
+  GROUPS.forEach((g, k) => LEVELS.push({ id: `${W.n}-L${k + 1}`, world: W.n, k, tracks: g, name: placeOf(W.n, k).name, place: placeOf(W.n, k), seed: hash(`${W.n}-L${k + 1}`) }));
   LEVELS.push({ id: `${W.n}-boss`, world: W.n, k: GROUPS.length, boss: true, tracks: [], name: W.boss, seed: hash(`${W.n}-boss`) });
 }
 const STAGES = L => L.boss ? 1 : L.tracks.length;
@@ -273,11 +275,18 @@ const RAR = ["common", "rare", "epic", "legendary"];
 /* ================= saved progress ================= */
 const KEY = "prac4.v1", PKEY = "prac4.practice.seen";
 const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
-const FRESH = () => ({ v: 1, levels: {}, seen: {}, seed: 1, coins: 0, sound: true, world: 1, log: [] });
+const FRESH = () => ({ v: 1, layout: 2, levels: {}, seen: {}, seed: 1, coins: 0, sound: true, world: 1, log: [] });
 function load() {
   if (PRACTICE) { const s = FRESH(); try { const p = JSON.parse(localStorage.getItem(PKEY)); if (p && p.seen) { s.seen = p.seen; s.seed = p.seed || 1; } } catch (e) {} return s; }
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return migrate(Object.assign(FRESH(), s)); } catch (e) {}
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return migrate(Object.assign(FRESH(), relayout(s))); } catch (e) {}
   return FRESH();
+}
+/* Nov 2026: five big levels became four (the reading skills other than the cloze were dropped). The old big-level records
+   (which held different skills) are dropped; each skill keeps its own record, so a new level counts as cleared when all three of its skills were */
+function relayout(s) {
+  if (s.layout === 2) return s;
+  for (const id of Object.keys(s.levels)) if (/^\d-L\d$/.test(id)) delete s.levels[id];
+  s.layout = 2; return s;
 }
 /* progress from the first layout (one level per skill) carries over: a big level counts as cleared when all three of its skills were */
 function migrate(s) {
@@ -313,9 +322,9 @@ function briefing(L, stage = 0) {
   /* a question counts as seen as soon as it is put into a briefing, so leaving a briefing early never brings its questions straight back */
   const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); S.seen[q.gen || q.id] = S.seed++; out.push(Object.assign({}, q, { role })); } };
   if (L.boss) {
-    /* the boss mixes six skills (2 maths, 2 thinking, 2 reading), still climbing: steps 1, 2, 3, 3, 4, 4 */
-    const bySub = s => ORDER.filter(t => TR[t].subject === s).sort(() => Math.random() - .5).slice(0, 2);
-    const ts = [...bySub("maths"), ...bySub("thinking"), ...bySub("reading")].sort(() => Math.random() - .5);
+    /* the boss mixes six skills (3 maths, 2 thinking, 1 cloze), still climbing: steps 1, 2, 3, 3, 4, 4 */
+    const bySub = (s, n) => ORDER.filter(t => TR[t].subject === s).sort(() => Math.random() - .5).slice(0, n);
+    const ts = [...bySub("maths", 3), ...bySub("thinking", 2), ...bySub("reading", 1)].sort(() => Math.random() - .5);
     ts.forEach((t, i) => add(t, [1, 2, 3, 3, 4, 4][i], "boss"));
   } else {
     /* one skill, climbing inside the level: step 1 (warm-up) -> step 2 -> step 3 -> step 4 (test level) */
@@ -362,6 +371,7 @@ function levelCard(L) {
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
   const at = rec.at || 0;
   return `<div class="lvhead">${IMG(ART.bus)}<h3 class="px">Level ${L.k + 1}: ${esc(L.name)}</h3></div><p>A big level in three stages. Each stage starts with a briefing of four questions on one skill that climb from a warm-up to test level, then a long stretch of platforms and sniper nests:</p>
+    <p class="tip">⚠ <span><b>${esc(L.place.name)}:</b> ${esc(L.place.tip)}</span></p>
     <ol class="climb">${L.tracks.map((t, i) => `<li class="${i < at ? "done2" : ""}"><span class="tag ${TR[t].subject}">${TR[t].subject}</span> <b>${esc(TR[t].name)}</b>${i < at ? " ✔" : ""}</li>`).join("")}</ol>
     ${rec.cleared ? `<p>${stars(rec.stars || 0)}${rec.snipeBest ? ` · 🎯 sniper best <b style="color:var(--gold)">${rec.snipeBest}</b>` : ""}</p>` : ""}
     <button class="btn" id="btn-go">${at ? `Carry on: stage ${at + 1}` : "Start stage 1"}</button>${at ? ` <button class="btn alt" id="btn-restart">Start again from stage 1</button>` : ""}`;
@@ -501,7 +511,7 @@ const curTrack = () => B && !B.L.boss ? B.L.tracks[B.stage] : null;
 /* the skill's own record (best briefing per world), kept under the skill's id as before */
 const skillRec = (L, stage) => S.levels[`${L.world}-${L.tracks[stage]}`] || (S.levels[`${L.world}-${L.tracks[stage]}`] = {});
 /* each stage of a big level is its own stretch of platforms (its own seed); the boss is one run and the arena */
-const levelFor = (L, stage) => ({ world: L.world, boss: !!L.boss, seed: L.boss ? L.seed : hash(`${L.id}-s${stage}`), stage, stages: STAGES(L), bossName: L.boss ? L.name : "" });
+const levelFor = (L, stage) => ({ world: L.world, k: L.boss ? null : L.k, boss: !!L.boss, seed: L.boss ? L.seed : hash(`${L.id}-s${stage}`), stage, stages: STAGES(L), bossName: L.boss ? L.name : "" });
 let INV = false;
 function play() {
   show("play");
@@ -598,8 +608,8 @@ function coachLevel(L) {
   if (!PRACTICE) return;
   const el = $("#coach-body");
   if (!L) { el.innerHTML = `<h2 class="px">COACH NOTES (ADMIN ONLY)</h2><p>Pick a level to see which sample-paper questions its skill builds toward, and how the four steps of that skill climb from building blocks to the hardest questions.</p>
-    <h3>How the game is built</h3><ul><li>15 skills (6 maths, 5 thinking, 4 reading), each in 4 steps.</li><li>Each world has 5 big levels and a boss. A big level has 3 stages (one skill each, mixing maths, thinking and reading); every stage's briefing climbs: 4 questions on its skill, step 1 (warm-up) to step 4 (test level).</li><li>Each world brings every skill back with new questions; the platforming and sniping get harder world by world.</li><li>Bosses mix 6 skills (2 per subject), still climbing (steps 1, 2, 3, 3, 4, 4), as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
-  if (L.boss) { el.innerHTML = `<h2 class="px">COACH NOTES · WORLD ${L.world} BOSS</h2><p>The boss briefing mixes ${QN.boss} questions: 2 maths, 2 thinking and 2 reading skills, climbing through steps 1, 2, 3, 3, 4, 4. Coming without warning, mixed together like the real test, they check that each skill transfers when the topic isn't announced. In the fight, each third of the boss's health ends with a power crate: one more question (step 2–4 by world) for loot.</p>`; return; }
+    <h3>How the game is built</h3><ul><li>12 skills (6 maths, 5 thinking, and the cloze skill "The right word"), each in 4 steps.</li><li>Each world has 4 big levels and a boss. A big level has 3 stages (one skill each); every stage's briefing climbs: 4 questions on its skill, step 1 (warm-up) to step 4 (test level).</li><li>Each world brings every skill back with new questions; the platforming and sniping get harder world by world.</li><li>Bosses mix 6 skills (3 maths, 2 thinking, 1 cloze), still climbing (steps 1, 2, 3, 3, 4, 4), as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
+  if (L.boss) { el.innerHTML = `<h2 class="px">COACH NOTES · WORLD ${L.world} BOSS</h2><p>The boss briefing mixes ${QN.boss} questions: 3 maths, 2 thinking and 1 cloze skill, climbing through steps 1, 2, 3, 3, 4, 4. Coming without warning, mixed together like the real test, they check that each skill transfers when the topic isn't announced. In the fight, each third of the boss's health ends with a power crate: one more question (step 2–4 by world) for loot.</p>`; return; }
   el.innerHTML = `<h2 class="px">COACH NOTES · LEVEL ${L.k + 1}: ${esc(L.name.toUpperCase())}</h2><p>World ${L.world}. A big level in three stages, one skill each; every stage's briefing climbs through that skill's four steps (question 1 = step 1 … question 4 = step 4), with new questions in each world.</p>
     ${L.tracks.map((id, i) => { const t = TR[id]; return `<h3>Stage ${i + 1}: <span class="tag ${t.subject}">${t.subject}</span> ${esc(t.name)}</h3>
       <p><b>Sample questions it prepares for</b></p>${samplesHtml(t, 0)}<p><b>The four steps</b></p>${ladderHtml(t, 0)}<p><b>Same method, same words:</b> ${esc(t.method)}</p>`; }).join("")}`;

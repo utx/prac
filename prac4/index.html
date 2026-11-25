@@ -657,23 +657,6 @@ const TRACKS = [
     { title: "Views of a model", builds: "From a plan with stack heights, picking the view from the front or side.", traps: "the view from the other side; the view from the back (mirror); the top view." }] },
 
 /* ======================= READING ======================= */
-{ id: "infer", subject: "reading", name: "Reading between the lines", icon: "❝", cat: "Feelings & inference",
-  ideas: ["Writers SHOW feelings through actions, words and small details instead of naming them.",
-    "Ask: why did the writer include this detail? What does it make us think?",
-    "The right answer is usually an implication, not a repeat of the words in the text.",
-    "Wrong answers often use a real detail from the text attached to the wrong idea, or go too far."],
-  method: "Find the exact words in the text. Ask 'what does this show?' and pick the answer the words prove, not one that just repeats them.",
-  transfer: "Every story and poem question about feelings, attitudes, why a detail is there, what a word suggests, and the whole-text questions about technique and viewpoint (Reading Q1–6 and Q15–19 in every paper).",
-  samples: [
-    { ref: "PT1–PT3 Reading Q1–6", what: "story questions: what a detail shows, feelings shown not stated", rungs: [1, 2, 3, 4] },
-    { ref: "PT1–PT3 Reading Q15–19", what: "poem questions: comparisons, word choice, what a group of lines does", rungs: [3, 4] },
-    { ref: "Last question of each story and poem", what: "technique and its effect, viewpoint, overall impression", rungs: [4] }],
-  rungs: [
-    { title: "Feelings shown, not told", builds: "Short scenes where actions and words reveal a feeling that is never named.", traps: "the opposite feeling; a feeling that is too strong." },
-    { title: "Why is this detail here?", builds: "Choosing what a detail makes the reader understand.", traps: "a real detail attached to the wrong idea; a literal reading." },
-    { title: "What a word suggests", builds: "One word or phrase that changes the meaning: an adverb, a comparison, an image.", traps: "the dictionary meaning instead of the meaning here; taking a comparison literally." },
-    { title: "The whole passage", builds: "Technique and effect, viewpoint and overall impression from a longer extract.", traps: "an answer true of one sentence but not the whole." }] },
-
 { id: "word", subject: "reading", name: "The right word", icon: "Aa", cat: "Vocabulary & idioms",
   ideas: ["Near-synonyms are not interchangeable: the context decides the shade of meaning.",
     "Some words come in fixed partnerships (teeming WITH, the culmination OF).",
@@ -690,35 +673,6 @@ const TRACKS = [
     { title: "Grammar fit", builds: "Only one verb or adjective takes the following preposition or object.", traps: "a word that means the right thing but breaks the sentence." },
     { title: "Clues from the passage", builds: "Short passages where the deciding clue is in another sentence.", traps: "a word that fits its own sentence but not the passage." }] },
 
-{ id: "link", subject: "reading", name: "Linking sentences", icon: "⛓", cat: "Sentence links",
-  ideas: ["Reference words (this, they, it, here, such) point back to something just said.",
-    "Texts move from a general statement to an example, or from a claim to its reason.",
-    "Signal words (however, instead, not that, so) show a contrast or a result.",
-    "A sentence can be on the right topic and still not fit: check the words around the gap."],
-  method: "Read the sentence before AND after the gap. Find the pointing words (this, they, however) and check they have something to point to.",
-  transfer: "The missing-sentences task (Reading Q20–25 in every paper), and understanding how any passage is built.",
-  samples: [
-    { ref: "PT1–PT3 Reading Q20–25", what: "missing sentences chosen by reference words, examples and contrast", rungs: [1, 2, 3, 4] }],
-  rungs: [
-    { title: "What does 'this' point to?", builds: "Finding what a reference word refers to.", traps: "the nearest noun, which isn't the one meant." },
-    { title: "General, then example", builds: "Choosing the sentence that gives an example or a reason for the one before.", traps: "a sentence on the topic that doesn't follow on." },
-    { title: "Signal words", builds: "Contrast and result: however, instead, not that, so.", traps: "a signal that points the wrong way." },
-    { title: "Fill the gap", builds: "A short passage with a gap and four sentences, one of them on topic but with nothing to point to.", traps: "the on-topic sentence that fails on its reference." }] },
-
-{ id: "same", subject: "reading", name: "Same idea, different words", icon: "⇋", cat: "Main idea",
-  ideas: ["The question and the right extract say the same thing in DIFFERENT words.",
-    "Match the idea, not a repeated word: a shared word is often a trap.",
-    "Some questions ask about HOW a text is written (an opinion, figurative language), not what it is about.",
-    "Every extract usually answers at least one question."],
-  method: "Put the question into your own words, then look for the extract that means it, even if it uses none of the same words.",
-  transfer: "The four-extracts task (Reading Q26–33 in every paper), and any question that says an idea from the text in new words.",
-  samples: [
-    { ref: "PT1–PT3 Reading Q26–33", what: "which extract says, suggests or reveals an idea", rungs: [1, 2, 3, 4] }],
-  rungs: [
-    { title: "Say it another way", builds: "Matching a sentence to the one that means the same.", traps: "a sentence that shares a word but not the meaning." },
-    { title: "Which extract mentions it?", builds: "Four short extracts on one theme; find the one that mentions an idea in other words.", traps: "the extract that shares a word with the question." },
-    { title: "How is it written?", builds: "Opinion, comparison, figurative language, advice: the extract's technique.", traps: "the extract about the right topic but written the wrong way." },
-    { title: "What does it suggest?", builds: "Inference across four extracts: which one suggests or reveals something it never says outright.", traps: "an extract that states something similar outright about a different thing." }] }
 ];
 
 /* ---------------------------------------------------------------
@@ -1969,231 +1923,6 @@ whose("rule", 4, "tr4h", "Kofi", "Ana", "A jar holds 5 red and 5 yellow jellybea
    Each text builds one reading skill at a time, at test level from step 1 (story extracts of about 80–150 words);
    eight per step, answer letters spread evenly within each step (each letter twice). */
 const P = t => `<div class="passage">${t}</div>`;
-/* ---------- Reading between the lines ---------- */
-H("infer", 1, "ri1a", { passage: P(`<p>The high ropes course began with a ladder that ran straight up the trunk of a gum tree. Callum let the two boys behind him go first. “You go,” he said. “I'm still fixing my harness.” He had already checked the buckles three times.</p><p>When the instructor clipped him onto the safety line, Callum kept his eyes on the bark in front of his nose and counted the rungs under his breath. Halfway up, a magpie warbled somewhere above him. He did not look up to see where it was.</p>`),
-  stem: `<p>Which of these best describes how Callum feels as he begins the climb?</p>`,
-  opts: [["He is excited and can't wait to reach the top.", "he lets the others go first, which is the opposite of being eager"],
-    ["He is annoyed that the other boys pushed in front of him.", "nobody pushes in: Callum TELLS them to go first"],
-    ["He is frightened of the height but trying not to show it.", null],
-    ["He is more interested in the birds than in the climb.", "he hears the magpie but doesn't even look up"]],
-  body: "The writer never says “scared”, but SHOWS it: Callum makes an excuse to go last, checks his buckles again and again, and won't look anywhere but the bark in front of him." });
-H("infer", 1, "ri1b", { passage: P(`<p>Aunt Fen had knitted the jumper herself. It was mustard yellow, with a brown reindeer across the front whose antlers did not quite match.</p><p>“Do you love it?” she asked, her hands clasped under her chin.</p><p>Mei held it up and smiled so widely that her cheeks ached. “It's so … warm,” she said.</p><p>Later, when Aunt Fen had gone home, Mei folded the jumper very neatly and pushed it to the back of her bottom drawer, under her swimming costume. Then, after a moment, she took it out again and laid it on top.</p>`),
-  stem: `<p>What does the passage suggest about Mei?</p>`,
-  opts: [["She loves the jumper and wants to keep it safe.", "she folds it neatly, but she hides it at the back of a drawer at first"],
-    ["She dislikes the jumper but cares about her aunt's feelings.", null],
-    ["She is planning to give the jumper away to someone else in her family.", "nothing suggests that; she keeps it in her own drawer"],
-    ["She is upset that her aunt has gone home.", "the passage is about the jumper; nothing shows she misses her aunt"]],
-  body: "The forced smile and the pause before “warm” show she doesn't like it. Taking it out again and putting it on top shows she feels bad about hiding a present her aunt made with love." });
-H("infer", 1, "ri1c", { passage: P(`<p>“You'll be fine,” said Mum, pulling on her coat. “We're only next door, and the number's on the fridge.”</p><p>When the front door closed, Arlo stood very still in the hallway. His cousin Bea, who was four, looked up at him and waited.</p><p>Arlo cleared his throat. “Right,” he said, in a deep voice that didn't sound like his own. “Bath, story, bed.” He read the list on the fridge twice, although he had written it himself that afternoon. Then he checked that the back door was locked, and checked it again.</p>`),
-  stem: `<p>How does Arlo feel about looking after Bea?</p>`,
-  opts: [["He is cross that Mum has left him on his own.", "he stands still, but nothing he does is aimed at Mum"],
-    ["He is confident because he has done it many times before.", "he writes a list and checks it twice, which doesn't fit someone who has done it often"],
-    ["He is bored and wants Bea to go to bed quickly.", "“Bath, story, bed” is his plan, not a sign of boredom"],
-    ["He is unsure of himself but trying to sound in charge.", null]],
-  body: "The deep voice that “didn't sound like his own” shows he is putting on a grown-up act; reading the list twice and checking the lock twice show how nervous he really is." });
-H("infer", 1, "ri1d", { passage: P(`<p>When the judge announced that the other school had won the debate, Priya clapped along with everyone else. She shook hands with the other team and told their captain that her final speech had been brilliant.</p><p>On the bus home, Priya sat by the window and said she was fine, thanks, just tired. But when her friend offered her half a chocolate bar, she shook her head, and for the rest of the trip she watched the paddocks go past without really seeing any of them.</p>`),
-  stem: `<p>How does Priya really feel after the debate?</p>`,
-  opts: [["Disappointed, though she hides it", null],
-    ["Pleased that the better team won", "she praises the other captain politely, but her actions on the bus show she is far from pleased"],
-    ["Simply tired, as she tells her friend", "that is what she SAYS; the writer shows something else"],
-    ["Angry with the judge for being unfair", "nothing she does is aimed at the judge"]],
-  body: "She does all the polite things, but turning down chocolate and staring out without “really seeing” anything show she is quietly disappointed." });
-H("infer", 1, "ri1e", { passage: P(`<p>Jack's little sister won the art prize for her painting of a whale. At assembly, everyone clapped as she walked up to the stage, and Mum took eleven photos. Jack clapped too.</p><p>At home, he said that the whale's tail was a bit wonky, really, and that the judges probably felt sorry for the little kids. That night, though, when he thought nobody was looking, he stood in front of the painting on the fridge for a long time. Then he straightened it, very carefully, so that it hung exactly level.</p>`),
-  stem: `<p>What does the last part of the passage suggest about Jack?</p>`,
-  opts: [["He still thinks the painting is not very good.", "that is what he said earlier; what he does when alone shows something different"],
-    ["He is secretly proud of his sister.", null],
-    ["He wants to paint a whale of his own.", "nothing suggests he wants to paint"],
-    ["He is worried the painting will fall off the fridge.", "takes the straightening too literally"]],
-  body: "In front of others Jack picks at the painting, but alone he gazes at it and carefully straightens it. His private actions show pride he won't say out loud." });
-H("infer", 1, "ri1f", { passage: P(`<p>Lucia saw the balloons tied to Ana's chair before she even reached the classroom door, and her stomach dropped. She had circled the date on her calendar weeks ago. Then the circle had disappeared under a pile of homework.</p><p>All morning Lucia smiled whenever Ana looked her way, and talked a little too much about the weekend. At lunch she slipped away to the library, tore a page from the back of her exercise book, and spent the whole break drawing, folding and writing in her neatest letters.</p>`),
-  stem: `<p>Why does Lucia go to the library at lunch?</p>`,
-  opts: [["To finish the homework she had not done", "homework is mentioned, but only as the reason she lost track of the date"],
-    ["To keep away from Ana because the two of them have had an argument", "she smiles at Ana all morning; there's no sign of an argument"],
-    ["To make a birthday card because she forgot Ana's birthday", null],
-    ["To find a book to give Ana as a present", "she uses a page from her own exercise book, not a library book"]],
-  body: "The balloons, her stomach dropping and the date lost under homework show she forgot Ana's birthday. Drawing, folding and writing neatly show she is making a card to make up for it." });
-H("infer", 1, "ri1g", { passage: P(`<p>Mr Bellamy washed the old blue ute one last time on the morning it was sold. He even cleaned the hubcaps with a toothbrush.</p><p>When the young couple came to collect it, he showed them how the passenger door needed a bump with your hip to close, and where the spare key was hidden under the mat. He took their money without counting it. Then he stood at the end of the driveway, his hand half-raised, until the ute had turned the corner and the sound of its engine had faded away.</p>`),
-  stem: `<p>How does Mr Bellamy feel about selling the ute?</p>`,
-  opts: [["Glad to be rid of a car with a door that sticks", "the sticking door is a real detail, but he explains it fondly, like a habit of an old friend"],
-    ["Worried that the couple have not paid him enough", "he doesn't even count the money"],
-    ["Proud of how much money he has made", "the money hardly seems to matter to him"],
-    ["Sad to see it go, because it means a lot to him", null]],
-  body: "He cleans it with great care, hands over its little secrets, ignores the money and watches until it is out of sight and sound. Every action shows how much the ute meant to him." });
-H("infer", 1, "ri1h", { passage: P(`<p>At nine o'clock Zara's friends were still giggling over a board game, but Zara had gone quiet. She said she was just going to get a glass of water, and then stood for a long time in the dark kitchen, looking at the phone on the wall. Twice she picked it up. Twice she put it down again.</p><p>When she came back, she laughed at a joke a moment after everyone else did, and for the rest of the night she held her pillow tightly against her chest.</p>`),
-  stem: `<p>What is Zara most likely feeling?</p>`,
-  opts: [["Homesick, but not wanting to admit it", null],
-    ["Thirsty, so she goes for a drink of water", "the water is only her excuse: she spends the time looking at the phone"],
-    ["Left out because her friends won't let her play", "nobody leaves her out; she is the one who goes quiet"],
-    ["Bored, because she doesn't like board games", "laughing late shows her mind is elsewhere, not that she is bored by the game"]],
-  body: "She makes an excuse to leave, nearly phones home twice but stops herself, and clutches her pillow. She wants to go home but doesn't want the others to know." });
-H("infer", 2, "ri2a", { passage: P(`<p>Grandpa's workshop smelled of sawdust and oil. Every tool hung on the pegboard wall inside its own outline, drawn in black marker, so that a missing hammer left a hammer-shaped gap.</p><p>Only one outline had stood empty for as long as I could remember: the shape of a small saw. “Lent it to your father in 1998,” Grandpa said, every time I asked. “He'll bring it back one day.”</p><p>On my tenth birthday, Dad finally found the saw at the back of our garage. Grandpa hung it up without a word, but he whistled all afternoon.</p>`),
-  stem: `<p>Why does the writer describe the outlines drawn on the wall?</p>`,
-  opts: [["To show that Grandpa had too many tools to remember", "the outlines show exactly where each tool goes, the opposite of forgetting"],
-    ["To set up the gap that shows the saw is still missing", null],
-    ["To show that Grandpa was fussy and hard to please", "the outlines show he is orderly, but he is patient about the saw for years, not hard to please"],
-    ["To show that Grandpa enjoyed drawing far more than doing woodwork", "takes the drawing too literally"]],
-  body: "The outlines mean any missing tool leaves a gap you can see. That sets up the saw-shaped gap, which has been waiting for years, and makes its return feel special." });
-H("infer", 2, "ri2b", { passage: P(`<p>Tomasz arrived in the middle of term with a pencil case that still had its shop label on. At recess he stood beside the bubblers and read the notices on the wall, one after another, as if each one was very interesting.</p><p>On Thursday, Ms Ruiz asked who could help her carry some books, and his hand went up before she had finished the question. By Friday afternoon he was teaching three boys a card trick, and nobody remembered that he had ever stood alone by the bubblers.</p>`),
-  stem: `<p>Why does the writer say Tomasz read the notices “as if each one was very interesting”?</p>`,
-  opts: [["To show that he was a keen reader who loved learning", "takes it literally; the words “as if” suggest he wasn't really interested"],
-    ["To show that the notices at this school were unusually interesting ones", "again too literal: the point is about Tomasz, not the notices"],
-    ["To explain how Tomasz learned his card trick", "the card trick comes later and has nothing to do with the notices"],
-    ["To suggest he was pretending to be busy because he was alone", null]],
-  body: "“As if” tells us he only looked interested. Reading notice after notice alone at recess is something a new student does to look busy when he has no friends yet." });
-H("infer", 2, "ri2c", { passage: P(`<p>When Ms Adeyemi's class moved into the old building, every desk had a lid that lifted up. Inside Nikhil's, someone had scratched “R.T. 1974” into the wood, and underneath, in different handwriting, “J.T. 1999”.</p><p>At dinner, Nikhil wondered aloud who R.T. might have been, and whether J.T. had sat at the same desk. His father put down his fork.</p><p>“Robert Tan,” he said slowly. “My father. He went to that school.” He was quiet for a moment. “And J.T. is me.”</p>`),
-  stem: `<p>Why does the writer include the detail that Nikhil's father “put down his fork”?</p>`,
-  opts: [["To show that Nikhil's question has suddenly stopped him in surprise", null],
-    ["To show that he has finished his dinner", "takes the action literally; it marks a sudden pause"],
-    ["To show that he is about to tell Nikhil off for scratching the desk", "Nikhil didn't scratch it, and his father answers gently"],
-    ["To show that he doesn't want to talk about his school days", "he does talk about them, and tells Nikhil something important"]],
-  body: "Putting down the fork mid-meal shows the question has stopped him in his tracks: he has recognised the initials. The slow answer and the silence that follows show it moves him." });
-H("infer", 2, "ri2d", { passage: P(`<p>The lifeguard tower on North Beach is painted the same bright yellow as the lifeguards' shirts. Each morning, before the first swimmers arrive, the lifeguards push two red-and-yellow flags into the sand.</p><p>They move the flags several times a day. Visitors sometimes grumble about having to walk further along the beach to swim between them. But the flags are not put there at random. They mark the part of the beach where the lifeguards have checked the water for rips, the strong currents that can drag a swimmer out to sea, and where they can watch every swimmer at once.</p>`),
-  stem: `<p>Why does the writer mention that visitors “grumble”?</p>`,
-  opts: [["To show that the lifeguards are unfriendly to visitors", "the visitors grumble, not the lifeguards, and nothing unfriendly happens"],
-    ["To suggest that the flags are moved for no good reason", "the writer says the opposite: they are “not put there at random”"],
-    ["To set up the reason the flags are placed where they are", null],
-    ["To show that the beach is far too crowded for anyone to swim safely", "nothing in the passage mentions crowds"]],
-  body: "The writer raises the complaint (“Why walk further?”) and then answers it with “But …”: the flags mark the safe, watched water. The grumble is there so the explanation can follow." });
-H("infer", 2, "ri2e", { passage: P(`<p>The clock on the town hall stopped at twenty past four on the afternoon of the great flood, when brown water rose all the way to the hall's front steps.</p><p>The water went down after three days. The mud was scraped from the shops, and the council could easily have had the clock repaired. Instead, they left its hands exactly where they were. Every year on the anniversary, people gather on the steps beneath it with candles, and someone reads out the names of the streets that went under water.</p>`),
-  stem: `<p>Why did the council leave the clock's hands where they were?</p>`,
-  opts: [["Because the clock was too badly damaged to repair", "the passage says it could “easily” have been repaired"],
-    ["Because the council could not afford a repair", "the passage says it could “easily” have been fixed; money isn't mentioned"],
-    ["To show people exactly what time the yearly gathering starts", "the gathering is on the anniversary; nothing says it starts at twenty past four"],
-    ["So the clock would help the town remember the flood", null]],
-  body: "A clock frozen at the moment of the flood, with a yearly gathering beneath it, works as a memorial. The detail that it “could easily” have been fixed shows the choice was on purpose." });
-H("infer", 2, "ri2f", { passage: P(`<p>For eight months, Hamish dropped every coin he earned into a jar labelled GUITAR. He mowed lawns, washed Mrs Pike's car and once spent a whole Saturday pulling weeds for two dollars an hour.</p><p>When his little brother's bike was stolen from outside the shops, Hamish was quiet all through dinner. The next morning the jar on his shelf was empty, and in the garage stood a second-hand bike with a big red bow on the handlebars. The label on the jar had been carefully peeled off.</p>`),
-  stem: `<p>Why does the writer mention that Hamish once weeded “for two dollars an hour”?</p>`,
-  opts: [["To show that Mrs Pike did not pay him fairly", "the weeding wasn't for Mrs Pike, and the point isn't who paid"],
-    ["To suggest that Hamish was not very good at gardening jobs", "low pay doesn't mean he weeded badly"],
-    ["To show how hard he worked for the money he gave up", null],
-    ["To explain why guitars cost so much money", "the price of guitars is never mentioned"]],
-  body: "A whole Saturday for very little money shows how slowly and painfully the savings grew. That makes it mean more when he spends all of it on his brother's bike." });
-H("infer", 2, "ri2g", { passage: P(`<p>Each winter, humpback whales swim thousands of kilometres north from the icy waters of Antarctica to the warm seas off the coast of Queensland, where many of their calves are born.</p><p>For most of the journey the mothers eat almost nothing. They live off the thick layer of blubber they built up over summer. A newborn calf drinks large amounts of very rich milk and grows quickly, while its mother grows thinner. By the time they head south again in spring, the calf has built up a layer of blubber of its own for the cold Antarctic water.</p>`),
-  stem: `<p>Why does the writer mention that the mother “grows thinner”?</p>`,
-  opts: [["To suggest that she is sick after the long journey", "nothing suggests illness; thinning is the normal cost of feeding a calf"],
-    ["To show that she feeds her calf from her own body", null],
-    ["To show that humpback whales don't like eating in warm water", "the passage doesn't say why they don't eat; it says what they live on instead"],
-    ["To explain why the whales leave Antarctica in winter", "the thinning happens after they arrive, so it doesn't explain why they leave"]],
-  body: "The mother hardly eats, yet makes rich milk. Placing “grows thinner” right beside the calf growing quickly shows that the calf's growth comes from her blubber." });
-H("infer", 2, "ri2h", { passage: P(`<p>In the final of the 800 metres, Leila was in second place with one lap to go. Ahead of her, the girl in the lead clipped the edge of the track and fell hard.</p><p>Leila slowed. For a moment she seemed to look past the fallen runner to the finish line, where her whole class was shouting her name. Then she stopped, held out her hand and pulled the other girl to her feet. They crossed the line together, last and second-last.</p><p>Leila's coach, who had trained her all year for this race, was the first to start clapping.</p>`),
-  stem: `<p>Why does the writer say that Leila “seemed to look past the fallen runner to the finish line”?</p>`,
-  opts: [["To show that she was checking how far she still had left to run to finish", "too literal: the look is about a choice, not a distance"],
-    ["To show that she did not notice the girl had fallen", "she slows down because of the fall, so she did notice"],
-    ["To show that her class wanted her to stop and help", "her class was cheering her on to the finish, not asking her to stop"],
-    ["To show she was tempted to keep running before choosing to help", null]],
-  body: "The look towards the finish line, with her class shouting, shows the win she is giving up. That moment of temptation makes her choice to stop more powerful." });
-H("infer", 3, "ri3a", { passage: P(`<p>The puppy bulldozed through the flower bed.</p>`),
-  stem: `<p>What does the word “bulldozed” suggest about the puppy?</p>`,
-  opts: [["It ran in quickly but stepped neatly between the flowers.", "keeps the speed but misses the damage a bulldozer does"],
-    ["It was very strong and heavy for a puppy.", "takes the bulldozer too literally; the word is about how it moved through"],
-    ["It was trying to dig a hole to bury something in the garden.", "bulldozers push things flat; the word isn't about digging"],
-    ["It pushed through clumsily, flattening the flowers.", null]],
-  body: "A bulldozer pushes everything flat in its way. Using that word for a puppy makes us see it charging through and squashing the flowers." });
-H("infer", 3, "ri3b", { passage: P(`<p>“Of course you can borrow my new pencils,” said Lucy, pushing the tin towards Max with two fingers, as if it might bite.</p>`),
-  stem: `<p>What does “as if it might bite” suggest about Lucy?</p>`,
-  opts: [["She thinks the tin is dangerous.", "taken literally; the comparison is about her feelings"],
-    ["She doesn't really want to lend the pencils.", null],
-    ["She is proud of how new and shiny the pencils are.", "the pencils ARE new, but the comparison shows unwillingness, not pride"],
-    ["She is frightened of Max.", "she is reluctant about the pencils, not scared of Max"]],
-  body: "She says “of course”, but she pushes the tin away as little as possible, like something unpleasant. The comparison shows she is unwilling." });
-H("infer", 3, "ri3c", { passage: P(`<p>On wet afternoons the old library was a cave of whispers.</p>`),
-  stem: `<p>What does the writer suggest by calling the library “a cave of whispers”?</p>`,
-  opts: [["It was cold and damp because of the rain.", "uses the real detail (wet afternoons) but takes “cave” literally"],
-    ["People went there to tell secrets.", "whispering here is about keeping quiet, not secrets"],
-    ["It was dim, hushed and quiet.", null],
-    ["It was frightening to go into.", "caves can be scary, but nothing else suggests fear"]],
-  body: "A cave is dim and echoing; whispers are hushed. Together they paint a quiet, shadowy, peaceful room on a rainy day." });
-H("infer", 3, "ri3d", { passage: P(`<p>Dad looked at the blackened toast on his plate. “Lovely,” he said flatly.</p>`),
-  stem: `<p>What does the word “flatly” tell us?</p>`,
-  opts: [["He doesn't really think the toast is lovely.", null],
-    ["He thinks the toast is delicious, just the way he likes it.", "that is what the word “lovely” says, but “flatly” tells us he doesn't mean it"],
-    ["He is trying hard to sound cheerful.", "the opposite: a flat voice has no cheer in it at all"],
-    ["He is too tired to say much.", "he does speak; the word describes HOW, with no feeling"]],
-  body: "“Flatly” means with no feeling in the voice. Saying “lovely” flatly about burnt toast shows he means the opposite." });
-H("infer", 3, "ri3e", { passage: P(`<p>The old car coughed twice, shuddered and fell silent. Dad patted the steering wheel. “Come on, old girl,” he whispered. “Just one more trip.”</p>`),
-  stem: `<p>What do the words “Come on, old girl” suggest about Dad?</p>`,
-  opts: [["He is whispering so that he doesn't wake his passengers.", "takes the whisper literally: no passengers are mentioned, and he is speaking TO the car"],
-    ["He is fond of the car and treats it like a person.", null],
-    ["He is calling the car old because he is annoyed with it.", "“old girl” sounds like a complaint, but he pats the wheel and coaxes it gently"],
-    ["He is calm because he knows the car always starts in the end.", "“Just one more trip” is a plea: he isn't sure it will start at all"]],
-  body: "Patting the wheel and coaxing it in a whisper, Dad speaks to the car like an old friend. “Old girl” is a fond nickname, not a complaint." });
-H("infer", 3, "ri3f", { passage: P(`<p>All night the wind sharpened its teeth on the iron roof, and none of us slept.</p>`),
-  stem: `<p>What does “sharpened its teeth on the iron roof” suggest about the wind?</p>`,
-  opts: [["It had cut the roof so that its edges were sharp.", "takes the image literally"],
-    ["An animal was scratching about on the roof.", "teeth belong to animals, but here the words describe the wind"],
-    ["It was harsh and noisy, scraping at the roof.", null],
-    ["It was soft and soothing, helping everyone in the house to sleep.", "the opposite: “none of us slept”"]],
-  body: "The wind is pictured as a beast grinding its teeth: a harsh, scraping, frightening sound that kept everyone awake." });
-H("infer", 3, "ri3g", { passage: P(`<p>When the principal walked in, the noisy classroom wilted into silence.</p>`),
-  stem: `<p>What does the word “wilted” suggest about the class?</p>`,
-  opts: [["The students suddenly felt unwell.", "takes “wilted” too literally, as if the students were sick plants"],
-    ["The class's lively mood drooped as their nerve failed.", null],
-    ["The silence came instantly and all at once, like flicking a switch.", "wilting is a drooping, not a snap"],
-    ["The students grew hot and sleepy in the warm room.", "plants wilt in heat, but nothing here is about the temperature"]],
-  body: "A wilting plant droops and loses its life. The class's noise and energy sag the same way when the principal appears." });
-H("infer", 3, "ri3h", { passage: P(`<p>“What a lovely surprise,” said Mrs Vance, when she found the class's pet mice loose in the staffroom. Her smile did not reach her eyes.</p>`),
-  stem: `<p>What does “her smile did not reach her eyes” suggest?</p>`,
-  opts: [["She was only pretending to be pleased.", null],
-    ["She was pleased, but too surprised to show it fully.", "a real surprise would show in the eyes too; her words are polite cover"],
-    ["She was trying hard not to laugh at the mice.", "holding back a laugh would make the eyes smile, not stay cold"],
-    ["She was glad the lost mice had been found safely.", "this believes her words, but the cold eyes show she doesn't mean them"]],
-  body: "A real smile lights up the eyes as well as the mouth. Hers stayed on her mouth only, so “What a lovely surprise” is polite, not sincere." });
-H("infer", 4, "ri4a", { passage: P(`<p>My first day at drama club went like this. I arrived early, which was good. I sat in the director's chair, which was bad. I opened my folder and found my sister's maths homework instead of my script, which was worse.</p><p>The director, a tall woman with a pencil behind each ear, peered at me over her glasses. “Interesting choice,” she said. Twenty actors turned to look.</p><p>I read the maths homework aloud as my lines for the whole rehearsal. Nobody asked me to. Nobody asked me to stop, either. At the end the director said I had “a lot of nerve”, and I still don't know whether that was good.</p>`),
-  stem: `<p>What is the main effect of the way the writer lists what happened (“which was good … bad … worse”)?</p>`,
-  opts: [["It turns an embarrassing day into a funny story by building up each disaster.", null],
-    ["It shows that the writer was nervous all through the rehearsal.", "the day was awkward, but the calm, step-by-step telling is comic, not nervous"],
-    ["It shows that each problem was the writer's sister's fault.", "only one problem involves the sister's homework, and no one is blamed"],
-    ["It shows that the director was unkind and embarrassed him in front of all the other actors.", "her “interesting choice” is dry humour, and she lets him carry on"]],
-  body: "Each step is worse than the one before, and the writer tells it calmly: the pattern builds to a punchline. Read the whole passage: it is a comic memory, not a complaint." });
-H("infer", 4, "ri4b", { passage: P(`<p>The tall ones arrive while the sky is still grey. They bang their wooden tables open and tip out ice that slides and squeaks. I keep to my place on top of the stacked crates, where the boards are still warm from the lamp.</p><p>Soon the silver fish are laid out in rows, and the smell climbs up to me like a song. The tall one in the green apron pretends not to see me. Every morning he drops one small fish by the back wheel of his cart, and every morning he looks the other way while I take it. Neither of us has ever mentioned it.</p>`),
-  stem: `<p>Who is telling this?</p>`,
-  opts: [["A fish seller setting up a stall", "the fish seller is “the tall one in the green apron”, someone the narrator watches"],
-    ["A child visiting the market", "a child wouldn't call people “the tall ones” or sit on the crates waiting for a fish"],
-    ["A cat that lives at the market", null],
-    ["A bird watching from above", "the narrator sits on the crates and takes the fish from beside a cart wheel, on the ground"]],
-  body: "Put the clues together: people are “the tall ones”, the narrator sits on warm crates, loves the smell of fish and secretly takes one each day. Only a market cat fits all of them." });
-H("infer", 4, "ri4c", { passage: P(`<p>Aunt Rosa never threw anything away. A broken umbrella became a frame for her beans. Odd socks became puppets for the twins. When the kitchen clock stopped, she took it apart on a sheet of newspaper, laid every tiny wheel in order, and had it ticking again before dinner.</p><p>“Things aren't finished just because they're broken,” she said. The neighbours laughed at her garden of old bathtubs planted with herbs, until the summer the shops ran out of basil and half the street came knocking at her gate.</p>`),
-  stem: `<p>Which word best describes Aunt Rosa as she is shown in the whole passage?</p>`,
-  opts: [["Stubborn", "she keeps things, but the passage shows her cleverness in using them, not refusing to change"],
-    ["Resourceful", null],
-    ["Untidy", "the bathtub garden might look odd, but she lays the clock wheels out “in order”"],
-    ["Old-fashioned", "she uses old things, but the point is the clever new uses she finds for them"]],
-  body: "Every example shows her finding a clever new use for something broken, and in the end her neighbours need her. That is resourceful." });
-H("infer", 4, "ri4d", { passage: P(`<p>“Chess is boring,” I told Grandpa. He just set up the board.</p><p>For the first ten games I lost so quickly that I barely had time to sit down. Then Grandpa showed me how to protect my king with a wall of pawns and to wait, a little at a time, for him to make a mistake. In the eleventh game I trapped his queen. I could feel my heart thumping, as if it wanted to jump out and do a lap of the park.</p><p>We stayed at the park table until the light went orange. On the walk home Grandpa asked what I thought now.</p><p>“Chess is boring,” I said, grinning, and he laughed so hard he had to sit down on the kerb.</p>`),
-  stem: `<p>Why does the writer say “Chess is boring” again at the end?</p>`,
-  opts: [["Because the writer still thinks chess is boring", "the grin, the long afternoon and Grandpa's laughter show the opposite"],
-    ["To show the writer is embarrassed about losing the first ten games", "the early losses are real, but the writer is grinning, not embarrassed"],
-    ["To tease Grandpa because the writer won every game after that", "the writer trapped his queen once; nothing says every game was won"],
-    ["As a joke: by now the writer loves chess, and Grandpa knows it", null]],
-  body: "The same words mean the opposite at the end. The grin and Grandpa's laughter show it is a shared joke: the writer's mind has completely changed." });
-H("infer", 4, "ri4e", { passage: P(`<p>Every summer the small ones come and sit in my shade with their lunch boxes. They carve their names into my skin, which tickles, and every autumn I drop my leaves on them so that they shriek and throw them at one another.</p><p>Some of the small ones grow tall and stop coming. Years later a few come back with small ones of their own and point at the old names, which have stretched wider as I have grown.</p><p>Last spring a man with a clipboard tied a red ribbon around my middle and frowned up at my branches. The small ones have not stopped crying since.</p>`),
-  stem: `<p>What has most likely happened at the end of the passage?</p>`,
-  opts: [["The tree has won a prize for being the oldest in the school.", "a ribbon can mean a prize, but the frown and the crying don't fit"],
-    ["The children are crying because the leaves are falling on them.", "the leaves fall in autumn and make them shriek with fun, not cry"],
-    ["The tree is to be cut down, and the children are upset.", null],
-    ["The man is measuring the tree to see how much it has grown.", "he has a clipboard, but measuring wouldn't make the children cry"]],
-  body: "The narrator is a tree in a schoolyard (shade, carved names, falling leaves). A man frowning at it and tying on a ribbon, then children who can't stop crying, together suggest the tree is to be cut down." });
-H("infer", 4, "ri4f", { passage: P(`<p>Gran said the bus would come at eight. Eight o'clock came, and so did the rain. Gran said it would come at half past. Half past came, and so did a man selling umbrellas. Gran said it would surely come by nine. Nine o'clock came, and so did Grandad, in his old white car, with a thermos of hot chocolate and a look on his face that said he had heard all about this bus before.</p>`),
-  stem: `<p>What is the main effect of the pattern “Gran said … came, and so did …”?</p>`,
-  opts: [["It shows that Gran is always right about the bus.", "the opposite: every time she names a time, the bus doesn't come"],
-    ["It shows that the weather grew worse every half hour.", "the rain only arrives once; the other arrivals are a seller and Grandad"],
-    ["It builds a joke in which everything turns up except the bus.", null],
-    ["It shows that the narrator is frightened of waiting in the dark.", "nothing suggests fear; the tone is comic"]],
-  body: "Each round repeats the same shape and adds a new arrival that isn't the bus. The pattern builds to a punchline, and Grandad's look adds one more joke: this happens every time." });
-H("infer", 4, "ri4g", { passage: P(`<p>Uncle Theo arrived for Christmas with no presents and a suitcase full of jokes. He taught the twins to whistle with two fingers, which Mum did not thank him for. He burnt the pudding, set it alight anyway and called it “a special recipe”.</p><p>When the power went out on Boxing Day, it was Uncle Theo who found the candles, told ghost stories until even Grandpa jumped, and lay on the floor making shadow animals on the ceiling. He left on the twenty-seventh, as suddenly as he had come, and the house felt too quiet for a week.</p>`),
-  stem: `<p>Which word best describes Uncle Theo as he is shown in the whole passage?</p>`,
-  opts: [["Careless", "he burns the pudding, but the whole passage shows him making fun out of everything"],
-    ["Mean", "he brings no presents, but he gives everyone a great deal of fun"],
-    ["Brave", "he takes charge in the blackout, but nothing he does is dangerous"],
-    ["Fun-loving", null]],
-  body: "Jokes, whistling lessons, a flaming pudding, ghost stories and shadow animals: every example is about fun, and the quiet house after he leaves shows how much life he brought." });
-H("infer", 4, "ri4h", { passage: P(`<p>Imagine walking up a window and across the ceiling, upside down, without a drop of glue. Geckos do it every night.</p><p>The secret is on their toes, which are covered in millions of tiny hairs, each one splitting into even tinier tips. The tips get so close to a surface that a very weak pulling force acts between them. On its own, each pull is far too small to notice, but millions of them together are strong enough to hold up the gecko. To let go, the gecko simply peels its toes off, the way you would peel off a sticky label.</p>`),
-  stem: `<p>Why does the writer compare the gecko's toes to “a sticky label” at the end?</p>`,
-  opts: [["To help the reader picture how a gecko lets go of a surface", null],
-    ["To show that a gecko's feet are covered in glue", "the passage says “without a drop of glue”"],
-    ["To suggest that a gecko's toes are as flat and smooth as a label", "the toes are covered in millions of tiny hairs, so they are not smooth"],
-    ["To suggest that a gecko's grip, like a label's, works only once", "nothing says the grip wears out: geckos climb every night"]],
-  body: "The writer explains a hard idea with something familiar: just as a label comes away when peeled from one edge, the gecko peels its toes off rather than pulling straight away." });
 /* ---------- The right word ---------- */
 const GAP = s => `<p class="gapline">${s.replace("___", '<span class="blank">________</span>')}</p><p>Which word best fills the gap?</p>`;
 H("word", 1, "rw1a", { stem: GAP("The detective ___ every page of the diary, searching for even the smallest clue."),
@@ -2292,290 +2021,6 @@ H("word", 4, "rw4g", { stem: `<p class="gapline">Toby is always the first to vol
 H("word", 4, "rw4h", { stem: `<p class="gapline">The old letters had survived a house fire and a hundred years in a damp cellar. Nobody had read them for decades. When the museum finally received them, they were too <span class="blank">________</span> to be handled at all, so every page was photographed instead.</p><p>Which word best fills the gap?</p>`,
   opts: [["tattered", "tattered means ragged and torn at the edges; torn paper can still be handled with care"], ["weathered", "weathered means worn by time and weather, which fits their history but doesn't stop anyone touching them"], ["musty", "musty means smelling of damp, which fits the cellar, but a smell doesn't stop anyone handling paper"], ["brittle", null]],
   body: "All four words could describe old paper, so decide by the shade of meaning. “Too … to be handled at all” needs paper that would break if touched, and the first sentence explains why: fire dried it and damp weakened it. Paper so dry and hard that it snaps or crumbles is “brittle”." });
-/* ---------- Linking sentences ---------- */
-H("link", 1, "rl1a", { passage: P(`<p>Coral reefs are built by tiny animals called coral polyps. Each polyp builds a hard skeleton of limestone around its soft body. When it dies, the skeleton remains, and new polyps grow on top. Over thousands of years, the skeletons pile up into a reef.</p>`),
-  stem: `<p>In “When it dies”, what does “it” refer to?</p>`,
-  opts: [["The limestone skeleton", "this is the nearest noun, but the skeleton “remains”, so it isn't the thing that dies"], ["The coral reef", "the reef is still being built; it isn't what dies"], ["A coral polyp", null], ["The sea", "the sea isn't mentioned, and it can't die"]],
-  body: "Read on: “When it dies, the skeleton remains”. So “it” must be something living that HAS a skeleton: the polyp." });
-H("link", 1, "rl1b", { passage: P(`<p>Mum's old car and Dad's new one were both parked in the driveway. The former had a dent in one door and a faded sticker on the back window; the latter still smelled of the showroom.</p>`),
-  stem: `<p>What does “The former” refer to?</p>`,
-  opts: [["Dad's new car", "that is “the latter”: the second one mentioned"], ["Mum's old car", null], ["The driveway", "a driveway doesn't have doors or windows"], ["The door with the dent", "the dented door belongs to “the former”, so it can't be the former itself"]],
-  body: "“The former” means the first of two things just mentioned, and “the latter” means the second. Mum's old car came first." });
-H("link", 1, "rl1c", { passage: P(`<p>Some people believe that bats are blind. This is not true: bats can see, and many kinds also use echoes to find their way in the dark.</p>`),
-  stem: `<p>What does “This” refer to?</p>`,
-  opts: [["The fact that bats can see", "that is what the writer says IS true; “This” is what is not true"], ["Bats using echoes to find their way", "that comes after “This”, and the writer says it is true"], ["The people who believe it", "people can't be “not true”"], ["The idea that bats are blind", null]],
-  body: "“This is not true” points back to the belief in the sentence before: that bats are blind." });
-H("link", 1, "rl1d", { passage: P(`<p>Lena's grandmother taught her to sew, and her great-aunt taught her to knit. Years later, she still uses both skills every winter.</p>`),
-  stem: `<p>Who does “she” refer to?</p>`,
-  opts: [["Lena", null], ["Lena's great-aunt", "she is the nearest woman mentioned, but she only knew how to knit"], ["Lena's grandmother", "she taught sewing, not knitting"], ["Both of the older women", "“she” means one person, and only one person learned BOTH skills"]],
-  body: "“Both skills” is the clue: only Lena learned to sew AND to knit." });
-H("link", 1, "rl1e", { passage: P(`<p>Tom begged his parents to let him stay up to watch the eclipse. They said no at first, but when he promised to do his chores before dinner, they finally agreed to it.</p>`),
-  stem: `<p>In “they finally agreed to it”, what does “it” refer to?</p>`,
-  opts: [["Tom doing his chores before dinner", "the chores are the nearest idea, but they are Tom's promise, not what his parents agreed to"], ["The eclipse", "you can't agree to an eclipse"], ["Tom staying up late", null], ["Dinner", "dinner isn't something they were asked about"]],
-  body: "What did Tom ask for? To stay up for the eclipse. That is what his parents first refused and then agreed to." });
-H("link", 1, "rl1f", { passage: P(`<p>Emus, cassowaries and kiwis are all birds that cannot fly, but only the first two are found in the wild in Australia.</p>`),
-  stem: `<p>Which birds does “the first two” refer to?</p>`,
-  opts: [["Cassowaries and kiwis", "these are the LAST two in the list"], ["Emus and kiwis", "these are the first and the third"], ["All birds that cannot fly", "“the first two” picks out two birds from the list"], ["Emus and cassowaries", null]],
-  body: "Count along the list: emus (1), cassowaries (2), kiwis (3). The first two are emus and cassowaries; kiwis live in New Zealand." });
-H("link", 1, "rl1g", { passage: P(`<p>Our class wrote to the council asking for a pedestrian crossing outside the school. Three weeks later a reply arrived, together with a map of the street. It said that work would begin in the spring.</p>`),
-  stem: `<p>What does “It” refer to?</p>`,
-  opts: [["The map", "the map is the nearest noun, but a map shows places; it doesn't say when work will begin"], ["The reply", null], ["The crossing", "a crossing can't say anything"], ["The council", "the council sent the reply, but the thing that arrived and “said” this is the reply itself"]],
-  body: "Something that “said” work would begin must contain words: the reply to the class's letter." });
-H("link", 1, "rl1h", { passage: P(`<p>In 1969, hundreds of millions of people watched on television as astronauts walked on the Moon. Many of them still remember exactly where they were at that moment.</p>`),
-  stem: `<p>Who does “them” refer to?</p>`,
-  opts: [["The astronauts", "they are the nearest people, but they walked on the Moon; it is the viewers who remember where they were watching"], ["People today", "the sentence is about people who were alive in 1969"], ["The people who watched on television", null], ["The people who made the television show", "they aren't mentioned"]],
-  body: "“Many of them still remember where they were” only makes sense for the viewers at home, who were in many different places." });
-const NEXT = `<p>Which sentence would best come next?</p>`;
-H("link", 2, "rl2a", { passage: P(`<p>Camels are remarkably well suited to life in the desert. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["Camels were brought to Australia in the 1800s to carry goods across the outback.", "true and about camels, but it doesn't show how they suit the desert"],
-    ["Their broad, padded feet stop them sinking into soft sand.", null],
-    ["Deserts can be freezing at night, even when the days are hot.", "about deserts, not about camels"],
-    ["Some tourists ride camels along the beach at Broome.", "about camel rides, not about desert life"]],
-  body: "A general claim (camels suit the desert) should be followed by an example or a reason. Their feet are one." });
-H("link", 2, "rl2b", { passage: P(`<p>Not every invention is a success. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["The telephone was invented in the 1870s and changed the way the whole world talks.", "this is a famous success, the opposite of what the first sentence leads into"],
-    ["Inventors often fill notebooks with drawings and ideas.", "about inventors, not about inventions that failed"],
-    ["Many new gadgets are forgotten within a year because nobody buys them.", null],
-    ["Some inventions are thought up by children.", "about who invents, not about failure"]],
-  body: "“Not every invention is a success” leads into examples of failures: gadgets nobody buys." });
-H("link", 2, "rl2c", { passage: P(`<p>Our town's library is much more than a place to borrow books. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["Books can be borrowed for up to three weeks at a time.", "this is about borrowing books, the very thing the first sentence says it is MORE than"],
-    ["The library was built in 1952 and still has its original red tiled roof.", "history and looks, not what else it offers"],
-    ["Many people now prefer to buy their books online.", "about buying books, not about the library"],
-    ["It also runs homework clubs, lends out cake tins and shows films.", null]],
-  body: "“Much more than a place to borrow books” needs to be followed by the other things it offers." });
-H("link", 2, "rl2d", { passage: P(`<p>The school concert had to be moved to the following week. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["A storm had damaged the roof of the hall the night before.", null],
-    ["The concert will include songs from every class in the school.", "about the concert, but not why it was moved"],
-    ["Concerts are a good way for parents to see what students have learned.", "about concerts in general"],
-    ["Tickets will cost five dollars for adults.", "about tickets, not the change of date"]],
-  body: "After saying the concert was moved, the text should give the reason: storm damage to the hall." });
-H("link", 2, "rl2e", { passage: P(`<p>Ice is lighter than the same amount of liquid water. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["Water boils at 100 degrees Celsius at sea level.", "a true fact about water, but it doesn't follow on from ice being lighter"],
-    ["That is why ice cubes float in a drink.", null],
-    ["Ice-skating is a popular sport in cold countries.", "about ice, but not about it being lighter"],
-    ["Glaciers move very slowly down mountains.", "about ice, but it doesn't follow on"]],
-  body: "The first sentence gives a fact; the next gives its result. “That is why” points back to it: lighter things float." });
-H("link", 2, "rl2f", { passage: P(`<p>Grandpa is a man of very few words. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["He loves telling long stories about his years in the navy.", "the opposite: long stories don't fit a man of few words"],
-    ["He grew up on a dairy farm near Bega.", "about Grandpa, but not about how little he says"],
-    ["When I showed him my report, he just nodded and tapped one mark.", null],
-    ["Many grandparents enjoy spending lots of time with their grandchildren after school.", "about grandparents in general"]],
-  body: "A statement about someone's character is usually followed by an example. A nod and a tap, with no words, shows a man of few words." });
-H("link", 2, "rl2g", { passage: P(`<p>Some animals change colour with the seasons to match their surroundings. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["Colours can be warm, like red, or cool, like blue.", "about colours, not animals"],
-    ["Many small animals are hunted by bigger ones.", "it explains why hiding helps, but it isn't the example the sentence leads into"],
-    ["Red foxes were brought to Australia from England in the 1800s for hunting.", "shares the word “fox” with the right answer, but it doesn't follow on"],
-    ["The Arctic fox, for example, is white in winter and brown in summer.", null]],
-  body: "A general statement is followed by an example: “for example” and the Arctic fox's changing coat fit exactly." });
-H("link", 2, "rl2h", { passage: P(`<p>Finishing the jigsaw puzzle took far longer than we had planned. <span class="blank">________</span></p>`), stem: NEXT,
-  opts: [["Half the pieces were plain blue sky, all looking the same.", null],
-    ["Jigsaws are a good way to pass a rainy afternoon.", "about jigsaws in general, not why this one was slow"],
-    ["Jigsaw puzzles were first made in England more than two hundred years ago.", "history, not a reason"],
-    ["My sister prefers board games to puzzles.", "about the sister's taste, not the puzzle"]],
-  body: "After saying it took longer than planned, the next sentence should explain why: pieces that all look alike." });
-const SIG = `<p>Which word or phrase best fills the gap?</p>`;
-H("link", 3, "rl3a", { passage: P(`<p>The forecast promised sunshine all day. <span class="blank">________</span>, it rained all afternoon.</p>`), stem: SIG,
-  opts: [["Therefore", "“therefore” means “because of that”, but sunshine doesn't cause rain"], ["Also", "“also” adds a similar idea, but rain is the opposite of what was promised"], ["For example", "rain isn't an example of sunshine"], ["Instead", null]],
-  body: "The second sentence is the opposite of what was expected, so the link must show contrast: Instead." });
-H("link", 3, "rl3b", { passage: P(`<p>Kangaroos find it very hard to move backwards. <span class="blank">________</span>, they nearly always move forwards.</p>`), stem: SIG,
-  opts: [["However", "“however” signals a contrast, but the second idea follows from the first"], ["As a result", null], ["In contrast", "this would need two opposite ideas"], ["Even so", "“even so” means despite that, which doesn't fit"]],
-  body: "Moving forwards is a RESULT of finding backwards hard, so the link is “As a result”." });
-H("link", 3, "rl3c", { passage: P(`<p>Many people think owls are especially wise. <span class="blank">________</span> they are no cleverer than most other birds.</p>`), stem: SIG,
-  opts: [["Because", "“because” would introduce a reason for the first idea"], ["So", "“so” would show a result"], ["In fact,", null], ["For this reason,", "the second idea isn't caused by the first"]],
-  body: "The second sentence corrects a common belief. “In fact,” signals that correction." });
-H("link", 3, "rl3d", { passage: P(`<p>The cake sank in the middle and was burnt at the edges. <span class="blank">________</span> the whole family asked for a second slice.</p>`), stem: SIG,
-  opts: [["Even so,", null], ["As a result,", "a burnt, sunken cake wouldn't CAUSE people to want more"], ["For example,", "asking for more isn't an example of the cake sinking"], ["Instead,", "“instead” would need a replaced action"]],
-  body: "Despite the problems, they still wanted more: a contrast against expectations. “Even so” fits." });
-H("link", 3, "rl3e", { passage: P(`<p>The sunflower seeds were planted in poor, rocky soil. <span class="blank">________</span>, they grew into the tallest sunflowers in the street.</p>`), stem: SIG,
-  opts: [["Consequently", "“consequently” means “because of that”, but poor soil wouldn't CAUSE tall flowers"], ["Similarly", "“similarly” adds a matching idea, but the second idea is a surprise"], ["Nevertheless", null], ["For instance", "tall sunflowers aren't an example of poor soil"]],
-  body: "Poor soil would make you expect weak plants; instead they grew tallest. A surprising result despite the first idea needs “Nevertheless”." });
-H("link", 3, "rl3f", { passage: P(`<p>Lions usually hunt at night. <span class="blank">________</span>, cheetahs do most of their hunting during the day.</p>`), stem: SIG,
-  opts: [["Therefore", "“therefore” shows a result, but lions hunting at night doesn't cause cheetahs to hunt by day"], ["In contrast", null], ["For example", "cheetahs aren't an example of lions"], ["As a result", "this shows a result, which doesn't fit two separate facts"]],
-  body: "Two animals are being set against each other: night and day. The link must show contrast: “In contrast”." });
-H("link", 3, "rl3g", { passage: P(`<p>A fallen tree was blocking the main road. <span class="blank">________</span>, the bus had to take a much longer route.</p>`), stem: SIG,
-  opts: [["On the other hand", "this sets up a contrast, but the second idea follows from the first"], ["Nevertheless", "“nevertheless” means “despite that”, but the longer route happened BECAUSE of the tree"], ["In other words", "the second sentence doesn't say the same thing again"], ["Consequently", null]],
-  body: "The blocked road caused the longer route. A link that shows a result is needed: “Consequently”." });
-H("link", 3, "rl3h", { passage: P(`<p>Tasmanian devils look fierce and make terrifying screeches at night. <span class="blank">________</span>, they are shy animals that usually keep away from people.</p>`), stem: SIG,
-  opts: [["However", null], ["Therefore", "“therefore” shows a result, but looking fierce doesn't make them shy"], ["Furthermore", "“furthermore” adds a similar idea, but shy is the opposite of fierce"], ["Because of this", "their shyness isn't caused by how they look"]],
-  body: "Fierce looks, but shy behaviour: two ideas that pull against each other need a contrast word: “However”." });
-const FILL = `<p>Which sentence best fills the gap?</p>`;
-H("link", 4, "rl4a", { passage: P(`<p>The leafy sea dragon is a relative of the seahorse that lives off the southern coast of Australia. <span class="blank">________</span> These flaps are not used for swimming at all; they simply help it hide among the seaweed.</p>`), stem: FILL,
-  opts: [["Its body is covered in leaf-shaped flaps of skin.", null], ["It swims very slowly using tiny, almost see-through fins.", "on topic, but then “These flaps” would point to nothing"], ["Seahorses are also found in many other oceans.", "this leaves “These flaps” with nothing to refer to"], ["Divers travel from far away to see it.", "doesn't introduce any flaps"]],
-  body: "The sentence after the gap says “These flaps”, so the gap must introduce the flaps." });
-H("link", 4, "rl4b", { passage: P(`<p>Making paper by hand takes patience. First, old paper is torn into scraps and soaked overnight. <span class="blank">________</span> The pulp is then spread thinly on a screen and left to dry.</p>`), stem: FILL,
-  opts: [["Paper was first made in China about two thousand years ago, using tree bark and old rags.", "interesting, but it breaks the step-by-step order"], ["This makes it much stronger than paper from the shop.", "“This” has nothing sensible to point to, and the pulp still hasn't been made"], ["Next, the soggy scraps are mashed until they become a thick pulp.", null], ["Some people add flower petals for colour.", "it could fit somewhere, but “The pulp” after the gap still needs the pulp to be made first"]],
-  body: "“The pulp” after the gap must have been mentioned already, and the steps go in order (First … Next … then). Only one sentence makes the pulp." });
-H("link", 4, "rl4c", { passage: P(`<p>Some birds travel astonishing distances. <span class="blank">________</span> That is like flying to the Moon and back about three times.</p>`), stem: FILL,
-  opts: [["Many birds fly north or south when the weather turns cold, often travelling in large flocks.", "on topic, but “That” after the gap needs a distance to compare"], ["Over its lifetime, an Arctic tern may fly around two and a half million kilometres.", null], ["Terns are seabirds with sharp, pointed wings.", "no distance for “That” to point to"], ["Scientists track birds using tiny tags on their legs.", "no distance to compare with the Moon"]],
-  body: "“That is like flying to the Moon and back” needs a huge distance just before it." });
-H("link", 4, "rl4d", { passage: P(`<p>Long ago, sailors had no reliable way of telling the exact time at sea, which made it very hard to work out where they were. <span class="blank">________</span> His clocks kept good time even on a rolling ship.</p>`), stem: FILL,
-  opts: [["Ships today use satellites to find their position.", "on topic, but “His clocks” would have no “he” to refer to"], ["The sea can be very rough in winter.", "no person for “His” to point to"], ["This problem was finally solved by building bigger and faster ships with much taller sails.", "“This problem” fits, but bigger ships don't tell the time and there's still no “he”"], ["In the 1700s, a carpenter named John Harrison set out to solve the problem.", null]],
-  body: "“His clocks” needs a man to be named just before. Only one sentence introduces him." });
-H("link", 4, "rl4e", { passage: P(`<p>Saturn is the sixth planet from the Sun. <span class="blank">________</span> They are made of billions of pieces of ice and rock, some as small as grains of sand and others as big as houses.</p>`), stem: FILL,
-  opts: [["It is a giant planet made mostly of gas.", "on topic, but then “They” would have nothing to point to"],
-    ["Its many moons travel around it at different speeds.", "“They” could point to the moons, but moons are not as small as grains of sand"],
-    ["It is best known for its bright, wide rings.", null],
-    ["People have been studying it through telescopes for centuries.", "people aren't made of ice and rock"]],
-  body: "“They” after the gap needs something plural that is made of pieces of ice and rock, some tiny, some huge. Only Saturn's rings fit." });
-H("link", 4, "rl4f", { passage: P(`<p>Starting a compost heap is easy. First, lay down some twigs to let air in at the bottom. <span class="blank">________</span> Keep adding layers like this, and turn the whole heap with a garden fork every few weeks.</p>`), stem: FILL,
-  opts: [["Compost helps plants grow strong and healthy.", "on topic, but it breaks the step-by-step instructions"],
-    ["Next, add a layer of kitchen scraps.", null],
-    ["Turn the heap with a fork to let in more air.", "turning comes at the end, and “Keep adding layers like this” still needs a layer first"],
-    ["Soon worms will arrive to help break everything down.", "worms don't come before the heap has been built"]],
-  body: "The steps go in order (First … Next … Keep adding), and “layers like this” needs a layer to have been described just before it. Only the kitchen-scraps sentence does both." });
-H("link", 4, "rl4g", { passage: P(`<p>In 1928, a scientist named Alexander Fleming came back from a holiday to find mould growing on one of his dishes of germs. <span class="blank">________</span> This was the first step towards penicillin, a medicine that has since saved millions of lives.</p>`), stem: FILL,
-  opts: [["Fleming worked at a hospital in London.", "true, but working in London isn't a “first step” towards a medicine"],
-    ["Mould often grows on old bread and fruit.", "on topic, but mould on bread isn't the discovery that “This” points to"],
-    ["Penicillin is still given to patients by doctors all over the world today.", "it jumps ahead to penicillin before the discovery has been described"],
-    ["He saw that the germs near the mould had died.", null]],
-  body: "“This was the first step” needs a discovery just before it. Seeing that the mould killed the germs around it is that discovery." });
-H("link", 4, "rl4h", { passage: P(`<p>Ms Okoro's class wanted to raise money for a new school garden. <span class="blank">________</span> By the end of term they had sold more than three hundred of them, and the garden was paid for.</p>`), stem: FILL,
-  opts: [["So they made bookmarks from pressed flowers.", null],
-    ["A garden gives students a peaceful place to learn and relax outside in the fresh air.", "on topic, but “sold three hundred of them” would have nothing to point to"],
-    ["First, they asked the principal for permission.", "a sensible step, but you can't sell three hundred principals"],
-    ["Many parents offered to help dig the garden beds.", "“them” can't be the parents: nobody sells parents"]],
-  body: "“Sold more than three hundred of them” needs something to sell, mentioned just before. Only the bookmarks sentence gives one." });
-/* ---------- Same idea, different words ---------- */
-const MEANS = s => `<p>Which sentence means the same as:</p><p class="quote">“${s}”</p>`;
-H("same", 1, "rs1a", { stem: MEANS("The new rule was met with widespread disapproval."),
-  opts: [["The new rule was approved by many people.", "shares the word “approv(al)”, but “disapproval” is the opposite"],
-    ["The new rule was spread widely so that everyone knew it.", "shares “wide” and “spread”, but not the meaning"],
-    ["Many people did not like the new rule.", null],
-    ["A few people did not like the new rule.", "“widespread” means many people, not a few"]],
-  body: "Widespread = across many people; disapproval = not liking it. So many people disliked the rule." });
-H("same", 1, "rs1b", { stem: MEANS("Few of the guests stayed until the end of the party."),
-  opts: [["Most of the guests left before the party ended.", null],
-    ["A few guests left early, but most stayed until the end.", "“few” (without “a”) means hardly any stayed, the opposite"],
-    ["The party ended early because only a few guests came.", "shares “few”, but it is about how many came, not how many stayed"],
-    ["Not one of the guests stayed until the end of the party.", "too strong: “few” means some stayed, just not many"]],
-  body: "“Few stayed” means hardly any stayed, so most left before the end." });
-H("same", 1, "rs1c", { stem: MEANS("It was not until the rain stopped that the match could begin."),
-  opts: [["The match stopped as soon as the rain began.", "this swaps stopping and starting around"],
-    ["The match began even though it was still raining.", "the opposite: the match had to wait for the rain to stop"],
-    ["The match could begin only after the rain had stopped.", null],
-    ["The rain stopped because the match was about to begin.", "this turns the cause around"]],
-  body: "“Not until X … could Y” means Y had to wait for X: the match began only once the rain stopped." });
-H("same", 1, "rs1d", { stem: MEANS("Hardly had we sat down when the phone rang."),
-  opts: [["We could hardly sit down because the phone kept ringing.", "shares “hardly” and “sat down”, but not the meaning"],
-    ["We sat down a long time after the phone rang.", "the opposite order and timing"],
-    ["The phone rang, so we sat down to answer it.", "swaps the order and adds a reason"],
-    ["The phone rang almost as soon as we sat down.", null]],
-  body: "“Hardly had we … when …” means the second thing happened straight after the first." });
-H("same", 1, "rs1e", { stem: MEANS("Her explanation was anything but clear."),
-  opts: [["Her explanation was very confusing.", null],
-    ["Her explanation made everything clear.", "“anything but” means “not at all”, so this is the opposite"],
-    ["Her explanation was clearer than anything else.", "misreads “anything but” as a comparison"],
-    ["She could explain anything clearly.", "shares the words, but not the meaning"]],
-  body: "“Anything but clear” means not clear at all, so it was confusing." });
-H("same", 1, "rs1f", { stem: MEANS("The team's victory was by no means certain."),
-  opts: [["The team was certain to win by a large margin.", "“by no means” is the opposite of certain"],
-    ["It was far from sure that the team would win.", null],
-    ["The team won, but only by a few points.", "shares the word “by”, but it is about the score"],
-    ["There was no way at all that the team could win.", "too strong: not certain doesn't mean impossible"]],
-  body: "“By no means certain” means not at all sure: they might well lose, though they might also win." });
-H("same", 1, "rs1g", { stem: MEANS("Tom is no less talented than his older brother."),
-  opts: [["Tom is less talented than his older brother.", "this ignores the word “no”"],
-    ["Tom has no talent, unlike his older brother.", "misreads “no less” as “no talent”"],
-    ["Tom is at least as talented as his older brother.", null],
-    ["Tom's older brother is much more talented than he is.", "the opposite"]],
-  body: "“No less talented than” means not less: just as talented, or more." });
-H("same", 1, "rs1h", { stem: MEANS("The museum is seldom crowded on weekday mornings."),
-  opts: [["The museum is always crowded on weekday mornings.", "“seldom” means hardly ever, the opposite of always"],
-    ["The museum is closed on most weekday mornings.", "not crowded doesn't mean closed"],
-    ["The museum is crowded on weekday mornings, but not at weekends.", "this says the opposite about weekday mornings, and weekends aren't mentioned"],
-    ["On weekday mornings there are rarely many people at the museum.", null]],
-  body: "“Seldom” means rarely, so on weekday mornings the museum is hardly ever busy." });
-const SHOES = `<div class="extracts"><p><b>Extract A</b> When I was six I was given a pair of red sandals with a buckle shaped like a daisy. I refused to take them off, even in the bath, and in the end Mum gave up and let me wear them to bed for a week.</p>
-<p><b>Extract B</b> The oldest known leather shoe was found in a cave in Armenia in 2008. It is about 5500 years old and was stuffed with grass, perhaps to keep its shape, or perhaps to keep its owner's foot warm.</p>
-<p><b>Extract C</b> Schools should let students wear runners every day. Stiff black school shoes pinch and rub, and a child who is limping by lunchtime will not enjoy sport, or anything else.</p>
-<p><b>Extract D</b> The cobbler held the boot up to the window and frowned at the hole in its sole. “Walked a long way in this,” he said. The traveller only nodded, and counted his last few coins onto the counter.</p></div>`;
-const EX = ["Extract A", "Extract B", "Extract C", "Extract D"];
-const ext = (track, rung, id, passage, q, right, why, body) => H(track, rung, id, { passage, stem: `<p>${q}</p>`, opts: EX.map((x, i) => [x, i === right ? null : why[i]]), body });
-ext("same", 2, "rs2a", SHOES, "Which extract describes something being worn in places where you would not expect it?", 0,
-  ["", "the shoe was FOUND in a cave, not worn there", "runners at school is what the writer wants, and it isn't surprising", "the boot has been worn on a long walk, which is just what boots are for"],
-  "Sandals in the bath and in bed are not where anyone expects shoes to be worn.");
-ext("same", 2, "rs2b", SHOES, "Which extract suggests that someone has very little money left?", 3,
-  ["no money is mentioned", "no money is mentioned", "the writer talks about school shoes, not money", ""],
-  "Counting out his “last few coins” shows the traveller has almost no money left, though the word “poor” is never used.");
-ext("same", 2, "rs2c", SHOES, "Which extract admits that the reason for something is not known for certain?", 1,
-  ["Mum's reason for giving up is clear: the child refused", "", "the writer is sure about why runners are better", "the hole has an obvious cause: walking a long way"],
-  "“Perhaps … or perhaps …” shows nobody knows for sure why the shoe was stuffed with grass.");
-ext("same", 2, "rs2d", SHOES, "Which extract argues that a change would make people more comfortable?", 2,
-  ["the child chooses her own shoes; nothing is argued", "this gives facts about the past", "", "the traveller's boot needs mending, but nobody argues for a change"],
-  "Extract C argues for a change (runners every day) because school shoes “pinch and rub”: runners would be more comfortable.");
-const SAND = `<div class="extracts"><p><b>Extract A</b> Every summer, Dad and I build a sandcastle where the waves can reach it, and then we sit and wait. When I was little I used to cry when the sea knocked it down. Now, waiting for the first wave is my favourite part.</p>
-<p><b>Extract B</b> Not all sand is the same. The pale sand on many Australian beaches is mostly tiny grains of quartz, but some beaches in Hawaii are black, because their sand is made from volcanic rock.</p>
-<p><b>Extract C</b> To make a sand timer, pour dry sand into a small plastic bottle until it is a third full. Tape a second bottle to it, neck to neck, with a piece of card between them that has a small hole in the middle.</p>
-<p><b>Extract D</b> Cars should be banned from our beaches. Their tyres crush the eggs of shorebirds that nest in the sand, and families should not have to keep watch for four-wheel drives while their children play.</p></div>`;
-ext("same", 2, "rs2e", SAND, "Which extract explains why something is a particular colour?", 1,
-  ["the sandcastle's colour is never mentioned", "", "the instructions don't mention colour", "the extract is about cars and birds, not colour"],
-  "Extract B explains that some Hawaiian sand is black “because” it is made from volcanic rock.");
-ext("same", 2, "rs2f", SAND, "Which extract describes how the writer's feelings have changed?", 0,
-  ["", "this is all facts, with no feelings", "instructions, with no feelings", "the writer has strong feelings, but they don't change"],
-  "“I used to cry … Now, waiting for the first wave is my favourite part”: the writer's feelings have changed completely.");
-ext("same", 2, "rs2g", SAND, "Which extract is written so that the reader could follow it at home?", 2,
-  ["the sandcastle is described, but the reader isn't told how to build one", "it tells you what sand is made of; there is nothing to do", "", "it says what the government should do, not something a reader can follow"],
-  "Extract C is a set of instructions (pour, tape) for making a sand timer: something a reader can follow at home.");
-ext("same", 2, "rs2h", SAND, "Which extract mentions a danger to wildlife?", 3,
-  ["the waves knock down a sandcastle, not an animal", "no animals are mentioned", "no animals are mentioned", ""],
-  "Extract D says tyres “crush the eggs of shorebirds”.");
-const RAIN = `<div class="extracts"><p><b>Extract A</b> If you are caught outside in a thunderstorm, stay away from tall trees and open fields. Crouch down low, keep your feet together and wait until thirty minutes after the last thunder before you move on.</p>
-<p><b>Extract B</b> The rain arrived like a crowd of tiny drummers on the tin roof, and the dry garden seemed to sigh and stretch.</p>
-<p><b>Extract C</b> Rainy days are the best days of the year. Nothing beats a good book, a blanket and the sound of rain on the window, and anyone who says otherwise has simply never tried it.</p>
-<p><b>Extract D</b> Tully, in Queensland, is often called Australia's wettest town: it receives about four metres of rain in an average year, more than ten times as much as some towns in the dry centre of the country.</p></div>`;
-ext("same", 3, "rs3a", RAIN, "Which extract uses numbers to make a comparison?", 3,
-  ["“thirty minutes” is a number, but it's an instruction, not a comparison", "no numbers here", "no numbers here", ""], "Extract D compares Tully's rainfall with towns in the centre: “more than ten times as much”.");
-ext("same", 3, "rs3b", RAIN, "Which extract uses figurative language to describe a sound?", 1,
-  ["it describes what to do, plainly", "", "the sound of rain is mentioned, but plainly, with no comparison", "it uses facts, not figurative language"], "“Like a crowd of tiny drummers” compares the sound of rain to drumming: figurative language.");
-ext("same", 3, "rs3c", RAIN, "Which extract presents a personal opinion as if no one could disagree with it?", 2,
-  ["this is advice, not an opinion", "this describes a scene; it doesn't argue", "", "this states facts"], "“The best days of the year … anyone who says otherwise has simply never tried it” is an opinion stated as if it were beyond argument.");
-ext("same", 3, "rs3d", RAIN, "Which extract tells the reader what to do?", 0,
-  ["", "it describes; it gives no advice", "it says what the writer likes, not what the reader should do", "it gives facts"], "Extract A gives instructions: stay away, crouch down, keep your feet together, wait.");
-const MOON = `<div class="extracts"><p><b>Extract A</b> The moon hung over the paddock like a lantern someone had forgotten to take inside, and the sheep's shadows stretched long and blue across the grass.</p>
-<p><b>Extract B</b> The Moon is about 384 000 kilometres from Earth. If you could drive there at 100 kilometres an hour without ever stopping, the trip would take about 160 days.</p>
-<p><b>Extract C</b> Why do we spend billions of dollars sending rockets to the Moon when there are so many problems to fix here on Earth? Surely that money would do more good in our hospitals and schools.</p>
-<p><b>Extract D</b> Monday: half moon. Tuesday: a little fatter. Wednesday: cloudy, saw nothing. Thursday: nearly round. I'm drawing it every night for my science project, and Mum says bedtime is still eight o'clock, full moon or not.</p></div>`;
-ext("same", 3, "rs3e", MOON, "Which extract uses a comparison to describe how something looks?", 0,
-  ["", "it compares the Moon's distance with a car trip, which is about how far, not how it looks", "it compares spending on rockets with hospitals, not how anything looks", "the moon is described plainly (“a little fatter”), with no comparison"],
-  "“Like a lantern someone had forgotten to take inside” compares the moon's look to a lantern.");
-ext("same", 3, "rs3f", MOON, "Which extract uses a calculation to help the reader imagine a distance?", 1,
-  ["it describes long shadows, not a distance", "", "it mentions money, not distance", "it records the moon's shape, not its distance"],
-  "Extract B turns 384 000 km into a car trip: 384 000 ÷ 100 = 3840 hours, about 160 days. The calculation makes the distance easier to imagine.");
-ext("same", 3, "rs3g", MOON, "Which extract asks a question that it does not expect the reader to answer?", 2,
-  ["there is no question", "there is no question", "", "there is no question; it is a list of notes"],
-  "Extract C opens with “Why do we spend …?” and then gives its own answer. The question is there to make a point, not to be answered.");
-ext("same", 3, "rs3h", MOON, "Which extract records how something changes over several days?", 3,
-  ["it describes one night only", "it gives one fixed distance, not a change", "it argues about money, not changes", ""],
-  "Extract D is a diary of the moon's shape from Monday to Thursday.");
-const MOVE = `<div class="extracts"><p><b>Extract A</b> On my first day at the new school, a girl with a gap in her teeth handed me half her orange without saying a word. I never learned her name, but I remember the taste of that orange better than anything I was taught that week.</p>
-<p><b>Extract B</b> Grandad says that when his family arrived in the street in 1965, the neighbours watched from behind their curtains for a month before anyone said hello. “We were the most interesting thing in the street,” he jokes, “but not interesting enough to talk to.”</p>
-<p><b>Extract C</b> The flat was smaller than our old house, and from my bedroom I could see only the brick wall of the next building. I told myself I didn't mind, and stuck a poster of the sea over the glass.</p>
-<p><b>Extract D</b> My aunt moves house every two or three years for her job. “You learn to travel light,” she says, “and to leave a few boxes unpacked for as long as you can. Then saying goodbye isn't so hard.”</p></div>`;
-ext("same", 4, "rs4a", MOVE, "Which extract suggests that a small act of kindness can be remembered for a long time?", 0,
-  ["", "the neighbours were curious, not kind", "no one is kind to the writer here", "the aunt's advice isn't about kindness"], "A stranger's half an orange is a small kindness, and the writer still remembers it better than the lessons.");
-ext("same", 4, "rs4b", MOVE, "Which extract suggests that the writer was trying to hide a disappointment?", 2,
-  ["the writer is grateful, not disappointed", "this is about Grandad's family, told as a joke", "", "the aunt protects her feelings, but she isn't hiding a disappointment"], "“I told myself I didn't mind” and covering the window with a poster of the sea suggest the writer DID mind about the view.");
-ext("same", 4, "rs4c", MOVE, "Which extract suggests that people were curious about some new arrivals but kept their distance?", 1,
-  ["the girl comes up to the writer straight away", "", "no neighbours appear here", "the aunt is the one who keeps her distance, from places"], "Watching from behind curtains shows curiosity; taking a month to say hello shows they kept their distance.");
-ext("same", 4, "rs4d", MOVE, "Which extract suggests someone has found a way to protect herself from feeling sad?", 3,
-  ["this is about a happy memory", "Grandad jokes about it, but this isn't about protecting himself from sadness", "the writer covers the window, but the question is about a habit that makes goodbyes easier", ""], "The aunt leaves boxes unpacked so that “saying goodbye isn't so hard”: a way to protect herself from sadness.");
-const LOST = `<div class="extracts"><p><b>Extract A</b> For years after Grandpa died, Gran kept his reading glasses on the bedside table, folded, as if he might need them in the morning. She dusted carefully around them every Sunday.</p>
-<p><b>Extract B</b> When I lost my bus pass, I searched my bag four times, then my pockets, then my bag again. By the time I found it inside my lunch box, the bus had gone, and so had my temper.</p>
-<p><b>Extract C</b> The council's lost-property office holds more than two thousand umbrellas. “People will spend twenty minutes describing a watch,” says the manager, “but hardly anyone ever comes back for an umbrella.”</p>
-<p><b>Extract D</b> Mira told everyone that the bracelet didn't matter. It was only plastic, she said. But every afternoon that week she walked home the long way, past the park, with her eyes on the grass.</p></div>`;
-ext("same", 4, "rs4e", LOST, "Which extract suggests that someone has not let go of a person who has gone?", 0,
-  ["", "this is about a lost bus pass, not a person", "nobody here is missing a person", "Mira misses a bracelet, not a person"],
-  "Gran keeps Grandpa's glasses ready “as if he might need them in the morning” and dusts AROUND them for years: she hasn't let go of him.");
-ext("same", 4, "rs4f", LOST, "Which extract suggests that people don't bother much about cheap things they lose?", 2,
-  ["the glasses are kept for love, not because of their price", "the writer searches hard for the pass", "", "Mira says the bracelet was cheap, but she keeps searching for it"],
-  "Thousands of umbrellas are never collected, while people describe a watch at length: they don't bother with cheaper things.");
-ext("same", 4, "rs4g", LOST, "Which extract suggests that someone is pretending not to care about a loss?", 3,
-  ["Gran doesn't pretend: she openly keeps the glasses", "the writer openly loses their temper", "the people who leave umbrellas really don't care", ""],
-  "Mira SAYS the bracelet doesn't matter, but she searches the grass every afternoon. Her actions show she does care.");
-ext("same", 4, "rs4h", LOST, "Which extract suggests that someone ended up frustrated and cross?", 1,
-  ["Gran is quietly sad, not cross", "", "the manager sounds amused, not cross", "Mira is quietly searching, not cross"],
-  "“The bus had gone, and so had my temper”: the writer lost both the bus and their patience.");
 
 /* RIDGE RUNNER: finish the hand-written questions.
    Each step gets its own shuffle of answer letters, so no letter pattern repeats from step to step, while the
@@ -2631,6 +2076,20 @@ const PF = (() => {
     { name: "Silver Cliffs", sky: ["#8fb8de", "#dceaf6"], far: "#9aa9bd", mid: "#7586a0", top: "#d7e3ef", dirt: "#5f6f86", dirt2: "#526178", block: "#8a9bb5", deco: "pine" },
     { name: "Gold Forest", sky: ["#141b3a", "#2c3a6b"], far: "#22304f", mid: "#1b2a3a", top: "#3f8f4a", dirt: "#3b2f2a", dirt2: "#2f2521", block: "#6b5a3a", deco: "tree" },
     { name: "Storm Fortress", sky: ["#2a1840", "#5b3b7a"], far: "#3d2a57", mid: "#2b1d40", top: "#9a7fc4", dirt: "#3a3046", dirt2: "#2e2638", block: "#6d5a86", deco: "spire" }];
+  /* every big level is its own place, with its own look and its own hazard (David, Nov 2026: "the levels all look too samey … make them much
+     more different and challenging right from the start"). All drawn in code, our own. */
+  const BIOMES = {
+    canyon:  { name: "Dusty Canyon",   sky: ["#f6a86b", "#fbe0b8"], far: "#d98a55", mid: "#b65f36", top: "#e8a33d", dirt: "#9c5a32", dirt2: "#874a27", block: "#c97a3e", bg: "mesa",    pieces: ["boulders", "boulders", "crumble"], tip: "Boulders roll down at you: jump them!" },
+    ice:     { name: "Frozen Caves",   sky: ["#0f2a4a", "#3d7bb0"], far: "#2a5680", mid: "#1c3f63", top: "#dff4ff", dirt: "#4f7fa8", dirt2: "#44729a", block: "#9fd3f5", bg: "icecave", pieces: ["iceRun", "iceRun", "icicles"], ice: true, tip: "ICE! You slide. Icicles drop as you pass." },
+    jungle:  { name: "Vine Jungle",    sky: ["#0d3b2e", "#4f9a5a"], far: "#1f5c3a", mid: "#164a2e", top: "#6fcf4a", dirt: "#5a3d22", dirt2: "#4d331c", block: "#8a6a3a", bg: "jungle",  pieces: ["spring", "spring", "thorns", "swoop"], rain: true, tip: "Mushroom pads bounce you high. Thorns hurt!" },
+    foundry: { name: "Lava Foundry",   sky: ["#2a0f0a", "#7a2a12"], far: "#4a1f16", mid: "#33150f", top: "#ff8a3d", dirt: "#4a3b36", dirt2: "#3e312d", block: "#7a6a64", bg: "foundry", pieces: ["jets", "jets", "belts"], lava: true, tip: "Fire jets blast on and off. Mind the lava!" },
+    roofs:   { name: "Neon Rooftops",  sky: ["#0b0b2a", "#3b2a6b"], far: "#1c1a45", mid: "#141236", top: "#7af0ff", dirt: "#2e2f4f", dirt2: "#272844", block: "#5a5f9a", bg: "skyline", pieces: ["belts", "belts", "mover", "gapRun"], tip: "Conveyor belts push you: jump off in time." },
+    peaks:   { name: "Gale Peaks",     sky: ["#6fa8dc", "#e3f1ff"], far: "#a7bfd8", mid: "#7a93b3", top: "#ffffff", dirt: "#6b7d96", dirt2: "#5f7088", block: "#b8c8dc", bg: "peaks",   pieces: ["gapRun", "mover", "crumble"], wind: true, tip: "Wind gusts push you: watch for the arrows!" },
+    mine:    { name: "Lantern Mine",   sky: ["#120d08", "#2b1f14"], far: "#2a2016", mid: "#1e170f", top: "#c9a46a", dirt: "#4a3824", dirt2: "#3f301f", block: "#7a5a32", bg: "mine",    pieces: ["icicles", "crumble", "stones"], dark: true, tip: "It's DARK. Rocks fall from the roof!" },
+    storm:   { name: "Thunder Ridge",  sky: ["#1a1030", "#4b2f6b"], far: "#33224d", mid: "#24183a", top: "#b197fc", dirt: "#3a3046", dirt2: "#2e2638", block: "#6d5a86", bg: "storm",   pieces: ["gapRun", "stones", "mover"], bolts: true, tip: "Lightning hits the glowing mark: move!" } };
+  const BIOME_ORDER = [["canyon", "ice", "jungle", "foundry"], ["roofs", "peaks", "mine", "storm"], ["ice", "foundry", "canyon", "jungle"], ["mine", "storm", "peaks", "roofs"]];
+  const BOSS_BIOME = ["canyon", "peaks", "jungle", "storm"];
+  const biomeOf = L => BIOMES[L.biome || (L.boss ? BOSS_BIOME[L.world - 1] : BIOME_ORDER[L.world - 1][(L.k != null ? L.k : (L.seed >>> 3)) % 4])];
 
   /* ---------------- level generation (seeded) ---------------- */
   function rng(seed) { let a = seed >>> 0 || 1; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -2644,7 +2103,7 @@ const PF = (() => {
     /* the ground enemies, mixed from world 1: crawler bots, hopper bots and spiky rollers */
     const foe = (c) => { const k = r(), t = k < 0.4 ? "walker" : k < 0.7 ? "hopper" : "roller"; ents.push({ t, x: c * TS, y: gh * TS - 10, y0: gh * TS - 10 }); };
     const flat = (n, opt = {}) => { for (let i = 0; i < n; i++) ground(x + i, gh); if (opt.walker && n >= 5) foe(x + Math.floor(n / 2)); if (opt.coins) for (let i = 1; i < n - 1; i += 2) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 2) * TS + 4 }); x += n; };
-    const maxGap = 3, maxStep = w >= 3 ? 3 : 2, walkerP = 0.45 + 0.1 * w;
+    const maxGap = 3, maxStep = w >= 3 ? 3 : 2, walkerP = 0.6 + 0.08 * w, B = biomeOf(L);
     /* the trickier pieces (David, Nov 2026: the start "seems too basic … let's start with some challenge") */
     const reachCells = [];
     const piece = name => {
@@ -2666,7 +2125,30 @@ const PF = (() => {
         const n = int(3, 3 + (w >= 2 ? 1 : 0)); flat(1);
         for (let p = 0; p < n; p++) { for (let i = 0; i < 3; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } map[gh - 3][x + 1] = 2; ents.push({ t: p === n - 1 ? "ammo" : "coin", x: (x + 1) * TS + 4, y: (gh - 5) * TS }); x += 3; }
         flat(int(3, 4));
-      } else if (name === "tiers") {                /* a choice: the high road (blocks, bullets) or the low road (bots) */
+      } else if (name === "iceRun") {               /* a long sheet of ice ending at a gap: slide, then jump at the right moment */
+        flat(1); const n = int(6, 8 + w); for (let i = 0; i < n; i++) { ground(x + i, gh); map[gh][x + i] = 7; }
+        if (r() < 0.5) ents.push({ t: "icicle", x: (x + Math.floor(n / 2)) * TS + 4, y: Math.max(1, gh - 7) * TS, y0: Math.max(1, gh - 7) * TS });
+        x += n; const g = int(2, 3); for (let i = 0; i < g; i++) air(x + i); ents.push({ t: "coin", x: (x + 1) * TS + 4, y: (gh - 3) * TS }); x += g; flat(int(3, 4));
+      } else if (name === "icicles") {              /* things hang from the roof and drop when you pass under */
+        const n = int(7, 9); flat(n, { walker: r() < 0.4 });
+        for (let i = 0; i < 1 + (w >= 2 ? 1 : 0) + (r() < 0.5 ? 1 : 0); i++) { const c = x - n + 2 + i * 3; ents.push({ t: "icicle", x: c * TS + 4, y: Math.max(1, gh - 7) * TS, y0: Math.max(1, gh - 7) * TS, rock: B.dark }); }
+      } else if (name === "thorns") {               /* a thorn patch with a mushroom pad to bounce over it */
+        flat(1); map[gh][x] = 5; for (let y = gh + 1; y < ROWS; y++) map[y][x] = 1; for (let y = 0; y < gh; y++) map[y][x] = 0; x++;
+        const n = int(3, 4); for (let i = 0; i < n; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } ents.push({ t: "coin", x: (x + 1) * TS + 4, y: (gh - 6) * TS }); x += n; flat(int(3, 4));
+      } else if (name === "swoop") { flat(int(6, 8), { walker: true }); ents.push({ t: "swooper", x: (x - 3) * TS, y: (gh - 6) * TS, y0: (gh - 6) * TS, x0: (x - 3) * TS }); }
+      else if (name === "jets") {                   /* fire jets blast up through the floor, on and off */
+        flat(2); const n = 2 + (w >= 3 ? 1 : 0);
+        for (let i = 0; i < n; i++) { flat(1); ents.push({ t: "jet", x: x * TS, y: gh * TS, ph: i * 40 + int(0, 30) }); flat(2); }
+        flat(2);
+      } else if (name === "belts") {                /* a conveyor belt that carries you towards a gap or spikes */
+        flat(1); const n = int(6, 8), d = r() < 0.6 ? 1 : -1; for (let i = 0; i < n; i++) { ground(x + i, gh); map[gh][x + i] = d > 0 ? 9 : 8; }
+        x += n; if (d > 0) { const g = int(2, 3); for (let i = 0; i < g; i++) air(x + i); ents.push({ t: "coin", x: (x + 1) * TS + 4, y: (gh - 3) * TS }); x += g; }
+        else { ground(x, gh); map[gh - 1][x] = 3; x++; } flat(int(3, 4));
+      } else if (name === "gapRun") {               /* three gaps in a row with short landings */
+        for (let k = 0; k < 3; k++) { const g = int(2, maxGap); for (let i = 0; i < g; i++) air(x + i); ents.push({ t: "coin", x: (x + 1) * TS + 4, y: (gh - 3) * TS }); x += g; const h = Math.max(8, Math.min(14, gh + int(-1, 1))); gh = h; for (let i = 0; i < 2; i++) ground(x + i, gh); x += 2; }
+        flat(2);
+      } else if (name === "boulders") { flat(int(7, 9)); ents.push({ t: "boulder", x: (x - 1) * TS, y: (gh - 1) * TS - 2, x0: (x - 1) * TS, y0: (gh - 1) * TS - 2 }); }
+      else if (name === "tiers") {                /* a choice: the high road (blocks, bullets) or the low road (bots) */
         const x0 = x; flat(11, { walker: true });
         map[gh - 2][x0 + 1] = 2; for (let i = 3; i <= 9; i++) map[gh - 4][x0 + i] = 2;
         for (let i = 4; i <= 8; i += 2) ents.push({ t: i === 6 ? "ammo" : "coin", x: (x0 + i) * TS + 4, y: (gh - 6) * TS });
@@ -2676,7 +2158,7 @@ const PF = (() => {
     flat(6);
     ents.push({ t: "check", x: 2 * TS, y: gh * TS });
     /* the opening challenge: every stage starts with a moving platform and a crumbling bridge (boss runs too) */
-    piece("mover"); piece("crumble");
+    piece("mover"); piece("crumble"); piece(B.pieces[0]);          /* … and straight away, this place's own hazard */
     let chests = 0, sinceCheck = 0, nests = 0, wantNests = L.boss ? 0 : w <= 2 ? 2 : 3, sinceNest = 0;
     while (x < len - 14) {
       const k = r();
@@ -2719,9 +2201,10 @@ const PF = (() => {
         if (w >= 2 && r() < 0.6) ents.push({ t: "swooper", x: (x - 1) * TS, y: (gh - 6) * TS, y0: (gh - 6) * TS, x0: (x - 1) * TS });
       } else if (k < 0.66) { flat(int(6, 8), { walker: true, coins: true }); ents.push({ t: "ammo", x: (x - 4) * TS + 4, y: (gh - 3) * TS }); if (w >= 2) foe(x - 2);
         ents.push({ t: "ammo", high: true, x: (x - 6) * TS + 4, y: (gh - 6) * TS });             /* only a double jump reaches this one */ }
-      else if (k < 0.74) piece("mover");
-      else if (k < 0.81) piece("crumble");
-      else if (k < 0.88) piece("spring");
+      else if (k < 0.70) piece(B.pieces[int(0, B.pieces.length - 1)]);   /* this place's own hazards come often */
+      else if (k < 0.76) piece("mover");
+      else if (k < 0.82) piece("crumble");
+      else if (k < 0.88) piece(B.ice || B.lava ? B.pieces[0] : "spring");
       else if (k < 0.94) piece("stones");
       else piece("tiers");
       sinceCheck += 6; sinceNest += 6;
@@ -2744,15 +2227,17 @@ const PF = (() => {
     for (let y = 0; y < ROWS; y++) for (let c = 0; c < cols; c++) map[y][c] = map[y][c] || 0;
     /* hearts: one spare in the middle of longer levels */
     const mid = ents.filter(e => e.t === "check")[1]; if (mid) ents.push({ t: "heart", x: mid.x + 24, y: mid.y - 40 });
-    return { map, ents, cols, theme: THEMES[w - 1], world: w, reachCells };
+    if (B.dark) for (const e of ents.filter(e => e.t === "check" || e.t === "nest" || e.t === "chest")) ents.push({ t: "lantern", x: e.x + 8, y: e.y - 40 });
+    return { map, ents, cols, theme: B, biome: B, world: w, reachCells };
   }
-  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2 || t === 5 || (t === 6 && !(G.broken && G.broken[c + "," + r])) || (t === 4 && !G.open && !(G.gateOpen && G.gateOpen[c])); };
+  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2 || t === 5 || t === 7 || t === 8 || t === 9 || (t === 6 && !(G.broken && G.broken[c + "," + r])) || (t === 4 && !G.open && !(G.gateOpen && G.gateOpen[c])); };
   const spikeAt = (G, c, r) => c >= 0 && c < G.cols && r >= 0 && r < ROWS && G.map[r][c] === 3;
 
   /* one physics step for a body {x, y, vx, vy, ground} with input {dir, jump (held), jumpPressed} */
   function step(G, b, inp) {
-    const a = b.ground ? PH.acc : PH.air;
-    if (inp.dir) b.vx = Math.max(-PH.max, Math.min(PH.max, b.vx + inp.dir * a)); else { b.vx *= b.ground ? PH.fric : 0.92; if (Math.abs(b.vx) < 0.05) b.vx = 0; }
+    const ice = b.ground && b.under === 7, a = b.ground ? (ice ? 0.08 : PH.acc) : PH.air;
+    if (inp.dir) b.vx = Math.max(-PH.max, Math.min(PH.max, b.vx + inp.dir * a)); else { b.vx *= b.ground ? (ice ? 0.985 : PH.fric) : 0.92; if (Math.abs(b.vx) < 0.05) b.vx = 0; }
+    const belt = b.ground ? (b.under === 9 ? 0.9 : b.under === 8 ? -0.9 : 0) : 0;
     if (b.ground) b.coy = PH.coyote; else b.coy = Math.max(0, (b.coy || 0) - 1);
     if (inp.jumpPressed) b.buf = PH.buffer; else b.buf = Math.max(0, (b.buf || 0) - 1);
     if (b.buf > 0 && b.coy > 0) { b.vy = PH.jump; b.coy = 0; b.buf = 0; b.ground = false; b.jumped = true; }
@@ -2761,14 +2246,14 @@ const PF = (() => {
     if (b.vy >= 0) b.spring = false;
     b.vy = Math.min(PH.fall, b.vy + PH.grav);
     /* move x */
-    b.x += b.vx;
+    const dx = b.vx + belt + (b.push || 0); b.x += dx;
     const top = Math.floor(b.y / TS), bot = Math.floor((b.y + PH.h - 1) / TS);
-    if (b.vx > 0) { const c = Math.floor((b.x + PH.w - 1) / TS); for (let r = top; r <= bot; r++) if (solidAt(G, c, r)) { b.x = c * TS - PH.w; b.vx = 0; break; } }
-    else if (b.vx < 0) { const c = Math.floor(b.x / TS); for (let r = top; r <= bot; r++) if (solidAt(G, c, r)) { b.x = (c + 1) * TS; b.vx = 0; break; } }
+    if (dx > 0) { const c = Math.floor((b.x + PH.w - 1) / TS); for (let r = top; r <= bot; r++) if (solidAt(G, c, r)) { b.x = c * TS - PH.w; b.vx = 0; break; } }
+    else if (dx < 0) { const c = Math.floor(b.x / TS); for (let r = top; r <= bot; r++) if (solidAt(G, c, r)) { b.x = (c + 1) * TS; b.vx = 0; break; } }
     /* move y */
     b.y += b.vy; b.ground = false;
     const l = Math.floor(b.x / TS), rr = Math.floor((b.x + PH.w - 1) / TS);
-    if (b.vy > 0) { const r = Math.floor((b.y + PH.h) / TS); for (let c = l; c <= rr; c++) if (solidAt(G, c, r) && r < ROWS) { b.y = r * TS - PH.h; b.vy = 0; b.ground = true; b.usedDbl = false;
+    if (b.vy > 0) { const r = Math.floor((b.y + PH.h) / TS); for (let c = l; c <= rr; c++) if (solidAt(G, c, r) && r < ROWS) { b.y = r * TS - PH.h; b.vy = 0; b.ground = true; b.usedDbl = false; b.under = G.map[r][c];
       if (G.map[r][c] === 5) { b.vy = PH.spring; b.ground = false; b.spring = true; b.bounced = true; } break; } }
     else if (b.vy < 0) { const r = Math.floor(b.y / TS); for (let c = l; c <= rr; c++) if (solidAt(G, c, r)) { b.y = (r + 1) * TS; b.vy = 0; break; } }
     b.onSpike = false;
@@ -3154,6 +2639,8 @@ const PF = (() => {
     /* moving platforms: they move first, and carry the hero standing on them */
     for (const e of S.ents) if (e.t === "mover") { e.dx = e.v; e.x += e.v; if (e.x <= e.x0 || e.x >= e.x1) { e.x = Math.max(e.x0, Math.min(e.x1, e.x)); e.v = -e.v; } }
     if (P.onMover) P.x += P.onMover.dx;
+    hazardTick(P, G);
+    if (!S || S.over) return;
     const footY = P.y + PH.h;
     step(G, P, { dir, jump: KEYS.jump || KEYS.up, jumpPressed: jp });
     P.onMover = null;
@@ -3249,6 +2736,46 @@ const PF = (() => {
     S.cam = S.arena ? S.arena.L : Math.max(0, Math.min(G.cols * TS - VW, P.x - VW * 0.4));
   }
   const FOES = ["walker", "drone", "hopper", "roller", "swooper"];
+  /* each place's own hazards: fire jets, icicles and falling rocks, boulders, wind gusts and lightning */
+  function hazardTick(P, G) {
+    const B = G.biome, hit = (x, y, w, h) => P.x < x + w && P.x + PH.w > x && P.y < y + h && P.y + PH.h > y;
+    if (!S.tipBiome && S.t === 90) { S.tipBiome = true; msg(B.name.toUpperCase(), 220, "#ffffff"); msg(B.tip, 220, "#ffd43b"); }
+    for (const e of S.ents) {
+      if (!e.alive && e.alive !== undefined) continue;
+      if (e.t === "jet") {                                           /* 90 off (sputters for the last 30), then 50 of flame 3 tiles high */
+        const c = (S.t + e.ph) % 140; e.on = c >= 90; e.warn = c >= 60 && c < 90;
+        if (e.on && c === 90 && Math.abs(P.x - e.x) < 200) beep(110, .15, "sawtooth", .04);
+        if (e.on && hit(e.x + 2, e.y - 3 * TS, TS - 4, 3 * TS)) hurt("Scorched by a fire jet: wait for it to stop!");
+      } else if (e.t === "icicle") {                                 /* shakes when you come close, then drops */
+        if (!e.st) { if (Math.abs(P.x + 5 - e.x) < 34 && P.y > e.y) { e.st = 1; beep(900, .05, "square", .02); } }
+        else if (e.st < 30) e.st++;
+        else if (!e.done) { e.vy = (e.vy || 0) + 0.35; e.y += e.vy; const rr = Math.floor((e.y + 10) / TS);
+          if (hit(e.x - 3, e.y, 6, 12)) { hurt(e.rock ? "A rock fell on you!" : "An icicle fell on you!"); e.done = true; e.alive = false; burst(e.x, e.y + 8, e.rock ? "#8c6a4a" : "#dff4ff", 10); }
+          else if (solidAt(G, Math.floor(e.x / TS), rr) || e.y > ROWS * TS) { e.done = true; e.alive = false; burst(e.x, e.y + 8, e.rock ? "#8c6a4a" : "#dff4ff", 12); beep(e.rock ? 90 : 1200, .08, "triangle", .03); } }
+      } else if (e.t === "boulder") {                                /* rolls at you when you come near, then comes back again */
+        if (!e.roll) { if (P.x > e.x - 200 && P.x < e.x) { e.roll = true; e.vx = -1.6 - 0.2 * G.world; e.vy = 0; } }
+        else { e.vy += 0.3; e.x += e.vx; e.y += e.vy; e.spin = (e.spin || 0) + e.vx * 0.12;
+          const c = Math.floor((e.x + 7) / TS), rr = Math.floor((e.y + 14) / TS); if (e.vy > 0 && solidAt(G, c, rr)) { e.y = rr * TS - 14; e.vy = 0; }
+          if (solidAt(G, Math.floor(e.x / TS), Math.floor((e.y + 6) / TS)) || e.y > ROWS * TS || e.x < S.cam - 40) { e.roll = false; e.x = e.x0; e.y = e.y0; e.vx = 0; }
+          if (hit(e.x + 1, e.y + 1, 12, 12)) { hurt("Flattened by a boulder: jump it!"); e.roll = false; e.x = e.x0; e.y = e.y0; } }
+      }
+    }
+    /* wind gusts: a warning, then a push for about two seconds */
+    P.push = 0;
+    if (B.wind) {
+      S.gust = S.gust || { t: 220, dir: 1 }; const g = S.gust; g.t--;
+      if (g.t === 60) { g.dir = Math.random() < 0.5 ? -1 : 1; msg(g.dir > 0 ? "GUST →  brace!" : "←  GUST  brace!", 60, "#e7f5ff"); }
+      if (g.t <= 0 && g.t > -130) P.push = g.dir * (0.45 + 0.08 * G.world) * (P.ground ? 1 : 1.4);
+      if (g.t <= -130) g.t = 200 + Math.floor(Math.random() * 160);
+    }
+    /* lightning: a glowing mark on the ground, then a strike */
+    if (B.bolts) {
+      S.zap = S.zap || { t: 160 }; const z = S.zap; z.t--;
+      if (z.t === 70) { z.x = P.x + 5 + P.vx * 40 + (Math.random() - .5) * 40; z.y = groundBelow(z.x); }
+      if (z.t === 0) { S.zapF = 8; S.shake = 8; beep(70, .3, "sawtooth", .07); burst(z.x, z.y, "#e5dbff", 16); if (Math.abs(P.x + 5 - z.x) < 14 && P.y + PH.h > z.y - 40) hurt("Struck by lightning: move away from the glowing mark!"); }
+      if (z.t <= -12) z.t = 150 + Math.floor(Math.random() * 90) - 20 * G.world;
+    }
+  }
   /* ---------- the boss: a giant golem in an arena one screen wide (our own design, drawn in code) ----------
      Classic-platformer rules: learn its moves, dodge them, and hit it when it is open.
      Stomp → a shockwave runs along the floor both ways (jump it), then its chest core glows open for a moment.
@@ -3524,37 +3051,87 @@ const PF = (() => {
   function dropAmmo(e) { if (e.i % 2) return; const x = e.x + 3; S.ents.push({ t: "ammo", x, y: groundBelow(x) - 12, alive: true, i: S.ents.length, ph: 0 }); S.totalAmmo++; msg("It dropped a bullet!", 50, "#ffd43b"); }
   const groundBelow = x => { const c = Math.floor(x / TS); for (let r = 0; r < ROWS; r++) if (solidAt(S.G, c, r)) return r * TS; return ROWS * TS; };
 
-  /* ---------- surprise visitors (David, Nov 2026: "random stuff running across the screen rarely, like dogs or dinosaurs or an old man on a bike") ----------
-     Every 20 to 40 seconds or so, something runs across the far hills behind the level. Just for fun: it can't hurt you and you can't hit it. Our own drawings. */
-  const CRITTERS = { dog: { v: 2.3, says: ["Was that a dog?!", "Good boy! Where's he going?", "A dog on the run!"] }, dino: { v: 1.3, says: ["Was that a DINOSAUR?!", "A dinosaur! Nobody will believe this.", "Stomp, stomp, stomp…"] },
-    bike: { v: 1.0, says: ["An old man on a bike? Out here?", "Ding ding! Coming through!", "Grandpa's out for a ride!"] } };
-  const hillY = x => { const wx = x + S.cam * 0.45; return 190 + Math.round(18 * Math.sin(wx / 45) + 9 * Math.sin(wx / (45 * 0.37))); };
-  function spawnCritter(kind) {
+  /* ---------- surprise visitors (David, Nov 2026: "random stuff running across the screen rarely, like dogs or dinosaurs or an old man on a bike";
+     then: they "blend in with the ground … I also want you to die if they hit you") ----------
+     Every 20 to 40 seconds or so a warning flashes at the edge of the screen, then a dog, a dinosaur or an old man on a bike charges along
+     the level itself, bright and outlined. Jump over it: touching it knocks you out (a shield saves you once). Our own drawings. */
+  const CRITTERS = {
+    dog:  { v: 2.4, w: 22, h: 16, name: "DOG",       says: ["Out of the way of the dog!", "A runaway dog!"],          ko: "Bowled over by a runaway dog!" },
+    dino: { v: 1.5, w: 34, h: 26, name: "DINOSAUR",  says: ["Was that a DINOSAUR?!", "Stomp, stomp, stomp…"],          ko: "Squashed by a dinosaur!" },
+    bike: { v: 1.9, w: 30, h: 26, name: "BIKE",      says: ["Ding ding! Grandpa's coming through!", "Look out for the bike!"], ko: "Run over by Grandpa's bike!" } };
+  function spawnCritter(kind, dir) {
     kind = kind || ["dog", "dino", "bike"][Math.floor(Math.random() * 3)];
-    const dir = Math.random() < 0.5 ? 1 : -1;
-    S.critter = { k: kind, dir, x: dir > 0 ? -40 : VW + 40, t: 0 };
-    if (Math.random() < 0.6) msg(CRITTERS[kind].says[Math.floor(Math.random() * 3)], 90, "#fff3bf");
-    if (kind === "bike") beep(1568, .06, "triangle", .03), setTimeout(() => beep(1568, .08, "triangle", .03), 140);
+    dir = dir || (Math.random() < 0.7 ? -1 : 1);                          // most come at you from ahead; some from behind
+    S.critWarn = { k: kind, dir, t: 0 };
+    beep(880, .08, "square", .04); setTimeout(() => beep(880, .08, "square", .04), 160);
+  }
+  function landCritter(c) {                                              // start on solid ground near its x (step outwards past any pit)
+    const top = c2 => { for (let r = Math.max(0, Math.floor(S.P.y / TS) - 4); r < ROWS; r++) if (solidAt(S.G, c2, r)) return r; return -1; };
+    let col = Math.floor(c.x / TS);
+    for (let k = 0; k < 14 && top(col) < 0; k++) col -= c.dir;
+    c.x = col * TS + TS / 2; c.y = Math.max(0, top(col)) * TS;
   }
   function critterTick() {
     if (S.critT === undefined) S.critT = 700 + Math.floor(Math.random() * 900);
+    const w = S.critWarn;
+    if (w) {                                                               /* 1.2 s of warning, then it charges in from that edge */
+      if (++w.t >= 72) { const K = CRITTERS[w.k], c = { k: w.k, dir: w.dir, x: w.dir < 0 ? S.cam + VW + K.w : S.cam - K.w, y: 0, vy: 0, t: 0, hit: false };
+        landCritter(c); S.critter = c; S.critWarn = null; const say = K.says[Math.floor(Math.random() * K.says.length)]; msg(say, 80, "#ffd43b");
+        if (c.k === "bike") { beep(1568, .06, "triangle", .04); setTimeout(() => beep(1568, .08, "triangle", .04), 140); } else beep(c.k === "dino" ? 90 : 300, .2, "sawtooth", .05); }
+      return;
+    }
     const c = S.critter;
-    if (c) { c.t++; c.x += c.dir * CRITTERS[c.k].v; if (c.x < -60 || c.x > VW + 60) S.critter = null; return; }
+    if (c) {
+      const K = CRITTERS[c.k]; c.t++;
+      c.x += c.dir * K.v; c.vy = Math.min(7, c.vy + 0.4); c.y += c.vy;
+      const col = Math.floor(c.x / TS), row = Math.floor(c.y / TS);
+      if (c.vy >= 0 && solidAt(S.G, col, row) && !solidAt(S.G, col, row - 1)) { c.y = row * TS; c.vy = 0; c.ground = true; } else c.ground = false;
+      const ahead = Math.floor((c.x + c.dir * (K.w / 2 + 2)) / TS);
+      if (c.ground && solidAt(S.G, ahead, Math.floor((c.y - 6) / TS))) c.vy = -6.5;   // hop up a step
+      else if (c.ground && ![0, 1, 2, 3].some(d => solidAt(S.G, ahead, row + d))) c.vy = -6.8;   // leap a pit
+      if (c.ground && c.t % 90 === 45 && c.k === "dino") S.shake = Math.max(S.shake, 3);
+      if (c.y > VH + 60 || c.x < S.cam - 120 || c.x > S.cam + VW + 120) { S.critter = null; return; }
+      /* touching it knocks you out; jumping over it is the way past */
+      const P = S.P;
+      if (!c.hit && !S.over && P.x < c.x + K.w / 2 && P.x + PH.w > c.x - K.w / 2 && P.y < c.y && P.y + PH.h > c.y - K.h) {
+        c.hit = true;
+        if (S.invincible || P.inv > 0) return;
+        if (S.shield) { S.shield = 0; P.inv = 90; P.vy = -4; msg("Shield saved you from the " + K.name.toLowerCase() + "!", 90, "#9fe7ff"); beep(600, .1, "triangle"); return; }
+        S.lost += S.hearts; S.hearts = 0; S.shake = 14; burst(P.x + 5, P.y + 6, "#ff6b6b", 20); beep(120, .4, "sawtooth", .07); msg(K.ko, 120, "#ffb3b3"); end(false);
+      }
+      return;
+    }
     if (window.__noCritter) return;
     if (--S.critT <= 0) { spawnCritter(); S.critT = 1200 + Math.floor(Math.random() * 1200); }
   }
-  function drawCritter(ctx, c) {
+  /* the picture is drawn into a small canvas first, so it can get a thick black outline and stand out from the ground */
+  let critCv = null, critMask = null;
+  function drawCritter(ctx, c, ox) {
+    if (!critCv) { critCv = document.createElement("canvas"); critCv.width = 120; critCv.height = 90; critMask = document.createElement("canvas"); critMask.width = 120; critMask.height = 90; }
+    const x = critCv.getContext("2d"); x.clearRect(0, 0, 120, 90); x.save(); x.translate(60, 84); x.scale(c.dir * 1.5, 1.5);
+    drawCritterBody(x, c); x.restore();
+    const m = critMask.getContext("2d"); m.clearRect(0, 0, 120, 90); m.globalCompositeOperation = "source-over"; m.drawImage(critCv, 0, 0); m.globalCompositeOperation = "source-in"; m.fillStyle = "#000"; m.fillRect(0, 0, 120, 90);
+    const X = Math.round(c.x) + ox - 60, Y = Math.round(c.y) - 84;
+    for (const [dx, dy] of [[-2, 0], [2, 0], [0, -2], [0, 2], [-1, -1], [1, 1], [-1, 1], [1, -1]]) ctx.drawImage(critMask, X + dx, Y + dy);
+    ctx.drawImage(critCv, X, Y);
+  }
+  function drawCritterWarn(ctx) {
+    const w = S.critWarn; if (!w || S.t % 16 < 6) return;
+    const K = CRITTERS[w.k], right = w.dir < 0, x = right ? VW - 70 : 70;
+    ctx.fillStyle = "rgba(201,42,42,.9)"; ctx.fillRect(x - 62, 108, 124, 30); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x - 60, 110, 120, 26);
+    txt(ctx, `${right ? "" : "◀ "}${K.name}!${right ? " ▶" : ""}`, x, 122, 11, "#1b1b2f"); txt(ctx, "JUMP IT!", x, 133, 8, "#c92a2a");
+  }
+  function drawCritterBody(ctx, c) {
     const R = (x, y, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(x, y, w, h); };
-    const base = hillY(c.x), step = Math.floor(c.t / 6) % 2;
-    ctx.save(); ctx.translate(Math.round(c.x), base); ctx.scale(c.dir * 1.5, 1.5);
+    const step = Math.floor(c.t / 5) % 2;
     if (c.k === "dog") {          /* a scruffy brown dog, ears flapping */
       const hop = step ? -1 : 0;
-      R(-9, -9 + hop, 16, 6, "#1b1b2f"); R(-8, -8 + hop, 14, 4, "#a0682f");                        // body
-      R(5, -13 + hop, 7, 6, "#1b1b2f"); R(6, -12 + hop, 5, 4, "#a0682f"); R(11, -10 + hop, 2, 2, "#1b1b2f");   // head and nose
-      R(6, -14 + hop - step, 2, 3, "#5a3a1a"); R(8, -11 + hop, 1, 1, "#fff");                      // ear, eye
-      R(-11, -10 + hop - (step ? 2 : 0), 3, 2, "#a0682f");                                       // wagging tail
+      R(-9, -9 + hop, 16, 6, "#1b1b2f"); R(-8, -8 + hop, 14, 4, "#f8f9fa");                        // body
+      R(5, -13 + hop, 7, 6, "#1b1b2f"); R(6, -12 + hop, 5, 4, "#f8f9fa"); R(11, -10 + hop, 2, 2, "#1b1b2f");   // head and nose
+      R(6, -14 + hop - step, 2, 3, "#8c5a2b"); R(8, -11 + hop, 1, 1, "#fff");                      // ear, eye
+      R(-11, -10 + hop - (step ? 2 : 0), 3, 2, "#f8f9fa");                                       // wagging tail
       const L = step ? [[-7, 2], [4, -1]] : [[-6, -1], [3, 2]];
-      for (const [lx, d] of L) { R(lx, -4 + hop, 2, 4 + d, "#5a3a1a"); R(lx + 3, -4 + hop, 2, 4 - d, "#5a3a1a"); }
+      for (const [lx, d] of L) { R(lx, -4 + hop, 2, 4 + d, "#8c5a2b"); R(lx + 3, -4 + hop, 2, 4 - d, "#8c5a2b"); }
     } else if (c.k === "dino") {  /* a long-necked green dinosaur, plodding */
       const bob = step;
       R(-18, -16 + bob, 26, 10, "#1b1b2f"); R(-17, -15 + bob, 24, 8, "#5fae4f"); R(-14, -15 + bob, 18, 3, "#7fcf6a");          // body
@@ -3576,7 +3153,74 @@ const PF = (() => {
       const pd = step ? [[-1, -12], [2, -8]] : [[2, -12], [-1, -8]];
       R(-1, -18 + wob, 2, 4, "#495057"); R(pd[0][0], pd[0][1], 2, 4, "#495057"); R(pd[1][0], pd[1][1], 2, 3, "#495057");    // legs pedalling
     }
-    ctx.restore();
+  }
+
+  /* ---------- each place's backdrop (parallax) ---------- */
+  function drawBG(ctx, G, th) {
+    const B = G.biome, cam = S.cam, R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+    const g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
+    const loop = (par, span, fn) => { const off = (cam * par) % span; for (let x = -off - span; x < VW + span; x += span) fn(x, Math.floor((cam * par + x + off) / span)); };
+    const hills = (col, par, h, amp, f) => { ctx.fillStyle = col; for (let x = 0; x < VW; x += 4) { const wx = x + cam * par; const y = h + Math.round(amp * Math.sin(wx / f) + amp * 0.5 * Math.sin(wx / (f * 0.37))); ctx.fillRect(x, y, 4, VH - y); } };
+    const hsh = i => { let h = (i * 2654435761) >>> 0; return (h % 1000) / 1000; };
+    switch (B.bg) {
+      case "mesa":                                     /* flat-topped mesas and cacti under a hot sun */
+        R(380, 40, 26, 26, "#fff3bf"); R(384, 44, 18, 18, "#ffe066");
+        loop(0.15, 150, (x, i) => { const w = 70 + hsh(i) * 50, h = 50 + hsh(i + 7) * 50; R(x, 190 - h, w, h + 80, th.far); R(x - 6, 190 - h, w + 12, 6, "#e8a070"); });
+        loop(0.4, 110, (x, i) => { const h = 18 + hsh(i) * 14; R(x, 210 - h, 6, h + 60, th.mid); if (hsh(i + 3) > 0.4) { R(x - 6, 200 - h + 6, 6, 3, th.mid); R(x - 6, 200 - h, 3, 8, th.mid); R(x + 6, 200 - h + 10, 6, 3, th.mid); R(x + 9, 200 - h + 4, 3, 9, th.mid); } });
+        hills(th.mid, 0.45, 215, 10, 50); break;
+      case "icecave":                                  /* a cave of blue ice: crystals below, teeth of ice above */
+        loop(0.2, 60, (x, i) => { const h = 40 + hsh(i) * 60; ctx.fillStyle = th.far; ctx.beginPath(); ctx.moveTo(x, VH); ctx.lineTo(x + 18, VH - h - 60); ctx.lineTo(x + 36, VH); ctx.fill(); });
+        loop(0.35, 46, (x, i) => { const h = 20 + hsh(i) * 40; ctx.fillStyle = "#cfe9ff"; ctx.globalAlpha = .35; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 12, h); ctx.lineTo(x + 24, 0); ctx.fill(); ctx.globalAlpha = 1; });
+        R(0, 0, VW, 10, th.mid); hills(th.mid, 0.45, 205, 14, 40);
+        for (let i = 0; i < 14; i++) { const t2 = (S.t * 0.3 + i * 40) % VH; R((i * 73 + cam * 0.1) % VW, t2, 1, 1, "#e7f5ff"); } break;
+      case "jungle":                                   /* huge trees, hanging vines and a dark canopy */
+        loop(0.2, 90, (x, i) => { R(x + 30, 40, 22, VH, th.far); ctx.fillStyle = th.far; ctx.beginPath(); ctx.arc(x + 41, 50, 46 + hsh(i) * 14, 0, 7); ctx.fill(); });
+        loop(0.45, 70, (x, i) => { R(x + 10, 0, 2, 40 + hsh(i) * 70, "#2b8a3e"); R(x + 8, 40 + hsh(i) * 70, 6, 4, "#40c057"); });
+        R(0, 0, VW, 18, "#0b2a1e"); hills(th.mid, 0.45, 200, 16, 30); break;
+      case "foundry":                                  /* smokestacks, glowing furnaces and drifting smoke */
+        ctx.fillStyle = "rgba(255,120,40,.35)"; ctx.fillRect(0, 170, VW, 100);
+        loop(0.2, 120, (x, i) => { const h = 90 + hsh(i) * 70; R(x, VH - h, 24, h, th.far); R(x - 3, VH - h, 30, 6, "#5a2a1e"); const sm = (S.t * 0.4 + i * 30) % 60; ctx.fillStyle = "rgba(90,70,70,.5)"; ctx.beginPath(); ctx.arc(x + 12 + sm * 0.3, VH - h - sm, 6 + sm / 6, 0, 7); ctx.fill(); });
+        loop(0.45, 80, (x, i) => { R(x, 180, 50, 90, th.mid); R(x + 16, 200, 18, 12, hsh(i) > 0.5 ? "#ff922b" : "#c92a2a"); }); break;
+      case "skyline":                                  /* a city at night: lit windows and a big moon */
+        R(70, 30, 30, 30, "#fff9db"); R(78, 34, 6, 6, "#f1e7b0");
+        for (let i = 0; i < 40; i++) R((i * 97 + 13) % VW, (i * 53) % 110, 1, 1, "#fff");
+        loop(0.2, 60, (x, i) => { const h = 70 + hsh(i) * 90, w = 44; R(x, VH - h, w, h, th.far); for (let yy = VH - h + 8; yy < VH - 10; yy += 12) for (let xx = x + 6; xx < x + w - 6; xx += 10) if (hsh(i * 31 + yy + xx) > 0.55) R(xx, yy, 4, 5, "#ffe066"); });
+        loop(0.45, 50, (x, i) => { const h = 40 + hsh(i + 9) * 40; R(x, VH - h, 40, h, th.mid); R(x + 18, VH - h - 12, 2, 12, "#7af0ff"); if (S.t % 40 < 20) R(x + 17, VH - h - 14, 4, 3, "#ff6b6b"); }); break;
+      case "peaks":                                    /* sharp snowy peaks and fast clouds */
+        loop(0.15, 130, (x, i) => { const h = 100 + hsh(i) * 60; ctx.fillStyle = th.far; ctx.beginPath(); ctx.moveTo(x - 20, VH); ctx.lineTo(x + 65, VH - h - 40); ctx.lineTo(x + 150, VH); ctx.fill(); ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.moveTo(x + 50, VH - h - 18); ctx.lineTo(x + 65, VH - h - 40); ctx.lineTo(x + 80, VH - h - 18); ctx.fill(); });
+        for (let i = 0; i < 6; i++) { const cx = ((i * 140 - S.t * (0.6 + i * 0.1) * (S.gust && S.gust.t <= 0 ? S.gust.dir * 4 : 1)) % (VW + 120) + VW + 120) % (VW + 120) - 60; R(cx, 30 + i * 18, 50, 10, "rgba(255,255,255,.8)"); R(cx + 10, 24 + i * 18, 26, 8, "rgba(255,255,255,.8)"); }
+        hills(th.mid, 0.45, 205, 18, 40); break;
+      case "mine":                                     /* rock walls and wooden supports */
+        R(0, 0, VW, VH, th.far);
+        loop(0.3, 40, (x, i) => { for (let y = 0; y < VH; y += 24) R(x + hsh(i + y) * 20, y + hsh(i * 3 + y) * 10, 10, 6, th.mid); });
+        loop(0.6, 140, (x) => { R(x, 40, 8, VH, "#5a3d22"); R(x + 70, 40, 8, VH, "#5a3d22"); R(x - 4, 36, 86, 8, "#6b4a2a"); }); break;
+      case "storm":                                    /* dark spires and rolling thunderclouds */
+        loop(0.2, 100, (x, i) => { const h = 80 + hsh(i) * 80; R(x + 20, VH - h, 18, h, th.far); ctx.fillStyle = th.far; ctx.beginPath(); ctx.moveTo(x + 16, VH - h); ctx.lineTo(x + 29, VH - h - 24); ctx.lineTo(x + 42, VH - h); ctx.fill(); if (S.t % 50 < 25) R(x + 27, VH - h - 8, 4, 4, "#e599f7"); });
+        for (let i = 0; i < 8; i++) { const cx = ((i * 90 - S.t * 0.3) % (VW + 100) + VW + 100) % (VW + 100) - 50; ctx.fillStyle = "rgba(20,10,40,.7)"; ctx.beginPath(); ctx.arc(cx, 20 + (i % 3) * 10, 30, 0, 7); ctx.fill(); }
+        if (S.t % 240 < 4) { ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0, 0, VW, VH); }
+        hills(th.mid, 0.45, 205, 18, 45); break;
+      default: hills(th.far, 0.2, 150, 26, 70); hills(th.mid, 0.45, 190, 18, 45);
+    }
+  }
+  /* rain, wind, lightning marks and the dark of the mine, drawn over the level */
+  function drawWeather(ctx, G, ox) {
+    const B = G.biome, P = S.P;
+    if (B.rain) { ctx.strokeStyle = "rgba(200,230,255,.45)"; ctx.lineWidth = 1; ctx.beginPath(); for (let i = 0; i < 60; i++) { const x = (i * 53 + S.t * 3) % (VW + 40) - 20, y = (i * 37 + S.t * 7) % VH; ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 8); } ctx.stroke(); }
+    if (B.wind && S.gust) { const g = S.gust;
+      if (g.t <= 60 && g.t > 0 && S.t % 10 < 6) txt(ctx, g.dir > 0 ? "→ → →" : "← ← ←", VW / 2, 84, 16, "#e7f5ff");
+      if (g.t <= 0) { ctx.fillStyle = "rgba(255,255,255,.6)"; for (let i = 0; i < 24; i++) { const x = ((i * 61 + S.t * 9 * g.dir) % VW + VW) % VW, y = (i * 29) % VH; ctx.fillRect(x, y, 14, 1); } } }
+    if (B.bolts && S.zap && S.zap.x !== undefined) { const z = S.zap, x = Math.round(z.x) + ox;
+      if (z.t > 0 && z.t <= 70) { const a = 0.4 + 0.4 * Math.abs(Math.sin(S.t / 3)); ctx.fillStyle = `rgba(229,153,247,${a})`; ctx.fillRect(x - 14, z.y - 3, 28, 3); ctx.fillRect(x - 1, z.y - 10, 2, 7); }
+      if (z.t <= 0 && z.t > -12) { ctx.fillStyle = "#f8f0ff"; let yy = 0, xx = x; while (yy < z.y) { const nx = xx + (Math.random() - .5) * 10; ctx.fillRect(Math.min(xx, nx), yy, Math.abs(nx - xx) + 3, 14); xx = nx; yy += 14; } } }
+    if (S.zapF > 0) { S.zapF--; ctx.fillStyle = `rgba(255,255,255,${S.zapF / 12})`; ctx.fillRect(0, 0, VW, VH); }
+    if (B.dark) {                                    /* only a circle round the hero (and the lanterns) is lit */
+      const cv = S.darkCv || (S.darkCv = document.createElement("canvas")); cv.width = VW; cv.height = VH; const d = cv.getContext("2d");
+      d.fillStyle = "rgba(5,3,0,.93)"; d.fillRect(0, 0, VW, VH); d.globalCompositeOperation = "destination-out";
+      const hole = (x, y, r) => { const gr = d.createRadialGradient(x, y, r * 0.35, x, y, r); gr.addColorStop(0, "rgba(0,0,0,1)"); gr.addColorStop(1, "rgba(0,0,0,0)"); d.fillStyle = gr; d.fillRect(x - r, y - r, r * 2, r * 2); };
+      hole(P.x + 5 + ox, P.y + 6, 78 - 6 * G.world);
+      for (const e of S.ents) if (e.t === "lantern") { const x = e.x + ox; if (x > -80 && x < VW + 80) hole(x, e.y + 4, 64); }
+      d.globalCompositeOperation = "source-over"; ctx.drawImage(cv, 0, 0);
+    }
   }
 
   /* ---------- drawing ---------- */
@@ -3584,12 +3228,7 @@ const PF = (() => {
     if (!S) return; const { ctx, G } = S, th = G.theme;
     if (S.scope) return drawScope();
     ctx.save(); if (S.shake > 0) ctx.translate(Math.round((Math.random() - .5) * S.shake), Math.round((Math.random() - .5) * S.shake));
-    const g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
-    if (G.world === 3) { ctx.fillStyle = "#f8f3d0"; ctx.fillRect(390, 30, 18, 18); ctx.fillStyle = th.sky[0]; ctx.fillRect(396, 28, 14, 14); for (let i = 0; i < 30; i++) { ctx.fillStyle = "#fff"; ctx.fillRect((i * 97 + 13) % VW, (i * 53) % 120, 1, 1); } }
-    if (G.world === 4 && S.t % 240 < 4) { ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0, 0, VW, VH); }
-    const hills = (col, par, h, amp, f) => { ctx.fillStyle = col; for (let x = 0; x < VW; x += 4) { const wx = x + S.cam * par; const y = h + Math.round(amp * Math.sin(wx / f) + amp * 0.5 * Math.sin(wx / (f * 0.37))); ctx.fillRect(x, y, 4, VH - y); } };
-    hills(th.far, 0.2, 150, 26, 70); hills(th.mid, 0.45, 190, 18, 45);
-    if (S.critter) drawCritter(ctx, S.critter);
+    drawBG(ctx, G, th);
     const c0 = Math.floor(S.cam / TS), c1 = c0 + Math.ceil(VW / TS) + 1, ox = -Math.round(S.cam);
     for (let c = c0; c <= c1 && c < G.cols; c++) for (let r = 0; r < ROWS; r++) {
       const t = G.map[r][c], x = c * TS + ox, y = r * TS;
@@ -3597,11 +3236,30 @@ const PF = (() => {
       else if (t === 2) { ctx.fillStyle = th.block; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = "rgba(255,255,255,.25)"; ctx.fillRect(x, y, TS, 2); ctx.fillStyle = "rgba(0,0,0,.3)"; ctx.fillRect(x, y + TS - 2, TS, 2); ctx.fillRect(x + 7, y + 2, 2, TS - 4); }
       else if (t === 5) { ctx.fillStyle = (c + r) % 2 ? th.dirt : th.dirt2; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = th.top; ctx.fillRect(x, y, TS, 2); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1, y + 1, TS - 2, 6); ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 2, y + 2, TS - 4, 4); ctx.fillStyle = "#ced4da"; for (let k = 0; k < 3; k++) ctx.fillRect(x + 3 + k * 4, y + 6, 2, 4); }
       else if (t === 6) { const key = c + "," + r; if (!(G.broken && G.broken[key])) { const sh = G.crumbT && G.crumbT[key] > 8 ? Math.round((Math.random() - .5) * 2) : 0; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + sh, y, TS, 7); ctx.fillStyle = "#b08050"; ctx.fillRect(x + 1 + sh, y + 1, TS - 2, 5); ctx.fillStyle = "#7a5230"; ctx.fillRect(x + 5 + sh, y + 1, 1, 5); ctx.fillRect(x + 10 + sh, y + 3, 1, 3); ctx.fillStyle = "#5a3a22"; ctx.fillRect(x + 3, y + 7, 2, 5); ctx.fillRect(x + 11, y + 7, 2, 5); } }
+      else if (t === 7) { ctx.fillStyle = "#9fd8ff"; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = "#e7f8ff"; ctx.fillRect(x, y, TS, 3); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.fillRect(x + 3 + (c % 3) * 3, y + 5, 4, 1); ctx.fillStyle = "#5fa8d8"; ctx.fillRect(x, y + TS - 2, TS, 2); }
+      else if (t === 8 || t === 9) { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = "#495057"; ctx.fillRect(x, y + 1, TS, 6); ctx.fillStyle = "#ffd43b";
+        const sh = ((S.t * (t === 9 ? 1 : -1)) % 8 + 8) % 8; for (let k = -8; k < TS; k += 8) { const xx = x + k + sh; if (xx >= x && xx < x + TS - 3) { if (t === 9) { ctx.fillRect(xx, y + 2, 2, 1); ctx.fillRect(xx + 1, y + 3, 2, 1); ctx.fillRect(xx, y + 4, 2, 1); } else { ctx.fillRect(xx + 1, y + 2, 2, 1); ctx.fillRect(xx, y + 3, 2, 1); ctx.fillRect(xx + 1, y + 4, 2, 1); } } }
+        ctx.fillStyle = "#868e96"; ctx.fillRect(x, y + 8, TS, TS - 8); ctx.fillStyle = "#343a40"; ctx.fillRect(x + 3, y + 10, 3, 3); ctx.fillRect(x + 10, y + 10, 3, 3); }
+      else if (t === 3 && G.biome.lava) { const f = (S.t / 6 + c) % 2 < 1; ctx.fillStyle = "#c92a2a"; ctx.fillRect(x, y + 6, TS, TS - 6); ctx.fillStyle = f ? "#ff922b" : "#ffd43b"; ctx.fillRect(x, y + 6, TS, 3); ctx.fillRect(x + (c * 5) % 12, y + 3 + (f ? 0 : 1), 3, 3); }
+      else if (t === 3 && G.biome.bg === "jungle") { ctx.fillStyle = "#2b8a3e"; for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(x + k * 4, y + TS); ctx.lineTo(x + k * 4 + 2, y + 5); ctx.lineTo(x + k * 4 + 4, y + TS); ctx.fill(); } ctx.fillStyle = "#c92a2a"; ctx.fillRect(x + 1, y + 7, 2, 2); ctx.fillRect(x + 9, y + 6, 2, 2); }
       else if (t === 3) { ctx.fillStyle = "#d3d9e3"; for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(x + k * 4, y + TS); ctx.lineTo(x + k * 4 + 2, y + 6); ctx.lineTo(x + k * 4 + 4, y + TS); ctx.fill(); } }
     }
+    if (G.biome.lava) for (let c = c0; c <= c1 && c < G.cols; c++) if (!G.map[ROWS - 1][c]) { const x = c * TS + ox, f = Math.sin(S.t / 10 + c) * 2;     /* lava at the bottom of every pit */
+      ctx.fillStyle = "#c92a2a"; ctx.fillRect(x, (ROWS - 2) * TS + 4 + f, TS, 2 * TS); ctx.fillStyle = "#ff922b"; ctx.fillRect(x, (ROWS - 2) * TS + 4 + f, TS, 4); ctx.fillStyle = "#ffe066"; ctx.fillRect(x + (c * 7) % 12, (ROWS - 2) * TS + 5 + f, 3, 2); }
     for (const e of S.ents) {
       if (!e.alive) continue; const x = Math.round(e.x) + ox, y = Math.round(e.y);
       if (x < -40 || x > VW + 40) continue;
+      if (e.t === "jet") { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 2, y - 4, TS - 4, 4); ctx.fillStyle = e.warn || e.on ? "#ff6b6b" : "#868e96"; ctx.fillRect(x + 3, y - 3, TS - 6, 2);
+        if (e.warn && S.t % 6 < 3) { ctx.fillStyle = "#ffa94d"; ctx.fillRect(x + 6, y - 8, 4, 4); }
+        if (e.on) { const h = 3 * TS, fl = S.t % 4 < 2; ctx.fillStyle = "#e8590c"; ctx.fillRect(x + 2, y - h, TS - 4, h - 4); ctx.fillStyle = fl ? "#ffd43b" : "#ffa94d"; ctx.fillRect(x + 4, y - h + 6, TS - 8, h - 10); ctx.fillStyle = "#fff3bf"; ctx.fillRect(x + 6, y - h + 14, 4, h - 20); }
+        continue; }
+      if (e.t === "icicle") { const sh = e.st && e.st < 30 ? Math.round((Math.random() - .5) * 2) : 0;
+        if (e.rock) { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 5 + sh, y - 1, 10, 11); ctx.fillStyle = "#8c6a4a"; ctx.fillRect(x - 4 + sh, y, 8, 9); ctx.fillStyle = "#b08a64"; ctx.fillRect(x - 3 + sh, y + 1, 3, 2); }
+        else { ctx.fillStyle = "#1b1b2f"; ctx.beginPath(); ctx.moveTo(x - 5 + sh, y - 1); ctx.lineTo(x + 5 + sh, y - 1); ctx.lineTo(x + sh, y + 14); ctx.fill(); ctx.fillStyle = "#dff4ff"; ctx.beginPath(); ctx.moveTo(x - 4 + sh, y); ctx.lineTo(x + 4 + sh, y); ctx.lineTo(x + sh, y + 12); ctx.fill(); }
+        if (!e.st) { ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.fillRect(x - 1, 0, 2, y); }
+        continue; }
+      if (e.t === "boulder") { ctx.save(); ctx.translate(x + 7, y + 7); ctx.rotate(e.spin || 0); ctx.fillStyle = "#1b1b2f"; ctx.beginPath(); ctx.arc(0, 0, 8, 0, 7); ctx.fill(); ctx.fillStyle = "#a07a5a"; ctx.beginPath(); ctx.arc(0, 0, 7, 0, 7); ctx.fill(); ctx.fillStyle = "#7a5a3e"; ctx.fillRect(-4, -2, 3, 3); ctx.fillRect(1, 2, 3, 2); ctx.fillRect(2, -5, 2, 2); ctx.restore(); continue; }
+      if (e.t === "lantern") { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 12, 2, 12); ctx.fillRect(x - 4, y, 8, 9); ctx.fillStyle = S.t % 20 < 10 ? "#ffd43b" : "#ffe066"; ctx.fillRect(x - 3, y + 1, 6, 7); continue; }
       if (e.t === "mover") { const w2 = e.wd; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, w2 + 2, 9); ctx.fillStyle = th.block; ctx.fillRect(x, y, w2, 7); ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(x, y, w2, 2); ctx.fillStyle = "#ffd43b"; for (let k = 4; k < w2 - 4; k += 8) ctx.fillRect(x + k, y + 3, 4, 2); continue; }
       if (e.t === "coin") { const w = 2 + Math.abs(Math.round(3 * Math.sin(S.t / 8 + e.i))); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 4 - w, y, w * 2, 8); ctx.fillStyle = "#e67700"; ctx.fillRect(x + 4 - w, y + 7, w * 2, 1); }
       else if (e.t === "walker") { const f = Math.floor(S.t / 8) % 2; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 10); ctx.fillStyle = "#8a6a4a"; ctx.fillRect(x, y, 12, 8); ctx.fillStyle = "#b08a62"; ctx.fillRect(x + 1, y, 10, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + (e.vx < 0 ? 2 : 7), y + 3, 3, 3); ctx.fillStyle = "#e03131"; ctx.fillRect(x + (e.vx < 0 ? 3 : 8), y + 4, 1, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1 + f * 2, y + 8, 3, 2); ctx.fillRect(x + 8 - f * 2, y + 8, 3, 2); }
@@ -3628,6 +3286,7 @@ const PF = (() => {
     if (S.arena) { drawArena(ctx, ox); drawBoss(ctx, ox); }
     for (const sh of S.shells) { const x = sh.x + ox; ctx.fillStyle = sh.d % 10 < 5 ? "#ff3b3b" : "#ffd43b"; ctx.fillRect(x - 8, sh.y - 2, 16, 2); ctx.fillRect(x - 1, sh.y - 10, 2, 8); }
     for (const b of S.bolts) { ctx.fillStyle = "#9fe7ff"; ctx.fillRect(Math.round(b.x) + ox, Math.round(b.y), 6, 2); }
+    if (S.critter) drawCritter(ctx, S.critter, ox);
     const P = S.P;
     if (!(P.inv > 0 && S.t % 6 < 3)) {
       const legs = !P.ground ? "jump" : Math.abs(P.vx) > 0.3 ? (Math.floor(S.t / 6) % 2 ? "run1" : "run2") : "idle";
@@ -3636,6 +3295,7 @@ const PF = (() => {
       if (S.shield) { ctx.strokeStyle = "rgba(159,231,255,.8)"; ctx.strokeRect(Math.round(P.x) + ox - 3, Math.round(P.y) - 4, 16, 20); }
     }
     S.parts.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(Math.round(p.x) + ox, Math.round(p.y), 2, 2); });
+    drawWeather(ctx, G, ox);
     ctx.restore();
     S.camOx = ox; hud(); if (S.boss) bossBar(ctx); messages();
   }
@@ -3655,7 +3315,7 @@ const PF = (() => {
     if (S.kit.steady) { txt(ctx, "STEADY", x, 13, 9, "#8ce99a", "left"); }
     txt(ctx, `● ${S.coins}`, VW - 8, 13, 9, "#ffd43b", "right");
   }
-  function messages() { S.msgs.slice(-2).forEach((m, i) => txt(S.ctx, m.t, VW / 2, 44 + i * 16, 11, m.c)); }
+  function messages() { S.msgs.slice(-2).forEach((m, i) => txt(S.ctx, m.t, VW / 2, 44 + i * 16, 11, m.c)); if (!S.scope) drawCritterWarn(S.ctx); }
   function drawScope() {
     const { ctx } = S, sc = S.scope, w = S.G.world, th = S.G.theme;
     ctx.save(); if (S.shake > 0) ctx.translate(Math.round((Math.random() - .5) * S.shake), Math.round((Math.random() - .5) * S.shake));
@@ -3796,7 +3456,7 @@ const PF = (() => {
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
     fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
-    critter: k => { if (!S) return null; if (k) spawnCritter(k); return S.critter && { k: S.critter.k, x: S.critter.x, dir: S.critter.dir }; },
+    critter: (k, dir) => { if (!S) return null; if (k === "onHero") { if (S.critter) { S.critter.x = S.P.x + PH.w / 2; S.critter.y = S.P.y + PH.h; S.critter.vy = 0; } return null; } if (k) spawnCritter(k, dir); const c = S.critter; return S.critWarn ? { warn: S.critWarn.k } : c && { k: c.k, x: c.x, y: c.y, dir: c.dir, hit: c.hit }; },
     toChest: () => { if (!S) return false; const c = S.ents.find(e => e.t === "chest" && !e.opened); if (!c) return false; S.P.x = c.x; S.P.y = c.y - 4; S.P.vx = S.P.vy = 0; return true; },
     chests: () => S ? S.ents.filter(e => e.t === "chest").map(e => e.opened || "closed") : [], paused: () => !!(S && S.paused),
     incoming: () => S ? S.incoming.length : 0,
@@ -3949,27 +3609,29 @@ const PF = (() => {
     if (T.flash) { ctx.fillStyle = `rgba(255,255,255,${T.flash / 16})`; ctx.fillRect(0, 0, VW, VH); }
     if (T.go) { ctx.fillStyle = `rgba(255,255,255,${Math.min(1, T.go / 30)})`; ctx.fillRect(0, 0, VW, VH); }
   }
-  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, mood, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
+  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, mood, BIOMES, biomeOf, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
 })();
 
 </script>
 <script>
 "use strict";
 /* ================= levels ================= */
-const ORDER = ["frac", "flaw", "infer", "data", "claim", "word", "time", "rule", "link", "scale", "order", "same", "back", "space", "shape"];
+/* reading is the cloze skill only (David, Nov 2026: "drop everything apart from the cloze … keep everything else maths or thinking skills") */
+const ORDER = ["frac", "flaw", "word", "data", "claim", "time", "scale", "rule", "back", "order", "space", "shape"];
 const TR = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 const WORLDS = [
-  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", boss: "Rustjaw", sub: "Five big levels, then Rustjaw, the canyon crusher. Every stage starts with a briefing that climbs from a warm-up to test level." },
+  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", boss: "Rustjaw", sub: "Four big levels, then Rustjaw, the canyon crusher. Every stage starts with a briefing that climbs from a warm-up to test level." },
   { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", boss: "Frostgear", sub: "Every skill again, with new questions. Your scope now has drop dots for range. Frostgear guards the pass." },
   { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", boss: "Thornbark", sub: "New questions again. Night falls, and wind pushes your shots. Thornbark waits in the dark." },
   { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", boss: "the Storm Warden", sub: "The last round of new questions, the hardest levels and ridges, and the Storm Warden itself." }];
-/* five big levels a world, three skills each (one stage per skill), then the boss */
-const GROUPS = [["frac", "flaw", "infer"], ["data", "claim", "word"], ["time", "rule", "link"], ["scale", "order", "same"], ["back", "space", "shape"]];
-const LNAMES = ["Dusty Trail", "High Ledges", "Rope Bridges", "Lookout Ridge", "Long Climb"];
+/* four big levels a world, three skills each (one stage per skill), then the boss */
+const GROUPS = [["frac", "flaw", "word"], ["data", "claim", "time"], ["scale", "rule", "back"], ["order", "space", "shape"]];
+/* every level is its own place (PF.BIOMES): its name, look and hazard */
+const placeOf = (w, k) => PF.biomeOf({ world: w, k });
 const hash = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };
 const LEVELS = [];
 for (const W of WORLDS) {
-  GROUPS.forEach((g, k) => LEVELS.push({ id: `${W.n}-L${k + 1}`, world: W.n, k, tracks: g, name: LNAMES[k], seed: hash(`${W.n}-L${k + 1}`) }));
+  GROUPS.forEach((g, k) => LEVELS.push({ id: `${W.n}-L${k + 1}`, world: W.n, k, tracks: g, name: placeOf(W.n, k).name, place: placeOf(W.n, k), seed: hash(`${W.n}-L${k + 1}`) }));
   LEVELS.push({ id: `${W.n}-boss`, world: W.n, k: GROUPS.length, boss: true, tracks: [], name: W.boss, seed: hash(`${W.n}-boss`) });
 }
 const STAGES = L => L.boss ? 1 : L.tracks.length;
@@ -3987,11 +3649,18 @@ const RAR = ["common", "rare", "epic", "legendary"];
 /* ================= saved progress ================= */
 const KEY = "prac4.v1", PKEY = "prac4.practice.seen";
 const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
-const FRESH = () => ({ v: 1, levels: {}, seen: {}, seed: 1, coins: 0, sound: true, world: 1, log: [] });
+const FRESH = () => ({ v: 1, layout: 2, levels: {}, seen: {}, seed: 1, coins: 0, sound: true, world: 1, log: [] });
 function load() {
   if (PRACTICE) { const s = FRESH(); try { const p = JSON.parse(localStorage.getItem(PKEY)); if (p && p.seen) { s.seen = p.seen; s.seed = p.seed || 1; } } catch (e) {} return s; }
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return migrate(Object.assign(FRESH(), s)); } catch (e) {}
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return migrate(Object.assign(FRESH(), relayout(s))); } catch (e) {}
   return FRESH();
+}
+/* Nov 2026: five big levels became four (the reading skills other than the cloze were dropped). The old big-level records
+   (which held different skills) are dropped; each skill keeps its own record, so a new level counts as cleared when all three of its skills were */
+function relayout(s) {
+  if (s.layout === 2) return s;
+  for (const id of Object.keys(s.levels)) if (/^\d-L\d$/.test(id)) delete s.levels[id];
+  s.layout = 2; return s;
 }
 /* progress from the first layout (one level per skill) carries over: a big level counts as cleared when all three of its skills were */
 function migrate(s) {
@@ -4027,9 +3696,9 @@ function briefing(L, stage = 0) {
   /* a question counts as seen as soon as it is put into a briefing, so leaving a briefing early never brings its questions straight back */
   const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); S.seen[q.gen || q.id] = S.seed++; out.push(Object.assign({}, q, { role })); } };
   if (L.boss) {
-    /* the boss mixes six skills (2 maths, 2 thinking, 2 reading), still climbing: steps 1, 2, 3, 3, 4, 4 */
-    const bySub = s => ORDER.filter(t => TR[t].subject === s).sort(() => Math.random() - .5).slice(0, 2);
-    const ts = [...bySub("maths"), ...bySub("thinking"), ...bySub("reading")].sort(() => Math.random() - .5);
+    /* the boss mixes six skills (3 maths, 2 thinking, 1 cloze), still climbing: steps 1, 2, 3, 3, 4, 4 */
+    const bySub = (s, n) => ORDER.filter(t => TR[t].subject === s).sort(() => Math.random() - .5).slice(0, n);
+    const ts = [...bySub("maths", 3), ...bySub("thinking", 2), ...bySub("reading", 1)].sort(() => Math.random() - .5);
     ts.forEach((t, i) => add(t, [1, 2, 3, 3, 4, 4][i], "boss"));
   } else {
     /* one skill, climbing inside the level: step 1 (warm-up) -> step 2 -> step 3 -> step 4 (test level) */
@@ -4076,6 +3745,7 @@ function levelCard(L) {
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
   const at = rec.at || 0;
   return `<div class="lvhead">${IMG(ART.bus)}<h3 class="px">Level ${L.k + 1}: ${esc(L.name)}</h3></div><p>A big level in three stages. Each stage starts with a briefing of four questions on one skill that climb from a warm-up to test level, then a long stretch of platforms and sniper nests:</p>
+    <p class="tip">⚠ <span><b>${esc(L.place.name)}:</b> ${esc(L.place.tip)}</span></p>
     <ol class="climb">${L.tracks.map((t, i) => `<li class="${i < at ? "done2" : ""}"><span class="tag ${TR[t].subject}">${TR[t].subject}</span> <b>${esc(TR[t].name)}</b>${i < at ? " ✔" : ""}</li>`).join("")}</ol>
     ${rec.cleared ? `<p>${stars(rec.stars || 0)}${rec.snipeBest ? ` · 🎯 sniper best <b style="color:var(--gold)">${rec.snipeBest}</b>` : ""}</p>` : ""}
     <button class="btn" id="btn-go">${at ? `Carry on: stage ${at + 1}` : "Start stage 1"}</button>${at ? ` <button class="btn alt" id="btn-restart">Start again from stage 1</button>` : ""}`;
@@ -4215,7 +3885,7 @@ const curTrack = () => B && !B.L.boss ? B.L.tracks[B.stage] : null;
 /* the skill's own record (best briefing per world), kept under the skill's id as before */
 const skillRec = (L, stage) => S.levels[`${L.world}-${L.tracks[stage]}`] || (S.levels[`${L.world}-${L.tracks[stage]}`] = {});
 /* each stage of a big level is its own stretch of platforms (its own seed); the boss is one run and the arena */
-const levelFor = (L, stage) => ({ world: L.world, boss: !!L.boss, seed: L.boss ? L.seed : hash(`${L.id}-s${stage}`), stage, stages: STAGES(L), bossName: L.boss ? L.name : "" });
+const levelFor = (L, stage) => ({ world: L.world, k: L.boss ? null : L.k, boss: !!L.boss, seed: L.boss ? L.seed : hash(`${L.id}-s${stage}`), stage, stages: STAGES(L), bossName: L.boss ? L.name : "" });
 let INV = false;
 function play() {
   show("play");
@@ -4312,8 +3982,8 @@ function coachLevel(L) {
   if (!PRACTICE) return;
   const el = $("#coach-body");
   if (!L) { el.innerHTML = `<h2 class="px">COACH NOTES (ADMIN ONLY)</h2><p>Pick a level to see which sample-paper questions its skill builds toward, and how the four steps of that skill climb from building blocks to the hardest questions.</p>
-    <h3>How the game is built</h3><ul><li>15 skills (6 maths, 5 thinking, 4 reading), each in 4 steps.</li><li>Each world has 5 big levels and a boss. A big level has 3 stages (one skill each, mixing maths, thinking and reading); every stage's briefing climbs: 4 questions on its skill, step 1 (warm-up) to step 4 (test level).</li><li>Each world brings every skill back with new questions; the platforming and sniping get harder world by world.</li><li>Bosses mix 6 skills (2 per subject), still climbing (steps 1, 2, 3, 3, 4, 4), as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
-  if (L.boss) { el.innerHTML = `<h2 class="px">COACH NOTES · WORLD ${L.world} BOSS</h2><p>The boss briefing mixes ${QN.boss} questions: 2 maths, 2 thinking and 2 reading skills, climbing through steps 1, 2, 3, 3, 4, 4. Coming without warning, mixed together like the real test, they check that each skill transfers when the topic isn't announced. In the fight, each third of the boss's health ends with a power crate: one more question (step 2–4 by world) for loot.</p>`; return; }
+    <h3>How the game is built</h3><ul><li>12 skills (6 maths, 5 thinking, and the cloze skill "The right word"), each in 4 steps.</li><li>Each world has 4 big levels and a boss. A big level has 3 stages (one skill each); every stage's briefing climbs: 4 questions on its skill, step 1 (warm-up) to step 4 (test level).</li><li>Each world brings every skill back with new questions; the platforming and sniping get harder world by world.</li><li>Bosses mix 6 skills (3 maths, 2 thinking, 1 cloze), still climbing (steps 1, 2, 3, 3, 4, 4), as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
+  if (L.boss) { el.innerHTML = `<h2 class="px">COACH NOTES · WORLD ${L.world} BOSS</h2><p>The boss briefing mixes ${QN.boss} questions: 3 maths, 2 thinking and 1 cloze skill, climbing through steps 1, 2, 3, 3, 4, 4. Coming without warning, mixed together like the real test, they check that each skill transfers when the topic isn't announced. In the fight, each third of the boss's health ends with a power crate: one more question (step 2–4 by world) for loot.</p>`; return; }
   el.innerHTML = `<h2 class="px">COACH NOTES · LEVEL ${L.k + 1}: ${esc(L.name.toUpperCase())}</h2><p>World ${L.world}. A big level in three stages, one skill each; every stage's briefing climbs through that skill's four steps (question 1 = step 1 … question 4 = step 4), with new questions in each world.</p>
     ${L.tracks.map((id, i) => { const t = TR[id]; return `<h3>Stage ${i + 1}: <span class="tag ${t.subject}">${t.subject}</span> ${esc(t.name)}</h3>
       <p><b>Sample questions it prepares for</b></p>${samplesHtml(t, 0)}<p><b>The four steps</b></p>${ladderHtml(t, 0)}<p><b>Same method, same words:</b> ${esc(t.method)}</p>`; }).join("")}`;
