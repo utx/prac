@@ -8,7 +8,7 @@ const PF = (() => {
   const TS = 16, ROWS = 17, VW = 480, VH = 270;
   const ARENA_W = 30, ARENA_FLOOR = 12, LEDGES = [[7, 11], [18, 22]];
   /* physics (pixels per frame at 60 frames a second) */
-  const PH = { acc: 0.35, air: 0.25, max: 2.0, fric: 0.72, grav: 0.32, fall: 6, jump: -6.2, dbl: -5.4, cut: -2.2, coyote: 6, buffer: 6, w: 10, h: 14 };
+  const PH = { acc: 0.35, air: 0.25, max: 2.0, fric: 0.72, grav: 0.32, fall: 6, jump: -6.2, dbl: -5.4, spring: -9.0, cut: -2.2, coyote: 6, buffer: 6, w: 10, h: 14 };
   const THEMES = [
     { name: "Bronze Canyon", sky: ["#f6c28b", "#f9e3c0"], far: "#d9915a", mid: "#b8673e", top: "#e8a33d", dirt: "#9c5a32", dirt2: "#874a27", block: "#c97a3e", deco: "cactus" },
     { name: "Silver Cliffs", sky: ["#8fb8de", "#dceaf6"], far: "#9aa9bd", mid: "#7586a0", top: "#d7e3ef", dirt: "#5f6f86", dirt2: "#526178", block: "#8a9bb5", deco: "pine" },
@@ -28,8 +28,38 @@ const PF = (() => {
     const foe = (c) => { const k = r(), t = k < 0.4 ? "walker" : k < 0.7 ? "hopper" : "roller"; ents.push({ t, x: c * TS, y: gh * TS - 10, y0: gh * TS - 10 }); };
     const flat = (n, opt = {}) => { for (let i = 0; i < n; i++) ground(x + i, gh); if (opt.walker && n >= 5) foe(x + Math.floor(n / 2)); if (opt.coins) for (let i = 1; i < n - 1; i += 2) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 2) * TS + 4 }); x += n; };
     const maxGap = 3, maxStep = w >= 3 ? 3 : 2, walkerP = 0.45 + 0.1 * w;
-    flat(8);
+    /* the trickier pieces (David, Nov 2026: the start "seems too basic … let's start with some challenge") */
+    const reachCells = [];
+    const piece = name => {
+      if (name === "mover") {                       /* a pit too wide to jump: ride the moving platform across */
+        const g = int(5, 6 + (w >= 3 ? 1 : 0)); for (let i = 0; i < g; i++) air(x + i);
+        ents.push({ t: "mover", x: x * TS, y: gh * TS, wd: 3 * TS, x0: x * TS, x1: (x + g - 3) * TS, v: 0.7 + 0.1 * w });
+        for (let i = 0; i < g; i++) reachCells.push([x + i, gh]);
+        ents.push({ t: "coin", x: (x + 1) * TS + 4, y: (gh - 2) * TS }, { t: "ammo", x: (x + g - 2) * TS + 4, y: (gh - 3) * TS });
+        x += g; flat(int(3, 4));
+      } else if (name === "crumble") {              /* a bridge that falls away if you stop on it */
+        const g = int(4, 5 + (w >= 2 ? 1 : 0)); for (let i = 0; i < g; i++) { air(x + i); map[gh][x + i] = 6; }
+        for (let i = 1; i < g; i += 2) ents.push({ t: "coin", x: (x + i) * TS + 4, y: (gh - 2) * TS });
+        x += g; flat(int(3, 4));
+      } else if (name === "spring") {               /* a cliff too high to jump: bounce off the spring pad */
+        if (gh - 5 < 6) { flat(3); return piece("stones"); }
+        flat(2); map[gh][x] = 5; for (let y = gh + 1; y < ROWS; y++) map[y][x] = 1; for (let y = 0; y < gh; y++) map[y][x] = 0; x++;
+        flat(2); gh -= 5; ents.push({ t: "ammo", x: x * TS + 4, y: (gh - 2) * TS }); flat(int(4, 6), { coins: true });
+      } else if (name === "stones") {               /* stepping stones over a spike pit */
+        const n = int(3, 3 + (w >= 2 ? 1 : 0)); flat(1);
+        for (let p = 0; p < n; p++) { for (let i = 0; i < 3; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } map[gh - 3][x + 1] = 2; ents.push({ t: p === n - 1 ? "ammo" : "coin", x: (x + 1) * TS + 4, y: (gh - 5) * TS }); x += 3; }
+        flat(int(3, 4));
+      } else if (name === "tiers") {                /* a choice: the high road (blocks, bullets) or the low road (bots) */
+        const x0 = x; flat(11, { walker: true });
+        map[gh - 2][x0 + 1] = 2; for (let i = 3; i <= 9; i++) map[gh - 4][x0 + i] = 2;
+        for (let i = 4; i <= 8; i += 2) ents.push({ t: i === 6 ? "ammo" : "coin", x: (x0 + i) * TS + 4, y: (gh - 6) * TS });
+        flat(2);
+      }
+    };
+    flat(6);
     ents.push({ t: "check", x: 2 * TS, y: gh * TS });
+    /* the opening challenge: every stage starts with a moving platform and a crumbling bridge (boss runs too) */
+    piece("mover"); piece("crumble");
     let chests = 0, sinceCheck = 0, nests = 0, wantNests = L.boss ? 0 : w <= 2 ? 2 : 3, sinceNest = 0;
     while (x < len - 14) {
       const k = r();
@@ -38,15 +68,14 @@ const PF = (() => {
         ents.push({ t: "sign", x: (x - 5) * TS, y: gh * TS, nest: nests }); ents.push({ t: "ammo", x: (x - 2) * TS + 4, y: (gh - 4) * TS }); flat(3); ents.push({ t: "nest", x: (x) * TS, y: gh * TS, id: nests }); flat(4); ground(x, gh); for (let y = 0; y < gh; y++) map[y][x] = 4; ents.push({ t: "gate", x: x * TS, y: gh * TS, col: x, nest: nests }); x++; flat(3); nests++; sinceNest = 0; sinceCheck += 8; continue;
       }
       if (!L.boss && chests < 2 && x >= Math.round(len * (chests ? 0.68 : 0.3))) { flat(2); ents.push({ t: "chest", x: x * TS + 2, y: gh * TS - 12 }); flat(4); chests++; continue; }
-      let used = 0;
-      if (k < 0.16) { flat(int(5, 8), { walker: r() < walkerP, coins: r() < 0.5 }); }
-      else if (k < 0.34) {                                            /* a gap with coins over it */
+      if (k < 0.06) flat(int(4, 6), { walker: r() < walkerP, coins: r() < 0.5 });
+      else if (k < 0.18) {                                            /* a gap with coins over it */
         const g = int(2, maxGap); for (let i = 0; i < g; i++) air(x + i);
         for (let i = 0; i < g; i++) ents.push({ t: i === Math.floor(g / 2) ? "ammo" : "coin", x: (x + i) * TS + 4, y: (gh - 3) * TS });   /* a bullet at the top of the jump */
         x += g; flat(int(3, 5));
-      } else if (k < 0.46) {                                          /* a step up or down */
+      } else if (k < 0.26) {                                          /* a step up or down */
         const d = int(1, maxStep) * (r() < 0.5 ? -1 : 1); gh = Math.max(8, Math.min(14, gh + d)); flat(int(4, 6), { walker: r() < walkerP * 0.6 });
-      } else if (k < 0.58) {                                /* floating blocks over a pit */
+      } else if (k < 0.36) {                                /* floating blocks over a pit */
         const top = gh, n = int(2, 3); let px = x;
         for (let i = 0; i < 2; i++) air(px++);
         for (let p = 0; p < n; p++) {
@@ -56,9 +85,9 @@ const PF = (() => {
           px += wid; const g = int(1, 2); for (let i = 0; i < g; i++) air(px++);
         }
         x = px; flat(int(3, 5));
-      } else if (k < 0.68) {                                         /* spikes on the ground */
+      } else if (k < 0.43) {                                         /* spikes on the ground */
         flat(2); const s = int(1, w === 1 ? 2 : 3); for (let i = 0; i < s; i++) { ground(x + i, gh); map[gh - 1][x + i] = 3; } x += s; flat(int(3, 4));
-      } else if (k < 0.8) {                                          /* a run of narrow pillars */
+      } else if (k < 0.52) {                                         /* a run of narrow pillars */
         let h = gh; const n = int(3, 3 + w);
         for (let p = 0; p < n; p++) {
           const g = int(1, 2); for (let i = 0; i < g; i++) air(x++);
@@ -68,11 +97,16 @@ const PF = (() => {
           x += wid;
         }
         air(x++); gh = h; flat(int(3, 4));
-      } else if (k < 0.9) {                                         /* a drone patrol (and a swooper from world 2) */
+      } else if (k < 0.60) {                                         /* a drone patrol (and a swooper from world 2) */
         flat(int(5, 7)); ents.push({ t: "drone", x: (x - 3) * TS, y: (gh - 3) * TS, y0: (gh - 3) * TS });
         if (w >= 2 && r() < 0.6) ents.push({ t: "swooper", x: (x - 1) * TS, y: (gh - 6) * TS, y0: (gh - 6) * TS, x0: (x - 1) * TS });
-      } else { flat(int(6, 8), { walker: true, coins: true }); ents.push({ t: "ammo", x: (x - 4) * TS + 4, y: (gh - 3) * TS }); if (w >= 2) foe(x - 2);
+      } else if (k < 0.66) { flat(int(6, 8), { walker: true, coins: true }); ents.push({ t: "ammo", x: (x - 4) * TS + 4, y: (gh - 3) * TS }); if (w >= 2) foe(x - 2);
         ents.push({ t: "ammo", high: true, x: (x - 6) * TS + 4, y: (gh - 6) * TS });             /* only a double jump reaches this one */ }
+      else if (k < 0.74) piece("mover");
+      else if (k < 0.81) piece("crumble");
+      else if (k < 0.88) piece("spring");
+      else if (k < 0.94) piece("stones");
+      else piece("tiers");
       sinceCheck += 6; sinceNest += 6;
     }
     if (L.boss) {
@@ -93,9 +127,9 @@ const PF = (() => {
     for (let y = 0; y < ROWS; y++) for (let c = 0; c < cols; c++) map[y][c] = map[y][c] || 0;
     /* hearts: one spare in the middle of longer levels */
     const mid = ents.filter(e => e.t === "check")[1]; if (mid) ents.push({ t: "heart", x: mid.x + 24, y: mid.y - 40 });
-    return { map, ents, cols, theme: THEMES[w - 1], world: w };
+    return { map, ents, cols, theme: THEMES[w - 1], world: w, reachCells };
   }
-  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2 || (t === 4 && !G.open && !(G.gateOpen && G.gateOpen[c])); };
+  const solidAt = (G, c, r) => { if (c < 0) return true; if (c >= G.cols) return true; if (r < 0) return false; if (r >= ROWS) return false; const t = G.map[r][c]; return t === 1 || t === 2 || t === 5 || (t === 6 && !(G.broken && G.broken[c + "," + r])) || (t === 4 && !G.open && !(G.gateOpen && G.gateOpen[c])); };
   const spikeAt = (G, c, r) => c >= 0 && c < G.cols && r >= 0 && r < ROWS && G.map[r][c] === 3;
 
   /* one physics step for a body {x, y, vx, vy, ground} with input {dir, jump (held), jumpPressed} */
@@ -106,7 +140,8 @@ const PF = (() => {
     if (inp.jumpPressed) b.buf = PH.buffer; else b.buf = Math.max(0, (b.buf || 0) - 1);
     if (b.buf > 0 && b.coy > 0) { b.vy = PH.jump; b.coy = 0; b.buf = 0; b.ground = false; b.jumped = true; }
     else if (inp.jumpPressed && !b.ground && b.boots && !b.usedDbl) { b.vy = PH.dbl; b.usedDbl = true; b.buf = 0; b.dbl = 10; }
-    if (!inp.jump && b.vy < PH.cut) b.vy = PH.cut;
+    if (!inp.jump && b.vy < PH.cut && !b.spring) b.vy = PH.cut;
+    if (b.vy >= 0) b.spring = false;
     b.vy = Math.min(PH.fall, b.vy + PH.grav);
     /* move x */
     b.x += b.vx;
@@ -116,7 +151,8 @@ const PF = (() => {
     /* move y */
     b.y += b.vy; b.ground = false;
     const l = Math.floor(b.x / TS), rr = Math.floor((b.x + PH.w - 1) / TS);
-    if (b.vy > 0) { const r = Math.floor((b.y + PH.h) / TS); for (let c = l; c <= rr; c++) if (solidAt(G, c, r) && r < ROWS) { b.y = r * TS - PH.h; b.vy = 0; b.ground = true; b.usedDbl = false; break; } }
+    if (b.vy > 0) { const r = Math.floor((b.y + PH.h) / TS); for (let c = l; c <= rr; c++) if (solidAt(G, c, r) && r < ROWS) { b.y = r * TS - PH.h; b.vy = 0; b.ground = true; b.usedDbl = false;
+      if (G.map[r][c] === 5) { b.vy = PH.spring; b.ground = false; b.spring = true; b.bounced = true; } break; } }
     else if (b.vy < 0) { const r = Math.floor(b.y / TS); for (let c = l; c <= rr; c++) if (solidAt(G, c, r)) { b.y = (r + 1) * TS; b.vy = 0; break; } }
     b.onSpike = false;
     for (let c = l; c <= rr; c++) { const r = Math.floor((b.y + PH.h - 4) / TS); if (spikeAt(G, c, r)) b.onSpike = true; }
@@ -124,7 +160,7 @@ const PF = (() => {
 
   /* ---------------- can the goal be reached? (uses the same physics, no double jump) ---------------- */
   function reach(L) {
-    const G = gen(L); G.open = true; const  goal = G.ents.find(e => e.t === "goal" || e.t === "arena");
+    const G = gen(L); G.open = true; for (const [c, rr] of G.reachCells) G.map[rr][c] = 2; const  goal = G.ents.find(e => e.t === "goal" || e.t === "arena");
     const gx = Math.floor(goal.x / TS);
     const startC = 2, stand = new Map(), queue = [];
     const groundRow = c => { for (let r = 0; r < ROWS; r++) if (solidAt(G, c, r)) return r; return -1; };
@@ -474,7 +510,20 @@ const PF = (() => {
     if (S.shake > 0) S.shake--;
     const dir = (KEYS.right ? 1 : 0) - (KEYS.left ? 1 : 0); if (dir) P.face = dir;
     const jp = pressed("jump") || pressed("up");
+    /* moving platforms: they move first, and carry the hero standing on them */
+    for (const e of S.ents) if (e.t === "mover") { e.dx = e.v; e.x += e.v; if (e.x <= e.x0 || e.x >= e.x1) { e.x = Math.max(e.x0, Math.min(e.x1, e.x)); e.v = -e.v; } }
+    if (P.onMover) P.x += P.onMover.dx;
+    const footY = P.y + PH.h;
     step(G, P, { dir, jump: KEYS.jump || KEYS.up, jumpPressed: jp });
+    P.onMover = null;
+    if (P.vy >= 0) for (const e of S.ents) if (e.t === "mover" && P.x + PH.w > e.x + 1 && P.x < e.x + e.wd - 1 && footY <= e.y + 2 && P.y + PH.h >= e.y) { P.y = e.y - PH.h; P.vy = 0; P.ground = true; P.usedDbl = false; P.onMover = e; break; }
+    if (P.bounced) { P.bounced = false; beep(330, .06, "triangle"); beep(660, .1, "triangle"); burst(P.x + 5, P.y + 14, "#ffd43b", 8); if (!S.tipSpring) { S.tipSpring = true; msg("SPRING PAD! Hold → to land on the ledge", 90, "#ffd43b"); } }
+    /* crumbling blocks: stand on one too long and it falls away (it comes back later) */
+    G.broken = G.broken || {}; G.crumbT = G.crumbT || {};
+    if (P.ground && !P.onMover) { const rB = Math.floor((P.y + PH.h) / TS); for (let c = Math.floor(P.x / TS); c <= Math.floor((P.x + PH.w - 1) / TS); c++) if (rB < ROWS && G.map[rB][c] === 6 && !G.broken[c + "," + rB]) {
+      const key = c + "," + rB; G.crumbT[key] = (G.crumbT[key] || 0) + 1; if (G.crumbT[key] === 1 && !S.tipCrumble) { S.tipCrumble = true; msg("CRUMBLING BRIDGE! Keep running", 80, "#ffb3b3"); }
+      if (G.crumbT[key] > 24) { G.broken[key] = 240; G.crumbT[key] = 0; burst(c * TS + 8, rB * TS + 4, "#a0522d", 10); beep(120, .1, "sawtooth"); } } }
+    for (const key in G.broken) if (--G.broken[key] <= 0) { const [c, rB] = key.split(",").map(Number); if (P.x + PH.w > c * TS && P.x < c * TS + TS && P.y + PH.h > rB * TS && P.y < rB * TS + TS) G.broken[key] = 20; else { delete G.broken[key]; G.crumbT[key] = 0; } }
     if (jp && P.jumped) { beep(420, .05); P.jumped = false; }
     if (P.dbl > 0) { P.dbl--; if (P.dbl === 9) { burst(P.x + 5, P.y + 14, "#9fe7ff", 6); beep(620, .05); if (!S.tipBoots) { S.tipBoots = true; msg("BOOTS: a second jump in mid-air!", 80, "#b197fc"); } } }
     if (!S.tipStart && S.t === 200) { S.tipStart = true; const k = S.kit; msg(`Your kit: ${S.hearts} hearts${k.shield ? ", a shield" : ""}${k.boots ? ", double-jump boots" : ""}${k.steady ? ", a steady scope" : ""}, ${S.ammo} blaster shots, ${S.rounds} sniper rounds`, 200, "#9fe7ff"); }
@@ -841,13 +890,16 @@ const PF = (() => {
     const c0 = Math.floor(S.cam / TS), c1 = c0 + Math.ceil(VW / TS) + 1, ox = -Math.round(S.cam);
     for (let c = c0; c <= c1 && c < G.cols; c++) for (let r = 0; r < ROWS; r++) {
       const t = G.map[r][c], x = c * TS + ox, y = r * TS;
-      if (t === 1) { const top = r === 0 || G.map[r - 1][c] !== 1; ctx.fillStyle = (c + r) % 2 ? th.dirt : th.dirt2; ctx.fillRect(x, y, TS, TS); if (top) { ctx.fillStyle = th.top; ctx.fillRect(x, y, TS, 4); ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.fillRect(x, y + 4, TS, 1); } ctx.fillStyle = "rgba(0,0,0,.12)"; ctx.fillRect(x + 3 + (c * 7 + r * 3) % 9, y + 7, 2, 2); }
+      if (t === 1) { const top = r === 0 || (G.map[r - 1][c] !== 1 && G.map[r - 1][c] !== 5); ctx.fillStyle = (c + r) % 2 ? th.dirt : th.dirt2; ctx.fillRect(x, y, TS, TS); if (top) { ctx.fillStyle = th.top; ctx.fillRect(x, y, TS, 4); ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.fillRect(x, y + 4, TS, 1); } ctx.fillStyle = "rgba(0,0,0,.12)"; ctx.fillRect(x + 3 + (c * 7 + r * 3) % 9, y + 7, 2, 2); }
       else if (t === 2) { ctx.fillStyle = th.block; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = "rgba(255,255,255,.25)"; ctx.fillRect(x, y, TS, 2); ctx.fillStyle = "rgba(0,0,0,.3)"; ctx.fillRect(x, y + TS - 2, TS, 2); ctx.fillRect(x + 7, y + 2, 2, TS - 4); }
+      else if (t === 5) { ctx.fillStyle = (c + r) % 2 ? th.dirt : th.dirt2; ctx.fillRect(x, y, TS, TS); ctx.fillStyle = th.top; ctx.fillRect(x, y, TS, 2); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1, y + 1, TS - 2, 6); ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 2, y + 2, TS - 4, 4); ctx.fillStyle = "#ced4da"; for (let k = 0; k < 3; k++) ctx.fillRect(x + 3 + k * 4, y + 6, 2, 4); }
+      else if (t === 6) { const key = c + "," + r; if (!(G.broken && G.broken[key])) { const sh = G.crumbT && G.crumbT[key] > 8 ? Math.round((Math.random() - .5) * 2) : 0; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + sh, y, TS, 7); ctx.fillStyle = "#b08050"; ctx.fillRect(x + 1 + sh, y + 1, TS - 2, 5); ctx.fillStyle = "#7a5230"; ctx.fillRect(x + 5 + sh, y + 1, 1, 5); ctx.fillRect(x + 10 + sh, y + 3, 1, 3); ctx.fillStyle = "#5a3a22"; ctx.fillRect(x + 3, y + 7, 2, 5); ctx.fillRect(x + 11, y + 7, 2, 5); } }
       else if (t === 3) { ctx.fillStyle = "#d3d9e3"; for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(x + k * 4, y + TS); ctx.lineTo(x + k * 4 + 2, y + 6); ctx.lineTo(x + k * 4 + 4, y + TS); ctx.fill(); } }
     }
     for (const e of S.ents) {
       if (!e.alive) continue; const x = Math.round(e.x) + ox, y = Math.round(e.y);
       if (x < -40 || x > VW + 40) continue;
+      if (e.t === "mover") { const w2 = e.wd; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, w2 + 2, 9); ctx.fillStyle = th.block; ctx.fillRect(x, y, w2, 7); ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(x, y, w2, 2); ctx.fillStyle = "#ffd43b"; for (let k = 4; k < w2 - 4; k += 8) ctx.fillRect(x + k, y + 3, 4, 2); continue; }
       if (e.t === "coin") { const w = 2 + Math.abs(Math.round(3 * Math.sin(S.t / 8 + e.i))); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 4 - w, y, w * 2, 8); ctx.fillStyle = "#e67700"; ctx.fillRect(x + 4 - w, y + 7, w * 2, 1); }
       else if (e.t === "walker") { const f = Math.floor(S.t / 8) % 2; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1, 14, 10); ctx.fillStyle = "#8a6a4a"; ctx.fillRect(x, y, 12, 8); ctx.fillStyle = "#b08a62"; ctx.fillRect(x + 1, y, 10, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + (e.vx < 0 ? 2 : 7), y + 3, 3, 3); ctx.fillStyle = "#e03131"; ctx.fillRect(x + (e.vx < 0 ? 3 : 8), y + 4, 1, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1 + f * 2, y + 8, 3, 2); ctx.fillRect(x + 8 - f * 2, y + 8, 3, 2); }
       else if (e.t === "hopper") { const sq = e.air ? 0 : Math.max(0, 3 - Math.floor((70 - (e.st || 0)) / 8)); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1 + sq, 14, 11 - sq); ctx.fillStyle = "#2f9e44"; ctx.fillRect(x, y + sq, 12, 9 - sq); ctx.fillStyle = "#8ce99a"; ctx.fillRect(x + 1, y + sq, 10, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + 2, y + 2 + sq, 3, 3); ctx.fillRect(x + 7, y + 2 + sq, 3, 3); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 3, y + 3 + sq, 1, 1); ctx.fillRect(x + 8, y + 3 + sq, 1, 1); ctx.fillRect(x, y + 9, 4, 1); ctx.fillRect(x + 8, y + 9, 4, 1); }
@@ -1044,6 +1096,9 @@ const PF = (() => {
     /* the boss */
     toArena: () => { if (!S) return false; const a = S.ents.find(e => e.t === "arena"); if (!a) return false; S.P.x = a.x + 4 * TS; S.P.y = a.y - PH.h; S.P.vx = S.P.vy = 0; return true; },
     boss: () => S && S.boss && { hp: S.boss.hp, max: S.boss.max, phase: S.boss.phase, state: S.boss.state, core: S.boss.core, ball: S.boss.ball, x: S.boss.x, name: S.boss.info.name, waves: S.waves.length, orbs: S.orbs.length },
+    /* the new platform pieces */
+    pieces: () => S && { movers: S.ents.filter(e => e.t === "mover").map(e => ({ x: e.x, y: e.y, wd: e.wd })), springs: (() => { const o = []; for (let r = 0; r < ROWS; r++) for (let c = 0; c < S.G.cols; c++) if (S.G.map[r][c] === 5) o.push([c, r]); return o; })(), crumbles: (() => { const o = []; for (let r = 0; r < ROWS; r++) for (let c = 0; c < S.G.cols; c++) if (S.G.map[r][c] === 6) o.push([c, r, !!(S.G.broken && S.G.broken[c + "," + r])]); return o; })() },
+    place: (x, y) => { if (!S) return; S.P.x = x; S.P.y = y; S.P.vx = S.P.vy = 0; S.P.onMover = null; },
     /* nests: the gear card and the vehicles */
     intro: () => !!(S && S.scope && S.scope.intro),
     spawnVeh: k => { if (S && S.scope) { const ss = S.scope.nest.sentries; spawnVeh(ss, k); if (k === "plane") ss.veh.drops = [VW / 2]; } },
