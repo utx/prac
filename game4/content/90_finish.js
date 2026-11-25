@@ -28,7 +28,7 @@
       const options = opts.map(o => o[0]), answer = opts.findIndex(o => o[1] === null), traps = {};
       opts.forEach((o, i) => { if (o[1] !== null) traps[i] = o[1]; });
       const method = TRACKS.find(t => t.id === r.track).method;
-      HAND.push({ id: r.id, track: r.track, rung: r.rung, passage: r.q.passage || "", stem: r.q.stem, options, answer, traps, visual: !!r.q.visual,
+      HAND.push({ id: r.id, track: r.track, rung: r.rung, grp: r.q.grp, passage: r.q.passage || "", stem: r.q.stem, options, answer, traps, visual: !!r.q.visual,
         explain: `<p class="method"><b>Method:</b> ${method}</p><p>${r.q.body}</p>${LIB.whyNot({ options, traps })}` });
     });
   }

@@ -105,6 +105,11 @@ table.grid { border-collapse: collapse; background: #fff; } table.grid th, table
 .big { font-size: 22px; font-weight: 700; } .note { color: #555; font-size: 14px; } .quote { font-style: italic; font-size: 18px; }
 .box { border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; background: #f1f3f5; }
 .blank { display: inline-block; min-width: 90px; border-bottom: 2px solid var(--ink); }
+.passage .blank { min-width: 0; padding: 0 4px; color: #868e96; font-weight: 700; }
+.passage .blank.cur { background: #ffe066; color: var(--ink); border-radius: 4px; box-shadow: 0 0 0 2px #fab005; }
+.passage .filled { color: #2b8a3e; text-decoration: underline; }
+.passage .ptitle { margin: 0 0 4px; text-align: center; }
+.passage p { line-height: 1.75; }
 ul.clues, ol.sts { margin: 6px 0; } .gapline { font-size: 17px; }
 .explain { margin-top: 14px; border-top: 3px dashed #adb5bd; padding-top: 10px; }
 .explain .method { background: #e7f5ff; border-left: 5px solid #339af0; padding: 6px 10px; border-radius: 4px; }
@@ -661,17 +666,17 @@ const TRACKS = [
   ideas: ["Near-synonyms are not interchangeable: the context decides the shade of meaning.",
     "Some words come in fixed partnerships (teeming WITH, the culmination OF).",
     "Grammar decides too: only one word takes the words that follow it.",
-    "The clue may be in the sentence before or after the gap."],
+    "The clue may be in the sentence before or after the gap, or spread through the whole passage."],
   method: "Read the whole sentence (and the one before). Try each word in the gap and ask: does it fit the meaning, the partner words AND the grammar?",
   transfer: "The cloze passage (Reading Q7–14 in every paper), plus word-in-context questions in the story and poem.",
   samples: [
     { ref: "PT1–PT3 Reading Q7–14", what: "cloze gaps decided by collocation, grammar or shade of meaning", rungs: [1, 2, 3, 4] },
     { ref: "PT1–PT3 Reading Q1–6", what: "meaning of a word in context in the story", rungs: [1] }],
   rungs: [
-    { title: "Shades of meaning", builds: "Four near-synonyms; only one fits the situation.", traps: "a word that is close but too strong or too weak." },
-    { title: "Word partners", builds: "Fixed expressions and collocations: only one word goes with its partner.", traps: "a word with the right meaning but the wrong partner." },
-    { title: "Grammar fit", builds: "Only one verb or adjective takes the following preposition or object.", traps: "a word that means the right thing but breaks the sentence." },
-    { title: "Clues from the passage", builds: "Short passages where the deciding clue is in another sentence.", traps: "a word that fits its own sentence but not the passage." }] },
+    { title: "Shades of meaning", builds: "Gap 1 of each cloze passage: four near-synonyms; only one fits the situation.", traps: "a word that is close but too strong or too weak." },
+    { title: "Word partners", builds: "Gap 2: fixed expressions and collocations; only one word goes with its partner.", traps: "a word with the right meaning but the wrong partner." },
+    { title: "Grammar fit", builds: "Gap 3: only one word takes the words that follow it (a preposition, 'to' + verb, '-ing').", traps: "a word that means the right thing but breaks the sentence." },
+    { title: "Clues from the passage", builds: "Gap 4, the stretch: the deciding clue is elsewhere in the passage, so the whole passage must be read.", traps: "a word that fits its own sentence but not the passage." }] },
 
 ];
 
@@ -1919,108 +1924,114 @@ whose("rule", 4, "tr4h", "Kofi", "Ana", "A jar holds 5 red and 5 yellow jellybea
   ["", "Ana forgets the worst case: 5 yellow and 1 red is 6 jellybeans with only one red", "Ana's reasoning is not correct", "Kofi's reasoning IS correct"],
   "Kofi: with only two colours, 3 jellybeans must include two the same. Correct. Ana: the worst case is all 5 yellow first, then 1 red, so 6 gives only one red. She would need 7.");
 
-/* RIDGE RUNNER: hand-written reading questions (A–D). All texts are our own.
-   Each text builds one reading skill at a time, at test level from step 1 (story extracts of about 80–150 words);
-   eight per step, answer letters spread evenly within each step (each letter twice). */
+/* RIDGE RUNNER: the cloze passages (A–D). All texts are our own.
+   David, Nov 2026: "make the cloze questions proper passages with several gaps". Each passage has four gaps that climb
+   like the skill's four steps: gap 1 = shades of meaning, gap 2 = word partners, gap 3 = grammar fit, gap 4 = a clue
+   from the rest of the passage. A stage's briefing is one whole passage, gap 1 to gap 4 (briefing() in the template);
+   bosses and chests can ask one gap. Gaps already answered are shown filled in, the one being asked is highlighted.
+   Eight passages, so eight questions per step (each answer letter twice per step, spread by 90_finish.js). */
 const P = t => `<div class="passage">${t}</div>`;
-/* ---------- The right word ---------- */
-const GAP = s => `<p class="gapline">${s.replace("___", '<span class="blank">________</span>')}</p><p>Which word best fills the gap?</p>`;
-H("word", 1, "rw1a", { stem: GAP("The detective ___ every page of the diary, searching for even the smallest clue."),
-  opts: [["skimmed", "skimming is reading quickly for the gist, the opposite of searching for the smallest clue"], ["glimpsed", "a glimpse is a brief look"], ["scrutinised", null], ["surveyed", "surveying is looking over the whole of something, not studying every detail"]],
-  body: "“Searching for even the smallest clue” needs a word for examining closely and carefully: scrutinised." });
-H("word", 1, "rw1b", { stem: GAP("After weeks without rain, the once-mighty river had ___ to a thin, muddy trickle."),
-  opts: [["flourished", "flourishing is growing strongly, the opposite"], ["dwindled", null], ["plummeted", "plummeting is a sudden fall, but this happened slowly over weeks"], ["condensed", "condensing is a gas turning into liquid, which isn't what happened"]],
-  body: "Shrinking gradually over weeks, from mighty to a trickle: dwindled." });
-H("word", 1, "rw1c", { stem: GAP("The audience sat ___ as the magician slowly lifted the cloth from the empty cage."),
-  opts: [["restless", "restless means fidgety and impatient, not gripped"], ["drowsy", "drowsy is sleepy, not gripped by the trick"], ["oblivious", "oblivious means not noticing, but they are watching closely"], ["spellbound", null]],
-  body: "A slow, tense reveal holds the audience completely still and fascinated: spellbound." });
-H("word", 1, "rw1d", { stem: GAP("Although the storm had passed, the sea was still ___, with huge grey waves crashing over the breakwater."),
-  opts: [["turbulent", null], ["placid", "placid means calm, the opposite of crashing waves"], ["stagnant", "stagnant water is still and stale"], ["shallow", "about depth, not the wild waves"]],
-  body: "“Huge grey waves crashing” describes wild, churning water: turbulent." });
-H("word", 1, "rw1e", { stem: GAP("Mia gave such a ___ answer that nobody could tell whether she had agreed to come or not."),
-  opts: [["blunt", "a blunt answer is very direct, so everyone would know"], ["prompt", "prompt means quick, which doesn't explain the confusion"], ["vague", null], ["cheerful", "a cheerful answer could still be clear"]],
-  body: "Nobody could tell what she meant, so the answer was unclear: vague." });
-H("word", 1, "rw1f", { stem: GAP("The old sailor's tales were so ___ that many people refused to believe them."),
-  opts: [["mundane", "mundane means dull and ordinary, which nobody would doubt"], ["far-fetched", null], ["accurate", "accurate stories are true, the opposite of unbelievable"], ["modest", "modest stories are low-key, not hard to believe"]],
-  body: "People refused to believe them, so the stories must have been hard to believe: far-fetched." });
-H("word", 1, "rw1g", { stem: GAP("The ___ smell of fresh bread drew a long queue of customers out onto the footpath."),
-  opts: [["pungent", "pungent means sharp and strong, usually unpleasant"], ["faint", "a faint smell wouldn't draw a long queue"], ["stale", "stale doesn't fit fresh bread"], ["enticing", null]],
-  body: "A smell that pulls customers in is attractive and tempting: enticing." });
-H("word", 1, "rw1h", { stem: GAP("The new library was an ___ building of glass and steel that towered over the old shops around it."),
-  opts: [["imposing", null], ["unassuming", "unassuming means modest and plain, not towering"], ["inviting", "inviting is about seeming friendly, not about towering size"], ["unsightly", "unsightly means ugly, but nothing in the sentence says it was ugly"]],
-  body: "A huge glass-and-steel building that towers over its neighbours is grand and impressive: imposing. (The “an” before the gap also needs a word that starts with a vowel sound, and all four do, so only the meaning decides.)" });
-H("word", 2, "rw2a", { stem: GAP("After a long argument, the two teams agreed to ___ their differences and work together."),
-  opts: [["solve", "you solve a problem, but you don't “solve differences”"], ["mend", "you mend a friendship, but not “differences”"], ["settle", null], ["close", "you close a gap, but not “differences”"]],
-  body: "The fixed partner is “settle your differences”: sort out a disagreement." });
-H("word", 2, "rw2b", { stem: GAP("After a long meeting, the council finally ___ a decision about the new swimming pool."),
-  opts: [["reached", null], ["arrived", "“arrived” needs “at”: arrived AT a decision"], ["got", "“got a decision” would mean received one from someone else"], ["did", "you don't “do” a decision"]],
-  body: "You “reach a decision” (or “arrive at” one). Only “reached” fits without another word." });
-H("word", 2, "rw2c", { stem: GAP("The grass fire spread so quickly that it was soon out of ___."),
-  opts: [["order", "“out of order” means broken, like a lift"], ["reach", "“out of reach” means too far away to touch"], ["danger", "“out of danger” means safe, the opposite"], ["control", null]],
-  body: "Something that can no longer be managed is “out of control”." });
-H("word", 2, "rw2d", { stem: GAP("Please ___ close attention to the safety instructions before the ride begins."),
-  opts: [["spend", "“spend” goes with time or money, not attention"], ["pay", null], ["take", "you take notice, but you PAY attention"], ["put", "“put attention” isn't used"]],
-  body: "The fixed partner is “pay attention”." });
-H("word", 2, "rw2e", { stem: GAP("The scientist's discovery shed new ___ on how dinosaurs might have moved."),
-  opts: [["sight", "you catch sight of something; you don't shed it"], ["view", "you can take a new view, but you don't shed one"], ["light", null], ["glow", "close in meaning, but “shed glow” isn't the expression"]],
-  body: "“Shed light on” means help explain. Only “light” goes with “shed … on”." });
-H("word", 2, "rw2f", { stem: GAP("Mr Ito ___ his promise and was sitting in the front row for his daughter's concert."),
-  opts: [["held", "you hold your breath or your nerve, not a promise"], ["saved", "you save money or time, not a promise"], ["kept", null], ["made", "making a promise is giving it; the sentence shows he carried it out"]],
-  body: "Doing what you promised is “keeping” your promise. “Made” is the trap: he made it earlier, and this sentence shows him keeping it." });
-H("word", 2, "rw2g", { stem: GAP("The climbers had a ___ escape when the rock face crumbled moments after they reached the ledge."),
-  opts: [["thin", "close in meaning, but “a thin escape” isn't the expression"], ["slim", "“slim” goes with chance, not escape"], ["tight", "“tight” goes with squeeze, not escape"], ["narrow", null]],
-  body: "Escaping danger only just in time is a “narrow escape”." });
-H("word", 2, "rw2h", { stem: GAP("The council has ___ a ban on fireworks during the dry season."),
-  opts: [["imposed", null], ["inflicted", "you inflict pain or damage, not a ban"], ["committed", "you commit a crime or a mistake"], ["dealt", "you deal a blow or cards, not a ban"]],
-  body: "Rules and bans are “imposed”: put in place by someone with the power to do it." });
-H("word", 3, "rw3a", { stem: GAP("Lily insisted ___ paying for everyone's ice cream."),
-  opts: [["to", "“insisted to paying” breaks the sentence"], ["for", "“insisted for” isn't used"], ["at", "“insisted at” isn't used"], ["on", null]],
-  body: "“Insist” takes “on”: insisted on paying." });
-H("word", 3, "rw3b", { stem: GAP("The coach ___ us to keep our eyes on the ball."),
-  opts: [["said", "“said us to” breaks the grammar"], ["told", null], ["spoke", "“spoke us” has no place for “to keep”"], ["talked", "“talked us to keep” isn't correct"]],
-  body: "Only “told” can be followed by a person and then “to” + a verb: told us to keep." });
-H("word", 3, "rw3c", { stem: GAP("The scientist was famous ___ her work on rainforest frogs."),
-  opts: [["about", "we don't say “famous about”"], ["with", "“famous with” would mean popular with a group of people"], ["for", null], ["of", "“famous of” isn't used"]],
-  body: "You are famous FOR something you did." });
-H("word", 3, "rw3d", { stem: GAP("The teacher ___ the class that the excursion had been cancelled."),
-  opts: [["informed", null], ["announced", "you announce something TO the class, not “announced the class”"], ["explained", "you explain TO someone"], ["said", "you say something TO someone"]],
-  body: "Only “informed” can be followed straight away by the people and then “that…”." });
-H("word", 3, "rw3e", { stem: GAP("The scientists were intent ___ finding the cause of the mysterious illness."),
-  opts: [["to", "“intent to” is a noun phrase (“with intent to”), not what follows “were intent”"], ["for", "“intent for” isn't used"], ["at", "“intent at” isn't used"], ["on", null]],
-  body: "Being determined to do something is being “intent on” it: intent on finding." });
-H("word", 3, "rw3f", { stem: GAP("Ms Daly ___ that we bring a hat and a water bottle on the excursion."),
-  opts: [["wanted", "“wanted that we bring” breaks the grammar: we say “wanted us to bring”"], ["suggested", null], ["told", "“told” needs a person first: “told us that …”"], ["let", "“let” needs a person and a plain verb: “let us bring”"]],
-  body: "Only “suggested” can be followed straight away by “that we bring …”." });
-H("word", 3, "rw3g", { stem: GAP("The firefighters were praised ___ their bravery during the bushfire."),
-  opts: [["of", "“praised of” isn't used"], ["for", null], ["with", "“praised with” would mean the praise came along with something else"], ["about", "“praised about” isn't used"]],
-  body: "You are praised FOR something you did." });
-H("word", 3, "rw3h", { stem: GAP("Although he was furious, the coach refrained ___ shouting at the referee."),
-  opts: [["from", null], ["to", "“refrained to” breaks the grammar"], ["of", "“refrained of” isn't used"], ["against", "“against” sounds right for holding back, but “refrain” takes “from”"]],
-  body: "“Refrain” (hold yourself back) takes “from” + an -ing word: refrained from shouting." });
-H("word", 4, "rw4a", { stem: `<p class="gapline">Ruby had expected the old house to be gloomy. Instead, the rooms were <span class="blank">________</span>, with sunlight pouring through tall windows onto white walls.</p><p>Which word best fills the gap?</p>`,
-  opts: [["airy", null], ["dim", "dim is close to gloomy, but “Instead” says the rooms were the opposite"], ["cosy", "cosy suggests small and snug, not tall windows and pouring light"], ["musty", "musty is stale and old-smelling, which matches gloomy, not the sunlight"]],
-  body: "“Instead” signals the opposite of gloomy, and the sunlight, tall windows and white walls describe light, open, fresh rooms: airy." });
-H("word", 4, "rw4b", { stem: `<p class="gapline">The first time he tried, the pancake landed on the floor. The second time it stuck to the ceiling. By the tenth try, though, Sam had <span class="blank">________</span> the knack, and every pancake landed neatly back in the pan.</p><p>Which word best fills the gap?</p>`,
-  opts: [["lost", "he never had it to lose; the passage shows him improving"], ["missed", "missing the knack is the opposite of “every pancake landed neatly”"], ["mastered", null], ["forgotten", "the story is about learning, not forgetting"]],
-  body: "“Though” turns from the failures to success, and “every pancake landed neatly” shows he had learned the trick completely: mastered." });
-H("word", 4, "rw4c", { stem: `<p class="gapline">Most of the class finished the puzzle in ten minutes. Arjun took nearly an hour, but he refused to give up, and his teacher praised his <span class="blank">________</span>.</p><p>Which word best fills the gap?</p>`,
-  opts: [["speed", "he was the slowest, so speed would be the wrong thing to praise"], ["persistence", null], ["cleverness", "possible in general, but the passage stresses that he refused to give up"], ["luck", "nothing in the passage is about luck"]],
-  body: "The clue is in the earlier part of the sentence: he took ages but “refused to give up”. That is persistence." });
-H("word", 4, "rw4d", { stem: `<p class="gapline">Mia was sure the test would be easy, so she barely studied. When she read the first question, she realised she had been far too <span class="blank">________</span>.</p><p>Which word best fills the gap?</p>`,
-  opts: [["careful", "barely studying is the opposite of careful"], ["nervous", "she was sure it would be easy, so she wasn't nervous before"], ["modest", "being sure of yourself is the opposite of modest"], ["confident", null]],
-  body: "The clue is the sentence before: she was “sure the test would be easy” and “barely studied”. Her mistake was being too confident." });
-H("word", 4, "rw4e", { stem: `<p class="gapline">Everyone had expected the visiting speaker to be dull. Yet her talk was so <span class="blank">________</span> that the whole hall burst into laughter again and again.</p><p>Which word best fills the gap?</p>`,
-  opts: [["solemn", "solemn is serious, which matches “dull”, but “Yet” signals the opposite"], ["witty", null], ["lengthy", "a long talk wouldn't make the hall laugh"], ["informative", "it fits a talk, but it doesn't explain the laughter"]],
-  body: "“Yet” turns away from “dull”, and “burst into laughter again and again” shows a clever, funny talk: witty." });
-H("word", 4, "rw4f", { stem: `<p class="gapline">The garden had once been the pride of the street. Now, after years of neglect, it was <span class="blank">________</span> with weeds and broken pots.</p><p>Which word best fills the gap?</p>`,
-  opts: [["adorned", "adorned means decorated, which is positive, but the garden has been neglected"], ["bordered", "a border is only round the edge; weeds after years of neglect fill everything"], ["overrun", null], ["planted", "planting is done on purpose; neglect means nobody was caring for it"]],
-  body: "“Once the pride … Now, after years of neglect” sets up a contrast: weeds have spread everywhere. That is “overrun”." });
-H("word", 4, "rw4g", { stem: `<p class="gapline">Toby is always the first to volunteer for anything. So when he sat silently at the back while the teacher asked for helpers, his friends were <span class="blank">________</span>.</p><p>Which word best fills the gap?</p>`,
-  opts: [["unsurprised", "the first sentence says he ALWAYS volunteers, so this is the opposite of what they would expect"], ["puzzled", null], ["delighted", "nothing suggests his friends were happy he stayed quiet"], ["relieved", "relief would need a reason, such as not wanting him to help"]],
-  body: "The first sentence sets up what is normal for Toby, and “So” shows the friends reacting to the change. Seeing him act out of character, they would be puzzled." });
-H("word", 4, "rw4h", { stem: `<p class="gapline">The old letters had survived a house fire and a hundred years in a damp cellar. Nobody had read them for decades. When the museum finally received them, they were too <span class="blank">________</span> to be handled at all, so every page was photographed instead.</p><p>Which word best fills the gap?</p>`,
-  opts: [["tattered", "tattered means ragged and torn at the edges; torn paper can still be handled with care"], ["weathered", "weathered means worn by time and weather, which fits their history but doesn't stop anyone touching them"], ["musty", "musty means smelling of damp, which fits the cellar, but a smell doesn't stop anyone handling paper"], ["brittle", null]],
-  body: "All four words could describe old paper, so decide by the shade of meaning. “Too … to be handled at all” needs paper that would break if touched, and the first sentence explains why: fire dried it and damp weakened it. Paper so dry and hard that it snaps or crumbles is “brittle”." });
+/* CLOZE(grp, title, text, gaps): text marks the gaps [1] … [4]; gaps[k] = { opts: [[word, trap-or-null] x4], body } */
+const CLOZE = (grp, title, text, gaps) => {
+  const right = gaps.map(g => g.opts.find(o => o[1] === null)[0]);
+  gaps.forEach((g, i) => {
+    const k = i + 1;
+    const shown = text.replace(/\[(\d)\]/g, (m, n) => { n = +n;
+      if (n < k) return `<b class="filled">(${n}) ${right[n - 1]}</b>`;
+      if (n === k) return `<span class="blank cur">(${n}) ________</span>`;
+      return `<span class="blank">(${n}) ______</span>`; });
+    H("word", k, `${grp}-${k}`, { grp, passage: P(`<p class="ptitle"><b>${title}</b></p><p>${shown}</p>`),
+      stem: `<p>Which word best fills gap <b>${k}</b>?</p>`, opts: g.opts, body: g.body });
+  });
+};
+
+CLOZE("cz1", "The last keeper",
+  "For forty years, Mr Hale had climbed the hundred and twelve steps of Cape Wren lighthouse at dusk. Tonight would be the last time: from tomorrow, a machine would switch the lamp on by itself. He polished the great lens [1], lingering over every pane of glass as if he did not want to finish. Below him the sea heaved and foamed, and a few gulls [2] shelter among the rocks, waiting [3] the storm to pass. When the lamp finally blazed into life, Mr Hale did not go down. He stood beside it for a long time, watching its beam sweep across the water. He had always grumbled that the job was lonely, but now that it was ending, the thought left him strangely [4].",
+  [{ opts: [["unhurriedly", null], ["hastily", "hastily means in a rush, but he lingers as if he does not want to finish"], ["briskly", "briskly means quick and energetic, which clashes with lingering"], ["absent-mindedly", "absent-mindedly means without thinking; his lingering is deliberate, not careless"]],
+     body: "The clue is in the same sentence: he lingers over every pane 'as if he did not want to finish'. <b>Unhurriedly</b> means slowly, taking his time." },
+   { opts: [["took", null], ["made", "you make a shelter (build one), but you do not 'make shelter'"], ["held", "held goes with breath or ground, not with shelter"], ["kept", "kept goes with watch or quiet (keep watch), not with shelter"]],
+     body: "Shelter's partner word is <b>take</b>: to take shelter means to find a safe place out of the weather." },
+   { opts: [["for", null], ["until", "'waiting until' needs a whole clause after it (waiting until the storm passed), not 'the storm to pass'"], ["while", "'while' must be followed by a whole clause, such as 'while the storm passed'"], ["since", "'since' must be followed by a whole clause, such as 'since the storm began'"]],
+     body: "Only <b>for</b> fits the pattern 'wait for something to happen': waiting for the storm to pass." },
+   { opts: [["hollow", null], ["relieved", "he did grumble that the job was lonely, but 'but now that it was ending' turns against that, and he lingers instead of going down"], ["proud", "nothing in the passage is about pride or something he has achieved"], ["cheerful", "cheerful clashes with the way he lingers by the lamp, not wanting to finish"]],
+     body: "Use the whole passage: he lingers over the lens, does not go down, and stands watching the beam. 'But now that it was ending' contrasts with his old grumbling: he is sad to leave, so the thought leaves him <b>hollow</b> (empty and sad)." }]);
+
+CLOZE("cz2", "Opening the hive",
+  "On the first warm morning of spring, Nana Rose lifted the lid of the hive [1], careful not to jolt the frames inside. Thousands of bees crawled over the golden comb, and the air was [2] with a low, steady hum. I had expected them to pour out in a fury, but they seemed far too [3] in their work to notice us. Nana pointed out the queen, longer than the others and surrounded by her attendants. By the time we eased the lid back on, my fear had [4], and I was already begging to come again next week.",
+  [{ opts: [["delicately", null], ["abruptly", "abruptly means suddenly: the kind of movement that would jolt the frames"], ["forcefully", "forcefully means with strength, the opposite of being careful"], ["hurriedly", "hurriedly means rushing, but careful lifting is slow"]],
+     body: "The clue comes straight after the gap: 'careful not to jolt the frames'. <b>Delicately</b> means gently and with great care." },
+   { opts: [["alive", null], ["lively", "lively looks similar, but it describes a person or a party; the partnership is 'alive with'"], ["living", "living means not dead, and 'living with' means sharing a home"], ["awake", "awake means not asleep; air cannot be awake"]],
+     body: "<b>Alive with</b> is a word partnership meaning full of movement or sound: the air was alive with a hum." },
+   { opts: [["absorbed", null], ["intent", "intent goes with 'on' (intent on their work), not 'in'"], ["devoted", "devoted goes with 'to' (devoted to their work), not 'in'"], ["accustomed", "accustomed goes with 'to' and means used to something"]],
+     body: "Check the word that follows the gap: 'in their work'. Only <b>absorbed</b> takes 'in': absorbed in their work means so busy that they notice nothing else." },
+   { opts: [["evaporated", null], ["intensified", "intensified means grew stronger, but at the end she is begging to come back"], ["returned", "returned would mean the fear had gone and come back; nothing in the passage shows that"], ["hardened", "hardened means set firm: a fear that stays, not one that has gone"]],
+     body: "Use the whole passage: she 'had expected' the bees to pour out in a fury, they ignored her, and at the end she is begging to come again. Her fear has disappeared: it has <b>evaporated</b>." }]);
+
+CLOZE("cz3", "The raft",
+  "Mia and her brother spent the whole holiday building a raft from old barrels and planks. Their first attempt sank within seconds, leaving Mia soaked and [1]. Undeterred, they lashed the barrels more tightly and added a third at the front. On launch day, the whole street held its [2] as Mia pushed off with a long pole. To everyone's surprise, the raft glided steadily downstream, as level as a kitchen table. Her brother cheered from the bank, but Mia kept her eyes on the water ahead. After the first disaster she was taking no chances, and she would not allow herself [3] yet. Only when the raft bumped safely against the sandbank at the bend did she finally [4].",
+  [{ opts: [["crestfallen", null], ["elated", "elated means overjoyed: not how you feel when your raft sinks"], ["indifferent", "indifferent means not caring, but 'undeterred' shows they cared and tried again"], ["triumphant", "triumphant is the feeling of winning, not of sinking"]],
+     body: "The raft has just sunk within seconds. <b>Crestfallen</b> means disappointed and downcast, which is how she would feel." },
+   { opts: [["breath", null], ["breathe", "breathe looks alike, but it is the verb; 'held its' needs the noun, breath"], ["air", "air has the right idea, but the partnership is 'hold your breath', not 'hold your air'"], ["pulse", "you take or feel a pulse; you cannot hold it"]],
+     body: "<b>Held its breath</b> is the word partnership: the whole street waited tensely, not breathing." },
+   { opts: [["to grin", null], ["grinning", "'allow herself grinning' breaks the sentence: allow takes 'to' + a verb"], ["grin", "'allow herself grin' is missing the 'to'"], ["grinned", "grinned is the past tense and cannot follow 'allow herself'"]],
+     body: "The pattern is 'allow yourself <b>to</b> do something', so only <b>to grin</b> fits after 'allow herself'." },
+   { opts: [["relax", null], ["relent", "relent means give in after refusing; she was not refusing anything"], ["despair", "despair means lose hope, but the raft has just reached safety"], ["hesitate", "she has been careful the whole way, so 'finally hesitate' makes no sense once she is safe"]],
+     body: "Use the whole passage: after the first disaster she takes no chances, keeps her eyes ahead and will not even grin. Only when the raft is safe does she <b>relax</b>." }]);
+
+CLOZE("cz4", "The clockmaker",
+  "Mr Petrov's shop was so crammed with clocks that it was hard to find a bare patch of wall. Every hour, dozens of them chimed at once, a [1] that made new customers jump. Mr Petrov sat hunched over his bench, peering through a magnifying glass and coaxing tiny cogs back into place with tweezers. He [2] great pride in his work and refused to be rushed. 'A clock mended in a hurry,' he liked to say, 'is a clock that will soon need mending again.' When I asked him how he could bear the noise, he looked puzzled, as if the question had never [3] to him. To him, the chiming was not noise at all. When every clock struck the hour together, it was the sound of everything working [4].",
+  [{ opts: [["din", null], ["melody", "a melody is a tune; it would not make people jump"], ["murmur", "a murmur is soft and low, but dozens of clocks chiming at once is loud"], ["whisper", "a whisper is far too quiet to make anyone jump"]],
+     body: "Dozens of clocks chimed at once and made customers jump: a <b>din</b> is a loud, confused noise." },
+   { opts: [["took", null], ["gave", "you can give praise, but pride does not partner with give"], ["made", "made does not partner with pride"], ["held", "held does not partner with pride in this way"]],
+     body: "Pride's partner word is <b>take</b>: to take pride in your work means to be pleased with it and do it carefully." },
+   { opts: [["occurred", null], ["struck", "struck fits 'had never struck him', but not with 'to him'"], ["crossed", "crossed needs 'his mind' (had never crossed his mind), not 'to him'"], ["suggested", "'had never suggested to him' does not make sense: a question cannot suggest"]],
+     body: "Only <b>occurred</b> takes 'to him': the question had never occurred to him (come into his mind)." },
+   { opts: [["perfectly", null], ["loudly", "the chimes are loud, but the passage says that to him they were not noise at all"], ["slowly", "he works slowly, but the clocks striking together are not slow"], ["separately", "they strike the hour together, not separately"]],
+     body: "Use the whole passage: he takes great care, refuses to be rushed, and to him the chiming is not noise. When every clock strikes the hour together, they all show the right time: everything is working <b>perfectly</b>." }]);
+
+CLOZE("cz5", "Waiting for a platypus",
+  "Dad woke me before sunrise and we [1] down to the creek. He had promised me a platypus, but he warned me that they are shy and easily disturbed. We sat on a log without a sound, so still that a wren hopped within [2] reach of us. For a long time nothing happened except the slow brightening of the sky. Then a line of bubbles appeared near the far bank, and a small brown shape [3] to the surface, as smooth as a wet stone. It floated for a moment, then I shifted my foot on the log, and in a flash it curled under and was gone. Dad just smiled. The platypus had proved to be exactly as [4] as he had warned.",
+  [{ opts: [["tiptoed", null], ["ambled", "ambled means walked slowly and easily, but it says nothing about keeping quiet for a shy animal"], ["hurried", "hurried means moved quickly, which is noisy and careless near a shy animal"], ["trudged", "trudged means walked heavily and wearily, which would disturb a shy animal"]],
+     body: "The next sentence gives the clue: platypuses are 'shy and easily disturbed'. <b>Tiptoed</b> means walked quietly and carefully." },
+   { opts: [["arm's", null], ["hand's", "'within hand's reach' is not the phrase"], ["finger's", "'within finger's reach' is not the phrase"], ["leg's", "'within leg's reach' is not the phrase"]],
+     body: "<b>Within arm's reach</b> is a fixed phrase meaning close enough to touch." },
+   { opts: [["rose", null], ["surfaced", "surfaced already means came to the surface, so 'surfaced to the surface' says it twice"], ["arrived", "you arrive at a place, not 'to' it"], ["appeared", "you appear at or on something; 'appeared to the surface' breaks the sentence"]],
+     body: "Only <b>rose</b> fits with 'to the surface': the shape rose to the surface." },
+   { opts: [["timid", null], ["fierce", "'as he had warned' sounds like danger, but Dad warned that platypuses are shy, not fierce"], ["slippery", "it was 'as smooth as a wet stone', but that is how it looked, not what Dad warned about"], ["sleepy", "Dad never said it would be sleepy, and it vanished in a flash"]],
+     body: "Go back to the start of the passage: Dad 'warned me that they are shy and easily disturbed'. One small movement of a foot and it was gone, so it was exactly as <b>timid</b> (shy and easily frightened) as he had warned." }]);
+
+CLOZE("cz6", "Robot rescue",
+  "Our robot was meant to carry a ping-pong ball through a maze and drop it into a cup. In practice it had worked perfectly, but on competition day it [1] at the first corner and refused to move. While the judges waited, Arjun set to [2], insisting [3] checking every wire himself. At last he found the problem: a loose battery clip. He fixed it, set the robot back at the start and pressed the switch. This time it rolled smoothly through the maze, and the ball dropped neatly into the cup. We did not win, because the judges took points off for the [4]. Even so, as we packed up, Arjun looked as pleased as if we had.",
+  [{ opts: [["stalled", null], ["slowed", "slowed means went more slowly, but the robot stopped completely"], ["hesitated", "hesitated means paused for a moment and then went on, but it refused to move at all"], ["skidded", "skidded means slid out of control, but it did not move"]],
+     body: "It 'refused to move': <b>stalled</b> means stopped working and came to a halt." },
+   { opts: [["work", null], ["job", "'set to job' is not a phrase"], ["task", "'set to task' is not a phrase without 'the'"], ["labour", "'set to labour' is not the phrase used"]],
+     body: "<b>Set to work</b> is a word partnership meaning started working hard straight away." },
+   { opts: [["on", null], ["in", "insist goes with 'on', not 'in'"], ["to", "'insisting to checking' breaks the sentence"], ["for", "insist does not take 'for'"]],
+     body: "The verb insist takes <b>on</b>: insisting on checking every wire." },
+   { opts: [["delay", null], ["speed", "the robot was not too fast: in the end it rolled smoothly through the maze"], ["noise", "nothing in the passage mentions noise"], ["shortcut", "it went through the maze and dropped the ball in the cup; no shortcut is mentioned"]],
+     body: "Use the whole passage: the robot stalled and 'the judges waited' while Arjun checked every wire. The only thing that went wrong was the time this took: the <b>delay</b>." }]);
+
+CLOZE("cz7", "The kite",
+  "Last September I flew a kite I had made myself from bamboo and an old shopping bag. It was not the most [1] kite on the beach, but it climbed higher than I had dared to hope. I was so proud that I began to take the wind for [2]. Then, without warning, it changed direction. My kite lurched sideways, and for a terrible moment I could not stop it [3] towards a family's picnic rug. I hauled on the string with all my strength, and it swooped up again, missing their sandwiches by a whisker. The family clapped, and my face burned with [4]. From then on I kept a firm grip and watched the sky like a sailor.",
+  [{ opts: [["elegant", null], ["effective", "'but it climbed higher than I had dared to hope' shows it flew well, so it did not lack effectiveness"], ["powerful", "it climbed high, so power is not what it lacked"], ["successful", "it was successful, so 'not the most successful … but it climbed higher' makes no sense"]],
+     body: "'But' sets up a contrast: it was made from an old shopping bag (not much to look at) but it flew well. <b>Elegant</b> (graceful, stylish) is about looks, so it is the only one that contrasts." },
+   { opts: [["granted", null], ["given", "'take for given' is not the phrase"], ["guaranteed", "'take for guaranteed' is not the phrase, even though the meaning is close"], ["certain", "you can take something 'as certain', but not 'for certain' after take"]],
+     body: "<b>Take for granted</b> is a fixed phrase meaning expect something to always be there without thinking about it." },
+   { opts: [["diving", null], ["to dive", "'stop it to dive' would mean stop it so that it could dive"], ["dive", "'stop it dive' is missing a word"], ["dived", "dived is the past tense and cannot follow 'stop it'"]],
+     body: "The pattern is 'stop something <b>doing</b> something', so only <b>diving</b> fits: I could not stop it diving towards the rug." },
+   { opts: [["shame", null], ["pride", "the family clapped, but his kite had nearly crashed into their picnic: nothing to be proud of"], ["joy", "being clapped for can feel good, but he had nearly ruined their picnic"], ["fury", "nobody had done anything to him: the mistake was his own"]],
+     body: "On its own, the sentence could fit pride or joy, because the family clapped. The rest of the passage decides: he had taken the wind for granted and his kite nearly crashed into their picnic. The clapping makes it worse, so his face burned with <b>shame</b> (embarrassment)." }]);
+
+CLOZE("cz8", "The corn maze",
+  "The sign at the entrance promised that the corn maze would take 'about twenty minutes'. An hour later, Leo and I were still [1] between walls of green stalks far taller than us. Leo wanted to keep turning left, but I [2] to differ. I was convinced [3] the exit lay near the tractor we could hear in the next field, so in the end we followed the sound. Ten minutes later we stumbled out, scratched and dusty, right beside the ticket booth. My [4] had been right after all. The woman there glanced at her watch and smiled. 'About twenty minutes,' she said, and I still cannot decide whether she was teasing us.",
+  [{ opts: [["wandering", null], ["strolling", "strolling means walking for pleasure, but they are lost after an hour"], ["sauntering", "sauntering means walking in a slow, relaxed way, not being lost"], ["parading", "parading means walking to show off"]],
+     body: "An hour later they are 'still' inside: <b>wandering</b> means moving around without knowing where you are going." },
+   { opts: [["begged", null], ["asked", "'asked to differ' is not the phrase"], ["pleaded", "'pleaded to differ' is not the phrase"], ["requested", "'requested to differ' is not the phrase"]],
+     body: "<b>I beg to differ</b> is a fixed, polite way of saying 'I disagree'." },
+   { opts: [["that", null], ["what", "'convinced what the exit lay' breaks the sentence"], ["which", "'convinced which the exit lay' breaks the sentence"], ["of", "'convinced of' needs a noun after it, such as 'convinced of the way out'"]],
+     body: "After 'convinced', a whole idea needs <b>that</b>: I was convinced that the exit lay near the tractor." },
+   { opts: [["hunch", null], ["sign", "the sign promised about twenty minutes and they took over an hour, so the sign was not right"], ["map", "no map is mentioned: they found the way by following the sound of the tractor"], ["compass", "no compass is mentioned: they followed the sound of the tractor"]],
+     body: "Use the whole passage: Leo wanted to keep turning left, but the writer 'was convinced' the exit was near the tractor, without being able to prove it. They followed that idea and came out at the exit. A feeling you trust without proof is a <b>hunch</b>." }]);
 
 /* RIDGE RUNNER: finish the hand-written questions.
    Each step gets its own shuffle of answer letters, so no letter pattern repeats from step to step, while the
@@ -2052,7 +2063,7 @@ H("word", 4, "rw4h", { stem: `<p class="gapline">The old letters had survived a 
       const options = opts.map(o => o[0]), answer = opts.findIndex(o => o[1] === null), traps = {};
       opts.forEach((o, i) => { if (o[1] !== null) traps[i] = o[1]; });
       const method = TRACKS.find(t => t.id === r.track).method;
-      HAND.push({ id: r.id, track: r.track, rung: r.rung, passage: r.q.passage || "", stem: r.q.stem, options, answer, traps, visual: !!r.q.visual,
+      HAND.push({ id: r.id, track: r.track, rung: r.rung, grp: r.q.grp, passage: r.q.passage || "", stem: r.q.stem, options, answer, traps, visual: !!r.q.visual,
         explain: `<p class="method"><b>Method:</b> ${method}</p><p>${r.q.body}</p>${LIB.whyNot({ options, traps })}` });
     });
   }
@@ -3702,7 +3713,13 @@ function briefing(L, stage = 0) {
     ts.forEach((t, i) => add(t, [1, 2, 3, 3, 4, 4][i], "boss"));
   } else {
     /* one skill, climbing inside the level: step 1 (warm-up) -> step 2 -> step 3 -> step 4 (test level) */
-    for (let r = 1; r <= QN.normal; r++) add(L.tracks[stage], r, "focus");
+    const t = L.tracks[stage], grps = [...new Set(HAND.filter(q => q.track === t && q.grp).map(q => q.grp))];
+    if (grps.length) {
+      /* a cloze passage: one whole passage, gap 1 to gap 4 (the gaps climb like the steps); unseen passages first */
+      const age = g => Math.max(0, ...HAND.filter(q => q.grp === g).map(q => S.seen[q.id] || 0)), fresh = grps.filter(g => !age(g));
+      const g = fresh.length ? fresh[Math.floor(Math.random() * fresh.length)] : grps.sort((a, b) => age(a) - age(b))[0];
+      HAND.filter(q => q.grp === g).sort((a, b) => a.rung - b.rung).forEach(q => { ids.push(q.id); S.seen[q.id] = S.seed++; out.push(Object.assign({}, q, { role: "focus" })); });
+    } else for (let r = 1; r <= QN.normal; r++) add(t, r, "focus");
   }
   save();
   return out;

@@ -105,6 +105,11 @@ table.grid { border-collapse: collapse; background: #fff; } table.grid th, table
 .big { font-size: 22px; font-weight: 700; } .note { color: #555; font-size: 14px; } .quote { font-style: italic; font-size: 18px; }
 .box { border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; background: #f1f3f5; }
 .blank { display: inline-block; min-width: 90px; border-bottom: 2px solid var(--ink); }
+.passage .blank { min-width: 0; padding: 0 4px; color: #868e96; font-weight: 700; }
+.passage .blank.cur { background: #ffe066; color: var(--ink); border-radius: 4px; box-shadow: 0 0 0 2px #fab005; }
+.passage .filled { color: #2b8a3e; text-decoration: underline; }
+.passage .ptitle { margin: 0 0 4px; text-align: center; }
+.passage p { line-height: 1.75; }
 ul.clues, ol.sts { margin: 6px 0; } .gapline { font-size: 17px; }
 .explain { margin-top: 14px; border-top: 3px dashed #adb5bd; padding-top: 10px; }
 .explain .method { background: #e7f5ff; border-left: 5px solid #339af0; padding: 6px 10px; border-radius: 4px; }
@@ -328,7 +333,13 @@ function briefing(L, stage = 0) {
     ts.forEach((t, i) => add(t, [1, 2, 3, 3, 4, 4][i], "boss"));
   } else {
     /* one skill, climbing inside the level: step 1 (warm-up) -> step 2 -> step 3 -> step 4 (test level) */
-    for (let r = 1; r <= QN.normal; r++) add(L.tracks[stage], r, "focus");
+    const t = L.tracks[stage], grps = [...new Set(HAND.filter(q => q.track === t && q.grp).map(q => q.grp))];
+    if (grps.length) {
+      /* a cloze passage: one whole passage, gap 1 to gap 4 (the gaps climb like the steps); unseen passages first */
+      const age = g => Math.max(0, ...HAND.filter(q => q.grp === g).map(q => S.seen[q.id] || 0)), fresh = grps.filter(g => !age(g));
+      const g = fresh.length ? fresh[Math.floor(Math.random() * fresh.length)] : grps.sort((a, b) => age(a) - age(b))[0];
+      HAND.filter(q => q.grp === g).sort((a, b) => a.rung - b.rung).forEach(q => { ids.push(q.id); S.seen[q.id] = S.seed++; out.push(Object.assign({}, q, { role: "focus" })); });
+    } else for (let r = 1; r <= QN.normal; r++) add(t, r, "focus");
   }
   save();
   return out;
