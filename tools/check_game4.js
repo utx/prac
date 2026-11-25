@@ -211,7 +211,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const browser = await chromium.launch();
   const url = "file://" + PAGE;
   const errs = [];
-  const open = async (vp, q = "", splash = false) => { const p = await browser.newPage({ viewport: vp }); if (!splash) await p.addInitScript(() => { window.__noSplash = true; }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
+  const open = async (vp, q = "", splash = false) => { const p = await browser.newPage({ viewport: vp }); if (!splash) await p.addInitScript(() => { window.__noSplash = true; window.__noIntro = true; window.__noVeh = true; }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
   /* the title screen: it animates, a key press flashes into the map */
   { const ps = await open({ width: 1280, height: 800 }, "", true);
     if (!(await ps.isVisible("#splash"))) bad("the game should open on its title screen");
@@ -382,6 +382,36 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     await p.evaluate(() => { __rr.PF.hook.aimAt(0, "body"); __rr.PF.hook.fire(); __rr.PF.hook.quiet(); }); await p.waitForTimeout(1500);
     if (await p.evaluate(() => __rr.PF.hook.incoming())) bad("shooting an aiming sentry first should stop its shot"); }
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "body")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(80);
+  /* the gear card before the shooting, and the vehicles (with both switched back on) */
+  { const pv = await open({ width: 1280, height: 800 });
+    await pv.evaluate(() => { window.__noIntro = false; window.__noVeh = false; __rr.startBrief("3-L1", 0); });
+    for (let i = 0; i < 4; i++) { await pv.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await pv.click("#btn-next"); }
+    await pv.click("#btn-play"); await pv.waitForTimeout(300);
+    await pv.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await pv.waitForTimeout(150); await pv.keyboard.press("KeyE"); await pv.waitForTimeout(500);
+    if (!(await pv.evaluate(() => __rr.PF.hook.intro()))) bad("entering a nest should first show the gear card");
+    if (shots) await pv.screenshot({ path: path.join(shots, "rr-gear.png") });
+    await pv.keyboard.press("KeyJ"); await pv.waitForTimeout(100); if (!(await pv.evaluate(() => __rr.PF.hook.intro()))) bad("only SPACE should close the gear card");
+    await pv.keyboard.press("Space"); await pv.waitForTimeout(150); if (await pv.evaluate(() => __rr.PF.hook.intro())) bad("SPACE should close the gear card and start the shooting");
+    await pv.evaluate(() => __rr.PF.hook.vehOff(true));
+    /* a plane drops a paratrooper: a sky shot knocks it out */
+    await pv.evaluate(() => __rr.PF.hook.spawnVeh("plane"));
+    let ch = null; for (let k = 0; k < 40 && !ch; k++) { await pv.waitForTimeout(100); ch = (await pv.evaluate(() => __rr.PF.hook.vehicles())).chutes[0]; }
+    if (!ch) bad("a plane should drop a paratrooper");
+    else { await pv.waitForTimeout(300); const c = (await pv.evaluate(() => __rr.PF.hook.vehicles())).chutes[0]; const ko0 = (await pv.evaluate(() => __rr.PF.hook.vehicles())).stat.ko;
+      await pv.evaluate(c => { __rr.PF.hook.aimPoint(c.x, c.y + 4); __rr.PF.hook.fire(); }, c); await pv.waitForTimeout(150);
+      const v1 = await pv.evaluate(() => __rr.PF.hook.vehicles()); if (v1.stat.ko !== ko0 + 1 || v1.chutes.length) bad(`a shot on a paratrooper should knock it out (${JSON.stringify(v1.stat)})`); }
+    if (shots) await pv.screenshot({ path: path.join(shots, "rr-plane.png") });
+    /* a helicopter takes 3 hits; a tank's hatch counts double */
+    for (const [k, hits] of [["heli", 3], ["tank", 2]]) {
+      await pv.waitForTimeout(3000); await pv.evaluate(k => __rr.PF.hook.spawnVeh(k), k);
+      for (let t = 0; t < 60; t++) { await pv.waitForTimeout(100); const v = (await pv.evaluate(() => __rr.PF.hook.vehicles())).veh; if (v && v.x > 60 && v.x < 420 && v.state !== "in") break; }
+      if (shots) await pv.screenshot({ path: path.join(shots, `rr-${k}.png`) });
+      for (let h = 0; h < hits; h++) { await pv.evaluate(k => { const v = __rr.PF.hook.vehicles().veh; if (v) { __rr.PF.hook.aimPoint(v.x, k === "tank" ? v.y - 23 : v.y); __rr.PF.hook.fire(); } }, k); await pv.waitForTimeout(700); }
+      const v = (await pv.evaluate(() => __rr.PF.hook.vehicles())).veh;
+      if (v && !v.dead) bad(`${k}: ${hits} ${k === "tank" ? "hatch hits" : "hits"} should bring it down (${JSON.stringify(v)})`);
+    }
+    if (!((await pv.evaluate(() => __rr.PF.hook.vehicles())).stat.veh >= 3)) bad("vehicles and sky shots should be counted for the report");
+    await pv.evaluate(() => localStorage.clear()); await pv.close(); }
   /* losing: one retry with the same kit, then a new briefing */
   await p.evaluate(() => __rr.PF.hook.lose()); await p.waitForTimeout(900);
   if (!(await p.isVisible("#btn-retry"))) bad("losing should offer a retry with the same kit");
