@@ -405,11 +405,17 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     await pv.evaluate(() => { window.__noIntro = false; window.__noVeh = false; __rr.startBrief("3-L1", 0); });
     for (let i = 0; i < 4; i++) { await pv.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await pv.click("#btn-next"); }
     await pv.click("#btn-play"); await pv.waitForTimeout(300);
-    await pv.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await pv.waitForTimeout(150); await pv.keyboard.press("KeyE"); await pv.waitForTimeout(500);
+    await pv.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await pv.waitForTimeout(150); await pv.keyboard.down("ArrowDown"); await pv.waitForTimeout(500);
     if (!(await pv.evaluate(() => __rr.PF.hook.intro()))) bad("entering a nest should first show the gear card");
     if (shots) await pv.screenshot({ path: path.join(shots, "rr-gear.png") });
+    /* the bug David found: ▼ held to open the nest and let go while the gear card is up must not stay "held" */
+    await pv.keyboard.down("ArrowDown"); await pv.waitForTimeout(200); await pv.keyboard.up("ArrowDown"); await pv.waitForTimeout(100);
     await pv.keyboard.press("KeyJ"); await pv.waitForTimeout(100); if (!(await pv.evaluate(() => __rr.PF.hook.intro()))) bad("only SPACE should close the gear card");
     await pv.keyboard.press("Space"); await pv.waitForTimeout(150); if (await pv.evaluate(() => __rr.PF.hook.intro())) bad("SPACE should close the gear card and start the shooting");
+    { const y0 = await pv.evaluate(() => __rr.PF.hook.state().sy); await pv.waitForTimeout(600); const y1 = await pv.evaluate(() => __rr.PF.hook.state().sy);
+      if (Math.abs(y1 - y0) > 1) bad(`the crosshair should stay still when no key is held (it drifted ${y0} → ${y1})`);
+      await pv.keyboard.down("ArrowUp"); await pv.waitForTimeout(300); await pv.keyboard.up("ArrowUp"); const y2 = await pv.evaluate(() => __rr.PF.hook.state().sy);
+      if (!(y2 < y1 - 10)) bad(`↑ should move the crosshair up (${y1} → ${y2})`); }
     await pv.evaluate(() => __rr.PF.hook.vehOff(true));
     /* a plane drops a paratrooper: a sky shot knocks it out */
     await pv.evaluate(() => __rr.PF.hook.spawnVeh("plane"));
