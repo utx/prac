@@ -4,68 +4,83 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ridge Runner</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root { --bg: #14172b; --panel: #1f2440; --panel2: #262c4f; --ink: #1b2a41; --paper: #fbfaf6; --text: #eef0ff; --muted: #a9b0d6; --gold: #ffd43b; --green: #51cf66; --red: #ff6b6b; --blue: #74c0fc;
-  --m: #ff922b; --t: #4dabf7; --r: #b197fc; }
+:root { --bg: #081233; --bg2: #1a0f4a; --panel: #142a6b; --panel2: #1d3a8a; --line: rgba(255,255,255,.14); --ink: #1b2a41; --paper: #fbfaf6; --text: #f1f4ff; --muted: #b4bfe8; --gold: #ffe14d; --gold2: #ffb703; --green: #3ee07a; --red: #ff5a6a; --blue: #4cc3ff;
+  --m: #ff922b; --t: #4dabf7; --r: #b197fc;
+  --common: linear-gradient(160deg, #a7b4c2, #5d6b7a); --rare: linear-gradient(160deg, #47b4ff, #1f5fd1); --epic: linear-gradient(160deg, #cf6bff, #7a2bd6); --legendary: linear-gradient(160deg, #ffb347, #d9661c); }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-.px { font-family: "Press Start 2P", "Courier New", monospace; letter-spacing: .5px; }
-header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #0d1022; border-bottom: 3px solid #000; position: sticky; top: 0; z-index: 5; flex-wrap: wrap; }
-header h1 { margin: 0; font-size: 16px; color: var(--gold); text-shadow: 2px 2px 0 #000; }
+body { margin: 0; color: var(--text); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(1200px 600px at 15% -10%, #2d55c8 0%, transparent 60%), radial-gradient(900px 600px at 110% 10%, #6b2bd6 0%, transparent 55%), linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); background-attachment: fixed; min-height: 100vh; }
+/* chunky italic capitals for every heading and label (system fonts only) */
+.px { font-family: "Arial Black", "Segoe UI Black", Impact, system-ui, sans-serif; font-style: italic; text-transform: uppercase; letter-spacing: .3px; font-weight: 900; }
+.art { display: block; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,.45)); }
+header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: linear-gradient(90deg, rgba(10,22,70,.92), rgba(48,18,110,.92)); border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; flex-wrap: wrap; backdrop-filter: blur(6px); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+header h1 { margin: 0; font-size: 22px; background: linear-gradient(180deg, #fff6a8, #ffc300 55%, #ff8a00); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 0 rgba(0,0,0,.6)); }
 header .sp { flex: 1; }
-.chip { background: var(--panel); border: 2px solid #000; padding: 4px 10px; border-radius: 6px; font-size: 13px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,.35); border: 1px solid var(--line); padding: 4px 12px 4px 6px; border-radius: 999px; font-size: 14px; font-weight: 800; }
+.chip img { width: 22px; height: 22px; }
+.chip.plain { padding-left: 12px; }
 button { font: inherit; cursor: pointer; }
-.btn { background: var(--gold); color: #1b1b2f; border: 3px solid #000; box-shadow: 0 4px 0 #000; padding: 10px 18px; border-radius: 8px; font-weight: 800; }
-.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #000; }
-.btn.alt { background: #dee2ff; } .btn.grn { background: var(--green); } .btn.red { background: var(--red); } .btn.sm { padding: 6px 10px; font-size: 14px; }
+.btn { font-family: "Arial Black", "Segoe UI Black", Impact, sans-serif; font-style: italic; text-transform: uppercase; letter-spacing: .3px; background: linear-gradient(180deg, #fff27a, var(--gold) 45%, var(--gold2)); color: #1b1440; border: 0; border-radius: 10px; padding: 11px 20px; font-size: 15px;
+  box-shadow: 0 4px 0 #a86a00, 0 8px 18px rgba(0,0,0,.35); transform: skewX(-6deg); transition: transform .08s, filter .15s; }
+.btn:hover { filter: brightness(1.07); } .btn:active { transform: skewX(-6deg) translateY(3px); box-shadow: 0 1px 0 #a86a00; }
+.btn.alt { background: linear-gradient(180deg, #ffffff, #d9e1ff); box-shadow: 0 4px 0 #7d89b8, 0 8px 18px rgba(0,0,0,.3); }
+.btn.grn { background: linear-gradient(180deg, #8dffb4, var(--green) 50%, #17a84f); box-shadow: 0 4px 0 #0d6e33, 0 8px 18px rgba(0,0,0,.35); }
+.btn.red { background: linear-gradient(180deg, #ff9aa5, var(--red)); box-shadow: 0 4px 0 #9a1d2b; }
+.btn.sm { padding: 6px 12px; font-size: 12.5px; }
 .btn[disabled] { opacity: .45; cursor: default; }
-.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; max-width: 1560px; margin: 0 auto; padding: 12px 16px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; max-width: 1560px; margin: 0 auto; padding: 14px 16px; }
 body.practice .layout { grid-template-columns: minmax(0, 1fr) 380px; }
 @media (max-width: 1000px) { body.practice .layout { grid-template-columns: minmax(0, 1fr); } }
 main { min-width: 0; }
-.panel { background: var(--panel); border: 3px solid #000; border-radius: 12px; padding: 16px; box-shadow: 0 6px 0 #000; }
+.panel { background: linear-gradient(160deg, rgba(36,72,170,.92), rgba(22,36,100,.94)); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: 0 12px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15); }
 .hidden { display: none !important; }
 /* map */
 .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-.tab { border: 3px solid #000; border-radius: 8px; padding: 8px 12px; background: var(--panel2); color: var(--text); font-size: 11px; }
-.tab.on { background: var(--gold); color: #111; }
-.tab.lock { opacity: .5; }
-.world { border-radius: 12px; padding: 14px; border: 3px solid #000; }
-.world h2 { margin: 0 0 4px; font-size: 14px; } .world p.sub { margin: 0 0 12px; color: #dfe3ff; font-size: 14px; }
-.path { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.node { position: relative; text-align: left; border: 3px solid #000; border-radius: 10px; padding: 8px; background: #f8f9fa; color: #111; min-height: 92px; box-shadow: 0 4px 0 #000; }
-.node .n { font-size: 10px; } .node .ic { font-size: 22px; line-height: 1.1; }
-.node .nm { font-size: 12.5px; font-weight: 700; line-height: 1.2; }
-.node .st { font-size: 13px; color: #e67700; letter-spacing: 1px; }
-.node.maths { border-left: 10px solid var(--m); } .node.thinking { border-left: 10px solid var(--t); } .node.reading { border-left: 10px solid var(--r); }
+.tab { border: 0; border-radius: 10px; padding: 9px 14px; background: rgba(255,255,255,.1); color: var(--text); font-size: 13px; transform: skewX(-6deg); box-shadow: inset 0 0 0 1px var(--line); }
+.tab.on { background: linear-gradient(180deg, #fff27a, var(--gold2)); color: #1b1440; box-shadow: 0 4px 0 #a86a00; }
+.tab.lock { opacity: .45; }
+.world { border-radius: 18px; padding: 16px; position: relative; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 14px 34px rgba(0,0,0,.4); }
+.world::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(115deg, rgba(255,255,255,.05) 0 2px, transparent 2px 22px); pointer-events: none; }
+.world > * { position: relative; }
+.world h2 { margin: 0 0 4px; font-size: 22px; text-shadow: 0 3px 0 rgba(0,0,0,.35); } .world h2 small { font-size: 13px; padding: 2px 10px; border-radius: 999px; background: rgba(0,0,0,.3); vertical-align: 4px; margin-left: 6px; }
+.world p.sub { margin: 0 0 14px; color: #f3f5ff; font-size: 14.5px; max-width: 900px; }
+.path { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 12px; }
+.node { position: relative; text-align: left; border: 0; border-radius: 14px; padding: 10px; color: #fff; min-height: 96px; overflow: hidden;
+  background: linear-gradient(170deg, rgba(255,255,255,.22), rgba(255,255,255,.06)), rgba(10,18,60,.55); box-shadow: inset 0 0 0 2px rgba(255,255,255,.25), 0 8px 18px rgba(0,0,0,.35); transition: transform .12s; }
+.node:hover:not(.lock) { transform: translateY(-3px); }
+.node .n { font-size: 12px; color: var(--gold); text-shadow: 0 2px 0 rgba(0,0,0,.4); } .node .ic { font-size: 22px; line-height: 1.1; }
+.node .nm { font-size: 16px; font-weight: 900; line-height: 1.15; font-family: "Arial Black", Impact, sans-serif; font-style: italic; text-transform: uppercase; text-shadow: 0 2px 0 rgba(0,0,0,.35); }
+.node .st { font-size: 16px; color: var(--gold); letter-spacing: 2px; margin-top: 4px; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
 #splash { position: fixed; inset: 0; z-index: 50; background: #0b0820; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 #splash.hidden { display: none; }
 #splash canvas { width: min(100vw, calc(100vh * 16 / 9)); height: auto; max-height: 100vh; image-rendering: pixelated; image-rendering: crisp-edges; }
-.snipe .roast { margin: 10px 0 0; font-style: italic; color: #fff3bf; font-size: 15px; }
-.node.boss { background: #ffe066; border-left: 10px solid #e03131; }
-.node.big { min-height: 150px; border-left: 10px solid #ffd43b; }
-.node .sk { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
-.node .sk span { font-size: 11.5px; font-weight: 700; padding: 2px 6px; border-radius: 6px; border-left: 6px solid #adb5bd; background: #e9ecef; }
+.node.boss { background: linear-gradient(165deg, rgba(255,90,106,.85), rgba(120,20,60,.9)); box-shadow: inset 0 0 0 2px #ffd0d6, 0 8px 22px rgba(255,60,90,.35); }
+.node.boss img.art { width: 58px; height: 58px; margin: 2px 0 2px; }
+.node.big { min-height: 160px; }
+.node .sk { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.node .sk span { font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 8px; background: rgba(0,0,0,.32); border-left: 5px solid #adb5bd; }
 .node .sk span.maths { border-left-color: var(--m); } .node .sk span.thinking { border-left-color: var(--t); } .node .sk span.reading { border-left-color: var(--r); }
-.node .sk span.ok { background: #d3f9d8; }
-.node .prog2 { font-size: 9px; color: #e67700; margin-top: 4px; }
+.node .sk span.ok { background: rgba(62,224,122,.35); }
+.node .prog2 { font-size: 11px; color: var(--gold); margin-top: 6px; }
 .node .ic.big { font-size: 40px; }
-.climb li.done2 { color: #2b8a3e; }
-.node.lock { opacity: .45; filter: grayscale(.8); cursor: not-allowed; }
-.node.sel { outline: 4px solid var(--gold); }
-.node.done::after { content: "✔"; position: absolute; right: 8px; top: 6px; color: #2b8a3e; font-weight: 900; }
-.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 10px; }
-.legend i { display: inline-block; width: 12px; height: 12px; border: 2px solid #000; margin-right: 4px; vertical-align: -1px; }
+.climb li.done2 { color: var(--green); }
+.node.lock { filter: grayscale(.85) brightness(.6); cursor: not-allowed; }
+.node.lock::after { content: "🔒"; position: absolute; right: 10px; top: 8px; font-size: 18px; }
+.node.sel { box-shadow: inset 0 0 0 3px var(--gold), 0 0 0 3px rgba(255,225,77,.35), 0 10px 26px rgba(0,0,0,.45); }
+.node.done::after { content: "✔"; position: absolute; right: 10px; top: 6px; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: var(--green); color: #053; font-weight: 900; font-size: 14px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: #eef; margin-top: 12px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
 .lvcard { margin-top: 14px; }
-.lvcard h3 { margin: 0 0 6px; font-size: 13px; color: var(--gold); }
+.lvcard h3 { margin: 0 0 6px; font-size: 20px; color: var(--gold); text-shadow: 0 2px 0 rgba(0,0,0,.35); }
+.lvhead { display: flex; gap: 14px; align-items: center; }
+.lvhead img { width: 64px; height: 64px; flex: none; }
 /* question card */
-.qcard { background: var(--paper); color: var(--ink); border: 3px solid #000; border-radius: 12px; padding: 18px; box-shadow: 0 6px 0 #000; }
+.qcard { background: var(--paper); color: var(--ink); border-radius: 16px; padding: 18px; box-shadow: 0 14px 34px rgba(0,0,0,.4); border-top: 6px solid var(--gold); }
 .qhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-.qhead .px { font-size: 10px; color: #444; }
-.dots { display: flex; gap: 6px; } .dots span { width: 14px; height: 14px; border: 2px solid #000; border-radius: 3px; background: #dee2e6; } .dots .ok { background: var(--green); } .dots .no { background: var(--red); } .dots .cur { background: var(--gold); }
-.passage { background: #fff; border: 2px solid #d3d9e3; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; max-height: 46vh; overflow: auto; }
+.qhead .px { font-size: 13px; color: #2a2f6a; }
+.dots { display: flex; gap: 6px; } .dots span { width: 16px; height: 16px; border-radius: 50%; background: #dee2e6; box-shadow: inset 0 0 0 2px rgba(0,0,0,.15); } .dots .ok { background: var(--green); } .dots .no { background: var(--red); } .dots .cur { background: var(--gold); box-shadow: 0 0 0 3px rgba(255,183,3,.35); }
+.passage { background: #fff; border: 2px solid #d3d9e3; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; max-height: 46vh; overflow: auto; }
 .qgrid { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
 .qgrid > div { min-width: 0; }
 @media (min-width: 900px) {
@@ -81,10 +96,10 @@ main { min-width: 0; }
 .figure { margin: 10px 0; overflow-x: auto; } .figure svg { max-width: 100%; height: auto; }
 table.grid { border-collapse: collapse; background: #fff; } table.grid th, table.grid td { border: 2px solid var(--ink); padding: 6px 10px; text-align: center; min-width: 46px; } table.grid th { background: #eef1f6; } table.grid td.gap { background: #fff3bf; }
 .opts { display: grid; gap: 8px; margin-top: 12px; }
-.opt { display: flex; gap: 10px; align-items: center; text-align: left; background: #fff; color: var(--ink); border: 3px solid var(--ink); border-radius: 10px; padding: 9px 12px; box-shadow: 0 3px 0 var(--ink); }
-.opt b.l { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 6px; background: var(--ink); color: #fff; }
-.opt:hover:not([disabled]) { background: #fff9db; }
-.opt.right { background: #d3f9d8; } .opt.wrong { background: #ffe3e3; }
+.opt { display: flex; gap: 10px; align-items: center; text-align: left; background: #fff; color: var(--ink); border: 2px solid #c9d2e6; border-radius: 12px; padding: 9px 12px; box-shadow: 0 3px 0 #c9d2e6; transition: transform .08s, border-color .12s; }
+.opt b.l { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; background: linear-gradient(160deg, #3b5bdb, #5f3dc4); color: #fff; font-style: italic; }
+.opt:hover:not([disabled]) { border-color: var(--gold2); background: #fffbe6; transform: translateX(2px); }
+.opt.right { background: #d3f9d8; border-color: #2f9e44; } .opt.right b.l { background: #2f9e44; } .opt.wrong { background: #ffe3e3; border-color: #e03131; } .opt.wrong b.l { background: #e03131; }
 .opts.visual { grid-template-columns: repeat(2, minmax(0, 1fr)); } .opts.visual .opt { justify-content: center; }
 .fr sup, .fr sub { font-size: .75em; }
 .big { font-size: 22px; font-weight: 700; } .note { color: #555; font-size: 14px; } .quote { font-style: italic; font-size: 18px; }
@@ -94,58 +109,104 @@ ul.clues, ol.sts { margin: 6px 0; } .gapline { font-size: 17px; }
 .explain { margin-top: 14px; border-top: 3px dashed #adb5bd; padding-top: 10px; }
 .explain .method { background: #e7f5ff; border-left: 5px solid #339af0; padding: 6px 10px; border-radius: 4px; }
 .explain .why-not { background: #fff4e6; border-left: 5px solid #fd7e14; padding: 6px 10px; border-radius: 4px; }
-.verdict { font-weight: 800; font-size: 18px; } .verdict.ok { color: #2b8a3e; } .verdict.no { color: #c92a2a; }
-/* kit */
-.kitgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 12px 0; }
-.kit { background: var(--panel2); border: 3px solid #000; border-radius: 10px; padding: 10px; }
-.kitlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 8px; margin: 10px 0; }
-.kitrow { display: flex; gap: 10px; align-items: flex-start; background: var(--panel2); border: 3px solid #000; border-radius: 10px; padding: 8px 10px; }
-.kitrow .ki { font-size: 26px; width: 34px; text-align: center; } .kitrow .kv { color: var(--gold); } .kitrow.off { opacity: .55; } .kitrow small { color: var(--muted); }
-.modal { position: fixed; inset: 0; background: rgba(5,8,20,.78); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.verdict { font-weight: 900; font-size: 19px; font-style: italic; text-transform: uppercase; font-family: "Arial Black", Impact, sans-serif; } .verdict.ok { color: #2b8a3e; } .verdict.no { color: #c92a2a; }
+/* kit: item tiles with the item art, glowing when earned */
+.kithead { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.kithead h2 { margin: 0; font-size: 26px; color: var(--gold); text-shadow: 0 3px 0 rgba(0,0,0,.35); }
+.score-ring { --p: 0; width: 74px; height: 74px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--gold) calc(var(--p) * 1%), rgba(255,255,255,.15) 0); flex: none; }
+.score-ring b { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: #142a6b; font: italic 900 20px "Arial Black", Impact, sans-serif; }
+.kitlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin: 14px 0; }
+.kitrow { position: relative; display: flex; gap: 12px; align-items: center; border-radius: 14px; padding: 10px 12px; color: #fff; overflow: hidden; background: var(--legendary); box-shadow: inset 0 0 0 2px rgba(255,255,255,.35), 0 8px 18px rgba(0,0,0,.3); animation: dealin .35s ease-out both; }
+.kitrow:nth-child(2) { animation-delay: .06s; } .kitrow:nth-child(3) { animation-delay: .12s; } .kitrow:nth-child(4) { animation-delay: .18s; } .kitrow:nth-child(5) { animation-delay: .24s; } .kitrow:nth-child(6) { animation-delay: .3s; }
+.kitrow.r-rare { background: var(--rare); } .kitrow.r-epic { background: var(--epic); }
+.kitrow::before { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.22) 45%, transparent 60%); transform: translateX(-100%); animation: shine 2.8s ease-in-out infinite; }
+.kitrow .ki { flex: none; width: 64px; height: 64px; display: grid; place-items: center; border-radius: 12px; background: rgba(0,0,0,.22); font-size: 32px; font-weight: 900; }
+.kitrow .ki img { width: 54px; height: 54px; }
+.kitrow .kn { font: italic 900 15px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-shadow: 0 2px 0 rgba(0,0,0,.35); }
+.kitrow .kv { display: inline-block; margin-left: 4px; padding: 0 8px; border-radius: 999px; background: rgba(0,0,0,.35); color: var(--gold); }
+.kitrow .kd { font-size: 13.5px; line-height: 1.35; } .kitrow small { display: block; margin-top: 3px; color: #fff6c9; font-weight: 700; }
+.kitrow.off { background: linear-gradient(160deg, #4a5168, #2b3046); box-shadow: inset 0 0 0 2px rgba(255,255,255,.12); } .kitrow.off::before { display: none; } .kitrow.off .ki img { filter: grayscale(1) brightness(.7); opacity: .7; }
+.kitrow.off small { color: #ffd27a; }
+@keyframes dealin { from { transform: translateY(14px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes shine { 0%, 60% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.modal { position: fixed; inset: 0; background: rgba(5,8,30,.8); backdrop-filter: blur(3px); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 16px; }
 .modal .qcard { max-width: 1100px; width: 100%; max-height: calc(100vh - 32px); overflow: auto; }
-.loot { text-align: center; padding: 10px; border: 3px solid #000; border-radius: 12px; background: linear-gradient(#fff9db, #ffe066); margin-top: 10px; animation: pop .35s ease-out; }
-.loot .li { font-size: 46px; } .loot .ln { font-size: 22px; font-weight: 900; }
+.chesthead { display: flex; align-items: center; gap: 10px; } .chesthead img { width: 48px; height: 40px; }
+.loot { display: flex; align-items: center; gap: 14px; justify-content: center; text-align: left; padding: 12px 16px; border-radius: 14px; color: #fff; background: var(--legendary); box-shadow: 0 0 0 3px #ffe8b0, 0 0 30px rgba(255,170,40,.6); margin-top: 10px; animation: pop .35s ease-out; }
+.loot .li { font-size: 46px; width: 76px; height: 76px; display: grid; place-items: center; } .loot .li img { width: 72px; height: 72px; } .loot .ln { font: italic 900 22px "Arial Black", Impact, sans-serif; text-transform: uppercase; text-shadow: 0 2px 0 rgba(0,0,0,.3); }
 @keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.snipe { background: #1b1f3b; border: 3px solid var(--gold); border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }
-.snipe .px { font-size: 11px; color: var(--gold); } .snipe .big2 { font-size: 44px; font-weight: 900; color: var(--gold); line-height: 1.1; }
-.snipe .nhs { font-family: "Press Start 2P", monospace; color: #ff922b; font-size: 14px; animation: pop .5s ease-out infinite alternate; }
-.snipe .note2 { color: var(--muted); } .snipe .stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
-.snipe .stats span { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); } .snipe .stats b { font-size: 20px; color: #fff; }
-.tip { background: #2c335c; border: 2px solid #000; border-radius: 8px; padding: 8px 12px; }
-.kit .v { font-size: 22px; font-weight: 800; color: var(--gold); } .kit.off { opacity: .5; } .kit small { color: var(--muted); display: block; }
+/* results */
+.banner { display: flex; align-items: center; gap: 16px; padding: 14px 18px; margin: -18px -18px 14px; border-radius: 16px 16px 0 0; background: linear-gradient(100deg, #1fb75a, #0e7a8a); }
+.banner.lost { background: linear-gradient(100deg, #b3263a, #4b1a6b); } .banner.boss { background: var(--legendary); }
+.banner img { width: 78px; height: 72px; flex: none; animation: pop .45s ease-out; }
+.banner h2 { margin: 0; font-size: 30px; line-height: 1.05; text-shadow: 0 3px 0 rgba(0,0,0,.3); }
+.banner .starsbig { font-size: 30px; color: var(--gold); letter-spacing: 4px; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
+.statrow { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+.stat { background: rgba(0,0,0,.25); border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; min-width: 110px; }
+.stat b { display: block; font: italic 900 22px "Arial Black", Impact, sans-serif; color: #fff; } .stat span { font-size: 12.5px; color: var(--muted); }
+.snipe { background: linear-gradient(160deg, rgba(10,14,40,.75), rgba(40,14,80,.75)); border: 1px solid rgba(255,225,77,.5); border-radius: 16px; padding: 14px; margin: 10px 0; text-align: center; }
+.snipe .px { font-size: 14px; color: var(--gold); } .snipe .big2 { font: italic 900 54px/1.05 "Arial Black", Impact, sans-serif; background: linear-gradient(180deg, #fff6a8, #ffc300 55%, #ff8a00); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.snipe .nhs { font: italic 900 18px "Arial Black", Impact, sans-serif; color: #ff9f43; text-transform: uppercase; animation: pop .5s ease-out infinite alternate; }
+.snipe .note2 { color: var(--muted); } .snipe .stats { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+.snipe .stats span { display: flex; flex-direction: column; font-size: 12.5px; color: var(--muted); background: rgba(255,255,255,.07); border-radius: 10px; padding: 6px 12px; min-width: 92px; } .snipe .stats b { font: italic 900 22px "Arial Black", Impact, sans-serif; color: #fff; }
+.roast, .snipe .roast { display: flex; gap: 12px; align-items: center; text-align: left; margin: 12px auto 0; max-width: 640px; background: #fff; color: #1b1440; border-radius: 14px; padding: 10px 14px; font-weight: 700; font-size: 15px; position: relative; box-shadow: 0 6px 16px rgba(0,0,0,.3); }
+.roast img { width: 52px; height: 52px; flex: none; }
+.tip { display: flex; gap: 12px; align-items: center; background: rgba(0,0,0,.25); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.tip img { width: 46px; height: 46px; flex: none; }
 /* play */
-.stage { position: relative; background: #000; border: 3px solid #000; border-radius: 10px; overflow: hidden; }
+.stage { position: relative; background: #000; border-radius: 14px; overflow: hidden; box-shadow: 0 14px 34px rgba(0,0,0,.45), 0 0 0 2px var(--line); }
 canvas#cv { display: block; width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; aspect-ratio: 16 / 9; }
 .pads { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; flex-wrap: wrap; user-select: none; -webkit-user-select: none; }
 .pads .grp { display: flex; gap: 8px; }
-.pad { width: 58px; height: 54px; border: 3px solid #000; border-radius: 10px; background: #dee2ff; color: #111; font-size: 20px; box-shadow: 0 3px 0 #000; touch-action: none; }
-.pad.wide { width: auto; padding: 0 12px; font-size: 14px; font-weight: 800; }
+.pad { width: 58px; height: 54px; border: 0; border-radius: 12px; background: linear-gradient(180deg, rgba(255,255,255,.95), #c9d4ff); color: #1b1440; font-size: 20px; font-weight: 900; box-shadow: 0 4px 0 #6f7bb0; touch-action: none; }
+.pad.wide { width: auto; padding: 0 12px; font: italic 900 14px "Arial Black", Impact, sans-serif; }
 .keys { color: var(--muted); font-size: 13px; margin-top: 8px; }
-.keys kbd { background: #fff; color: #111; border: 2px solid #000; border-radius: 4px; padding: 0 5px; font-size: 12px; }
+.keys kbd { background: #fff; color: #111; border-radius: 5px; padding: 0 5px; font-size: 12px; box-shadow: 0 2px 0 #8a94c0; }
+/* the gear card and ridge report, drawn by the page over the scope */
+.ov { position: absolute; inset: 0; z-index: 4; display: flex; align-items: center; justify-content: center; padding: 2.2%; cursor: pointer; }
+.ovcard { width: min(100%, 860px); max-height: 100%; overflow: auto; border-radius: 18px; padding: 14px 18px; color: #fff; background: linear-gradient(160deg, rgba(30,70,180,.96), rgba(60,20,130,.96)); box-shadow: 0 0 0 2px rgba(255,255,255,.25), 0 20px 50px rgba(0,0,0,.6); animation: pop .3s ease-out; }
+.ovcard h2 { margin: 0; font-size: clamp(18px, 2.6vw, 30px); color: var(--gold); text-shadow: 0 3px 0 rgba(0,0,0,.35); }
+.ovcard .ovsub { font-size: 13.5px; color: #dfe6ff; margin: 2px 0 8px; }
+.gear { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+.gear .g { display: flex; gap: 10px; align-items: center; border-radius: 12px; padding: 7px 10px; background: var(--legendary); box-shadow: inset 0 0 0 2px rgba(255,255,255,.3); animation: dealin .35s ease-out both; }
+.gear .g.r-rare { background: var(--rare); } .gear .g.r-epic { background: var(--epic); }
+.gear .g.off { background: linear-gradient(160deg, #4a5168, #2b3046); } .gear .g.off img { filter: grayscale(1) brightness(.7); }
+.gear .g .gi { flex: none; width: 46px; height: 46px; display: grid; place-items: center; font-size: 26px; font-weight: 900; border-radius: 10px; background: rgba(0,0,0,.22); } .gear .g .gi img { width: 40px; height: 40px; }
+.gear .g b { font: italic 900 13.5px "Arial Black", Impact, sans-serif; text-transform: uppercase; } .gear .g span { display: block; font-size: 12.5px; line-height: 1.3; }
+.threats { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 10px; font: italic 900 12.5px "Arial Black", Impact, sans-serif; text-transform: uppercase; color: #ffb3b3; }
+.threats i { font-style: italic; padding: 3px 10px; border-radius: 999px; background: rgba(255,60,80,.25); border: 1px solid rgba(255,120,130,.6); color: #fff; }
+.go { margin-top: 12px; text-align: center; } .go .btn { animation: pulse 1.1s ease-in-out infinite; }
+@keyframes pulse { 50% { filter: brightness(1.15); transform: skewX(-6deg) scale(1.04); } }
+.rep { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; margin: 8px 0; }
+.rep div { background: rgba(0,0,0,.28); border-radius: 12px; padding: 6px 10px; animation: dealin .3s ease-out both; } .rep b { display: block; font: italic 900 22px "Arial Black", Impact, sans-serif; } .rep span { font-size: 12px; color: var(--muted); }
+.repscore { display: flex; align-items: baseline; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.repscore .big2 { font: italic 900 clamp(34px, 5vw, 58px)/1 "Arial Black", Impact, sans-serif; background: linear-gradient(180deg, #fff6a8, #ffc300 55%, #ff8a00); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.repscore .nhs { font: italic 900 18px "Arial Black", Impact, sans-serif; color: #ff9f43; text-transform: uppercase; animation: pop .5s ease-out infinite alternate; }
+@media (max-width: 700px) { .ov { position: fixed; padding: 10px; background: rgba(5,8,30,.85); z-index: 30; } .gear { grid-template-columns: 1fr; } }
 /* coach sidebar */
 aside#coach { display: none; }
 body.practice aside#coach { display: block; }
 aside#coach .panel { position: sticky; top: 70px; max-height: calc(100vh - 90px); overflow: auto; background: #fff; color: var(--ink); font-size: 14px; }
-aside#coach h2 { font-size: 11px; margin: 0 0 8px; color: #c92a2a; }
+aside#coach h2 { font-size: 13px; margin: 0 0 8px; color: #c92a2a; }
 aside#coach h3 { font-size: 14px; margin: 14px 0 4px; border-bottom: 2px solid #e9ecef; padding-bottom: 2px; }
 aside#coach ul { margin: 4px 0; padding-left: 18px; } aside#coach li { margin: 3px 0; }
 aside#coach .now { background: #fff3bf; border-radius: 4px; padding: 0 3px; font-weight: 700; }
 aside#coach .later { color: #868e96; }
 aside#coach .ladder li.cur { font-weight: 800; } aside#coach .ladder li.cur::marker { content: "▶ "; }
-.tag { display: inline-block; border-radius: 4px; padding: 0 6px; font-size: 12px; font-weight: 800; color: #fff; }
+.tag { display: inline-block; border-radius: 6px; padding: 0 7px; font-size: 12px; font-weight: 800; color: #fff; }
 .tag.maths { background: #e8590c; } .tag.thinking { background: #1c7ed6; } .tag.reading { background: #7048e8; }
 .adminbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
 ol.climb { margin: 4px 0 10px; } details.grown { margin-top: 16px; } details.grown summary { cursor: pointer; color: var(--muted); }
-table.prog { border-collapse: collapse; font-size: 13px; width: 100%; } table.prog th, table.prog td { border: 1px solid #3a4170; padding: 4px 6px; text-align: left; }
+table.prog { border-collapse: collapse; font-size: 13px; width: 100%; } table.prog th, table.prog td { border: 1px solid rgba(255,255,255,.18); padding: 4px 6px; text-align: left; }
 footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-@media (max-width: 640px) { table.grid th, table.grid td { padding: 5px 6px; min-width: 36px; } .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 12px; } .qcard { padding: 12px; } }
+@media (max-width: 640px) { .path { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .node .nm { font-size: 14px; } table.grid th, table.grid td { padding: 5px 6px; min-width: 36px; } .opts.visual { grid-template-columns: 1fr 1fr; } .pad { width: 50px; height: 50px; } header h1 { font-size: 17px; } .qcard { padding: 12px; } .banner h2 { font-size: 22px; } .banner img { width: 56px; height: 52px; } }
 </style>
 </head>
 <body>
 <div id="splash" class="hidden" role="button" tabindex="0" aria-label="Ridge Runner: press space or tap to start"><canvas id="tcv" width="480" height="270"></canvas></div>
 <header>
   <h1 class="px">RIDGE RUNNER</h1>
-  <span class="chip" id="hdr-stars">★ 0</span><span class="chip" id="hdr-coins">● 0</span>
+  <span class="chip plain" id="hdr-stars">★ 0</span><span class="chip" id="hdr-coinchip"><img class="art" src="../prac3/art/coins.webp" alt=""><span id="hdr-coins">0</span></span>
   <span class="sp"></span>
   <span class="chip hidden" id="hdr-practice">Practice: nothing is saved</span>
   <button class="btn sm alt" id="btn-map">Map</button>
@@ -157,7 +218,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
   <section id="scr-brief" class="hidden"></section>
   <section id="scr-kit" class="hidden"></section>
   <section id="scr-play" class="hidden">
-    <div class="stage"><canvas id="cv" width="480" height="270" tabindex="0" aria-label="the platform level"></canvas></div>
+    <div class="stage"><canvas id="cv" width="480" height="270" tabindex="0" aria-label="the platform level"></canvas><div class="ov hidden" id="ov" role="dialog" aria-live="polite"></div></div>
     <div class="pads" id="pads">
       <div class="grp"><button class="pad" data-k="left" aria-label="left">◀</button><button class="pad" data-k="right" aria-label="right">▶</button><button class="pad" data-k="down" aria-label="down or use">▼</button></div>
       <div class="grp"><button class="pad wide" data-k="duck">DUCK</button><button class="pad wide" data-k="use">SCOPE</button><button class="pad" data-k="fire" aria-label="fire">✦</button><button class="pad" data-k="jump" aria-label="jump">▲</button></div>
@@ -169,7 +230,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 </main>
 <aside id="coach"><div class="panel" id="coach-body"></div></aside>
 </div>
-<footer>Ridge Runner · a practice game · all art and questions made for this site</footer>
+<footer>Ridge Runner · a practice game · the questions, levels, bosses and pixel art are made for this site · item pictures and emojis © Epic Games, used in a private, non-commercial fan project: not official and not endorsed by Epic</footer>
 <script>
 const INK = "#1b2a41";
 const GENS = [], HAND = [];
@@ -2793,7 +2854,7 @@ const PF = (() => {
     if (lv.boss) { msg(`${G.theme.name}: ${(lv.bossName || "the boss")} waits at the end`, 160); msg("Run to the arena!", 200, "#ffd43b"); }
     else { msg(G.theme.name + (lv.stages > 1 ? `, stage ${lv.stage + 1} of ${lv.stages}: reach the flag` : ": reach the flag"), 160); msg("Grab the gold bullets: every one is a sniper round!", 200, "#ffd43b"); }
   }
-  function stop() { cancelAnimationFrame(raf); removeEventListener("keydown", kd); removeEventListener("keyup", ku); for (const k in KEYS) KEYS[k] = false; S = null; }
+  function stop() { if (S && S.opts.onCard) S.opts.onCard(null); cancelAnimationFrame(raf); removeEventListener("keydown", kd); removeEventListener("keyup", ku); for (const k in KEYS) KEYS[k] = false; S = null; }
   const msg = (t, d = 90, c = "#fff") => S.msgs.push({ t, d, c });
   const burst = (x, y, c, n = 8) => { for (let i = 0; i < n; i++) S.parts.push({ x, y, vx: (Math.random() - .5) * 3, vy: -Math.random() * 3, d: 30, c }); };
   function hurt(why) {
@@ -2923,8 +2984,17 @@ const PF = (() => {
     ctx.restore();
     if (v.aim && !v.dead) { const f2 = 2 + 2 * Math.abs(Math.sin(S.t / 3)); ctx.fillStyle = "#ff2b2b"; ctx.fillRect(v.x + v.dir * 14 - f2 * 2, v.y, f2 * 4, 2); ctx.fillRect(v.x + v.dir * 14 - 1, v.y + 1 - f2 * 2, 2, f2 * 4); }
   }
+  /* the page draws the gear card and the ridge report over the canvas (modern cards with the item art); the canvas only dims */
+  const cardOut = (kind, data) => { if (S && S.opts.onCard) S.opts.onCard(kind, data); };
+  function gearInfo(sc) {
+    const ss = sc.nest.sentries, w = S.G.world, k = S.kit;
+    return { nest: sc.nest.id + 1, world: w, rounds: S.rounds, min: ss.min, steady: !!k.steady, hearts: S.hearts, shield: !!S.shield, boots: !!k.boots, wind: w >= 3 ? ss.wind : null, dots: w >= 2,
+      threats: vehKinds(w) };
+  }
+  function dimOnly(ctx, t, n) { ctx.fillStyle = `rgba(5,8,20,${0.6 * Math.min(1, t / n)})`; ctx.fillRect(0, 0, VW, VH); }
   /* the gear card before the shooting starts: what the briefing earned, and what each thing does */
   function drawIntro(ctx, sc) {
+    if (S.opts.onCard) { sc.intro.t++; return dimOnly(ctx, sc.intro.t, 10); }
     const it = sc.intro, ss = sc.nest.sentries, w = S.G.world, k = S.kit; it.t++; const g = Math.min(1, it.t / 10);
     ctx.fillStyle = `rgba(5,8,20,${0.85 * g})`; ctx.fillRect(0, 0, VW, VH);
     ctx.save(); ctx.translate(VW / 2, VH / 2); ctx.scale(0.7 + 0.3 * g, 0.7 + 0.3 * g); ctx.translate(-VW / 2, -VH / 2);
@@ -2950,6 +3020,7 @@ const PF = (() => {
     for (const k in KEYS) KEYS[k] = false;
     S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0, intro: !n.boss && !n.briefed && !window.__noIntro ? { t: 0 } : null };
     n.briefed = true;
+    if (S.scope.intro) cardOut("gear", gearInfo(S.scope));
     S.msgs = [];                                                        // the platform's messages would clutter the scope
     msg(n.boss ? "BOSS: the Warden is on the far ridge!" : `SCORE ATTACK! Knock out ${n.sentries.min} to open the gate, then as many as your rounds allow`, 160, "#ffe066");
     if (S.kit.steady && !S.tipSteady) { S.tipSteady = true; msg("STEADY SCOPE: half the sway, from your briefing", 140, "#8ce99a"); }
@@ -3001,7 +3072,7 @@ const PF = (() => {
   }
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
-    if (sc.intro) { const go = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (go && sc.intro.t > 12) { sc.intro = null; for (const k in KEYS) KEYS[k] = false; beep(660, .08, "triangle"); } return; }   /* the gear card: nothing moves */
+    if (sc.intro) { const go = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (go && sc.intro.t > 12) { sc.intro = null; cardOut(null); for (const k in KEYS) KEYS[k] = false; beep(660, .08, "triangle"); } return; }   /* the gear card: nothing moves */
     { const ss = sc.nest.sentries;                                             /* the ridge report: wait for SPACE, nothing else moves */
       if (ss.card && !sc.nest.boss) { const any = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (any && ss.card.t > 20) { closeCard(); for (const k in KEYS) KEYS[k] = false; } return; } }
     for (const b of S.incoming) {                                              /* bullets flying at you */
@@ -3373,9 +3444,12 @@ const PF = (() => {
     const st = ss.stat, acc = st.shots ? Math.round(100 * st.hits / st.shots) : 0;
     const ridgeBest = S.opts.bestRidge || 0, isBest = st.score > ridgeBest && st.score > 0;
     if (isBest) { S.newRidgeBest = st.score; beep(523, .1, "triangle"); beep(659, .1, "triangle"); beep(1046, .25, "triangle"); }
-    return Object.assign({}, st, { acc, isBest, ridgeBest, t: 0, roast: roast(Object.assign({}, st, { acc, gate: ss.gate, min: ss.min })) });
+    const m = mood(Object.assign({}, st, { acc, gate: ss.gate, min: ss.min }));
+    const c = Object.assign({}, st, { acc, isBest, ridgeBest, t: 0, mood: m, gate: ss.gate, min: ss.min, roast: pickOne(ROASTS[m]) });
+    cardOut("report", c);
+    return c;
   }
-  function closeCard() { const ss = S.scope.nest.sentries; S.scope = null; ss.card = null; if (!ss.gate) msg("The gate is still shut: come back with more rounds", 120, "#ffb3b3"); }
+  function closeCard() { const ss = S.scope.nest.sentries; S.scope = null; ss.card = null; cardOut(null); if (!ss.gate) msg("The gate is still shut: come back with more rounds", 120, "#ffb3b3"); }
   /* the level's sniper totals, added up from every nest once at the end (so nothing is counted twice) */
   function snipeTotals() {
     const t = { score: 0, ko: 0, head: 0, shots: 0, hits: 0, best: 0, first: 0, ridgeMax: 0 };
@@ -3393,16 +3467,18 @@ const PF = (() => {
     veh: ["You knocked things out of the SKY. The pilots would like a word.", "Planes, choppers, tanks... is there anything you won't shoot?", "That tank had a very bad day. You're welcome, sentries."],
     heads: ["So many headshots the sentries are ordering bigger helmets.", "Headshot after headshot. The helmet shop is sold out."],
     perfect: ["Every shot hit! Did you bribe the sentries?", "100% accuracy. Now try being this accurate with your spelling.", "Perfect aim. The sentries have filed a complaint. It was ignored."] };
-  function roast(st) {
-    const pickOne = a => a[Math.floor(Math.random() * a.length)];
-    if (!st.shots) return pickOne(ROASTS.none);
-    if (!st.hits) return pickOne(ROASTS.zero);
-    if (st.gate === false && st.ko < st.min) return pickOne(ROASTS.shut);
-    if (st.acc >= 100 && st.hits >= 3) return pickOne(ROASTS.perfect);
-    if ((st.veh || 0) >= 2) return pickOne(ROASTS.veh);
-    if (st.head >= 3 && st.head >= st.ko / 2) return pickOne(ROASTS.heads);
-    return pickOne(st.acc < 35 ? ROASTS.bad : st.acc < 65 ? ROASTS.ok : ROASTS.good);
+  const pickOne = a => a[Math.floor(Math.random() * a.length)];
+  /* which kind of roast fits (the page shows a matching emoji) */
+  function mood(st) {
+    if (!st.shots) return "none";
+    if (!st.hits) return "zero";
+    if (st.gate === false && st.ko < st.min) return "shut";
+    if (st.acc >= 100 && st.hits >= 3) return "perfect";
+    if ((st.veh || 0) >= 2) return "veh";
+    if (st.head >= 3 && st.head >= st.ko / 2) return "heads";
+    return st.acc < 35 ? "bad" : st.acc < 65 ? "ok" : "good";
   }
+  function roast(st) { return pickOne(ROASTS[mood(st)]); }
   /* wrapped, centred text on the canvas */
   function wrap(ctx, s, cx, y, w, size, c) {
     ctx.font = `bold ${size}px "Courier New", monospace`; const words = s.split(" "), lines = []; let line = "";
@@ -3410,6 +3486,7 @@ const PF = (() => {
     lines.push(line); lines.slice(0, 2).forEach((l, i) => txt(ctx, l, cx, y + i * (size + 2) - (lines.length > 1 ? 5 : 0), size, c));
   }
   function drawCard(ctx, c) {
+    if (S.opts.onCard) { c.t++; return dimOnly(ctx, c.t, 12); }
     c.t++; const g = Math.min(1, c.t / 12);
     ctx.fillStyle = `rgba(5,8,20,${0.8 * g})`; ctx.fillRect(0, 0, VW, VH);
     ctx.save(); ctx.translate(VW / 2, VH / 2); ctx.scale(0.6 + 0.4 * g, 0.6 + 0.4 * g); ctx.translate(-VW / 2, -VH / 2);
@@ -3630,7 +3707,7 @@ const PF = (() => {
     nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length, ko: e.sentries.stat.ko, score: e.sentries.stat.score, min: e.sentries.min, gate: e.sentries.gate, card: !!e.sentries.card })) : [],
     snipe: () => S && snipeTotals(),
     quiet: () => { if (!S || !S.scope) return; const ss = S.scope.nest.sentries; ss.respawn = []; S.incoming = []; ss.list.forEach((q, i) => { if (i && q.alive) { q.state = "hide"; q.st = 0; q.hold = 99999; } }); },
-    exitScope: () => { if (S && S.scope) { S.scope.nest.sentries.card = null; S.scope = null; } },
+    exitScope: () => { if (S && S.scope) { S.scope.nest.sentries.card = null; S.scope = null; cardOut(null); } },
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
     fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
@@ -3786,7 +3863,7 @@ const PF = (() => {
     if (T.flash) { ctx.fillStyle = `rgba(255,255,255,${T.flash / 16})`; ctx.fillRect(0, 0, VW, VH); }
     if (T.go) { ctx.fillStyle = `rgba(255,255,255,${Math.min(1, T.go / 30)})`; ctx.fillRect(0, 0, VW, VH); }
   }
-  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
+  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, mood, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
 })();
 
 </script>
@@ -3813,6 +3890,14 @@ const STAGES = L => L.boss ? 1 : L.tracks.length;
 const LV = Object.fromEntries(LEVELS.map(l => [l.id, l]));
 const QN = { boss: 6, normal: 4 };
 
+/* ================= pictures: Epic's item art (shared with Storm Island) and emojis (prac4/art) ================= */
+const A3 = n => `../prac3/art/${n}.webp`, A4 = n => `art/${n}.webp`;
+const IMG = (src, cls = "art", alt = "") => `<img class="${cls}" src="${src}" alt="${alt}" loading="lazy">`;
+const ART = { hearts: A3("medkit"), shield: A3("shieldpotion"), steady: A4("satchel"), rounds: A4("emo-bullseye"), blaster: A3("gun-pistol"), chest: A3("chest"), crate: A3("llama"), coins: A3("coins"),
+  win: A3("victory"), crown: A3("crown"), lost: A4("emo-heartbroken"), storm: A3("storm"), bus: A3("battlebus"), slurp: A3("slurp"), chug: A3("chugjug") };
+const MOOD = { none: "emo-noscope", zero: "emo-salty", shut: "emo-heartbroken", bad: "emo-rage", ok: "emo-bullseye", good: "emo-onfire", veh: "emo-onfire", heads: "emo-headshot", perfect: "emo-gg" };
+const LOOTART = { med: ART.hearts, shield: ART.shield, ammo: ART.rounds, steady: ART.steady, blaster: ART.blaster };
+const RAR = ["common", "rare", "epic", "legendary"];
 /* ================= saved progress ================= */
 const KEY = "prac4.v1", PKEY = "prac4.practice.seen";
 const PRACTICE = (() => { try { return new URLSearchParams(location.search).has("admin") && sessionStorage.getItem("prac.admin") === "1"; } catch (e) { return false; } })();
@@ -3872,7 +3957,7 @@ function briefing(L, stage = 0) {
 const $ = s => document.querySelector(s);
 const SCR = ["map", "brief", "kit", "play", "result"];
 function show(name) { SCR.forEach(n => $("#scr-" + n).classList.toggle("hidden", n !== name)); if (name !== "play") PF.stop(); window.scrollTo(0, 0); hdr(); }
-function hdr() { $("#hdr-stars").textContent = "★ " + totalStars() + (S.snipeBest ? `  🎯 ${S.snipeBest}` : ""); $("#hdr-coins").textContent = "● " + S.coins; $("#btn-sound").textContent = "Sound: " + (S.sound ? "on" : "off"); }
+function hdr() { $("#hdr-stars").textContent = "★ " + totalStars() + (S.snipeBest ? `  🎯 ${S.snipeBest}` : ""); $("#hdr-coins").textContent = S.coins; $("#btn-sound").textContent = "Sound: " + (S.sound ? "on" : "off"); }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const stars = n => "★".repeat(n) + "☆".repeat(3 - n);
 let SEL = null;
@@ -3881,7 +3966,7 @@ function renderMap() {
   const tabs = WORLDS.map(w => { const first = LEVELS.find(l => l.world === w.n); return `<button class="tab px ${w.n === S.world ? "on" : ""} ${unlocked(first) ? "" : "lock"}" data-w="${w.n}">${w.n}. ${w.name.toUpperCase()}</button>`; }).join("");
   const nodes = LEVELS.filter(l => l.world === W.n).map(l => {
     const rec = S.levels[l.id] || {};
-    const inner = l.boss ? `<div class="n px">BOSS</div><div class="ic big">♛</div><div class="nm">${esc(cap(l.name))}</div>`
+    const inner = l.boss ? `<div class="n px">World boss</div>${IMG(ART.crown)}<div class="nm">${esc(cap(l.name))}</div>`
       : `<div class="n px">LEVEL ${l.k + 1}</div><div class="nm">${esc(l.name)}</div><div class="sk">${l.tracks.map((t, i) => `<span class="${TR[t].subject} ${rec.at > i || rec.cleared ? "ok" : ""}" title="${esc(TR[t].name)}">${TR[t].icon} ${esc(TR[t].name)}</span>`).join("")}</div>${rec.at ? `<div class="prog2 px">STAGE ${rec.at + 1} OF 3</div>` : ""}`;
     return `<button class="node ${l.boss ? "boss" : "big"} ${unlocked(l) ? "" : "lock"} ${rec.cleared ? "done" : ""} ${SEL === l.id ? "sel" : ""}" data-l="${l.id}" ${unlocked(l) ? "" : 'aria-disabled="true"'}>
       ${inner}<div class="st">${rec.cleared ? stars(rec.stars || 1) : ""}</div></button>`;
@@ -3889,8 +3974,8 @@ function renderMap() {
   const L = SEL && LV[SEL];
   const card = L ? levelCard(L) : `<p class="sub">Pick a level. Each big level has three stages, and each stage starts with a short briefing: the more questions you get right, the better your kit for that stage. Clear all five levels to face the boss.</p>`;
   $("#scr-map").innerHTML = `<div class="tabs">${tabs}</div>
-    <div class="world" style="background:${W.col}"><h2 class="px">WORLD ${W.n}: ${W.name.toUpperCase()} <small>(${W.rar})</small></h2><p class="sub">${W.sub}</p><div class="path">${nodes}</div>
-    <div class="legend"><span><i style="background:var(--m)"></i>Maths</span><span><i style="background:var(--t)"></i>Thinking</span><span><i style="background:var(--r)"></i>Reading</span><span><i style="background:#ffe066"></i>Boss: mixed questions, then a giant boss fight</span></div></div>
+    <div class="world" style="background:radial-gradient(700px 300px at 85% 0%, rgba(255,255,255,.18), transparent 70%), var(--${RAR[W.n - 1]})"><h2 class="px">World ${W.n}: ${esc(W.name)} <small>${W.rar}</small></h2><p class="sub">${W.sub}</p><div class="path">${nodes}</div>
+    <div class="legend"><span><i style="background:var(--m)"></i>Maths</span><span><i style="background:var(--t)"></i>Thinking</span><span><i style="background:var(--r)"></i>Reading</span><span><i style="background:var(--red)"></i>Boss: mixed questions, then a giant boss fight</span></div></div>
     <div class="panel lvcard" id="lvcard">${card}</div>${grownUps()}`;
   document.querySelectorAll(".tab").forEach(b => b.onclick = () => { S.world = +b.dataset.w; SEL = null; save(); renderMap(); coachLevel(null); });
   document.querySelectorAll(".node").forEach(b => b.onclick = () => { const l = LV[b.dataset.l]; if (!unlocked(l)) return; SEL = l.id; renderMap(); coachLevel(l); $("#lvcard").scrollIntoView({ block: "nearest" }); });
@@ -3901,10 +3986,10 @@ function renderMap() {
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 function levelCard(L) {
   const rec = S.levels[L.id] || {};
-  if (L.boss) return `<h3 class="px">WORLD ${L.world} BOSS: ${esc(L.name.toUpperCase())}</h3><p>A mixed briefing of ${QN.boss} questions from this world's skills builds your kit. Then a short run to the arena, where ${esc(L.name)} towers over you. Jump its shockwaves, dodge what it throws, hide on the ledges when it rolls, then blast its glowing core or stomp its head while it's dazed.</p>
+  if (L.boss) return `<div class="lvhead">${IMG(ART.crown)}<h3 class="px">World ${L.world} boss: ${esc(L.name)}</h3></div><p>A mixed briefing of ${QN.boss} questions from this world's skills builds your kit. Then a short run to the arena, where ${esc(L.name)} towers over you. Jump its shockwaves, dodge what it throws, hide on the ledges when it rolls, then blast its glowing core or stomp its head while it's dazed.</p>
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
   const at = rec.at || 0;
-  return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(L.name.toUpperCase())}</h3><p>A big level in three stages. Each stage starts with a briefing of four questions on one skill that climb from a warm-up to test level, then a long stretch of platforms and sniper nests:</p>
+  return `<div class="lvhead">${IMG(ART.bus)}<h3 class="px">Level ${L.k + 1}: ${esc(L.name)}</h3></div><p>A big level in three stages. Each stage starts with a briefing of four questions on one skill that climb from a warm-up to test level, then a long stretch of platforms and sniper nests:</p>
     <ol class="climb">${L.tracks.map((t, i) => `<li class="${i < at ? "done2" : ""}"><span class="tag ${TR[t].subject}">${TR[t].subject}</span> <b>${esc(TR[t].name)}</b>${i < at ? " ✔" : ""}</li>`).join("")}</ol>
     ${rec.cleared ? `<p>${stars(rec.stars || 0)}${rec.snipeBest ? ` · 🎯 sniper best <b style="color:var(--gold)">${rec.snipeBest}</b>` : ""}</p>` : ""}
     <button class="btn" id="btn-go">${at ? `Carry on: stage ${at + 1}` : "Start stage 1"}</button>${at ? ` <button class="btn alt" id="btn-restart">Start again from stage 1</button>` : ""}`;
@@ -3973,24 +4058,25 @@ function showKit() {
   else { (rec.sr = rec.sr || [])[B.stage] = B.right; const sk = skillRec(B.L, B.stage); sk.best = Math.max(sk.best || 0, B.right); sk.last = B.right; }
   save();
   const rows = B.L.boss ? [
-    ["❤", "Hearts", k.hearts, true, "The boss hits hard: every shockwave, fireball, roll or touch costs a heart.", `${best.hearts} with all right`],
-    ["◆", "Shield", k.shield ? "ON" : "off", k.shield, "Blocks the first hit completely.", "for all right"],
-    ["⤒", "Double-jump boots", k.boots ? "ON" : "off", k.boots, "A second jump in mid-air: easier to clear the shockwaves and reach the ledges when the boss rolls.", "for half right"],
-    ["✦", "Blaster", k.ammo, true, "Shoot the boss's core when it glows open (after a stomp, and while it is dazed). Crates drop more when you run low.", `${best.ammo} with all right`]] : [
-    ["❤", "Hearts", k.hearts, true, "Every hit from spikes, a bot, a fall or a sniper bullet costs one heart. Lose them all and you start the level again.", `${best.hearts} with all right`],
-    ["◆", "Shield", k.shield ? "ON" : "off", k.shield, "Blocks the first hit completely: no heart lost.", "for all right"],
-    ["⤒", "Double-jump boots", k.boots ? "ON" : "off", k.boots, "Press jump again in mid-air: clear wide gaps and reach the <b style=\"color:#b197fc\">high gold bullets</b> (purple glow) that a normal jump can't.", "for ¾ right"],
-    ["〰", "Steady scope", k.steady ? "ON" : "off", k.steady, "At a sniper nest the crosshair sways half as much, so shots land where you aim.", "for half right"],
-    ["◎", "Sniper rounds", k.rounds, true, "One shot each at the nests. Knock out every sentry to open the laser gate. Gold bullets in the level add more.", `${best.rounds} with all right`],
-    ["✦", "Blaster", k.ammo, true, "Press J to shoot bots, hoppers, rollers and drones. Spiky rollers can't be stomped: blast them or jump over.", `${best.ammo} with all right`]];
-  const tips = B.L.boss ? `<p class="tip">♛ <b>How to beat ${esc(B.L.name)}:</b> jump the shockwave after each stomp, dodge the fireballs, and when it curls up and rolls, get up on a ledge. When it slams into the wall it is dazed: <b>stomp on its head</b> (big damage) or <b>blast the glowing core</b>. Each time its health drops a third, a power crate falls: answer its question for loot.</p>`
-    : `<p class="tip">🎯 <b>Sniper nests are a score attack:</b> knock out enough to open the gate, then keep going until your rounds run out. Headshots, shooting first and streaks score more: <b>every extra round is a chance at a high score.</b></p>
-    <p class="tip">🎁 <b>Treasure chests</b> wait in every stage. Answer a bonus question from another skill to open one: a med kit, shield, boots, steady scope or more ammo. ◎ <b>Gold bullets</b> lie over gaps, on pillars and beside bots: each is one more sniper round.</p>`;
-  $("#scr-kit").innerHTML = `<div class="panel"><h2 class="px" style="font-size:14px;color:var(--gold)">YOUR KIT: ${B.right} OF ${n} RIGHT</h2>
-    <p>Each right answer in the briefing bought you something for ${B.L.boss ? "the boss fight" : `stage ${B.stage + 1}`}. Here is what you have and how it helps:</p>
-    <div class="kitlist">${rows.map(([ic, name, v, on, how, need]) => `<div class="kitrow ${on ? "" : "off"}"><div class="ki">${ic}</div><div><b>${name}: <span class="kv">${v}</span></b><br>${how}${on && !/with all/.test(need) ? "" : ` <small>(${on ? need : "you get this " + need})</small>`}</div></div>`).join("")}</div>
+    [ART.hearts, "Hearts", k.hearts, true, "The boss hits hard: every shockwave, fireball, roll or touch costs a heart.", `${best.hearts} with all right`, "legendary"],
+    [ART.shield, "Shield", k.shield ? "ON" : "off", k.shield, "Blocks the first hit completely.", "for all right", "rare"],
+    ["⤒", "Double-jump boots", k.boots ? "ON" : "off", k.boots, "A second jump in mid-air: easier to clear the shockwaves and reach the ledges when the boss rolls.", "for half right", "epic"],
+    [ART.blaster, "Blaster", k.ammo, true, "Shoot the boss's core when it glows open (after a stomp, and while it is dazed). Crates drop more when you run low.", `${best.ammo} with all right`, "rare"]] : [
+    [ART.hearts, "Hearts", k.hearts, true, "Every hit from spikes, a bot, a fall or a sniper bullet costs one heart. Lose them all and you start the level again.", `${best.hearts} with all right`, "legendary"],
+    [ART.shield, "Shield", k.shield ? "ON" : "off", k.shield, "Blocks the first hit completely: no heart lost.", "for all right", "rare"],
+    ["⤒", "Double-jump boots", k.boots ? "ON" : "off", k.boots, "Press jump again in mid-air: clear wide gaps and reach the <b>high gold bullets</b> (purple glow) that a normal jump can't.", "for ¾ right", "epic"],
+    [ART.steady, "Steady scope", k.steady ? "ON" : "off", k.steady, "At a sniper nest the crosshair sways half as much, so shots land where you aim.", "for half right", "epic"],
+    [ART.rounds, "Sniper rounds", k.rounds, true, "One shot each at the nests. Knock out every sentry to open the laser gate. Gold bullets in the level add more.", `${best.rounds} with all right`, "legendary"],
+    [ART.blaster, "Blaster", k.ammo, true, "Press J to shoot bots, hoppers, rollers and drones. Spiky rollers can't be stomped: blast them or jump over.", `${best.ammo} with all right`, "rare"]];
+  const icon = a => /\//.test(a) ? IMG(a) : a;
+  const tips = B.L.boss ? `<p class="tip">${IMG(ART.crown)}<span><b>How to beat ${esc(B.L.name)}:</b> jump the shockwave after each stomp, dodge the fireballs, and when it curls up and rolls, get up on a ledge. When it slams into the wall it is dazed: <b>stomp on its head</b> (big damage) or <b>blast the glowing core</b>. Each time its health drops a third, a power crate falls: answer its question for loot.</span></p>`
+    : `<p class="tip">${IMG(A4("emo-onfire"))}<span><b>Sniper nests are a score attack:</b> knock out enough to open the gate, then keep going until your rounds run out. Headshots, shooting first and streaks score more: <b>every extra round is a chance at a high score.</b></span></p>
+    <p class="tip">${IMG(ART.chest)}<span><b>Treasure chests</b> wait in every stage. Answer a bonus question from another skill to open one: a med kit, shield, boots, steady scope or more ammo. <b>Gold bullets</b> lie over gaps, on pillars and beside bots: each is one more sniper round.</span></p>`;
+  $("#scr-kit").innerHTML = `<div class="panel"><div class="kithead"><div class="score-ring" style="--p:${Math.round(100 * B.right / n)}"><b>${B.right}/${n}</b></div><div><h2 class="px">Your kit: ${B.right} of ${n} right</h2>
+    <p style="margin:2px 0 0">Each right answer in the briefing bought you something for ${B.L.boss ? "the boss fight" : `stage ${B.stage + 1}`}. Here is what you have and how it helps:</p></div></div>
+    <div class="kitlist">${rows.map(([ic, name, v, on, how, need, rar]) => `<div class="kitrow r-${rar} ${on ? "" : "off"}"><div class="ki">${icon(ic)}</div><div><div class="kn">${name}<span class="kv">${v}</span></div><div class="kd">${how}</div>${on && !/with all/.test(need) ? "" : `<small>${on ? need : "Locked: you get this " + need}</small>`}</div></div>`).join("")}</div>
     ${tips}
-    <button class="btn grn" id="btn-play">${B.L.boss ? "Go to the boss ▶" : `Start stage ${B.stage + 1} ▶`}</button></div>`;
+    <p style="margin-top:14px"><button class="btn grn" id="btn-play">${B.L.boss ? "Go to the boss ▶" : `Start stage ${B.stage + 1} ▶`}</button></p></div>`;
   $("#btn-play").onclick = () => play();
   coachKit();
   show("kit");
@@ -4006,7 +4092,7 @@ function onChest(info, api) {
   CH = { q, info, api, done: false };
   const t = TR[q.track], letters = "ABCDE", visual = q.visual || q.options.some(o => /<svg/.test(o));
   const m = document.createElement("div"); m.className = "modal"; m.id = "chest";
-  m.innerHTML = `<div class="qcard"><div class="qhead"><span class="px">${info.boss ? "⚡ POWER CRATE" : "🎁 TREASURE CHEST"}: ONE GO TO OPEN IT</span><span class="note"><span class="tag ${t.subject}">${t.subject}</span> a bonus question: ${esc(t.name)}</span></div>
+  m.innerHTML = `<div class="qcard"><div class="qhead"><span class="px chesthead">${IMG(info.boss ? ART.crate : ART.chest)}${info.boss ? "POWER CRATE" : "TREASURE CHEST"}: ONE GO TO OPEN IT</span><span class="note"><span class="tag ${t.subject}">${t.subject}</span> a bonus question: ${esc(t.name)}</span></div>
     <div class="qgrid"><div class="left">${q.passage || ""}<div class="stem">${q.stem}</div></div>
     <div class="right"><div class="opts ${visual ? "visual" : ""}">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><b class="l">${letters[i]}</b><span>${o}</span></button>`).join("")}</div>
     <div class="after hidden" id="ch-after"></div><div id="ch-loot"></div><div class="explain hidden" id="ch-explain"></div></div></div></div>`;
@@ -4020,7 +4106,7 @@ function chestAnswer(i) {
   document.querySelectorAll("#chest .opt").forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add("right"); else if (k === i) b.classList.add("wrong"); });
   let loot = "";
   if (ok) { const r = CH.api.open(CH.info.pick); const change = r.before !== undefined ? ` (${r.key === "med" ? "hearts" : r.key === "ammo" ? "sniper rounds" : "blaster shots"} ${r.before} → ${r.after})` : "";
-    loot = `<div class="loot"><div class="li">${r.icon}</div><div class="ln">${esc(r.name)}!</div><div>${esc(r.what)}${change}</div></div>`; }
+    loot = `<div class="loot"><div class="li">${LOOTART[r.key] ? IMG(LOOTART[r.key]) : r.icon}</div><div class="ln">${esc(r.name)}!</div><div>${esc(r.what)}${change}</div></div>`; }
   else CH.api.lock();
   $("#ch-after").classList.remove("hidden");
   $("#ch-after").innerHTML = `<p class="verdict ${ok ? "ok" : "no"}">${ok ? "✔ Right! The chest opens…" : `✘ The lock holds: the answer is ${"ABCDE"[q.answer]}.`}</p><button class="btn" id="ch-back">Back to the level ▶</button>`;
@@ -4048,7 +4134,7 @@ let INV = false;
 function play() {
   show("play");
   $("#play-admin").classList.toggle("hidden", !PRACTICE);
-  PF.start({ canvas: $("#cv"), level: levelFor(B.L, B.stage), kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done, onChest, bestRidge: (S.levels[B.L.id] || {}).ridgeBest || 0 });
+  PF.start({ canvas: $("#cv"), level: levelFor(B.L, B.stage), kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done, onChest, onCard, bestRidge: (S.levels[B.L.id] || {}).ridgeBest || 0 });
   $("#cv").focus();
 }
 function done(res) {
@@ -4058,17 +4144,18 @@ function done(res) {
   const sn = res.snipe || {}, newBest = (sn.score || 0) > (rec.snipeBest || 0) && sn.score > 0, prevBest = rec.snipeBest || 0;
   rec.snipeBest = Math.max(prevBest, sn.score || 0); rec.ridgeBest = Math.max(rec.ridgeBest || 0, sn.ridgeMax || 0); S.snipeBest = Math.max(S.snipeBest || 0, sn.score || 0);
   const acc = sn.shots ? Math.round(100 * sn.hits / sn.shots) : 0;
-  const snipeCard = sn.shots ? `<div class="snipe"><div class="px">SNIPER SCORE</div><div class="big2">${sn.score}</div>${newBest ? `<div class="nhs">NEW HIGH SCORE!</div>` : `<div class="note2">Best on this level: ${prevBest}</div>`}
+  const snMood = PF.mood(Object.assign({}, sn, { acc }));
+  const snipeCard = sn.shots ? `<div class="snipe"><div class="px">Sniper score</div><div class="big2">${sn.score}</div>${newBest ? `<div class="nhs">New high score!</div>` : `<div class="note2">Best on this level: ${prevBest}</div>`}
     <div class="stats">${[["Knocked out", sn.ko], ["Headshots", sn.head], ["Shot first", sn.first], ["Accuracy", acc + "%"], ["Best streak", sn.best]].map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join("")}</div>
-    <p class="roast">🎙 ${esc(PF.roast(Object.assign({}, sn, { acc })))}</p></div>` : "";
+    <p class="roast">${IMG(A4(MOOD[snMood]))}<span>${esc(PF.roast(Object.assign({}, sn, { acc })))}</span></p></div>` : "";
+  const statRow = (list) => `<div class="statrow">${list.filter(Boolean).map(([k, v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join("")}</div>`;
   const last = B.stage >= STAGES(L) - 1;
   if (res.win && !last) {
     /* a stage of a big level is done: save where we are, then the next stage's briefing */
     rec.at = B.stage + 1; skillRec(L, B.stage).cleared = true; save();
     const nt = TR[L.tracks[B.stage + 1]];
-    $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">STAGE ${B.stage + 1} OF 3 CLEAR!</h2>${snipeCard}
-      <p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
-      ${res.totalAmmo ? `<p>Sniper bullets gathered: <b>${res.got} of ${res.totalAmmo}</b>${res.got === res.totalAmmo ? " · every one!" : ""}</p>` : ""}
+    $("#scr-result").innerHTML = `<div class="panel"><div class="banner">${IMG(ART.win)}<h2 class="px">STAGE ${B.stage + 1} OF 3 CLEAR!</h2></div>
+      ${statRow([["Briefing", `${B.right}/${n}`], ["Coins", res.coins], res.lost ? ["Hits taken", res.lost] : null, res.totalAmmo ? ["Gold bullets", `${res.got}/${res.totalAmmo}${res.got === res.totalAmmo ? " ★" : ""}`] : null])}${snipeCard}
       <p>Next, stage ${B.stage + 2}: a new briefing on <span class="tag ${nt.subject}">${nt.subject}</span> <b>${esc(nt.name)}</b>, then a new stretch of the level.</p>
       <button class="btn grn" id="btn-nextst">Stage ${B.stage + 2}: the briefing ▶</button> <button class="btn alt" id="btn-tomap">Map (your place is saved)</button></div>`;
     $("#btn-nextst").onclick = () => startBrief(L, B.stage + 1);
@@ -4078,16 +4165,15 @@ function done(res) {
     const st = 1 + (total >= Math.ceil(of * 0.75) ? 1 : 0) + (total === of ? 1 : 0);
     rec.cleared = true; rec.at = 0; rec.stars = Math.max(rec.stars || 0, st); if (!L.boss) skillRec(L, B.stage).cleared = true; save();
     const i = LEVELS.indexOf(L), next = LEVELS[i + 1];
-    $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">${L.boss ? `${esc(L.name.toUpperCase())} IS DEFEATED!` : "LEVEL CLEAR!"}</h2>
-      <p style="font-size:28px;color:var(--gold)">${stars(st)}</p>${snipeCard}<p>${L.boss ? "Briefing" : "All three briefings"}: ${total}/${of} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
-      ${res.totalAmmo ? `<p>Sniper bullets gathered: <b>${res.got} of ${res.totalAmmo}</b>${res.got === res.totalAmmo ? " · every one!" : ""}</p>` : ""}
+    $("#scr-result").innerHTML = `<div class="panel"><div class="banner ${L.boss ? "boss" : ""}">${IMG(L.boss ? ART.crown : ART.win)}<div><h2 class="px">${L.boss ? `${esc(L.name.toUpperCase())} IS DEFEATED!` : "LEVEL CLEAR!"}</h2><div class="starsbig">${stars(st)}</div></div></div>
+      ${statRow([[L.boss ? "Briefing" : "All three briefings", `${total}/${of}`], ["Coins", res.coins], res.lost ? ["Hits taken", res.lost] : null, res.totalAmmo ? ["Gold bullets", `${res.got}/${res.totalAmmo}${res.got === res.totalAmmo ? " ★" : ""}`] : null])}${snipeCard}
       <p class="note" style="color:var(--muted)">★ for clearing the level, ★ for ¾ of the briefing questions right, ★ for every one right.</p>
-      ${next ? `<button class="btn grn" id="btn-nextlv">Next: ${next.boss ? `the boss, ${esc(next.name)}` : `level ${next.k + 1}, ${esc(next.name)}`} ▶</button>` : `<p class="px" style="color:var(--gold)">YOU BEAT ALL FOUR WORLDS!</p>`}
+      ${next ? `<button class="btn grn" id="btn-nextlv">Next: ${next.boss ? `the boss, ${esc(next.name)}` : `level ${next.k + 1}, ${esc(next.name)}`} ▶</button>` : `<p class="px" style="color:var(--gold);font-size:22px">You beat all four worlds!</p>`}
       <button class="btn alt" id="btn-tomap">Map</button></div>`;
     if (next) $("#btn-nextlv").onclick = () => { S.world = next.world; SEL = next.id; save(); startLevel(next); };
   } else {
     save();
-    $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--red);font-size:16px">OUT OF HEARTS</h2>
+    $("#scr-result").innerHTML = `<div class="panel"><div class="banner lost">${IMG(ART.lost)}<h2 class="px">OUT OF HEARTS</h2></div>
       ${snipeCard}<p>The kit comes from the briefing. A new briefing means new questions and a new kit${L.boss ? "" : ` (you stay on stage ${B.stage + 1})`}.</p>
       ${B.retries > 0 ? `<button class="btn" id="btn-retry">Try again with this kit (${B.retries} left)</button>` : ""}
       <button class="btn grn" id="btn-rebrief">New briefing</button> <button class="btn alt" id="btn-tomap">Map</button></div>`;
@@ -4097,6 +4183,38 @@ function done(res) {
   $("#btn-tomap").onclick = () => { renderMap(); show("map"); };
   show("result");
 }
+
+/* ================= the gear card and ridge report over the scope (the game pauses until SPACE or a tap) ================= */
+let OVT = 0;
+function onCard(kind, d) {
+  const ov = $("#ov"); cancelAnimationFrame(OVT);
+  if (!kind) { ov.classList.add("hidden"); ov.innerHTML = ""; return; }
+  if (kind === "gear") {
+    const rows = [
+      [ART.rounds, `Sniper rounds: ${d.rounds}`, true, `One shot each. Knock out ${d.min} to open the gate, then keep going for a high score.`, "legendary"],
+      [ART.steady, `Steady scope: ${d.steady ? "on" : "off"}`, d.steady, d.steady ? "Your crosshair sways half as much: easier to hit." : "Big sway. Get half the briefing right to earn it.", "epic"],
+      [ART.hearts, `Hearts: ${d.hearts}${d.shield ? " + shield" : ""}`, true, "Each enemy shot that hits costs one. Hold K to duck when you see a red glint.", "rare"],
+      ["⤒", `Boots: ${d.boots ? "on" : "off"}`, d.boots, d.boots ? "A second jump in mid-air on the way to the next nest." : "Get ¾ of the briefing right for double-jump boots.", "epic"]];
+    if (d.dots) rows.push(["⋮", "Drop dots", true, "Far targets: aim 1 dot high for 200 m, 2 dots for 300 m.", "rare"]);
+    if (d.wind != null) rows.push(["≋", `Wind: ${d.wind > 0 ? "→".repeat(d.wind) : "←".repeat(-d.wind)}`, true, "Aim against the wind, one green dot per arrow.", "rare"]);
+    const th = ["Sentries"].concat(d.threats.map(v => ({ plane: "Planes + paratroopers", heli: "Helicopters", tank: "Tanks" }[v])));
+    ov.innerHTML = `<div class="ovcard"><h2 class="px">Sniper nest ${d.nest}: your gear</h2><p class="ovsub">What the briefing earned you, and what each thing does.</p>
+      <div class="gear">${rows.map(([ic, h, on, t, rar], i) => `<div class="g r-${rar} ${on ? "" : "off"}" style="animation-delay:${i * 0.07}s"><div class="gi">${/\//.test(ic) ? IMG(ic) : ic}</div><div><b>${h}</b><span>${t}</span></div></div>`).join("")}</div>
+      <div class="threats">Watch out for: ${th.map(x => `<i>${x}</i>`).join("")}</div>
+      <div class="go"><span class="btn">Press SPACE to start shooting</span></div></div>`;
+  } else {
+    const rows = [["Knocked out", d.ko], ["Headshots", d.head], ["Vehicles + sky shots", d.veh || 0], ["Shot first", d.first], ["Accuracy", d.acc + "%"], ["Best streak", d.best]];
+    ov.innerHTML = `<div class="ovcard"><h2 class="px">Ridge report</h2>
+      <div class="rep">${rows.map(([k, v], i) => `<div style="animation-delay:${i * 0.08}s"><b>${v}</b><span>${k}</span></div>`).join("")}</div>
+      <div class="repscore"><span class="px" style="color:var(--gold)">Score</span><span class="big2" id="ov-score">0</span>${d.isBest ? `<span class="nhs">New high score!</span>` : `<span class="ovsub">Best on this level: ${d.ridgeBest}</span>`}</div>
+      <p class="roast">${IMG(A4(MOOD[d.mood] || "emo-bullseye"))}<span>${esc(d.roast)}</span></p>
+      <div class="go"><span class="btn">Press SPACE to carry on</span></div></div>`;
+    /* the score counts up (on animation frames: the game has no clocks) */
+    let k = 0; const up = () => { k++; const el = $("#ov-score"); if (!el) return; el.textContent = Math.round(d.score * Math.min(1, k / 40)); if (k < 40) OVT = requestAnimationFrame(up); }; OVT = requestAnimationFrame(up);
+  }
+  ov.classList.remove("hidden");
+}
+$("#ov").addEventListener("pointerdown", e => { e.preventDefault(); PF.hook.tap(); });
 
 /* ================= coach sidebar (practice mode only) ================= */
 function samplesHtml(t, rung) {
