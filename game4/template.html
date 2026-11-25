@@ -573,6 +573,7 @@ function onCard(kind, d) {
     ov.innerHTML = `<div class="ovcard"><h2 class="px">Sniper nest ${d.nest}: your gear</h2><p class="ovsub">What the briefing earned you, and what each thing does.</p>
       <div class="gear">${rows.map(([ic, h, on, t, rar], i) => `<div class="g r-${rar} ${on ? "" : "off"}" style="animation-delay:${i * 0.07}s"><div class="gi">${/\//.test(ic) ? IMG(ic) : ic}</div><div><b>${h}</b><span>${t}</span></div></div>`).join("")}</div>
       <div class="threats">Watch out for: ${th.map(x => `<i>${x}</i>`).join("")}</div>
+      ${d.threats.length ? `<div class="threats" style="color:#ffd8a8">💥 Hit a plane, chopper or tank 3 times and it explodes: <i>mega points!</i></div>` : ""}
       <div class="go"><span class="btn">Press SPACE to start shooting</span></div></div>`;
   } else {
     const rows = [["Knocked out", d.ko], ["Headshots", d.head], ["Vehicles + sky shots", d.veh || 0], ["Shot first", d.first], ["Accuracy", d.acc + "%"], ["Best streak", d.best]];

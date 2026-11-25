@@ -430,9 +430,16 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
       await pv.waitForTimeout(3000); await pv.evaluate(k => __rr.PF.hook.spawnVeh(k), k);
       for (let t = 0; t < 60; t++) { await pv.waitForTimeout(100); const v = (await pv.evaluate(() => __rr.PF.hook.vehicles())).veh; if (v && v.x > 60 && v.x < 420 && v.state !== "in") break; }
       if (shots) await pv.screenshot({ path: path.join(shots, `rr-${k}.png`) });
-      for (let h = 0; h < hits; h++) { await pv.evaluate(k => { const v = __rr.PF.hook.vehicles().veh; if (v) { __rr.PF.hook.aimPoint(v.x, k === "tank" ? v.y - 23 : v.y); __rr.PF.hook.fire(); } }, k); await pv.waitForTimeout(700); }
-      const v = (await pv.evaluate(() => __rr.PF.hook.vehicles())).veh;
+      const sc0 = (await pv.evaluate(() => __rr.PF.hook.vehicles())).stat.score; let boomSeen = false;
+      for (let h = 0; h < hits; h++) { await pv.evaluate(k => { const v = __rr.PF.hook.vehicles().veh; if (v) { __rr.PF.hook.aimPoint(v.x, k === "tank" ? v.y - 23 : v.y); __rr.PF.hook.fire(); } }, k); await pv.waitForTimeout(h === hits - 1 ? 150 : 700); }
+      boomSeen = (await pv.evaluate(() => __rr.PF.hook.fx())).includes("boom");
+      if (shots && k === "heli") await pv.screenshot({ path: path.join(shots, "rr-boom.png") });
+      await pv.waitForTimeout(550);
+      const vs = await pv.evaluate(() => __rr.PF.hook.vehicles()), v = vs.veh;
       if (v && !v.dead) bad(`${k}: ${hits} ${k === "tank" ? "hatch hits" : "hits"} should bring it down (${JSON.stringify(v)})`);
+      /* David: three hits and it explodes for mega points */
+      if (!boomSeen) bad(`${k}: the last hit should blow it up (an explosion)`);
+      if (!(vs.stat.score - sc0 >= 1500)) bad(`${k}: blowing it up should score mega points (got ${vs.stat.score - sc0})`);
     }
     if (!((await pv.evaluate(() => __rr.PF.hook.vehicles())).stat.veh >= 3)) bad("vehicles and sky shots should be counted for the report");
     await pv.evaluate(() => localStorage.clear()); await pv.close(); }
