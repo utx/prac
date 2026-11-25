@@ -235,6 +235,11 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   /* every level has its sniper nests (2 in worlds 1–2, 3 in worlds 3–4), each with a laser gate after it */
   const nestBad = await p.evaluate(() => __stages.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen(L), n = G.ents.filter(e => e.t === "nest").length, g = G.ents.filter(e => e.t === "gate").length; return n !== (L.world <= 2 ? 2 : 3) || g !== n; }).map(L => L.id));
   if (nestBad.length) bad(`stages without the right number of nests and gates: ${nestBad.join(", ")}`);
+  /* the trickier pieces: every stage opens with a moving platform and a crumbling bridge; world 1 already has springs */
+  { const bad2 = await p.evaluate(() => __stages.filter(L => { const G = __rr.PF.gen(L), m = G.ents.find(e => e.t === "mover"); let cr = 0; for (let c = 0; c < 40; c++) for (let r = 0; r < 17; r++) if (G.map[r][c] === 6) cr++; return !m || m.x > 30 * 16 || cr < 4; }).map(L => L.id));
+    if (bad2.length) bad(`stages that don't open with a moving platform and a crumbling bridge: ${bad2.slice(0, 6).join(", ")}`);
+    const w1 = await p.evaluate(() => { let springs = 0, movers = 0; for (const L of __stages.filter(L => L.world === 1)) { const G = __rr.PF.gen(L); movers += G.ents.filter(e => e.t === "mover").length; for (let r = 0; r < 17; r++) for (let c = 0; c < G.cols; c++) if (G.map[r][c] === 5) springs++; } return { springs, movers }; });
+    if (w1.springs < 3 || w1.movers < 18) bad(`world 1 should already have springs and plenty of moving platforms (${JSON.stringify(w1)})`); }
   /* every boss run ends in an arena with ledges to hide on */
   const arenaBad = await p.evaluate(() => __stages.filter(L => L.boss).filter(L => { const G = __rr.PF.gen(L), a = G.ents.find(e => e.t === "arena"); if (!a) return true; let ledges = 0; for (let c = a.col; c < a.col + 30; c++) if (G.map[9][c] === 2) ledges++; return ledges < 8 || G.ents.some(e => e.t === "nest"); }).map(L => L.id));
   if (arenaBad.length) bad(`boss runs without a proper arena: ${arenaBad.join(", ")}`);
@@ -260,6 +265,19 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.click("#btn-play"); await p.waitForTimeout(400);
   const st0 = await p.evaluate(() => __rr.PF.hook.state());
   if (!st0 || st0.hearts !== kit.hearts || st0.ammo !== kit.ammo || st0.rounds !== kit.rounds) bad("the level should start with the kit from the briefing");
+  /* a moving platform carries the hero; a crumbling block falls if you stand on it; a spring bounces higher than a jump */
+  { const pc = await p.evaluate(() => __rr.PF.hook.pieces()), m = pc.movers[0];
+    await p.evaluate(m => __rr.PF.hook.place(m.x + 16, m.y - 20), m); await p.waitForTimeout(300);
+    const a0 = await p.evaluate(() => __rr.PF.hook.state()); await p.waitForTimeout(500); const a1 = await p.evaluate(() => __rr.PF.hook.state());
+    if (Math.abs(a1.x - a0.x) < 10 || Math.abs(a1.y - (m.y - 14)) > 2) bad(`standing on a moving platform should carry the hero (${a0.x} → ${a1.x}, y ${a1.y})`);
+    const cb = pc.crumbles[1]; await p.evaluate(c => __rr.PF.hook.place(c[0] * 16 + 3, c[1] * 16 - 20), cb); await p.waitForTimeout(900);
+    const pc2 = await p.evaluate(() => __rr.PF.hook.pieces()); if (!pc2.crumbles.some(c => c[2])) bad("standing on a crumbling block should make it fall away");
+    if (shots) await p.screenshot({ path: path.join(shots, "rr-crumble.png") });
+    await p.evaluate(() => { __rr.PF.hook.teleport(3); }); await p.waitForTimeout(300);
+    const hts = await p.evaluate(() => { const map = [...Array(17)].map(() => Array(20).fill(0)); for (let c = 0; c < 20; c++) map[12][c] = 1; map[12][10] = 5;
+      const G = { map, cols: 20, open: true }, top = (x0, jump) => { const b = { x: x0, y: 12 * 16 - 14, vx: 0, vy: 0, ground: true }; let min = b.y; for (let f = 0; f < 90; f++) { __rr.PF.step(G, b, { dir: 0, jump, jumpPressed: jump && f === 0 }); min = Math.min(min, b.y); } return 12 * 16 - 14 - min; };
+      return { jump: top(48, true), spring: (() => { const b = { x: 10 * 16 + 3, y: 12 * 16 - 40, vx: 0, vy: 1, ground: false }; let min = 999, max = 0; for (let f = 0; f < 90; f++) { __rr.PF.step(G, b, { dir: 0, jump: false, jumpPressed: false }); min = Math.min(min, b.y); } return 12 * 16 - 14 - min; })() }; });
+    if (!(hts.spring > hts.jump + 40)) bad(`a spring pad should bounce far higher than a normal jump (jump ${Math.round(hts.jump)} px, spring ${Math.round(hts.spring)} px)`); }
   /* real keys move the hero */
   await p.keyboard.down("ArrowRight"); await p.waitForTimeout(500); await p.keyboard.up("ArrowRight");
   const st1 = await p.evaluate(() => __rr.PF.hook.state()); if (!(st1.x > st0.x + 20)) bad("the right arrow should move the hero");
