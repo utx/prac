@@ -34,13 +34,21 @@ main { min-width: 0; }
 .tab.lock { opacity: .5; }
 .world { border-radius: 12px; padding: 14px; border: 3px solid #000; }
 .world h2 { margin: 0 0 4px; font-size: 14px; } .world p.sub { margin: 0 0 12px; color: #dfe3ff; font-size: 14px; }
-.path { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.path { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 .node { position: relative; text-align: left; border: 3px solid #000; border-radius: 10px; padding: 8px; background: #f8f9fa; color: #111; min-height: 92px; box-shadow: 0 4px 0 #000; }
 .node .n { font-size: 10px; } .node .ic { font-size: 22px; line-height: 1.1; }
 .node .nm { font-size: 12.5px; font-weight: 700; line-height: 1.2; }
 .node .st { font-size: 13px; color: #e67700; letter-spacing: 1px; }
 .node.maths { border-left: 10px solid var(--m); } .node.thinking { border-left: 10px solid var(--t); } .node.reading { border-left: 10px solid var(--r); }
 .node.boss { background: #ffe066; border-left: 10px solid #e03131; }
+.node.big { min-height: 150px; border-left: 10px solid #ffd43b; }
+.node .sk { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
+.node .sk span { font-size: 11.5px; font-weight: 700; padding: 2px 6px; border-radius: 6px; border-left: 6px solid #adb5bd; background: #e9ecef; }
+.node .sk span.maths { border-left-color: var(--m); } .node .sk span.thinking { border-left-color: var(--t); } .node .sk span.reading { border-left-color: var(--r); }
+.node .sk span.ok { background: #d3f9d8; }
+.node .prog2 { font-size: 9px; color: #e67700; margin-top: 4px; }
+.node .ic.big { font-size: 40px; }
+.climb li.done2 { color: #2b8a3e; }
 .node.lock { opacity: .45; filter: grayscale(.8); cursor: not-allowed; }
 .node.sel { outline: 4px solid var(--gold); }
 .node.done::after { content: "✔"; position: absolute; right: 8px; top: 6px; color: #2b8a3e; font-weight: 900; }
@@ -171,16 +179,20 @@ const GENS = [], HAND = [];
 const ORDER = ["frac", "flaw", "infer", "data", "claim", "word", "time", "rule", "link", "scale", "order", "same", "back", "space", "shape"];
 const TR = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 const WORLDS = [
-  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", sub: "Every level climbs: four questions on one skill, from a warm-up to test level. One sniper nest after another." },
-  { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", sub: "Every skill again, with new questions. Your scope now has drop dots for range." },
-  { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", sub: "New questions again. Night falls, and wind pushes your shots." },
-  { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", sub: "The last round of new questions, and the hardest levels and ridges." }];
+  { n: 1, name: "Bronze Canyon", rar: "Common", col: "#8a6a4a", boss: "Rustjaw", sub: "Five big levels, then Rustjaw, the canyon crusher. Every stage starts with a briefing that climbs from a warm-up to test level." },
+  { n: 2, name: "Silver Cliffs", rar: "Rare", col: "#4c6a8f", boss: "Frostgear", sub: "Every skill again, with new questions. Your scope now has drop dots for range. Frostgear guards the pass." },
+  { n: 3, name: "Gold Forest", rar: "Epic", col: "#2b5a3a", boss: "Thornbark", sub: "New questions again. Night falls, and wind pushes your shots. Thornbark waits in the dark." },
+  { n: 4, name: "Storm Fortress", rar: "Legendary", col: "#4b2f6b", boss: "the Storm Warden", sub: "The last round of new questions, the hardest levels and ridges, and the Storm Warden itself." }];
+/* five big levels a world, three skills each (one stage per skill), then the boss */
+const GROUPS = [["frac", "flaw", "infer"], ["data", "claim", "word"], ["time", "rule", "link"], ["scale", "order", "same"], ["back", "space", "shape"]];
+const LNAMES = ["Dusty Trail", "High Ledges", "Rope Bridges", "Lookout Ridge", "Long Climb"];
 const hash = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };
 const LEVELS = [];
 for (const W of WORLDS) {
-  ORDER.forEach((t, k) => LEVELS.push({ id: `${W.n}-${t}`, world: W.n, k, track: t, seed: hash(`${W.n}-${t}`) }));
-  LEVELS.push({ id: `${W.n}-boss`, world: W.n, k: ORDER.length, boss: true, seed: hash(`${W.n}-boss`) });
+  GROUPS.forEach((g, k) => LEVELS.push({ id: `${W.n}-L${k + 1}`, world: W.n, k, tracks: g, name: LNAMES[k], seed: hash(`${W.n}-L${k + 1}`) }));
+  LEVELS.push({ id: `${W.n}-boss`, world: W.n, k: GROUPS.length, boss: true, tracks: [], name: W.boss, seed: hash(`${W.n}-boss`) });
 }
+const STAGES = L => L.boss ? 1 : L.tracks.length;
 const LV = Object.fromEntries(LEVELS.map(l => [l.id, l]));
 const QN = { boss: 6, normal: 4 };
 
@@ -190,8 +202,16 @@ const PRACTICE = (() => { try { return new URLSearchParams(location.search).has(
 const FRESH = () => ({ v: 1, levels: {}, seen: {}, seed: 1, coins: 0, sound: true, world: 1, log: [] });
 function load() {
   if (PRACTICE) { const s = FRESH(); try { const p = JSON.parse(localStorage.getItem(PKEY)); if (p && p.seen) { s.seen = p.seen; s.seed = p.seed || 1; } } catch (e) {} return s; }
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return Object.assign(FRESH(), s); } catch (e) {}
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return migrate(Object.assign(FRESH(), s)); } catch (e) {}
   return FRESH();
+}
+/* progress from the first layout (one level per skill) carries over: a big level counts as cleared when all three of its skills were */
+function migrate(s) {
+  for (const L of LEVELS) if (!L.boss && !s.levels[L.id]) {
+    const old = L.tracks.map(t => s.levels[`${L.world}-${t}`]);
+    if (old.every(r => r && r.cleared)) s.levels[L.id] = { cleared: true, stars: Math.min(...old.map(r => r.stars || 1)), migrated: true };
+  }
+  return s;
 }
 let S = load();
 const save = () => { try { if (PRACTICE) localStorage.setItem(PKEY, JSON.stringify({ seen: S.seen, seed: S.seed })); else localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
@@ -214,7 +234,7 @@ function pick(track, rung, avoid) {
   if (unseen.length) return unseen[Math.floor(Math.random() * unseen.length)];
   return pool.slice().sort((a, b) => S.seen[a.id] - S.seen[b.id])[0];
 }
-function briefing(L) {
+function briefing(L, stage = 0) {
   const out = [], ids = [];
   /* a question counts as seen as soon as it is put into a briefing, so leaving a briefing early never brings its questions straight back */
   const add = (track, rung, role) => { const q = pick(track, rung, ids); if (q) { ids.push(q.id); S.seen[q.gen || q.id] = S.seed++; out.push(Object.assign({}, q, { role })); } };
@@ -225,7 +245,7 @@ function briefing(L) {
     ts.forEach((t, i) => add(t, [1, 2, 3, 3, 4, 4][i], "boss"));
   } else {
     /* one skill, climbing inside the level: step 1 (warm-up) -> step 2 -> step 3 -> step 4 (test level) */
-    for (let r = 1; r <= QN.normal; r++) add(L.track, r, "focus");
+    for (let r = 1; r <= QN.normal; r++) add(L.tracks[stage], r, "focus");
   }
   save();
   return out;
@@ -243,42 +263,47 @@ function renderMap() {
   const W = WORLDS[S.world - 1];
   const tabs = WORLDS.map(w => { const first = LEVELS.find(l => l.world === w.n); return `<button class="tab px ${w.n === S.world ? "on" : ""} ${unlocked(first) ? "" : "lock"}" data-w="${w.n}">${w.n}. ${w.name.toUpperCase()}</button>`; }).join("");
   const nodes = LEVELS.filter(l => l.world === W.n).map(l => {
-    const t = l.boss ? null : TR[l.track], rec = S.levels[l.id] || {};
-    const cls = l.boss ? "boss" : t.subject;
-    return `<button class="node ${cls} ${unlocked(l) ? "" : "lock"} ${rec.cleared ? "done" : ""} ${SEL === l.id ? "sel" : ""}" data-l="${l.id}" ${unlocked(l) ? "" : 'aria-disabled="true"'}>
-      <div class="n px">${l.boss ? "BOSS" : `LEVEL ${l.k + 1}`}</div><div class="ic">${l.boss ? "♛" : t.icon}</div>
-      <div class="nm">${l.boss ? "The Warden" : esc(t.name)}</div><div class="st">${rec.cleared ? stars(rec.stars || 1) : ""}</div></button>`;
+    const rec = S.levels[l.id] || {};
+    const inner = l.boss ? `<div class="n px">BOSS</div><div class="ic big">♛</div><div class="nm">${esc(cap(l.name))}</div>`
+      : `<div class="n px">LEVEL ${l.k + 1}</div><div class="nm">${esc(l.name)}</div><div class="sk">${l.tracks.map((t, i) => `<span class="${TR[t].subject} ${rec.at > i || rec.cleared ? "ok" : ""}" title="${esc(TR[t].name)}">${TR[t].icon} ${esc(TR[t].name)}</span>`).join("")}</div>${rec.at ? `<div class="prog2 px">STAGE ${rec.at + 1} OF 3</div>` : ""}`;
+    return `<button class="node ${l.boss ? "boss" : "big"} ${unlocked(l) ? "" : "lock"} ${rec.cleared ? "done" : ""} ${SEL === l.id ? "sel" : ""}" data-l="${l.id}" ${unlocked(l) ? "" : 'aria-disabled="true"'}>
+      ${inner}<div class="st">${rec.cleared ? stars(rec.stars || 1) : ""}</div></button>`;
   }).join("");
   const L = SEL && LV[SEL];
-  const card = L ? levelCard(L) : `<p class="sub">Pick a level. Each one starts with a short briefing: the more questions you get right, the better your kit for the level.</p>`;
+  const card = L ? levelCard(L) : `<p class="sub">Pick a level. Each big level has three stages, and each stage starts with a short briefing: the more questions you get right, the better your kit for that stage. Clear all five levels to face the boss.</p>`;
   $("#scr-map").innerHTML = `<div class="tabs">${tabs}</div>
     <div class="world" style="background:${W.col}"><h2 class="px">WORLD ${W.n}: ${W.name.toUpperCase()} <small>(${W.rar})</small></h2><p class="sub">${W.sub}</p><div class="path">${nodes}</div>
-    <div class="legend"><span><i style="background:var(--m)"></i>Maths</span><span><i style="background:var(--t)"></i>Thinking</span><span><i style="background:var(--r)"></i>Reading</span><span><i style="background:#ffe066"></i>Boss: mixed questions</span></div></div>
+    <div class="legend"><span><i style="background:var(--m)"></i>Maths</span><span><i style="background:var(--t)"></i>Thinking</span><span><i style="background:var(--r)"></i>Reading</span><span><i style="background:#ffe066"></i>Boss: mixed questions, then a giant boss fight</span></div></div>
     <div class="panel lvcard" id="lvcard">${card}</div>${grownUps()}`;
   document.querySelectorAll(".tab").forEach(b => b.onclick = () => { S.world = +b.dataset.w; SEL = null; save(); renderMap(); coachLevel(null); });
   document.querySelectorAll(".node").forEach(b => b.onclick = () => { const l = LV[b.dataset.l]; if (!unlocked(l)) return; SEL = l.id; renderMap(); coachLevel(l); $("#lvcard").scrollIntoView({ block: "nearest" }); });
-  const go = $("#btn-go"); if (go) go.onclick = () => startBrief(LV[SEL]);
+  const go = $("#btn-go"); if (go) go.onclick = () => startLevel(LV[SEL]);
+  const rs = $("#btn-restart"); if (rs) rs.onclick = () => { const r = S.levels[SEL]; if (r) r.at = 0; save(); startLevel(LV[SEL]); };
   hdr();
 }
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 function levelCard(L) {
   const rec = S.levels[L.id] || {};
-  if (L.boss) return `<h3 class="px">WORLD ${L.world} BOSS: THE WARDEN</h3><p>A mixed briefing of ${QN.boss} questions from this world's skills, then a run to the Warden's ridge and a sniper duel. Read the drop dots and the wind!</p>
+  if (L.boss) return `<h3 class="px">WORLD ${L.world} BOSS: ${esc(L.name.toUpperCase())}</h3><p>A mixed briefing of ${QN.boss} questions from this world's skills builds your kit. Then a short run to the arena, where ${esc(L.name)} towers over you. Jump its shockwaves, dodge what it throws, hide on the ledges when it rolls, then blast its glowing core or stomp its head while it's dazed.</p>
     ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.boss}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
-  const t = TR[L.track];
-  return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(t.name.toUpperCase())}</h3><p><span class="tag ${t.subject}">${t.subject}</span> Four questions that climb, from a warm-up to test level:</p><ol class="climb">${t.rungs.map(r => `<li><b>${esc(r.title)}</b></li>`).join("")}</ol>
-    ${rec.best != null ? `<p>Best briefing: ${rec.best}/${QN.normal} · ${stars(rec.stars || 0)}${rec.snipeBest ? ` · 🎯 sniper best <b style="color:var(--gold)">${rec.snipeBest}</b>` : ""}</p>` : ""}<button class="btn" id="btn-go">Start the briefing</button>`;
+  const at = rec.at || 0;
+  return `<h3 class="px">LEVEL ${L.k + 1}: ${esc(L.name.toUpperCase())}</h3><p>A big level in three stages. Each stage starts with a briefing of four questions on one skill that climb from a warm-up to test level, then a long stretch of platforms and sniper nests:</p>
+    <ol class="climb">${L.tracks.map((t, i) => `<li class="${i < at ? "done2" : ""}"><span class="tag ${TR[t].subject}">${TR[t].subject}</span> <b>${esc(TR[t].name)}</b>${i < at ? " ✔" : ""}</li>`).join("")}</ol>
+    ${rec.cleared ? `<p>${stars(rec.stars || 0)}${rec.snipeBest ? ` · 🎯 sniper best <b style="color:var(--gold)">${rec.snipeBest}</b>` : ""}</p>` : ""}
+    <button class="btn" id="btn-go">${at ? `Carry on: stage ${at + 1}` : "Start stage 1"}</button>${at ? ` <button class="btn alt" id="btn-restart">Start again from stage 1</button>` : ""}`;
 }
 function grownUps() {
-  const rows = ORDER.map(t => { const tr = TR[t]; return `<tr><td>${esc(tr.name)}</td>${WORLDS.map(w => { const r = S.levels[`${w.n}-${t}`]; return `<td>${r ? `${r.cleared ? "✔ " : ""}${r.best}/${QN.normal}` : "–"}</td>`; }).join("")}</tr>`; }).join("");
-  return `<details class="grown"><summary>For grown-ups: best briefing scores by skill</summary><div class="panel" style="margin-top:8px"><p>Every level's briefing climbs through the skill's four steps. Each world brings the skill back with new questions. The score is the best briefing (questions right before the level).</p>
+  const rows = ORDER.map(t => { const tr = TR[t]; return `<tr><td>${esc(tr.name)}</td>${WORLDS.map(w => { const r = S.levels[`${w.n}-${t}`]; return `<td>${r && r.best != null ? `${r.cleared ? "✔ " : ""}${r.best}/${QN.normal}` : "–"}</td>`; }).join("")}</tr>`; }).join("");
+  return `<details class="grown"><summary>For grown-ups: best briefing scores by skill</summary><div class="panel" style="margin-top:8px"><p>Each big level has three stages, one skill each, and every stage's briefing climbs through that skill's four steps. Each world brings the skill back with new questions. The score is the best briefing (questions right before the level).</p>
     <table class="prog"><tr><th>Skill</th>${WORLDS.map(w => `<th>World ${w.n}</th>`).join("")}</tr>${rows}</table></div></details>`;
 }
 
 /* ================= briefing ================= */
 let B = null;
-function startBrief(L) {
-  const qs = briefing(L);
-  B = { L, qs, i: 0, right: 0, res: [] };
+function startLevel(L) { const rec = S.levels[L.id] || {}; startBrief(L, L.boss ? 0 : Math.min(rec.at || 0, STAGES(L) - 1)); }
+function startBrief(L, stage = 0) {
+  const qs = briefing(L, stage);
+  B = { L, stage, qs, i: 0, right: 0, res: [] };
   renderQ();
 }
 function renderQ() {
@@ -286,7 +311,7 @@ function renderQ() {
   save();
   const visual = q.visual || q.options.some(o => /<svg/.test(o));
   const role = (q.role === "boss" ? "Boss briefing · " : "") + `Step ${q.rung} of 4${q.rung === 1 ? " (warm-up)" : q.rung === 4 ? " (test level)" : ""}`;
-  $("#scr-brief").innerHTML = `<div class="qcard"><div class="qhead"><span class="px">BRIEFING · ${B.L.boss ? `WORLD ${B.L.world} BOSS` : `LEVEL ${B.L.k + 1}`} · QUESTION ${B.i + 1} OF ${B.qs.length}</span>
+  $("#scr-brief").innerHTML = `<div class="qcard"><div class="qhead"><span class="px">BRIEFING · ${B.L.boss ? `WORLD ${B.L.world} BOSS` : `LEVEL ${B.L.k + 1} · STAGE ${B.stage + 1} OF 3`} · QUESTION ${B.i + 1} OF ${B.qs.length}</span>
       <span class="dots">${B.qs.map((x, i) => `<span class="${B.res[i] === true ? "ok" : B.res[i] === false ? "no" : i === B.i ? "cur" : ""}"></span>`).join("")}</span></div>
     <p class="note"><span class="tag ${t.subject}">${t.subject}</span> ${esc(t.name)} · ${role}</p>
     <div class="qgrid"><div class="left">${q.passage || ""}<div class="stem">${q.stem}</div></div>
@@ -320,25 +345,35 @@ addEventListener("keydown", e => {
 /* ================= kit ================= */
 function kitFor(right, n, boss) {
   const f = right / n;
-  return { hearts: 2 + Math.round(4 * f), ammo: 4 + Math.round(12 * f), rounds: (boss ? 4 : 2) + Math.round((boss ? 8 : 6) * f), steady: f >= 0.5, boots: f >= 0.75, shield: right === n };
+  if (boss) return { hearts: 3 + Math.round(4 * f), ammo: 10 + Math.round(20 * f), rounds: 0, steady: false, boots: f >= 0.5, shield: right === n };
+  return { hearts: 2 + Math.round(4 * f), ammo: 4 + Math.round(12 * f), rounds: 2 + Math.round(6 * f), steady: f >= 0.5, boots: f >= 0.75, shield: right === n };
 }
 function showKit() {
   const n = B.qs.length, k = kitFor(B.right, n, B.L.boss), best = kitFor(n, n, B.L.boss);
   B.kit = k; B.retries = 1;
-  const rec = S.levels[B.L.id] || (S.levels[B.L.id] = {}); rec.best = Math.max(rec.best || 0, B.right); rec.last = B.right; save();
-  const rows = [
+  const rec = S.levels[B.L.id] || (S.levels[B.L.id] = {});
+  if (B.L.boss) { rec.best = Math.max(rec.best || 0, B.right); rec.last = B.right; }
+  else { (rec.sr = rec.sr || [])[B.stage] = B.right; const sk = skillRec(B.L, B.stage); sk.best = Math.max(sk.best || 0, B.right); sk.last = B.right; }
+  save();
+  const rows = B.L.boss ? [
+    ["❤", "Hearts", k.hearts, true, "The boss hits hard: every shockwave, fireball, roll or touch costs a heart.", `${best.hearts} with all right`],
+    ["◆", "Shield", k.shield ? "ON" : "off", k.shield, "Blocks the first hit completely.", "for all right"],
+    ["⤒", "Double-jump boots", k.boots ? "ON" : "off", k.boots, "A second jump in mid-air: easier to clear the shockwaves and reach the ledges when the boss rolls.", "for half right"],
+    ["✦", "Blaster", k.ammo, true, "Shoot the boss's core when it glows open (after a stomp, and while it is dazed). Crates drop more when you run low.", `${best.ammo} with all right`]] : [
     ["❤", "Hearts", k.hearts, true, "Every hit from spikes, a bot, a fall or a sniper bullet costs one heart. Lose them all and you start the level again.", `${best.hearts} with all right`],
     ["◆", "Shield", k.shield ? "ON" : "off", k.shield, "Blocks the first hit completely: no heart lost.", "for all right"],
     ["⤒", "Double-jump boots", k.boots ? "ON" : "off", k.boots, "Press jump again in mid-air: clear wide gaps and reach the <b style=\"color:#b197fc\">high gold bullets</b> (purple glow) that a normal jump can't.", "for ¾ right"],
     ["〰", "Steady scope", k.steady ? "ON" : "off", k.steady, "At a sniper nest the crosshair sways half as much, so shots land where you aim.", "for half right"],
     ["◎", "Sniper rounds", k.rounds, true, "One shot each at the nests. Knock out every sentry to open the laser gate. Gold bullets in the level add more.", `${best.rounds} with all right`],
     ["✦", "Blaster", k.ammo, true, "Press J to shoot bots, hoppers, rollers and drones. Spiky rollers can't be stomped: blast them or jump over.", `${best.ammo} with all right`]];
+  const tips = B.L.boss ? `<p class="tip">♛ <b>How to beat ${esc(B.L.name)}:</b> jump the shockwave after each stomp, dodge the fireballs, and when it curls up and rolls, get up on a ledge. When it slams into the wall it is dazed: <b>stomp on its head</b> (big damage) or <b>blast the glowing core</b>. Each time its health drops a third, a power crate falls: answer its question for loot.</p>`
+    : `<p class="tip">🎯 <b>Sniper nests are a score attack:</b> knock out enough to open the gate, then keep going until your rounds run out. Headshots, shooting first and streaks score more: <b>every extra round is a chance at a high score.</b></p>
+    <p class="tip">🎁 <b>Treasure chests</b> wait in every stage. Answer a bonus question from another skill to open one: a med kit, shield, boots, steady scope or more ammo. ◎ <b>Gold bullets</b> lie over gaps, on pillars and beside bots: each is one more sniper round.</p>`;
   $("#scr-kit").innerHTML = `<div class="panel"><h2 class="px" style="font-size:14px;color:var(--gold)">YOUR KIT: ${B.right} OF ${n} RIGHT</h2>
-    <p>Each right answer in the briefing bought you something for the level. Here is what you have and how it helps:</p>
+    <p>Each right answer in the briefing bought you something for ${B.L.boss ? "the boss fight" : `stage ${B.stage + 1}`}. Here is what you have and how it helps:</p>
     <div class="kitlist">${rows.map(([ic, name, v, on, how, need]) => `<div class="kitrow ${on ? "" : "off"}"><div class="ki">${ic}</div><div><b>${name}: <span class="kv">${v}</span></b><br>${how}${on && !/with all/.test(need) ? "" : ` <small>(${on ? need : "you get this " + need})</small>`}</div></div>`).join("")}</div>
-    <p class="tip">🎯 <b>Sniper nests are a score attack:</b> knock out enough to open the gate, then keep going until your rounds run out. Headshots, shooting first and streaks score more: <b>every extra round is a chance at a high score.</b></p>
-    <p class="tip">🎁 <b>Treasure chests</b> wait in every level. Answer a bonus question from another skill to open one: a med kit, shield, boots, steady scope or more ammo. ◎ <b>Gold bullets</b> lie over gaps, on pillars and beside bots: each is one more sniper round.</p>
-    <button class="btn grn" id="btn-play">Start the level ▶</button></div>`;
+    ${tips}
+    <button class="btn grn" id="btn-play">${B.L.boss ? "Go to the boss ▶" : `Start stage ${B.stage + 1} ▶`}</button></div>`;
   $("#btn-play").onclick = () => play();
   coachKit();
   show("kit");
@@ -347,14 +382,14 @@ function showKit() {
 /* ================= treasure chests: a bonus question from another skill opens the loot ================= */
 let CH = null;
 function onChest(info, api) {
-  const others = ORDER.filter(t => t !== B.L.track), track = others[Math.floor(Math.random() * others.length)];
-  const steps = [[1, 2], [2, 3], [3, 3], [3, 4]][info.world - 1], rung = steps[Math.floor(Math.random() * steps.length)];
+  const others = ORDER.filter(t => t !== curTrack()), track = others[Math.floor(Math.random() * others.length)];
+  const steps = info.boss ? [[2, 3], [3, 3], [3, 4], [4, 4]][info.world - 1] : [[1, 2], [2, 3], [3, 3], [3, 4]][info.world - 1], rung = steps[Math.floor(Math.random() * steps.length)];
   const q = pick(track, rung, []); if (!q) { api.lock(); api.resume(); return; }
   S.seen[q.gen || q.id] = S.seed++; save();
   CH = { q, info, api, done: false };
   const t = TR[q.track], letters = "ABCDE", visual = q.visual || q.options.some(o => /<svg/.test(o));
   const m = document.createElement("div"); m.className = "modal"; m.id = "chest";
-  m.innerHTML = `<div class="qcard"><div class="qhead"><span class="px">🎁 TREASURE CHEST: ONE GO TO OPEN IT</span><span class="note"><span class="tag ${t.subject}">${t.subject}</span> a bonus question: ${esc(t.name)}</span></div>
+  m.innerHTML = `<div class="qcard"><div class="qhead"><span class="px">${info.boss ? "⚡ POWER CRATE" : "🎁 TREASURE CHEST"}: ONE GO TO OPEN IT</span><span class="note"><span class="tag ${t.subject}">${t.subject}</span> a bonus question: ${esc(t.name)}</span></div>
     <div class="qgrid"><div class="left">${q.passage || ""}<div class="stem">${q.stem}</div></div>
     <div class="right"><div class="opts ${visual ? "visual" : ""}">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><b class="l">${letters[i]}</b><span>${o}</span></button>`).join("")}</div>
     <div class="after hidden" id="ch-after"></div><div id="ch-loot"></div><div class="explain hidden" id="ch-explain"></div></div></div></div>`;
@@ -387,11 +422,16 @@ addEventListener("keydown", e => {
 }, true);
 
 /* ================= play ================= */
+const curTrack = () => B && !B.L.boss ? B.L.tracks[B.stage] : null;
+/* the skill's own record (best briefing per world), kept under the skill's id as before */
+const skillRec = (L, stage) => S.levels[`${L.world}-${L.tracks[stage]}`] || (S.levels[`${L.world}-${L.tracks[stage]}`] = {});
+/* each stage of a big level is its own stretch of platforms (its own seed); the boss is one run and the arena */
+const levelFor = (L, stage) => ({ world: L.world, boss: !!L.boss, seed: L.boss ? L.seed : hash(`${L.id}-s${stage}`), stage, stages: STAGES(L), bossName: L.boss ? L.name : "" });
 let INV = false;
 function play() {
   show("play");
   $("#play-admin").classList.toggle("hidden", !PRACTICE);
-  PF.start({ canvas: $("#cv"), level: { world: B.L.world, boss: !!B.L.boss, seed: B.L.seed }, kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done, onChest, bestRidge: (S.levels[B.L.id] || {}).ridgeBest || 0 });
+  PF.start({ canvas: $("#cv"), level: levelFor(B.L, B.stage), kit: B.kit, sound: S.sound, invincible: PRACTICE && INV, onEnd: done, onChest, bestRidge: (S.levels[B.L.id] || {}).ridgeBest || 0 });
   $("#cv").focus();
 }
 function done(res) {
@@ -403,25 +443,38 @@ function done(res) {
   const acc = sn.shots ? Math.round(100 * sn.hits / sn.shots) : 0;
   const snipeCard = sn.shots ? `<div class="snipe"><div class="px">SNIPER SCORE</div><div class="big2">${sn.score}</div>${newBest ? `<div class="nhs">NEW HIGH SCORE!</div>` : `<div class="note2">Best on this level: ${prevBest}</div>`}
     <div class="stats">${[["Knocked out", sn.ko], ["Headshots", sn.head], ["Shot first", sn.first], ["Accuracy", acc + "%"], ["Best streak", sn.best]].map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join("")}</div></div>` : "";
-  if (res.win) {
-    const st = 1 + (B.right >= Math.ceil(n * 0.75) ? 1 : 0) + (B.right === n ? 1 : 0);
-    rec.cleared = true; rec.stars = Math.max(rec.stars || 0, st); save();
-    const i = LEVELS.indexOf(L), next = LEVELS[i + 1];
-    $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">${L.boss ? "BOSS DEFEATED!" : "LEVEL CLEAR!"}</h2>
-      <p style="font-size:28px;color:var(--gold)">${stars(st)}</p>${snipeCard}<p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
+  const last = B.stage >= STAGES(L) - 1;
+  if (res.win && !last) {
+    /* a stage of a big level is done: save where we are, then the next stage's briefing */
+    rec.at = B.stage + 1; skillRec(L, B.stage).cleared = true; save();
+    const nt = TR[L.tracks[B.stage + 1]];
+    $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">STAGE ${B.stage + 1} OF 3 CLEAR!</h2>${snipeCard}
+      <p>Briefing ${B.right}/${n} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
       ${res.totalAmmo ? `<p>Sniper bullets gathered: <b>${res.got} of ${res.totalAmmo}</b>${res.got === res.totalAmmo ? " · every one!" : ""}</p>` : ""}
-      <p class="note" style="color:var(--muted)">★ for clearing the level, ★ for ¾ of the briefing right, ★ for a perfect briefing.</p>
-      ${next ? `<button class="btn grn" id="btn-nextlv">Next: ${next.boss ? "the Warden" : esc(TR[next.track].name)} ▶</button>` : `<p class="px" style="color:var(--gold)">YOU BEAT ALL FOUR WORLDS!</p>`}
+      <p>Next, stage ${B.stage + 2}: a new briefing on <span class="tag ${nt.subject}">${nt.subject}</span> <b>${esc(nt.name)}</b>, then a new stretch of the level.</p>
+      <button class="btn grn" id="btn-nextst">Stage ${B.stage + 2}: the briefing ▶</button> <button class="btn alt" id="btn-tomap">Map (your place is saved)</button></div>`;
+    $("#btn-nextst").onclick = () => startBrief(L, B.stage + 1);
+  } else if (res.win) {
+    /* stars for the whole level: every stage's latest briefing counts */
+    const total = L.boss ? B.right : (rec.sr || []).reduce((a, x) => a + (x || 0), 0), of = L.boss ? n : QN.normal * STAGES(L);
+    const st = 1 + (total >= Math.ceil(of * 0.75) ? 1 : 0) + (total === of ? 1 : 0);
+    rec.cleared = true; rec.at = 0; rec.stars = Math.max(rec.stars || 0, st); if (!L.boss) skillRec(L, B.stage).cleared = true; save();
+    const i = LEVELS.indexOf(L), next = LEVELS[i + 1];
+    $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--green);font-size:16px">${L.boss ? `${esc(L.name.toUpperCase())} IS DEFEATED!` : "LEVEL CLEAR!"}</h2>
+      <p style="font-size:28px;color:var(--gold)">${stars(st)}</p>${snipeCard}<p>${L.boss ? "Briefing" : "All three briefings"}: ${total}/${of} · coins collected: ${res.coins}${res.lost ? ` · hits taken: ${res.lost}` : ""}</p>
+      ${res.totalAmmo ? `<p>Sniper bullets gathered: <b>${res.got} of ${res.totalAmmo}</b>${res.got === res.totalAmmo ? " · every one!" : ""}</p>` : ""}
+      <p class="note" style="color:var(--muted)">★ for clearing the level, ★ for ¾ of the briefing questions right, ★ for every one right.</p>
+      ${next ? `<button class="btn grn" id="btn-nextlv">Next: ${next.boss ? `the boss, ${esc(next.name)}` : `level ${next.k + 1}, ${esc(next.name)}`} ▶</button>` : `<p class="px" style="color:var(--gold)">YOU BEAT ALL FOUR WORLDS!</p>`}
       <button class="btn alt" id="btn-tomap">Map</button></div>`;
-    if (next) $("#btn-nextlv").onclick = () => { S.world = next.world; SEL = next.id; save(); startBrief(next); };
+    if (next) $("#btn-nextlv").onclick = () => { S.world = next.world; SEL = next.id; save(); startLevel(next); };
   } else {
     save();
     $("#scr-result").innerHTML = `<div class="panel"><h2 class="px" style="color:var(--red);font-size:16px">OUT OF HEARTS</h2>
-      ${snipeCard}<p>The kit comes from the briefing. A new briefing means new questions and a new kit.</p>
+      ${snipeCard}<p>The kit comes from the briefing. A new briefing means new questions and a new kit${L.boss ? "" : ` (you stay on stage ${B.stage + 1})`}.</p>
       ${B.retries > 0 ? `<button class="btn" id="btn-retry">Try again with this kit (${B.retries} left)</button>` : ""}
       <button class="btn grn" id="btn-rebrief">New briefing</button> <button class="btn alt" id="btn-tomap">Map</button></div>`;
     if (B.retries > 0) $("#btn-retry").onclick = () => { B.retries--; play(); };
-    $("#btn-rebrief").onclick = () => startBrief(B.L);
+    $("#btn-rebrief").onclick = () => startBrief(B.L, B.stage);
   }
   $("#btn-tomap").onclick = () => { renderMap(); show("map"); };
   show("result");
@@ -436,14 +489,11 @@ function coachLevel(L) {
   if (!PRACTICE) return;
   const el = $("#coach-body");
   if (!L) { el.innerHTML = `<h2 class="px">COACH NOTES (ADMIN ONLY)</h2><p>Pick a level to see which sample-paper questions its skill builds toward, and how the four steps of that skill climb from building blocks to the hardest questions.</p>
-    <h3>How the game is built</h3><ul><li>15 skills (6 maths, 5 thinking, 4 reading), each in 4 steps.</li><li>Every briefing climbs: 4 questions on one skill, step 1 (warm-up) to step 4 (test level).</li><li>Each world brings every skill back with new questions; the platforming and sniping get harder world by world.</li><li>Bosses mix 6 skills (2 per subject), still climbing (steps 1, 2, 3, 3, 4, 4), as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
-  if (L.boss) { el.innerHTML = `<h2 class="px">COACH NOTES · WORLD ${L.world} BOSS</h2><p>The boss briefing mixes ${QN.boss} questions: 2 maths, 2 thinking and 2 reading skills, all at step ${L.world}. Coming without warning, mixed together like the real test, they check that each skill transfers when the topic isn't announced.</p>`; return; }
-  const t = TR[L.track];
-  el.innerHTML = `<h2 class="px">COACH NOTES · ${esc(t.name.toUpperCase())}</h2><p><span class="tag ${t.subject}">${t.subject}</span> World ${L.world}: the briefing climbs through all four steps (question 1 = step 1 … question 4 = step 4), with new questions in each world.</p>
-    <h3>Sample questions this skill prepares for</h3>${samplesHtml(t, 0)}
-    <h3>The underlying skill</h3><ul>${t.ideas.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
-    <h3>The four steps</h3>${ladderHtml(t, 0)}
-    <h3>Same method, same words</h3><p>${esc(t.method)}</p><h3>Transfer</h3><p>${esc(t.transfer)}</p>`;
+    <h3>How the game is built</h3><ul><li>15 skills (6 maths, 5 thinking, 4 reading), each in 4 steps.</li><li>Each world has 5 big levels and a boss. A big level has 3 stages (one skill each, mixing maths, thinking and reading); every stage's briefing climbs: 4 questions on its skill, step 1 (warm-up) to step 4 (test level).</li><li>Each world brings every skill back with new questions; the platforming and sniping get harder world by world.</li><li>Bosses mix 6 skills (2 per subject), still climbing (steps 1, 2, 3, 3, 4, 4), as a transfer check.</li><li>Maths, order and spatial questions are templates: new numbers, contexts and pictures every play, so the child learns the idea, not one picture.</li></ul>`; return; }
+  if (L.boss) { el.innerHTML = `<h2 class="px">COACH NOTES · WORLD ${L.world} BOSS</h2><p>The boss briefing mixes ${QN.boss} questions: 2 maths, 2 thinking and 2 reading skills, climbing through steps 1, 2, 3, 3, 4, 4. Coming without warning, mixed together like the real test, they check that each skill transfers when the topic isn't announced. In the fight, each third of the boss's health ends with a power crate: one more question (step 2–4 by world) for loot.</p>`; return; }
+  el.innerHTML = `<h2 class="px">COACH NOTES · LEVEL ${L.k + 1}: ${esc(L.name.toUpperCase())}</h2><p>World ${L.world}. A big level in three stages, one skill each; every stage's briefing climbs through that skill's four steps (question 1 = step 1 … question 4 = step 4), with new questions in each world.</p>
+    ${L.tracks.map((id, i) => { const t = TR[id]; return `<h3>Stage ${i + 1}: <span class="tag ${t.subject}">${t.subject}</span> ${esc(t.name)}</h3>
+      <p><b>Sample questions it prepares for</b></p>${samplesHtml(t, 0)}<p><b>The four steps</b></p>${ladderHtml(t, 0)}<p><b>Same method, same words:</b> ${esc(t.method)}</p>`; }).join("")}`;
 }
 function coachQ(q) {
   if (!PRACTICE) return;
@@ -482,8 +532,8 @@ $("#adm-quit").onclick = () => { PF.stop(); renderMap(); show("map"); };
 if (PRACTICE) { document.body.classList.add("practice"); $("#hdr-practice").classList.remove("hidden"); }
 renderMap(); coachLevel(null); show("map");
 /* test hooks (tools/check_game4.js) */
-window.__rr = { chestAnswer: i => chestAnswer(i), closeChest: () => closeChest(), chest: () => CH && { answer: CH.q.answer, done: CH.done }, S: () => S, LEVELS, TRACKS, briefing, startBrief: id => startBrief(LV[id]), B: () => B, answer, PF, kitFor, practice: PRACTICE,
-  preview: q => { B = { L: LEVELS[0], qs: [Object.assign({}, q, { role: "focus" })], i: 0, right: 0, res: [] }; renderQ(); } };
+window.__rr = { chestAnswer: i => chestAnswer(i), closeChest: () => closeChest(), chest: () => CH && { answer: CH.q.answer, done: CH.done }, S: () => S, LEVELS, TRACKS, briefing, startBrief: (id, stage) => startBrief(LV[id], stage || 0), startLevel: id => startLevel(LV[id]), levelFor, B: () => B, answer, PF, kitFor, practice: PRACTICE,
+  preview: q => { B = { L: LEVELS[0], stage: 0, qs: [Object.assign({}, q, { role: "focus" })], i: 0, right: 0, res: [] }; renderQ(); } };
 </script>
 </body>
 </html>

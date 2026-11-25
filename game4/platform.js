@@ -6,6 +6,7 @@
    --------------------------------------------------------------- */
 const PF = (() => {
   const TS = 16, ROWS = 17, VW = 480, VH = 270;
+  const ARENA_W = 30, ARENA_FLOOR = 12, LEDGES = [[7, 11], [18, 22]];
   /* physics (pixels per frame at 60 frames a second) */
   const PH = { acc: 0.35, air: 0.25, max: 2.0, fric: 0.72, grav: 0.32, fall: 6, jump: -6.2, dbl: -5.4, cut: -2.2, coyote: 6, buffer: 6, w: 10, h: 14 };
   const THEMES = [
@@ -18,7 +19,7 @@ const PF = (() => {
   function rng(seed) { let a = seed >>> 0 || 1; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
   function gen(L) {
     const r = rng(L.seed), int = (a, b) => a + Math.floor(r() * (b - a + 1)), w = L.world;
-    const len = L.boss ? 80 + 10 * w : 96 + 18 * w;
+    const len = L.boss ? 56 + 8 * w : 96 + 18 * w;
     const map = [...Array(ROWS)].map(() => []), ents = [];
     let x = 0, gh = 12;
     const ground = (c, h) => { for (let y = 0; y < ROWS; y++) map[y][c] = y >= h ? 1 : 0; };
@@ -74,7 +75,15 @@ const PF = (() => {
         ents.push({ t: "ammo", high: true, x: (x - 6) * TS + 4, y: (gh - 6) * TS });             /* only a double jump reaches this one */ }
       sinceCheck += 6; sinceNest += 6;
     }
-    if (L.boss) { flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); flat(4); ents.push({ t: "nest", x: x * TS, y: gh * TS, id: 9, boss: true }); flat(10); }
+    if (L.boss) {
+      /* the boss arena: a flat floor one screen wide, a ledge on each side to hide on when the boss rolls */
+      flat(4); ents.push({ t: "check", x: (x - 2) * TS, y: gh * TS }); flat(3);
+      while (gh !== ARENA_FLOOR) { gh += Math.sign(ARENA_FLOOR - gh); flat(3); }
+      flat(3); ents.push({ t: "arena", x: x * TS, y: gh * TS, col: x });
+      for (let i = 0; i < ARENA_W; i++) ground(x + i, gh);
+      for (const [a, b] of LEDGES) for (let i = a; i <= b; i++) map[gh - 3][x + i] = 2;
+      x += ARENA_W; flat(1);
+    }
     else { flat(12); ents.push({ t: "goal", x: (x - 5) * TS, y: gh * TS }); }
     ents.push({ t: "crate", x: 5 * TS, y: 12 * TS - 12 });                // a small blaster crate near the start
     { const sentries = L.boss ? 0 : (w === 1 ? 2 : w === 4 ? 4 : 3) * nests, have = () => ents.filter(e => e.t === "ammo").length;
@@ -115,7 +124,7 @@ const PF = (() => {
 
   /* ---------------- can the goal be reached? (uses the same physics, no double jump) ---------------- */
   function reach(L) {
-    const G = gen(L); G.open = true; const  goal = G.ents.find(e => e.t === "goal" || e.boss);
+    const G = gen(L); G.open = true; const  goal = G.ents.find(e => e.t === "goal" || e.t === "arena");
     const gx = Math.floor(goal.x / TS);
     const startC = 2, stand = new Map(), queue = [];
     const groundRow = c => { for (let r = 0; r < ROWS; r++) if (solidAt(G, c, r)) return r; return -1; };
@@ -181,7 +190,7 @@ const PF = (() => {
       P: { x: first.x + 3, y: first.y - PH.h, vx: 0, vy: 0, ground: false, face: 1, inv: 0, boots: opts.kit.boots, cd: 0 },
       check: { x: first.x + 3, y: first.y - PH.h }, hearts: opts.kit.hearts, shield: opts.kit.shield ? 1 : 0, ammo: opts.kit.ammo, rounds: opts.kit.rounds,
       ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -(0.45 + 0.15 * opts.level.world) : 0, ph: i * 1.7 }, e)),
-      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0, incoming: [], snipe: { score: 0, ko: 0, head: 0, shots: 0, hits: 0, best: 0, first: 0 } };
+      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0, incoming: [], snipe: { score: 0, ko: 0, head: 0, shots: 0, hits: 0, best: 0, first: 0 }, arena: null, boss: null, waves: [], orbs: [], strikes: [], pops: [] };
     S.totalAmmo = S.ents.filter(e => e.t === "ammo").length;
     S.ents.filter(e => e.t === "nest").forEach(e => { e.sentries = makeSentries(e); });
     G.gateOpen = {};
@@ -193,7 +202,9 @@ const PF = (() => {
       draw(); if (S && !S.over) raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
-    msg(G.theme.name + (opts.level.boss ? ": the boss waits at the end" : ": reach the flag"), 160); msg("Grab the gold bullets: every one is a sniper round!", 200, "#ffd43b");
+    const lv = opts.level;
+    if (lv.boss) { msg(`${G.theme.name}: ${(lv.bossName || "the boss")} waits at the end`, 160); msg("Run to the arena!", 200, "#ffd43b"); }
+    else { msg(G.theme.name + (lv.stages > 1 ? `, stage ${lv.stage + 1} of ${lv.stages}: reach the flag` : ": reach the flag"), 160); msg("Grab the gold bullets: every one is a sniper round!", 200, "#ffd43b"); }
   }
   function stop() { cancelAnimationFrame(raf); removeEventListener("keydown", kd); removeEventListener("keyup", ku); for (const k in KEYS) KEYS[k] = false; S = null; }
   const msg = (t, d = 90, c = "#fff") => S.msgs.push({ t, d, c });
@@ -338,6 +349,7 @@ const PF = (() => {
       if (S.stop > 0) { S.stop--; return; }                                               /* the freeze-frame on a hit */
       scopeTick(); S.parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .15; p.d--; }); S.parts = S.parts.filter(p => p.d > 0); S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0); return; }
     const P = S.P, G = S.G;
+    if (S.shake > 0) S.shake--;
     const dir = (KEYS.right ? 1 : 0) - (KEYS.left ? 1 : 0); if (dir) P.face = dir;
     const jp = pressed("jump") || pressed("up");
     step(G, P, { dir, jump: KEYS.jump || KEYS.up, jumpPressed: jp });
@@ -345,6 +357,9 @@ const PF = (() => {
     if (P.dbl > 0) { P.dbl--; if (P.dbl === 9) { burst(P.x + 5, P.y + 14, "#9fe7ff", 6); beep(620, .05); if (!S.tipBoots) { S.tipBoots = true; msg("BOOTS: a second jump in mid-air!", 80, "#b197fc"); } } }
     if (!S.tipStart && S.t === 200) { S.tipStart = true; const k = S.kit; msg(`Your kit: ${S.hearts} hearts${k.shield ? ", a shield" : ""}${k.boots ? ", double-jump boots" : ""}${k.steady ? ", a steady scope" : ""}, ${S.ammo} blaster shots, ${S.rounds} sniper rounds`, 200, "#9fe7ff"); }
     if (P.inv > 0) P.inv--;
+    /* the boss arena: once inside, its walls close and the camera holds still */
+    if (!S.arena) { const a = S.ents.find(e => e.t === "arena"); if (a && P.x > a.x + 2 * TS) startArena(a); }
+    if (S.arena) { const A = S.arena; if (P.x < A.L + 10) { P.x = A.L + 10; P.vx = Math.max(0, P.vx); } if (P.x > A.R - 10 - PH.w) { P.x = A.R - 10 - PH.w; P.vx = Math.min(0, P.vx); } bossTick(); if (!S || S.over) return; }
     if (P.onSpike) hurt("Ouch! Spikes");
     if (P.y > ROWS * TS + 20) { hurt("You fell!"); if (S && !S.over) { P.x = S.check.x; P.y = S.check.y; P.vx = P.vy = 0; } }
     /* shooting the blaster */
@@ -355,12 +370,13 @@ const PF = (() => {
     if (nest && (pressed("use") || pressed("down"))) enterNest(nest);
     if (nest && nest.boss && !nest.seen) { nest.seen = true; enterNest(nest); }
     /* bolts */
-    for (const b of S.bolts) { b.x += b.vx; b.d--; if (solidAt(G, Math.floor(b.x / TS), Math.floor(b.y / TS))) b.d = 0;
+    for (const b of S.bolts) { b.x += b.vx; b.d--; if (solidAt(G, Math.floor(b.x / TS), Math.floor(b.y / TS))) b.d = 0; if (S.boss && b.d > 0 && boltBoss(b)) b.d = 0;
       for (const e of S.ents) if (e.alive && FOES.includes(e.t) && Math.abs(b.x - (e.x + 6)) < 9 && Math.abs(b.y - (e.y + 5)) < 9) { e.alive = false; b.d = 0; burst(e.x + 6, e.y + 5, "#ffd43b"); S.coins++; beep(300, .06); dropAmmo(e); } }
     S.bolts = S.bolts.filter(b => b.d > 0);
     /* entities */
     for (const e of S.ents) {
       if (!e.alive) continue;
+      if (e.fall < 0) { e.fall = Math.min(0, e.fall + 5); e.y = e.y0 + e.fall; if (!e.fall) { burst(e.x + 6, e.y + 10, "#ced4da", 8); beep(160, .06); } continue; }
       if (e.t === "walker") {
         const nx = e.x + e.vx, c = Math.floor((e.vx < 0 ? nx : nx + 12) / TS), r = Math.floor((e.y + 10) / TS);
         if (solidAt(G, c, Math.floor((e.y + 4) / TS)) || !solidAt(G, c, r)) e.vx = -e.vx; else e.x = nx;
@@ -394,7 +410,7 @@ const PF = (() => {
           open: lootKey => { if (!S) return null; e.opened = "open"; return Object.assign({ key: lootKey }, LOOT[lootKey], giveLoot(lootKey)); },
           lock: () => { if (S) { e.opened = "locked"; msg("The lock holds", 60, "#ffb3b3"); } },
           resume: () => { if (S) { S.paused = false; for (const k in KEYS) KEYS[k] = false; } } };
-        if (S.opts.onChest) S.opts.onChest({ world: S.G.world, pick: pickLoot() }, api); else { api.lock(); api.resume(); }
+        if (S.opts.onChest) S.opts.onChest({ world: S.G.world, pick: pickLoot(), boss: !!e.boss }, api); else { api.lock(); api.resume(); }
       } else if (e.t === "coin" && hitP(8, 8)) { e.alive = false; S.coins++; beep(980, .04, "triangle", .03); }
       else if (e.t === "heart" && hitP(10, 10)) { e.alive = false; S.hearts = Math.min(6, S.hearts + 1); msg("+1 heart", 50, "#ff8787"); beep(760, .1, "triangle"); }
       else if (e.t === "ammo" && hitP(8, 12)) {
@@ -402,7 +418,7 @@ const PF = (() => {
         msg("+1 SNIPER ROUND", 50, "#ffd43b");
         if (S.streak % 3 === 0) { S.rounds++; msg(`BULLET STREAK x${S.streak}: +1 BONUS ROUND`, 80, "#ffa94d"); beep(1568, .12, "triangle"); }
       }
-      else if (e.t === "crate" && hitP(12, 12)) { e.alive = false; S.ammo += 3; msg("+3 blaster ammo", 50, "#ffd43b"); beep(500, .06); }
+      else if (e.t === "crate" && hitP(12, 12)) { e.alive = false; const n = S.arena ? 5 : 3; S.ammo += n; msg(`+${n} blaster ammo`, 50, "#ffd43b"); beep(500, .06); }
       else if (e.t === "check" && !e.on && Math.abs(P.x - e.x) < 12) { e.on = true; S.check = { x: e.x + 2, y: e.y - PH.h }; msg("Checkpoint", 40, "#9be15d"); beep(540, .07, "triangle"); }
       else if (e.t === "gate" && !G.gateOpen[e.col] && Math.abs(P.x + PH.w - e.x) < 3 && S.t % 90 === 0) msg("Laser gate locked: clear the sentries from the nest (▼ / E)", 90, "#ffb3b3");
       else if (e.t === "goal" && Math.abs(P.x - e.x) < 12) { e.alive = false; msg("LEVEL CLEAR!", 120, "#9be15d"); beep(523, .1, "triangle"); beep(784, .2, "triangle"); end(true); return; }
@@ -418,9 +434,199 @@ const PF = (() => {
     S.shells = S.shells.filter(s => s.d > 0);
     S.parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .15; p.d--; }); S.parts = S.parts.filter(p => p.d > 0);
     S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0);
-    S.cam = Math.max(0, Math.min(G.cols * TS - VW, P.x - VW * 0.4));
+    S.cam = S.arena ? S.arena.L : Math.max(0, Math.min(G.cols * TS - VW, P.x - VW * 0.4));
   }
   const FOES = ["walker", "drone", "hopper", "roller", "swooper"];
+  /* ---------- the boss: a giant golem in an arena one screen wide (our own design, drawn in code) ----------
+     Classic-platformer rules: learn its moves, dodge them, and hit it when it is open.
+     Stomp → a shockwave runs along the floor both ways (jump it), then its chest core glows open for a moment.
+     Throw → fireballs lobbed at you. Roll → it curls into a ball and rolls to the far wall (get up on a ledge);
+     it slams the wall and is dazed: its head is low enough to stomp (3 damage) and its core is open (blaster, 1 each).
+     Each third of its health lost: it roars and a power crate falls (a bonus question for loot). */
+  const BOSSES = [
+    { name: "RUSTJAW", body: "#8c4a2f", dark: "#5c2e1c", light: "#c9733f", metal: "#868e96", eye: "#ffd43b", core: "#ff922b", crest: "horns" },
+    { name: "FROSTGEAR", body: "#4d6f99", dark: "#2f4566", light: "#9cc3e8", metal: "#d0dbe8", eye: "#7fe3ff", core: "#99e9f2", crest: "icicles" },
+    { name: "THORNBARK", body: "#5a4630", dark: "#3a2c1d", light: "#82a04a", metal: "#4b5d34", eye: "#a9e34b", core: "#d8f5a2", crest: "branches" },
+    { name: "THE STORM WARDEN", body: "#4b2f6b", dark: "#2b1b40", light: "#9775fa", metal: "#ced4da", eye: "#ffec99", core: "#f3d9fa", crest: "bolt" }];
+  const BW = 64, BH = 104;
+  function startArena(a) {
+    const w = S.G.world, info = BOSSES[w - 1], max = 8 + 3 * w;
+    S.arena = { L: a.x, R: a.x + ARENA_W * TS, floor: a.y };
+    S.boss = { x: a.x + ARENA_W * TS - BW - 40, drop: -260, vy: 0, hp: max, max, phase: 1, state: "intro", st: 0, face: -1, flash: 0, lift: 0, core: false, ball: false, spin: 0, sink: 0, cyc: 0, info, hint: 0 };
+    S.waves = []; S.orbs = []; S.strikes = []; S.pops = []; S.supplyT = 0;
+    S.check = { x: a.x + 3 * TS, y: a.y - PH.h };
+    S.msgs = []; msg(`BOSS: ${info.name}!`, 150, "#ff6b6b"); beep(110, .4, "sawtooth", .06);
+  }
+  const bossCycle = (B, w) => B.phase === 1 ? ["stomp", "roll"] : B.phase === 2 ? (w === 4 ? ["stomp", "throw", "storm", "roll"] : ["stomp", "throw", "roll"]) : (w >= 2 ? ["throw", "stomp", "minions", "roll"] : ["throw", "stomp", "roll"]);
+  const bossBox = B => { const kneel = B.state === "stun" || B.state === "rise", top = S.arena.floor - B.lift - (B.ball ? 40 : kneel ? 44 : BH); return { l: B.x + 4, r: B.x + BW - 4, top, bot: S.arena.floor - B.lift + (B.ball ? 0 : 0), kneel }; };
+  function bossDamage(n, how) {
+    const B = S.boss; if (!B || B.hp <= 0 || B.state === "roar" || B.state === "intro") return;
+    B.hp = Math.max(0, B.hp - n); B.flash = 12; S.shake = Math.max(S.shake, n > 1 ? 10 : 4);
+    S.pops.push({ x: B.x + BW / 2, y: bossBox(B).top - 6, text: n > 1 ? `STOMP! -${n}` : `-${n}`, c: n > 1 ? "#ffd43b" : "#fff", t: 0 });
+    beep(n > 1 ? 180 : 320, .1, "square", .05); burst(B.x + BW / 2, bossBox(B).top + 20, B.info.core, n > 1 ? 18 : 8);
+    if (B.hp <= 0) { B.state = "dying"; B.st = 0; B.ball = false; B.core = false; S.waves = []; S.orbs = []; S.strikes = []; S.ents.forEach(e => { if (FOES.includes(e.t)) e.alive = false; }); msg(`${B.info.name} IS FINISHED!`, 160, "#9be15d"); return; }
+    const third = B.max / 3, phase = B.hp <= third ? 3 : B.hp <= 2 * third ? 2 : 1;
+    if (phase > B.phase) { B.phase = phase; B.state = "roar"; B.st = 0; B.ball = false; B.core = false; B.lift = 0; powerCrate(); }
+    else if (how === "stomp") { B.state = "rise"; B.st = 0; }
+  }
+  /* a power crate falls into the middle of the arena (a bonus question for loot), and blaster ammo on the side */
+  function powerCrate() {
+    const A = S.arena, c = (A.L + A.R) / 2 - 7;
+    S.ents.push({ t: "chest", boss: true, x: c, y: A.floor - 12, y0: A.floor - 12, fall: -220, alive: true, i: S.ents.length, ph: 0 });
+    dropCrate();
+    msg(`${S.boss.info.name} ROARS! A POWER CRATE FALLS: answer its question for loot`, 170, "#ffd43b");
+  }
+  function dropCrate() { const A = S.arena, x = S.P.x < (A.L + A.R) / 2 ? A.L + 2 * TS : A.R - 3 * TS; S.ents.push({ t: "crate", x, y: A.floor - 12, y0: A.floor - 12, fall: -200, alive: true, i: S.ents.length, ph: 0 }); }
+  function bossTick() {
+    const B = S.boss, A = S.arena, P = S.P, w = S.G.world, fy = A.floor;
+    B.st++; if (B.flash > 0) B.flash--;
+    const toward = Math.sign(P.x + 5 - (B.x + BW / 2)) || -1;
+    switch (B.state) {
+      case "intro": B.vy += 0.5; B.drop = Math.min(0, B.drop + B.vy); if (B.drop === 0 && B.st > 5) { S.shake = 24; beep(70, .4, "sawtooth", .07); burst(B.x + BW / 2, fy, "#ced4da", 24); B.state = "roar0"; B.st = 0; } break;
+      case "roar0": if (B.st === 1) msg(B.info.name + " ROARS!", 90, "#ff6b6b"); if (B.st > 70) { B.state = "idle"; B.st = 0; } break;
+      case "roar": if (B.st === 1) { S.shake = 30; beep(90, .5, "sawtooth", .07); } if (B.st > 90) { B.state = "idle"; B.st = 0; } break;
+      case "idle": {
+        B.face = toward; const nx = B.x + toward * (0.35 + 0.1 * B.phase);
+        if (Math.abs(P.x + 5 - (B.x + BW / 2)) > 50 && nx > A.L + 8 && nx + BW < A.R - 8) B.x = nx;
+        if (B.st > 80 - 12 * B.phase - 4 * w) { const cyc = bossCycle(B, w); B.state = cyc[B.cyc++ % cyc.length]; B.st = 0; }
+        break; }
+      case "stomp":
+        if (B.st <= 36) B.lift = Math.round(14 * Math.sin(B.st / 36 * Math.PI / 2));
+        if (B.st === 37) { B.lift = 0; S.shake = 16; beep(70, .3, "sawtooth", .07); const v = 2.0 + 0.25 * w + 0.35 * (B.phase - 1); S.waves.push({ x: B.x + 6, dir: -1, v }, { x: B.x + BW - 6, dir: 1, v }); burst(B.x + BW / 2, fy, "#ced4da", 16); if (!S.tipWave) { S.tipWave = true; msg("SHOCKWAVE! Jump over it", 90, "#ffd43b"); } }
+        if (B.st > 50) { B.state = "vent"; B.st = 0; B.ventFor = 80 - 6 * w; }
+        break;
+      case "vent": B.core = true; if (B.st === 2 && !S.tipCore) { S.tipCore = true; msg("Its core is glowing: BLAST IT (J)!", 100, "#ffd43b"); } if (B.st > B.ventFor) { B.core = false; B.state = "idle"; B.st = 0; } break;
+      case "throw": {
+        const n = 1 + B.phase + (w >= 3 ? 1 : 0);
+        B.face = toward;
+        if (B.st > 26 && (B.st - 26) % 20 === 0 && (B.st - 26) / 20 <= n) {
+          const x0 = B.x + (B.face > 0 ? BW : 0), y0 = fy - BH - 6, T = 52 - 3 * w, tx = P.x + 5 + (Math.random() - 0.5) * 50 + P.vx * 20, ty = fy - 4, g = 0.2;
+          S.orbs.push({ x: x0, y: y0, vx: (tx - x0) / T, vy: (ty - y0 - 0.5 * g * T * T) / T, g }); beep(240, .08, "triangle");
+        }
+        if (B.st > 26 + 20 * (n + 1)) { B.state = "vent"; B.st = 0; B.ventFor = 55 - 5 * w; }
+        break; }
+      case "roll":
+        if (B.st === 1) { B.dir = B.x + BW / 2 > (A.L + A.R) / 2 ? -1 : 1; msg("IT'S CURLING UP: GET ON A LEDGE!", 90, "#ff6b6b"); beep(200, .2, "sawtooth"); }
+        if (B.st > 30) B.ball = true;
+        if (B.st > 62 - 3 * w) {
+          B.x += B.dir * (3.0 + 0.35 * w + 0.4 * (B.phase - 1)); B.spin += B.dir * 0.25;
+          if (B.x <= A.L + 22 || B.x + BW >= A.R - 22) { B.x = Math.max(A.L + 22, Math.min(A.R - 22 - BW, B.x)); B.ball = false; S.shake = 26; beep(60, .5, "sawtooth", .08); burst(B.dir < 0 ? A.L + 4 : A.R - 4, fy - 30, "#ced4da", 26); B.state = "stun"; B.st = 0; B.face = -B.dir; B.core = true; msg("IT'S DAZED: STOMP ITS HEAD or BLAST THE CORE!", 110, "#9be15d"); }
+        }
+        break;
+      case "stun": B.core = true; if (B.st > 170 - 15 * w) { B.state = "rise"; B.st = 0; } break;
+      case "rise": B.core = false; if (B.st > 22) { B.state = "idle"; B.st = 0; } break;
+      case "minions": if (B.st === 10) { for (const fx of [A.L + 5 * TS, A.R - 6 * TS]) S.ents.push({ t: "hopper", x: fx, y: fy - 10 - 160, y0: fy - 10, air: true, vy: 0, vx: 0, alive: true, i: S.ents.length, ph: 0 }); msg("It calls in hopper bots!", 70, "#ffb3b3"); } if (B.st > 40) { B.state = "idle"; B.st = 0; } break;
+      case "storm":
+        if (B.st === 1) { S.strikes = [-60, 0, 60].map(d => ({ x: Math.max(A.L + 10, Math.min(A.R - 10, P.x + 5 + d)), t: 0 })); msg("Lightning marks: MOVE!", 70, "#ffec99"); }
+        if (B.st > 80) { B.state = "vent"; B.st = 0; B.ventFor = 40; }
+        break;
+      case "dying": B.sink = Math.min(70, B.st * 0.45); S.shake = 6; if (B.st % 8 === 0) { burst(B.x + Math.random() * BW, fy - Math.random() * BH, B.st % 16 ? "#ffd43b" : B.info.core, 12); beep(80 + Math.random() * 200, .08, "square", .05); }
+        if (B.st === 170) { msg("BOSS DEFEATED!", 120, "#9be15d"); beep(523, .12, "triangle"); beep(784, .3, "triangle"); }
+        if (B.st > 190) { end(true); return; }
+        break;
+    }
+    if (B.state === "dying" || B.state === "intro") return;
+    /* hazards */
+    for (const v of S.waves) { v.x += v.dir * v.v; if (P.ground && Math.abs(P.y + PH.h - fy) < 2 && Math.abs(P.x + 5 - v.x) < 8) hurt("The shockwave got you: JUMP over it"); }
+    S.waves = S.waves.filter(v => v.x > A.L && v.x < A.R);
+    for (const o of S.orbs) { o.x += o.vx; o.y += o.vy; o.vy += o.g; if (Math.abs(o.x - (P.x + 5)) < 8 && Math.abs(o.y - (P.y + 7)) < 10) { o.dead = true; hurt("Hit by a fireball"); } if (o.y >= fy - 3) { o.dead = true; burst(o.x, fy - 3, B.info.core, 10); beep(150, .08, "sawtooth"); } }
+    S.orbs = S.orbs.filter(o => !o.dead);
+    for (const k of S.strikes) { k.t++; if (k.t === 55) { S.shake = 8; beep(1200, .1, "sawtooth"); if (Math.abs(P.x + 5 - k.x) < 13) hurt("Struck by lightning"); } }
+    S.strikes = S.strikes.filter(k => k.t < 70);
+    /* touching the boss: a stomp on its head when it is dazed, otherwise it hurts */
+    const b = bossBox(B), over = P.x + PH.w > b.l && P.x < b.r && P.y + PH.h > b.top && P.y < b.bot;
+    if (over) {
+      const onHead = b.kneel && B.state === "stun" && P.vy > 0.5 && P.y + PH.h - b.top < 14 && P.x + PH.w > B.x + 6 && P.x < B.x + BW - 6;
+      if (onHead) { P.vy = -6.5; P.y = b.top - PH.h; bossDamage(3, "stomp"); }
+      else if (P.inv === 0 && !S.invincible) { hurt(B.ball ? "Flattened by the rolling boss: get on a ledge!" : "You ran into the boss"); P.vx = (P.x + 5 < B.x + BW / 2 ? -1 : 1) * 3; P.vy = -3.5; }
+    }
+    /* never stuck: when the blaster is empty, ammo crates keep falling */
+    if (S.ammo <= 0 && !S.ents.some(e => e.t === "crate" && e.alive)) { if (++S.supplyT > 300) { S.supplyT = 0; dropCrate(); msg("A crate of blaster ammo drops in", 80, "#ffd43b"); } } else S.supplyT = 0;
+  }
+  /* a blaster bolt reaching the boss: damage when the core glows, a clang when it is shut */
+  function boltBoss(bt) {
+    const B = S.boss; if (!B || B.hp <= 0 || B.state === "intro" || B.state === "dying") return false;
+    const b = bossBox(B); if (!(bt.x > b.l && bt.x < b.r && bt.y > b.top && bt.y < b.bot)) return false;
+    const coreTop = b.kneel ? S.arena.floor - 50 : S.arena.floor - B.lift - 80, coreBot = b.kneel ? S.arena.floor - 2 : S.arena.floor - B.lift - 36;
+    if (B.core && bt.y >= coreTop && bt.y <= coreBot) bossDamage(1, "bolt");
+    else { burst(bt.x, bt.y, "#ced4da", 4); beep(1400, .03, "square", .02); if (++B.hint % 4 === 1) msg(B.core ? "Aim for the glowing core: jump, or shoot from a ledge" : "CLANG! Wait for the core to glow", 70, "#ced4da"); }
+    return true;
+  }
+  function drawBoss(ctx, ox) {
+    const B = S.boss, A = S.arena, fy = A.floor, k = B.info, w = S.G.world;
+    const fl = B.flash > 0 && B.flash % 4 < 2, C = c => fl ? "#ffffff" : c;
+    const bx = Math.round(B.x) + ox, by = fy + Math.round(B.drop) - B.lift + Math.round(B.sink);
+    const R = (x, y, ww, hh, c) => { ctx.fillStyle = C(c); ctx.fillRect(bx + x, by + y, ww, hh); };
+    ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.fillRect(bx - 6, fy - 3, BW + 12, 4);
+    if (B.ball) {
+      const cx = bx + 32, cy = fy - 20, rr = 21;
+      ctx.fillStyle = C("#1b1b2f"); ctx.beginPath(); ctx.arc(cx, cy, rr + 2, 0, 7); ctx.fill();
+      ctx.fillStyle = C(k.body); ctx.beginPath(); ctx.arc(cx, cy, rr, 0, 7); ctx.fill();
+      ctx.strokeStyle = C(k.dark); ctx.lineWidth = 3; for (let i = 0; i < 4; i++) { const a = B.spin + i * Math.PI / 2; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); ctx.stroke(); }
+      ctx.fillStyle = C(k.metal); for (let i = 0; i < 8; i++) { const a = B.spin + i * Math.PI / 4; ctx.fillRect(Math.round(cx + Math.cos(a) * (rr + 3)) - 2, Math.round(cy + Math.sin(a) * (rr + 3)) - 2, 4, 4); }
+      ctx.fillStyle = C(k.eye); ctx.fillRect(cx - 4, cy - 3, 8, 4);
+      return;
+    }
+    if (w >= 3) { const g = ctx.createRadialGradient(bx + 32, by - 60, 10, bx + 32, by - 60, 90); g.addColorStop(0, "rgba(255,255,255,.22)"); g.addColorStop(1, "rgba(255,255,255,0)"); ctx.fillStyle = g; ctx.fillRect(bx - 60, by - 160, BW + 120, 170); }   /* a backlight on the night worlds */
+    const kneel = B.state === "stun" || B.state === "rise", dy = kneel ? 40 : 0, raise = B.state === "throw" && B.st > 10;
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, VW, fy); ctx.clip();          /* sinking to its knees: the floor hides the legs */
+    /* legs and feet */
+    if (kneel) { R(4, -14, 24, 14, k.dark); R(36, -14, 24, 14, k.dark); }
+    else { R(8, -30, 18, 30, k.dark); R(38, -30, 18, 30, k.dark); R(4, -8, 26, 8, "#1b1b2f"); R(34, -8, 26, 8, "#1b1b2f"); R(10, -28, 14, 3, k.body); R(40, -28, 14, 3, k.body); }
+    /* torso */
+    R(0, -80 + dy, 64, 54, "#1b1b2f"); R(2, -78 + dy, 60, 50, k.body); R(2, -78 + dy, 60, 6, k.light); R(2, -34 + dy, 60, 6, k.dark);
+    for (let i = 0; i < 4; i++) R(6 + i * 16, -76 + dy, 3, 3, k.metal);
+    /* the core: glowing and pulsing when open, a shut grate when not */
+    const cx = 32, cy = -56 + dy;
+    if (B.core) { const pul = 2 + Math.round(2 * Math.sin(S.t / 3)); ctx.fillStyle = fl ? "#fff" : `rgba(255,255,255,.35)`; ctx.beginPath(); ctx.arc(bx + cx, by + cy, 14 + pul, 0, 7); ctx.fill(); R(cx - 11, cy - 11, 22, 22, "#1b1b2f"); R(cx - 9, cy - 9, 18, 18, k.core); R(cx - 4, cy - 4, 8, 8, "#fff"); }
+    else { R(cx - 11, cy - 11, 22, 22, "#1b1b2f"); R(cx - 9, cy - 9, 18, 18, k.metal); for (let i = 0; i < 3; i++) R(cx - 9, cy - 6 + i * 6, 18, 2, k.dark); }
+    /* shoulders and arms */
+    R(-10, -84 + dy, 20, 18, "#1b1b2f"); R(-9, -83 + dy, 18, 16, k.metal); R(54, -84 + dy, 20, 18, "#1b1b2f"); R(55, -83 + dy, 18, 16, k.metal);
+    R(-3, -80 + dy, 3, 3, k.dark); R(64, -80 + dy, 3, 3, k.dark);
+    R(-6, -66 + dy, 12, 38, k.body); R(-9, -30 + dy, 18, 14, k.dark);
+    const throwSide = B.face > 0;
+    if (raise && throwSide) { R(58, -118 + dy, 12, 40, k.body); R(55, -130 + dy, 18, 14, k.dark); ctx.fillStyle = C(k.core); ctx.beginPath(); ctx.arc(bx + 64, by - 136 + dy, 6 + Math.abs(Math.sin(S.t / 4)) * 2, 0, 7); ctx.fill(); }
+    else R(58, -66 + dy, 12, 38, k.body);
+    if (!(raise && throwSide)) R(55, -30 + dy, 18, 14, k.dark);
+    if (raise && !throwSide) { R(-6, -118 + dy, 12, 40, k.body); R(-9, -130 + dy, 18, 14, k.dark); ctx.fillStyle = C(k.core); ctx.beginPath(); ctx.arc(bx, by - 136 + dy, 6 + Math.abs(Math.sin(S.t / 4)) * 2, 0, 7); ctx.fill(); }
+    /* head: a heavy helm with one wide glowing visor; the glow follows you. Dazed, it slumps forward onto its chest */
+    const hdy = kneel ? dy + 22 : dy, hx = kneel ? B.face * 22 : 0;
+    { const R0 = R; const R2 = (x, y, ww, hh, c) => R0(x + hx, y + hdy, ww, hh, c); drawHead(R2, kneel); }
+    ctx.restore();
+    /* dazed: spinning stars over the head */
+    if (B.state === "stun") for (let i = 0; i < 3; i++) { const a = S.t / 9 + i * 2.1, sx = bx + 32 + hx + Math.cos(a) * 20, sy = by - 92 + hdy + Math.sin(a) * 4; ctx.fillStyle = "#ffd43b"; ctx.fillRect(sx - 1, sy - 4, 3, 8); ctx.fillRect(sx - 4, sy - 1, 8, 3); }
+    /* telegraphs */
+    if (B.state === "roll" && B.st <= 30) { R(-2, -84 + dy, 68, 4, "#ff6b6b"); txt(ctx, "!", bx + 32, by - 120, 18, "#ff3b3b"); }
+    if (B.state === "stomp" && B.st < 37) txt(ctx, "▼", bx + 32, by - 116, 12, "#ffd43b");
+  }
+  function drawHead(R, kneel) {
+    const B = S.boss, k = B.info, dy = 0;
+    R(14, -106 + dy, 36, 28, "#1b1b2f"); R(16, -104 + dy, 32, 24, k.body); R(16, -104 + dy, 32, 6, k.dark);
+    R(20, -95 + dy, 24, 7, "#1b1b2f"); const px = Math.max(0, Math.min(16, Math.round(8 + 8 * Math.sign(S.P.x - B.x - 32)))); R(21, -94 + dy, 22, 5, kneel ? "#495057" : k.eye); R(21 + px, -94 + dy, 6, 5, kneel ? "#868e96" : "#fff");
+    R(20, -84 + dy, 24, 5, k.dark); for (let i = 0; i < 5; i++) R(22 + i * 5, -84 + dy, 2, 2, k.metal);
+    if (k.crest === "horns") { R(10, -114 + dy, 6, 12, k.light); R(6, -120 + dy, 6, 8, k.light); R(48, -114 + dy, 6, 12, k.light); R(52, -120 + dy, 6, 8, k.light); }
+    if (k.crest === "icicles") for (let i = 0; i < 5; i++) R(18 + i * 6, -112 - (i % 2) * 6 + dy, 4, 8 + (i % 2) * 6, k.light);
+    if (k.crest === "branches") { R(18, -116 + dy, 3, 12, k.dark); R(12, -120 + dy, 10, 4, k.light); R(43, -116 + dy, 3, 12, k.dark); R(42, -122 + dy, 12, 4, k.light); R(30, -114 + dy, 4, 10, k.light); }
+    if (k.crest === "bolt") { R(28, -124 + dy, 6, 8, k.eye); R(24, -118 + dy, 6, 6, k.eye); R(30, -114 + dy, 6, 8, k.eye); }
+  }
+  function drawArena(ctx, ox) {
+    const A = S.arena, fy = A.floor, k = S.boss.info;
+    /* pillars that close the arena */
+    for (const px of [A.L, A.R - 10]) { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(px + ox - 1, 0, 12, fy); ctx.fillStyle = k.dark; ctx.fillRect(px + ox, 0, 10, fy); ctx.fillStyle = k.light; for (let y = 8; y < fy; y += 24) ctx.fillRect(px + ox + 2, y, 6, 3); }
+    for (const v of S.waves) { const x = Math.round(v.x) + ox; ctx.fillStyle = "#ced4da"; ctx.fillRect(x - 6, fy - 6, 12, 6); ctx.fillStyle = "#fff"; ctx.fillRect(x - 3, fy - 11, 6, 5); ctx.fillStyle = "rgba(206,212,218,.5)"; ctx.fillRect(x - 6 - v.dir * 10, fy - 3, 10, 3); }
+    for (const o of S.orbs) { const x = Math.round(o.x) + ox, y = Math.round(o.y); ctx.fillStyle = "#1b1b2f"; ctx.beginPath(); ctx.arc(x, y, 6, 0, 7); ctx.fill(); ctx.fillStyle = k.core; ctx.beginPath(); ctx.arc(x, y, 5, 0, 7); ctx.fill(); ctx.fillStyle = "#fff"; ctx.fillRect(x - 1, y - 2, 3, 3); }
+    for (const s of S.strikes) { const x = Math.round(s.x) + ox; if (s.t < 55) { ctx.fillStyle = s.t % 10 < 5 ? "#ffec99" : "#ff6b6b"; ctx.fillRect(x - 12, fy - 2, 24, 2); txt(ctx, "⚡", x, fy - 8, 10, "#ffec99"); } else { ctx.fillStyle = "rgba(255,236,153,.9)"; for (let y = 0; y < fy; y += 12) ctx.fillRect(x - 3 + ((y / 12) % 2) * 4, y, 4, 12); } }
+  }
+  function bossBar(ctx) {
+    const B = S.boss; if (!B || B.state === "intro" && B.drop < -100) return;
+    const w = 220, x = (VW - w) / 2, y = 22;
+    ctx.fillStyle = "rgba(10,12,30,.7)"; ctx.fillRect(x - 4, y - 2, w + 8, 20);
+    txt(ctx, B.info.name, VW / 2, y + 8, 8, "#fff");
+    ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x, y + 11, w, 6); ctx.fillStyle = "#e03131"; ctx.fillRect(x, y + 11, Math.round(w * B.hp / B.max), 6);
+    ctx.fillStyle = "#fff"; for (const f of [1 / 3, 2 / 3]) ctx.fillRect(x + Math.round(w * f), y + 11, 1, 6);
+    for (const p of S.pops) { p.t++; txt(ctx, p.text, p.x + Math.round(S.camOx || 0), p.y - p.t * 0.6, 12, p.c); } S.pops = S.pops.filter(p => p.t < 50);
+  }
+
   /* chest loot: something useful that you don't already have, most useful first */
   const LOOT = {
     med: { name: "Med kit", icon: "❤", what: "+1 heart" }, shield: { name: "Shield", icon: "◆", what: "blocks the next hit" },
@@ -474,6 +680,7 @@ const PF = (() => {
   function draw() {
     if (!S) return; const { ctx, G } = S, th = G.theme;
     if (S.scope) return drawScope();
+    ctx.save(); if (S.shake > 0) ctx.translate(Math.round((Math.random() - .5) * S.shake), Math.round((Math.random() - .5) * S.shake));
     const g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
     if (G.world === 3) { ctx.fillStyle = "#f8f3d0"; ctx.fillRect(390, 30, 18, 18); ctx.fillStyle = th.sky[0]; ctx.fillRect(396, 28, 14, 14); for (let i = 0; i < 30; i++) { ctx.fillStyle = "#fff"; ctx.fillRect((i * 97 + 13) % VW, (i * 53) % 120, 1, 1); } }
     if (G.world === 4 && S.t % 240 < 4) { ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0, 0, VW, VH); }
@@ -494,7 +701,7 @@ const PF = (() => {
       else if (e.t === "hopper") { const sq = e.air ? 0 : Math.max(0, 3 - Math.floor((70 - (e.st || 0)) / 8)); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1 + sq, 14, 11 - sq); ctx.fillStyle = "#2f9e44"; ctx.fillRect(x, y + sq, 12, 9 - sq); ctx.fillStyle = "#8ce99a"; ctx.fillRect(x + 1, y + sq, 10, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + 2, y + 2 + sq, 3, 3); ctx.fillRect(x + 7, y + 2 + sq, 3, 3); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 3, y + 3 + sq, 1, 1); ctx.fillRect(x + 8, y + 3 + sq, 1, 1); ctx.fillRect(x, y + 9, 4, 1); ctx.fillRect(x + 8, y + 9, 4, 1); }
       else if (e.t === "roller") { const a = e.spin || 0; ctx.fillStyle = "#1b1b2f"; ctx.beginPath(); ctx.arc(x + 6, y + 5, 6.5, 0, 7); ctx.fill(); ctx.fillStyle = "#868e96"; ctx.beginPath(); ctx.arc(x + 6, y + 5, 5, 0, 7); ctx.fill(); ctx.fillStyle = "#e9ecef"; for (let i = 0; i < 6; i++) { const an = a + i * Math.PI / 3; ctx.fillRect(Math.round(x + 6 + Math.cos(an) * 7) - 1, Math.round(y + 5 + Math.sin(an) * 7) - 1, 2, 2); } ctx.fillStyle = "#e03131"; ctx.fillRect(x + 5, y + 4, 2, 2); }
       else if (e.t === "swooper") { const f = S.t % 10 < 5, dive = e.mode === "dive"; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 2, y + 2, 9, 6); ctx.fillStyle = "#5f3dc4"; ctx.fillRect(x + 3, y + 3, 7, 4); ctx.fillStyle = "#b197fc"; if (dive) { ctx.fillRect(x, y, 3, 3); ctx.fillRect(x + 10, y, 3, 3); } else { ctx.fillRect(x - 3, f ? y : y + 4, 5, 2); ctx.fillRect(x + 11, f ? y : y + 4, 5, 2); } ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 5, y + 7, 3, 2); ctx.fillStyle = "#fff"; ctx.fillRect(x + 4, y + 4, 1, 1); ctx.fillRect(x + 8, y + 4, 1, 1); }
-      else if (e.t === "chest") { const open = e.opened === "open", locked = e.opened === "locked", bob = e.opened ? 0 : Math.round(Math.sin(S.t / 10)); ctx.fillStyle = `rgba(255,212,59,${e.opened ? 0 : 0.3 + 0.2 * Math.sin(S.t / 7)})`; ctx.fillRect(x - 3, y - 4 + bob, 20, 18); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1 + bob, 16, 13); ctx.fillStyle = locked ? "#495057" : "#a0522d"; ctx.fillRect(x, y + 4 + bob, 14, 7); ctx.fillStyle = locked ? "#6c757d" : "#c97a3e"; ctx.fillRect(x, open ? y - 4 : y + bob, 14, 4); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 6, y + 3 + bob, 2, 3); if (open) { ctx.fillStyle = "#fff3bf"; ctx.fillRect(x + 3, y + 1, 8, 3); } if (!e.opened && Math.abs(S.P.x - e.x) < 60) txt(ctx, "TREASURE!", x + 7, y - 10, 7, "#ffd43b"); }
+      else if (e.t === "chest") { const open = e.opened === "open", locked = e.opened === "locked", bob = e.opened ? 0 : Math.round(Math.sin(S.t / 10)); ctx.fillStyle = `rgba(255,212,59,${e.opened ? 0 : 0.3 + 0.2 * Math.sin(S.t / 7)})`; ctx.fillRect(x - 3, y - 4 + bob, 20, 18); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y - 1 + bob, 16, 13); ctx.fillStyle = locked ? "#495057" : "#a0522d"; ctx.fillRect(x, y + 4 + bob, 14, 7); ctx.fillStyle = locked ? "#6c757d" : "#c97a3e"; ctx.fillRect(x, open ? y - 4 : y + bob, 14, 4); ctx.fillStyle = "#ffd43b"; ctx.fillRect(x + 6, y + 3 + bob, 2, 3); if (open) { ctx.fillStyle = "#fff3bf"; ctx.fillRect(x + 3, y + 1, 8, 3); } if (!e.opened && Math.abs(S.P.x - e.x) < 60) txt(ctx, e.boss ? "POWER CRATE!" : "TREASURE!", x + 7, y - 10, 7, "#ffd43b"); }
       else if (e.t === "drone") { const f = S.t % 6 < 3; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x - 1, y + 2, 14, 7); ctx.fillStyle = "#c92a2a"; ctx.fillRect(x, y + 3, 12, 5); ctx.fillStyle = "#ffec99"; ctx.fillRect(x + 5, y + 4, 2, 2); ctx.fillStyle = "#adb5bd"; ctx.fillRect(f ? x - 2 : x, y, f ? 6 : 3, 1); ctx.fillRect(f ? x + 8 : x + 10, y, f ? 6 : 3, 1); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x + 1, y + 1, 1, 2); ctx.fillRect(x + 10, y + 1, 1, 2); }
       else if (e.t === "heart") { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(x + 1, y + 2, 3, 3); ctx.fillRect(x + 6, y + 2, 3, 3); ctx.fillRect(x, y + 3, 10, 3); ctx.fillRect(x + 2, y + 6, 6, 2); ctx.fillRect(x + 4, y + 8, 2, 1); }
       else if (e.t === "ammo") { if (e.high) { ctx.fillStyle = "rgba(177,151,252,.35)"; ctx.fillRect(x - 5, y - 5, 17, 21); }
@@ -511,6 +718,7 @@ const PF = (() => {
         if (Math.abs(S.P.x - e.x) < 22 && !clear) { ctx.fillStyle = "rgba(0,0,0,.65)"; ctx.fillRect(x - 46, y - 64, 94, 13); txt(ctx, "▼ / E: use the scope", x + 1, y - 54, 8, "#fff"); }
       }
     }
+    if (S.arena) { drawArena(ctx, ox); drawBoss(ctx, ox); }
     for (const sh of S.shells) { const x = sh.x + ox; ctx.fillStyle = sh.d % 10 < 5 ? "#ff3b3b" : "#ffd43b"; ctx.fillRect(x - 8, sh.y - 2, 16, 2); ctx.fillRect(x - 1, sh.y - 10, 2, 8); }
     for (const b of S.bolts) { ctx.fillStyle = "#9fe7ff"; ctx.fillRect(Math.round(b.x) + ox, Math.round(b.y), 6, 2); }
     const P = S.P;
@@ -521,7 +729,8 @@ const PF = (() => {
       if (S.shield) { ctx.strokeStyle = "rgba(159,231,255,.8)"; ctx.strokeRect(Math.round(P.x) + ox - 3, Math.round(P.y) - 4, 16, 20); }
     }
     S.parts.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(Math.round(p.x) + ox, Math.round(p.y), 2, 2); });
-    hud(); messages();
+    ctx.restore();
+    S.camOx = ox; hud(); if (S.boss) bossBar(ctx); messages();
   }
   function txt(ctx, s, x, y, size = 10, c = "#fff", align = "center") { ctx.font = `bold ${size}px "Courier New", monospace`; ctx.textAlign = align; ctx.fillStyle = "#1b1b2f"; ctx.fillText(s, x + 1, y + 1); ctx.fillStyle = c; ctx.fillText(s, x, y); }
   const need0 = () => S.ents.some(e => e.t === "nest" && !e.boss && e.x > S.P.x - 40 && e.x - S.P.x < 22 * TS && !e.sentries.gate);
@@ -676,6 +885,13 @@ const PF = (() => {
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.hideIn = 0; s.x = s.at + s.side * (s.boss ? 42 : 36); S.stop = 0; const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
     key: (k, down) => { if (down && S && S.scope && S.scope.nest.sentries.card) { S.anyKey = true; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
+    /* the boss */
+    toArena: () => { if (!S) return false; const a = S.ents.find(e => e.t === "arena"); if (!a) return false; S.P.x = a.x + 4 * TS; S.P.y = a.y - PH.h; S.P.vx = S.P.vy = 0; return true; },
+    boss: () => S && S.boss && { hp: S.boss.hp, max: S.boss.max, phase: S.boss.phase, state: S.boss.state, core: S.boss.core, ball: S.boss.ball, x: S.boss.x, name: S.boss.info.name, waves: S.waves.length, orbs: S.orbs.length },
+    bossDo: st => { if (S && S.boss) { S.boss.state = st; S.boss.st = 0; } },
+    bossHp: n => { if (S && S.boss) S.boss.hp = n; },
+    stompBoss: () => { if (!S || !S.boss) return; const B = S.boss, b = bossBox(B); S.P.x = B.x + BW / 2 - PH.w / 2; S.P.y = b.top - PH.h - 4; S.P.vy = 2; S.P.vx = 0; },
+    shootCore: () => { if (!S || !S.boss) return; const B = S.boss, b = bossBox(B); S.P.x = B.x - 40; S.P.face = 1; S.P.cd = 0; S.ammo = Math.max(S.ammo, 1); S.bolts.push({ x: B.x - 6, y: b.kneel ? S.arena.floor - 20 : S.arena.floor - 56, vx: 5, d: 20 }); },
     hurt: () => S && hurt("test"), win: () => S && end(true), lose: () => { if (S) { S.hearts = 1; S.shield = 0; S.P.inv = 0; hurt("test"); } }
   };
   return { start, stop, gen, reach, step, hook, THEMES, LOOT };
