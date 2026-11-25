@@ -234,6 +234,12 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const nStages = await p.evaluate(() => __stages.length); if (nStages !== 52) bad(`expected 48 stages and 4 boss runs (got ${nStages})`);
   const stuck = await p.evaluate(() => __stages.filter(L => !__rr.PF.reach(L).ok).map(L => L.id));
   if (stuck.length) bad(`stages that can't be finished: ${stuck.join(", ")}`);
+  /* cloze (David: "proper passages with several gaps"): a cloze stage's briefing is one passage, gaps 1 to 4 in order; the next briefing is a new passage */
+  { const cz = await p.evaluate(() => { const runs = []; for (let k = 0; k < 3; k++) { __rr.startBrief("1-L1", 2); runs.push(__rr.B().qs.map(q => [q.grp, q.rung])); } return { runs, passages: new Set(HAND.filter(q => q.track === "word").map(q => q.grp)).size, gaps: HAND.filter(q => q.track === "word").length }; });
+    if (cz.passages < 8 || cz.gaps !== cz.passages * 4) bad(`the cloze skill should be passages of 4 gaps (${cz.passages} passages, ${cz.gaps} gaps)`);
+    for (const r of cz.runs) if (new Set(r.map(x => x[0])).size !== 1 || !r[0][0] || r.map(x => x[1]).join() !== "1,2,3,4") bad(`a cloze briefing should be one passage, gaps 1 to 4 (${JSON.stringify(r)})`);
+    if (new Set(cz.runs.map(r => r[0][0])).size !== 3) bad("each new cloze briefing should bring a passage not seen yet");
+    await p.click("#btn-map"); }
   /* every big level is its own place (David: "the levels all look too samey"): 4 different places in each world, each stage with its own hazard */
   { const places = await p.evaluate(() => [1, 2, 3, 4].map(w => __rr.LEVELS.filter(L => L.world === w && !L.boss).map(L => L.name)));
     for (const [i, ps] of places.entries()) if (new Set(ps).size !== 4) bad(`world ${i + 1} should have 4 different places (${ps.join(", ")})`);
@@ -578,7 +584,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
       return out;
     });
     if (off.length) bad(`at ${vp.width}×${vp.height}${admin ? " with the coach sidebar" : ""} these need scrolling to reach the options or Next: ${off.slice(0, 6).join(", ")}${off.length > 6 ? ` … (${off.length})` : ""}`);
-    if (shots && vp.width === 1366 && admin) { await pg.evaluate(() => { __rr.preview(HAND.find(q => q.id === "rw4a")); __rr.answer(0); }); await pg.screenshot({ path: path.join(shots, "rr-monitor.png") }); }
+    if (shots && vp.width === 1366 && admin) { await pg.evaluate(() => { __rr.preview(HAND.find(q => q.id === "cz4-4")); __rr.answer(0); }); await pg.screenshot({ path: path.join(shots, "rr-monitor.png") }); }
     await pg.close();
   }
   /* the keyboard answers and moves on */
@@ -599,7 +605,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     return out;
   });
   if (wide.length) bad(`too wide for a phone: ${wide.slice(0, 8).join(", ")}${wide.length > 8 ? " …" : ""}`);
-  if (shots) { await ph.evaluate(() => __rr.preview(HAND.find(q => q.id === "rw2a"))); await ph.screenshot({ path: path.join(shots, "rr-phone.png"), fullPage: true }); }
+  if (shots) { await ph.evaluate(() => __rr.preview(HAND.find(q => q.id === "cz2-2"))); await ph.screenshot({ path: path.join(shots, "rr-phone.png"), fullPage: true }); }
   await browser.close();
   if (errs.length) bad("page errors: " + [...new Set(errs)].slice(0, 5).join(" | "));
   finish();

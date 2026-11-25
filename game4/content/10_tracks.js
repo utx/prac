@@ -268,16 +268,16 @@ const TRACKS = [
   ideas: ["Near-synonyms are not interchangeable: the context decides the shade of meaning.",
     "Some words come in fixed partnerships (teeming WITH, the culmination OF).",
     "Grammar decides too: only one word takes the words that follow it.",
-    "The clue may be in the sentence before or after the gap."],
+    "The clue may be in the sentence before or after the gap, or spread through the whole passage."],
   method: "Read the whole sentence (and the one before). Try each word in the gap and ask: does it fit the meaning, the partner words AND the grammar?",
   transfer: "The cloze passage (Reading Q7–14 in every paper), plus word-in-context questions in the story and poem.",
   samples: [
     { ref: "PT1–PT3 Reading Q7–14", what: "cloze gaps decided by collocation, grammar or shade of meaning", rungs: [1, 2, 3, 4] },
     { ref: "PT1–PT3 Reading Q1–6", what: "meaning of a word in context in the story", rungs: [1] }],
   rungs: [
-    { title: "Shades of meaning", builds: "Four near-synonyms; only one fits the situation.", traps: "a word that is close but too strong or too weak." },
-    { title: "Word partners", builds: "Fixed expressions and collocations: only one word goes with its partner.", traps: "a word with the right meaning but the wrong partner." },
-    { title: "Grammar fit", builds: "Only one verb or adjective takes the following preposition or object.", traps: "a word that means the right thing but breaks the sentence." },
-    { title: "Clues from the passage", builds: "Short passages where the deciding clue is in another sentence.", traps: "a word that fits its own sentence but not the passage." }] },
+    { title: "Shades of meaning", builds: "Gap 1 of each cloze passage: four near-synonyms; only one fits the situation.", traps: "a word that is close but too strong or too weak." },
+    { title: "Word partners", builds: "Gap 2: fixed expressions and collocations; only one word goes with its partner.", traps: "a word with the right meaning but the wrong partner." },
+    { title: "Grammar fit", builds: "Gap 3: only one word takes the words that follow it (a preposition, 'to' + verb, '-ing').", traps: "a word that means the right thing but breaks the sentence." },
+    { title: "Clues from the passage", builds: "Gap 4, the stretch: the deciding clue is elsewhere in the passage, so the whole passage must be read.", traps: "a word that fits its own sentence but not the passage." }] },
 
 ];
