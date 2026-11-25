@@ -211,7 +211,19 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const browser = await chromium.launch();
   const url = "file://" + PAGE;
   const errs = [];
-  const open = async (vp, q = "") => { const p = await browser.newPage({ viewport: vp }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
+  const open = async (vp, q = "", splash = false) => { const p = await browser.newPage({ viewport: vp }); if (!splash) await p.addInitScript(() => { window.__noSplash = true; }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
+  /* the title screen: it animates, a key press flashes into the map */
+  { const ps = await open({ width: 1280, height: 800 }, "", true);
+    if (!(await ps.isVisible("#splash"))) bad("the game should open on its title screen");
+    await ps.waitForTimeout(2200); if (shots) await ps.screenshot({ path: path.join(shots, "rr-title.png") });
+    const t0 = await ps.evaluate(() => __rr.PF.titleState()); if (!t0 || t0.t < 60) bad("the title screen should be animating");
+    await ps.keyboard.press("KeyJ"); await ps.waitForTimeout(400);
+    if (!(await ps.isVisible("#splash"))) bad("only SPACE (or a tap) should leave the title screen");
+    await ps.keyboard.press("Space"); await ps.waitForTimeout(1300);
+    if (await ps.isVisible("#splash")) bad("SPACE should leave the title screen"); if (!(await ps.isVisible("#scr-map"))) bad("after the title screen comes the map");
+    const ps2 = await open({ width: 390, height: 800 }, "", true); await ps2.waitForTimeout(400); await ps2.click("#splash"); await ps2.waitForTimeout(1300);
+    if (await ps2.isVisible("#splash")) bad("a tap should leave the title screen");
+    await ps.close(); await ps2.close(); }
   const p = await open({ width: 1280, height: 800 });
   /* every level can be finished */
   /* every stage of every big level, and every boss run, as the game builds them */
@@ -300,8 +312,8 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.keyboard.press("KeyE"); await p.waitForTimeout(150);
   if (!(await p.evaluate(() => __rr.PF.hook.nests()[0].card))) bad("E should show the ridge report");
   if (shots) await p.screenshot({ path: path.join(shots, "rr-report.png") });
-  await p.waitForTimeout(500); await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
-  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("E again should leave the scope");
+  await p.waitForTimeout(500); await p.keyboard.press("Space"); await p.waitForTimeout(100);
+  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("SPACE on the ridge report should leave the scope");
   await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.gates()[0].col - 3)); await p.keyboard.down("ArrowRight"); await p.waitForTimeout(900); await p.keyboard.up("ArrowRight");
   const gx = await p.evaluate(() => __rr.PF.hook.state().x), gcol = await p.evaluate(() => __rr.PF.hook.gates()[0].col);
   if (gx > gcol * 16) bad("a shut laser gate should block the way");
@@ -319,9 +331,13 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   if (!((await p.evaluate(() => __rr.PF.hook.nests()[0].score)) > sc0)) bad("shots after the gate opens should keep adding to the score");
   await p.evaluate(() => __rr.PF.hook.setRounds(0)); await p.waitForTimeout(700);
   if (!(await p.evaluate(() => __rr.PF.hook.nests()[0].card))) bad("running out of rounds after the gate opens should show the ridge report");
-  /* any key closes the report (J here), and an empty rifle can't reopen an open ridge */
-  await p.waitForTimeout(500); await p.keyboard.press("KeyJ"); await p.waitForTimeout(150);
-  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("any key (J) should close the ridge report");
+  /* the report has the commentator's roast; J doesn't close it, SPACE does; an empty rifle can't reopen an open ridge */
+  { const r = await p.evaluate(() => __rr.PF.roast({ shots: 5, hits: 0, acc: 0, ko: 0, head: 0 })); if (!/./.test(r)) bad("the commentator should have something to say"); }
+  await p.waitForTimeout(1500); if (shots) await p.screenshot({ path: path.join(shots, "rr-roast.png") });
+  await p.keyboard.press("KeyJ"); await p.waitForTimeout(150);
+  if (!(await p.evaluate(() => __rr.PF.hook.state().scope))) bad("J should not close the ridge report (only SPACE)");
+  await p.keyboard.press("Space"); await p.waitForTimeout(150);
+  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("SPACE should close the ridge report");
   await p.keyboard.press("KeyE"); await p.waitForTimeout(150);
   if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("with no rounds left, an open ridge shouldn't show its report again");
   await p.waitForTimeout(800);

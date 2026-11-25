@@ -40,6 +40,10 @@ main { min-width: 0; }
 .node .nm { font-size: 12.5px; font-weight: 700; line-height: 1.2; }
 .node .st { font-size: 13px; color: #e67700; letter-spacing: 1px; }
 .node.maths { border-left: 10px solid var(--m); } .node.thinking { border-left: 10px solid var(--t); } .node.reading { border-left: 10px solid var(--r); }
+#splash { position: fixed; inset: 0; z-index: 50; background: #0b0820; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+#splash.hidden { display: none; }
+#splash canvas { width: min(100vw, calc(100vh * 16 / 9)); height: auto; max-height: 100vh; image-rendering: pixelated; image-rendering: crisp-edges; }
+.snipe .roast { margin: 10px 0 0; font-style: italic; color: #fff3bf; font-size: 15px; }
 .node.boss { background: #ffe066; border-left: 10px solid #e03131; }
 .node.big { min-height: 150px; border-left: 10px solid #ffd43b; }
 .node .sk { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
@@ -138,6 +142,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 </style>
 </head>
 <body>
+<div id="splash" class="hidden" role="button" tabindex="0" aria-label="Ridge Runner: press space or tap to start"><canvas id="tcv" width="480" height="270"></canvas></div>
 <header>
   <h1 class="px">RIDGE RUNNER</h1>
   <span class="chip" id="hdr-stars">★ 0</span><span class="chip" id="hdr-coins">● 0</span>
@@ -2716,7 +2721,7 @@ const PF = (() => {
   const keyMap = { ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right", ArrowUp: "up", KeyW: "up", Space: "jump", ArrowDown: "down", KeyS: "down", KeyE: "use", KeyJ: "fire", KeyX: "fire", KeyK: "duck", KeyC: "duck", Escape: "leave", KeyQ: "leave" };
   function onKey(e, down) {
     if (!S) return;
-    if (down && S.scope && S.scope.nest.sentries.card) { S.anyKey = true; e.preventDefault(); return; }   /* any key closes the ridge report */
+    if (S.scope && S.scope.nest.sentries.card) { if (down && e.code === "Space") S.anyKey = true; if (e.code === "Space" || keyMap[e.code]) e.preventDefault(); return; }   /* SPACE closes the ridge report */
     const k = keyMap[e.code]; if (!k) return;
     e.preventDefault();
     if (down && !KEYS[k]) KEYS[k + "P"] = true;
@@ -2840,7 +2845,7 @@ const PF = (() => {
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
     { const ss = sc.nest.sentries;                                             /* the ridge report: wait for any key, nothing else moves */
-      if (ss.card && !sc.nest.boss) { const any = S.anyKey || Object.keys(KEYS).some(k => k.endsWith("P") && KEYS[k]); S.anyKey = false; if (any && ss.card.t > 20) { closeCard(); for (const k in KEYS) KEYS[k] = false; } else if (any) for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; return; } }
+      if (ss.card && !sc.nest.boss) { const any = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (any && ss.card.t > 20) { closeCard(); for (const k in KEYS) KEYS[k] = false; } return; } }
     for (const b of S.incoming) {                                              /* bullets flying at you */
       b.t++;
       if (b.t === b.dur) {
@@ -3196,7 +3201,7 @@ const PF = (() => {
     const st = ss.stat, acc = st.shots ? Math.round(100 * st.hits / st.shots) : 0;
     const ridgeBest = S.opts.bestRidge || 0, isBest = st.score > ridgeBest && st.score > 0;
     if (isBest) { S.newRidgeBest = st.score; beep(523, .1, "triangle"); beep(659, .1, "triangle"); beep(1046, .25, "triangle"); }
-    return Object.assign({}, st, { acc, isBest, ridgeBest, t: 0 });
+    return Object.assign({}, st, { acc, isBest, ridgeBest, t: 0, roast: roast(Object.assign({}, st, { acc, gate: ss.gate, min: ss.min })) });
   }
   function closeCard() { const ss = S.scope.nest.sentries; S.scope = null; ss.card = null; if (!ss.gate) msg("The gate is still shut: come back with more rounds", 120, "#ffb3b3"); }
   /* the level's sniper totals, added up from every nest once at the end (so nothing is counted twice) */
@@ -3205,6 +3210,31 @@ const PF = (() => {
     for (const n of S.ents.filter(e => e.t === "nest")) { const st = n.sentries.stat; for (const k of ["score", "ko", "head", "shots", "hits", "first"]) t[k] += st[k]; t.best = Math.max(t.best, st.best); t.ridgeMax = Math.max(t.ridgeMax, st.score); }
     return t;
   }
+  /* the commentator: a playful roast after every ridge, whether it went badly or well */
+  const ROASTS = {
+    none: ["You didn't fire a single shot. Very peaceful. Very strange.", "Zero shots. Are you a sniper or a bird-watcher?", "The rifle wants to know if it did something wrong."],
+    zero: ["Zero hits! The sentries are still laughing. Were you aiming at the clouds?", "Not one hit. The rocks say thanks for leaving them alone.", "Your bullets went on a holiday. Nobody knows where.", "Missed them all! Even the sentries felt sorry for you."],
+    shut: ["The gate's still shut and the sentries are doing a happy dance.", "Not enough knockouts to open the gate. The sentries say 'nice try, kiddo'."],
+    bad: ["That aim was so wobbly the scope got seasick.", "You hit more rocks than a landslide does.", "The sentries asked if you were shooting with your eyes shut.", "Some hits! Mostly misses. The misses are winning."],
+    ok: ["Half hits, half misses. Perfectly... medium.", "Not bad! Not great either. A solid 'meh' from the sentries.", "Some of your shots hit. The others are still flying somewhere."],
+    good: ["Okay, okay, you're good. Don't let it go to your head (your bullets did).", "Sharp shooting! The sentries want a rematch. And a hug.", "Nice! Your teacher would give that a sticker. A small one."],
+    heads: ["So many headshots the sentries are ordering bigger helmets.", "Headshot after headshot. The helmet shop is sold out."],
+    perfect: ["Every shot hit! Did you bribe the sentries?", "100% accuracy. Now try being this accurate with your spelling.", "Perfect aim. The sentries have filed a complaint. It was ignored."] };
+  function roast(st) {
+    const pickOne = a => a[Math.floor(Math.random() * a.length)];
+    if (!st.shots) return pickOne(ROASTS.none);
+    if (!st.hits) return pickOne(ROASTS.zero);
+    if (st.gate === false && st.ko < st.min) return pickOne(ROASTS.shut);
+    if (st.acc >= 100 && st.hits >= 3) return pickOne(ROASTS.perfect);
+    if (st.head >= 3 && st.head >= st.ko / 2) return pickOne(ROASTS.heads);
+    return pickOne(st.acc < 35 ? ROASTS.bad : st.acc < 65 ? ROASTS.ok : ROASTS.good);
+  }
+  /* wrapped, centred text on the canvas */
+  function wrap(ctx, s, cx, y, w, size, c) {
+    ctx.font = `bold ${size}px "Courier New", monospace`; const words = s.split(" "), lines = []; let line = "";
+    for (const wd of words) { const t2 = line ? line + " " + wd : wd; if (ctx.measureText(t2).width > w && line) { lines.push(line); line = wd; } else line = t2; }
+    lines.push(line); lines.slice(0, 2).forEach((l, i) => txt(ctx, l, cx, y + i * (size + 2) - (lines.length > 1 ? 5 : 0), size, c));
+  }
   function drawCard(ctx, c) {
     c.t++; const g = Math.min(1, c.t / 12);
     ctx.fillStyle = `rgba(5,8,20,${0.8 * g})`; ctx.fillRect(0, 0, VW, VH);
@@ -3212,10 +3242,13 @@ const PF = (() => {
     ctx.fillStyle = "#1b1b2f"; ctx.fillRect(86, 34, 308, 206); ctx.fillStyle = "#2c335c"; ctx.fillRect(90, 38, 300, 198); ctx.fillStyle = "#ffd43b"; ctx.fillRect(90, 38, 300, 22);
     txt(ctx, "RIDGE REPORT", VW / 2, 54, 12, "#1b1b2f");
     const rows = [["KNOCKED OUT", c.ko], ["HEADSHOTS", c.head], ["SHOT FIRST", c.first], ["ACCURACY", c.acc + "%"], ["BEST STREAK", c.best]];
-    rows.forEach(([k, v], i) => { const show = c.t > 10 + i * 8; if (!show) return; txt(ctx, k, 110, 82 + i * 18, 10, "#ced4da", "left"); txt(ctx, String(v), 370, 82 + i * 18, 11, "#fff", "right"); });
-    if (c.t > 56) { txt(ctx, "SCORE", 110, 186, 12, "#ffd43b", "left"); txt(ctx, String(Math.min(c.score, Math.round(c.score * (c.t - 56) / 20))), 370, 188, 16, "#ffd43b", "right"); }
-    if (c.t > 80) { if (c.isBest) txt(ctx, c.t % 20 < 12 ? "NEW HIGH SCORE!" : "", VW / 2, 212, 14, "#ff922b"); else txt(ctx, `BEST ON THIS LEVEL: ${c.ridgeBest}`, VW / 2, 212, 9, "#adb5bd"); }
-    if (c.t > 20) txt(ctx, "Press any key to carry on", VW / 2, 230, 8, S.t % 40 < 26 ? "#fff" : "#868e96");
+    rows.forEach(([k, v], i) => { const show = c.t > 10 + i * 8; if (!show) return; txt(ctx, k, 110, 76 + i * 14, 9, "#ced4da", "left"); txt(ctx, String(v), 370, 76 + i * 14, 10, "#fff", "right"); });
+    if (c.t > 56) { txt(ctx, "SCORE", 110, 150, 11, "#ffd43b", "left"); txt(ctx, String(Math.min(c.score, Math.round(c.score * (c.t - 56) / 20))), 370, 152, 15, "#ffd43b", "right"); }
+    if (c.t > 66) { if (c.isBest) txt(ctx, c.t % 20 < 12 ? "NEW HIGH SCORE!" : "", VW / 2, 168, 12, "#ff922b"); else txt(ctx, `BEST ON THIS LEVEL: ${c.ridgeBest}`, VW / 2, 167, 8, "#adb5bd"); }
+    /* the commentator has something to say (playfully) */
+    if (c.t > 76) { const g2 = Math.min(1, (c.t - 76) / 8); ctx.globalAlpha = g2; ctx.fillStyle = "#ffd43b"; ctx.fillRect(100, 176, 280, 40); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(102, 178, 276, 36);
+      wrap(ctx, c.roast, VW / 2, 192, 260, 10, "#fff3bf"); ctx.globalAlpha = 1; }
+    if (c.t > 20) txt(ctx, "Press SPACE to carry on", VW / 2, 230, 9, S.t % 40 < 26 ? "#fff" : "#868e96");
     ctx.restore();
   }
   /* every second beaten bot drops a bullet (the drop is decided by the bot, so it is the same each play) */
@@ -3430,7 +3463,8 @@ const PF = (() => {
     grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.hideIn = 0; s.x = s.at + s.side * (s.boss ? 42 : 36); S.stop = 0; const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
-    key: (k, down) => { if (down && S && S.scope && S.scope.nest.sentries.card) { S.anyKey = true; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
+    key: (k, down) => { if (S && S.scope && S.scope.nest.sentries.card) { if (down && k === "jump") S.anyKey = true; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
+    tap: () => { if (S && S.scope && S.scope.nest.sentries.card) S.anyKey = true; },
     /* the boss */
     toArena: () => { if (!S) return false; const a = S.ents.find(e => e.t === "arena"); if (!a) return false; S.P.x = a.x + 4 * TS; S.P.y = a.y - PH.h; S.P.vx = S.P.vy = 0; return true; },
     boss: () => S && S.boss && { hp: S.boss.hp, max: S.boss.max, phase: S.boss.phase, state: S.boss.state, core: S.boss.core, ball: S.boss.ball, x: S.boss.x, name: S.boss.info.name, waves: S.waves.length, orbs: S.orbs.length },
@@ -3440,7 +3474,130 @@ const PF = (() => {
     shootCore: () => { if (!S || !S.boss) return; const B = S.boss, b = bossBox(B); S.P.x = B.x - 40; S.P.face = 1; S.P.cd = 0; S.ammo = Math.max(S.ammo, 1); S.bolts.push({ x: B.x - 6, y: b.kneel ? S.arena.floor - 20 : S.arena.floor - 56, vx: 5, d: 20 }); },
     hurt: () => S && hurt("test"), win: () => S && end(true), lose: () => { if (S) { S.hearts = 1; S.shield = 0; S.P.inv = 0; hurt("test"); } }
   };
-  return { start, stop, gen, reach, step, hook, THEMES, LOOT };
+  /* ---------------- the title screen (all our own pixel art, drawn in code) ----------------
+     A sunset canyon scrolls past; the hero runs and leaps over spiky rollers grabbing gold bullets; a giant golem
+     watches from the far ridge with a glowing eye, lit by lightning; the RIDGE RUNNER letters slam in one by one. */
+  const FONT = { R: ["11110", "10001", "10001", "11110", "10100", "10010", "10001"], I: ["11111", "00100", "00100", "00100", "00100", "00100", "11111"],
+    D: ["11110", "10001", "10001", "10001", "10001", "10001", "11110"], G: ["01111", "10000", "10000", "10111", "10001", "10001", "01111"],
+    E: ["11111", "10000", "10000", "11110", "10000", "10000", "11111"], U: ["10001", "10001", "10001", "10001", "10001", "10001", "01110"],
+    N: ["10001", "11001", "10101", "10011", "10001", "10001", "10001"] };
+  let T = null;
+  function title(opts) {
+    titleStop();
+    const cv = opts.canvas, ctx = cv.getContext("2d"); cv.width = VW; cv.height = VH; ctx.imageSmoothingEnabled = false;
+    T = { ctx, t: 0, cam: 0, P: { y: 0, vy: 0, ground: true }, rollers: [], bullets: [], sparks: [], got: 0, shake: 0, flash: 0, bolt: 0, raf: 0, sound: opts.sound, go: 0, onGo: opts.onGo };
+    const words = [["RIDGE", 34], ["RUNNER", 96]], B = 7;
+    T.letters = []; let k = 0;
+    for (const [w, y] of words) { const wd = w.length * (5 * B + B) - B; w.split("").forEach((c, i) => T.letters.push({ c, x: Math.round((VW - wd) / 2) + i * (6 * B), y, at: 20 + k++ * 9 })); }
+    T.B = B;
+    let last = performance.now(), acc = 0;
+    const loop = now => { acc += Math.min(100, now - last); last = now; while (acc >= 1000 / 60) { titleTick(); acc -= 1000 / 60; } if (!T) return; titleDraw(); T.raf = requestAnimationFrame(loop); };
+    T.raf = requestAnimationFrame(loop);
+  }
+  function titleStop() { if (T) cancelAnimationFrame(T.raf); T = null; }
+  function titleBeep(f, d, type = "square", v = 0.05, delay = 0) {
+    if (!T || !T.sound) return;
+    try { const A = T.ac || (T.ac = new (window.AudioContext || window.webkitAudioContext)()); const o = A.createOscillator(), g = A.createGain(), t0 = A.currentTime + delay; o.type = type; o.frequency.value = f; g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d); o.connect(g); g.connect(A.destination); o.start(t0); o.stop(t0 + d + 0.02); } catch (e) {}
+  }
+  /* press start: a rising fanfare, a white flash, then the map */
+  function titleGo() {
+    if (!T || T.go) return; T.go = 1; T.shake = 10;
+    [523, 659, 784, 1047].forEach((f, i) => titleBeep(f, .16, "square", .05, i * 0.09)); titleBeep(1568, .5, "triangle", .06, 0.38);
+  }
+  const GROUND = 232;
+  function titleTick() {
+    const S2 = T; S2.t++; const t = S2.t;
+    S2.cam += 2.2;
+    if (S2.shake > 0) S2.shake--; if (S2.flash > 0) S2.flash--;
+    /* the letters slam in: a thud and sparks as each one lands */
+    for (const L of S2.letters) if (t === L.at + 14) { S2.shake = Math.max(S2.shake, 5); for (let i = 0; i < 10; i++) S2.sparks.push({ x: L.x + Math.random() * 35, y: L.y + 49, vx: (Math.random() - .5) * 3, vy: -Math.random() * 3, d: 30, c: i % 2 ? "#ffd43b" : "#fff" }); }
+    if (t === S2.letters[S2.letters.length - 1].at + 30) { S2.flash = 16; S2.shake = 14; }
+    /* lightning now and then: the golem on the ridge lights up */
+    if (t > 120 && t % 260 === 0) { S2.bolt = 18; S2.flash = Math.max(S2.flash, 8); }
+    if (S2.bolt > 0) S2.bolt--;
+    /* the hero: a jump whenever a roller comes close */
+    const P = S2.P, hx = 120;
+    if (t % 90 === 30) S2.rollers.push({ x: VW + 20, spin: 0 });
+    if (t % 40 === 10) S2.bullets.push({ x: VW + 10, y: GROUND - 40 - (t % 80 ? 0 : 26), alive: true });
+    for (const r of S2.rollers) { r.x -= 3.4; r.spin -= 0.3; }
+    S2.rollers = S2.rollers.filter(r => r.x > -30);
+    for (const b of S2.bullets) b.x -= 2.2;
+    S2.bullets = S2.bullets.filter(b => b.x > -20);
+    if (P.ground && S2.rollers.some(r => r.x - hx > 6 && r.x - hx < 40)) { P.vy = -6.6; P.ground = false; }
+    if (!P.ground) { P.vy += 0.32; P.y += P.vy; if (P.y >= 0) { P.y = 0; P.vy = 0; P.ground = true; } }
+    for (const b of S2.bullets) if (b.alive && Math.abs(b.x - (hx + 5)) < 9 && Math.abs(b.y - (GROUND - 14 + P.y + 6)) < 14) { b.alive = false; S2.got++; for (let i = 0; i < 6; i++) S2.sparks.push({ x: b.x, y: b.y, vx: (Math.random() - .5) * 3, vy: -Math.random() * 2.5, d: 24, c: "#ffd43b" }); }
+    S2.sparks.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.d--; }); S2.sparks = S2.sparks.filter(p => p.d > 0);
+    if (S2.go && ++S2.go > 46) { const cb = S2.onGo; titleStop(); cb && cb(); }
+  }
+  function letter(ctx, L, B, y, t) {
+    const g = FONT[L.c];
+    g.forEach((row, r) => [...row].forEach((on, c) => { if (on !== "1") return; ctx.fillStyle = "#3b1d08"; ctx.fillRect(L.x + c * B + 4, y + r * B + 4, B, B); }));        /* the deep shadow */
+    g.forEach((row, r) => [...row].forEach((on, c) => { if (on !== "1") return; ctx.fillStyle = "#1b1b2f"; ctx.fillRect(L.x + c * B - 1, y + r * B - 1, B + 2, B + 2); }));  /* the outline */
+    g.forEach((row, r) => [...row].forEach((on, c) => {
+      if (on !== "1") return; const x = L.x + c * B, yy = y + r * B;
+      ctx.fillStyle = ["#fff3bf", "#ffe066", "#ffd43b", "#fcc419", "#fab005", "#f59f00", "#e67700"][r]; ctx.fillRect(x, yy, B, B);
+      ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.fillRect(x, yy, B, 1); ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.fillRect(x, yy + B - 1, B, 1);
+      const sw = (t * 3) % 420 - 60; if (Math.abs(x + yy * 0.6 - sw) < 9) { ctx.fillStyle = "rgba(255,255,255,.75)"; ctx.fillRect(x, yy, B, B); }   /* a shine sweeps across */
+    }));
+  }
+  function titleDraw() {
+    const { ctx, t } = T;
+    ctx.save(); if (T.shake) ctx.translate(Math.round((Math.random() - .5) * T.shake), Math.round((Math.random() - .5) * T.shake));
+    /* sky: a sunset with stars coming out */
+    const g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, "#1b1440"); g.addColorStop(0.45, "#6b2f6b"); g.addColorStop(0.75, "#f0743a"); g.addColorStop(1, "#ffc36b");
+    ctx.fillStyle = g; ctx.fillRect(-10, -10, VW + 20, VH + 20);
+    for (let i = 0; i < 46; i++) { const x = (i * 97 + 13) % VW, y = (i * 53) % 110, tw = Math.sin(t / 14 + i) > 0.6; ctx.fillStyle = tw ? "#fff" : "rgba(255,255,255,.5)"; ctx.fillRect(x, y, tw ? 2 : 1, tw ? 2 : 1); }
+    ctx.fillStyle = "rgba(255,214,120,.35)"; ctx.beginPath(); ctx.arc(70, 176, 46, 0, 7); ctx.fill(); ctx.fillStyle = "#ffd8a8"; ctx.beginPath(); ctx.arc(70, 176, 32, 0, 7); ctx.fill();
+    for (let i = 0; i < 4; i++) { ctx.fillStyle = "#f0743a"; ctx.fillRect(30, 168 + i * 8, 80, 2); }
+    const hills = (col, par, h, amp, f) => { ctx.fillStyle = col; for (let x = 0; x < VW; x += 3) { const wx = x + T.cam * par; const y = h + Math.round(amp * Math.sin(wx / f) + amp * 0.5 * Math.sin(wx / (f * 0.37))); ctx.fillRect(x, y, 3, VH - y); } };
+    hills("#4a2552", 0.15, 150, 22, 80);
+    /* the giant on the far ridge: a dark golem whose eye glows; lightning shows it for a moment */
+    { const bx = 428, by = 204, lit = T.bolt > 0, c = lit ? "#7a64a0" : "#2b1638", d = lit ? "#5a4680" : "#211030", e = 0.6 + 0.4 * Math.sin(t / 10), sway = Math.round(2 * Math.sin(t / 40));
+      const R = (x, y, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(bx + x, by + y + (y < -40 ? sway : 0), w, h); };
+      R(-30, -44, 24, 44, d); R(6, -44, 24, 44, d);                                   /* legs */
+      R(-44, -120, 88, 80, c); R(-44, -120, 88, 8, lit ? "#9775fa" : "#3a2050");     /* torso */
+      R(-64, -128, 30, 24, d); R(34, -128, 30, 24, d);                                 /* shoulders */
+      R(-62, -106, 18, 62, c); R(44, -106, 18, 62, c); R(-66, -48, 26, 20, d); R(40, -48, 26, 20, d);   /* arms and fists */
+      R(-24, -160, 48, 40, c); R(-24, -160, 48, 8, d);                                 /* head */
+      R(-32, -176, 8, 22, d); R(-38, -184, 8, 12, d); R(24, -176, 8, 22, d); R(30, -184, 8, 12, d);   /* horns */
+      ctx.fillStyle = `rgba(255,${120 + 80 * e | 0},60,${0.22 * e})`; ctx.beginPath(); ctx.ellipse(bx, by - 142 + sway, 26, 9, 0, 0, 7); ctx.fill();
+      R(-17, -146, 34, 8, "#1b1b2f"); R(-15, -145, 30, 6, `rgb(255,${180 + 60 * e | 0},80)`);   /* the visor eye */
+      ctx.fillStyle = `rgba(255,146,43,${0.25 * e})`; ctx.beginPath(); ctx.arc(bx, by - 82 + sway, 20, 0, 7); ctx.fill();
+      R(-10, -92, 20, 20, "#1b1b2f"); R(-8, -90, 16, 16, lit ? "#ffd43b" : `rgba(255,146,43,${0.55 + 0.45 * e})`); }  /* the core */
+    if (T.bolt > 10) { ctx.strokeStyle = "#fff9db"; ctx.lineWidth = 3; ctx.beginPath(); let x = 300 + (t % 7) * 9, y = 0; ctx.moveTo(x, y); while (y < 120) { x += (Math.random() - .5) * 26; y += 14; ctx.lineTo(x, y); } ctx.stroke(); }
+    hills("#2e1a3a", 0.4, 196, 14, 50);
+    /* a sniper glint on the ridge */
+    if (t % 150 < 20) { const f = 2 + 2 * Math.abs(Math.sin(t / 3)); ctx.fillStyle = "#ff3b3b"; ctx.fillRect(196 - f * 2, 180, f * 4, 2); ctx.fillRect(195, 179 - f * 2, 2, f * 4); }
+    /* the ground, scrolling */
+    const th = THEMES[0];
+    for (let x = -((T.cam * 1) % TS); x < VW; x += TS) for (let y = GROUND; y < VH; y += TS) { const c = Math.floor((x + T.cam) / TS); ctx.fillStyle = (c + y / TS) % 2 ? th.dirt : th.dirt2; ctx.fillRect(Math.round(x), y, TS, TS); }
+    ctx.fillStyle = th.top; ctx.fillRect(0, GROUND, VW, 4); ctx.fillStyle = "rgba(0,0,0,.2)"; ctx.fillRect(0, GROUND + 4, VW, 1);
+    for (let i = 0; i < 4; i++) { const x = ((i * 140 - T.cam) % 560 + 560) % 560 - 40; ctx.fillStyle = "#2f6b3a"; ctx.fillRect(x, GROUND - 22, 6, 22); ctx.fillRect(x - 6, GROUND - 16, 6, 3); ctx.fillRect(x - 6, GROUND - 16, 3, 8); ctx.fillRect(x + 6, GROUND - 13, 6, 3); ctx.fillRect(x + 9, GROUND - 13, 3, 8); }
+    /* gold bullets and spiky rollers */
+    for (const b of T.bullets) if (b.alive) { const bb = Math.round(2 * Math.sin(t / 8 + b.x)); ctx.fillStyle = "rgba(255,212,59,.4)"; ctx.fillRect(b.x - 3, b.y - 3 + bb, 13, 17); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(b.x, b.y - 1 + bb, 7, 12); ctx.fillStyle = "#e8a33d"; ctx.fillRect(b.x + 1, b.y + 4 + bb, 5, 6); ctx.fillStyle = "#ffd43b"; ctx.fillRect(b.x + 1, b.y + 4 + bb, 2, 6); ctx.fillStyle = "#e9ecef"; ctx.fillRect(b.x + 2, b.y + bb, 3, 4); }
+    for (const r of T.rollers) { const x = r.x, y = GROUND - 11; ctx.fillStyle = "#1b1b2f"; ctx.beginPath(); ctx.arc(x + 6, y + 5, 6.5, 0, 7); ctx.fill(); ctx.fillStyle = "#868e96"; ctx.beginPath(); ctx.arc(x + 6, y + 5, 5, 0, 7); ctx.fill(); ctx.fillStyle = "#e9ecef"; for (let i = 0; i < 6; i++) { const an = r.spin + i * Math.PI / 3; ctx.fillRect(Math.round(x + 6 + Math.cos(an) * 7) - 1, Math.round(y + 5 + Math.sin(an) * 7) - 1, 2, 2); } ctx.fillStyle = "#e03131"; ctx.fillRect(x + 5, y + 4, 2, 2); }
+    /* the hero, twice the size, running */
+    { const P = T.P, legs = !P.ground ? "jump" : Math.floor(t / 5) % 2 ? "run1" : "run2", img = sprite("hero-" + legs, HERO.concat(LEGS[legs]), false);
+      ctx.drawImage(img, 120 - 6, Math.round(GROUND - 32 + P.y), 24, 32);
+      if (P.ground && t % 6 < 3) { ctx.fillStyle = "rgba(255,230,180,.6)"; ctx.fillRect(112, GROUND - 3, 4, 3); } }
+    T.sparks.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(Math.round(p.x), Math.round(p.y), 2, 2); });
+    /* the title: each letter drops in and bounces */
+    for (const L of T.letters) {
+      const dt = t - L.at; if (dt < 0) continue;
+      const y = dt < 14 ? L.y - 140 * (1 - dt / 14) ** 2 : dt < 22 ? L.y - Math.round(6 * Math.sin((dt - 14) / 8 * Math.PI)) : L.y + Math.round(1.5 * Math.sin(t / 20 + L.x / 30));
+      letter(ctx, L, T.B, y, t);
+    }
+    const done = t > T.letters[T.letters.length - 1].at + 30;
+    if (done) {
+      txt(ctx, "ANSWER  ·  GEAR UP  ·  RUN", VW / 2, 164, 10, "#fff3bf");
+      if (!T.go ? t % 50 < 34 : t % 6 < 3) { ctx.fillStyle = "rgba(10,8,30,.6)"; ctx.fillRect(VW / 2 - 98, 180, 196, 22); txt(ctx, "PRESS SPACE TO START", VW / 2, 195, 11, "#ffffff"); }
+      if (T.got) txt(ctx, `◎ ${T.got}`, VW - 14, 16, 10, "#ffd43b", "right");
+    }
+    ctx.restore();
+    if (T.flash) { ctx.fillStyle = `rgba(255,255,255,${T.flash / 16})`; ctx.fillRect(0, 0, VW, VH); }
+    if (T.go) { ctx.fillStyle = `rgba(255,255,255,${Math.min(1, T.go / 30)})`; ctx.fillRect(0, 0, VW, VH); }
+  }
+  return { start, stop, gen, reach, step, hook, THEMES, LOOT, roast, title, titleGo, titleStop, titleState: () => T && { t: T.t, go: T.go, got: T.got } };
 })();
 
 </script>
@@ -3713,7 +3870,8 @@ function done(res) {
   rec.snipeBest = Math.max(prevBest, sn.score || 0); rec.ridgeBest = Math.max(rec.ridgeBest || 0, sn.ridgeMax || 0); S.snipeBest = Math.max(S.snipeBest || 0, sn.score || 0);
   const acc = sn.shots ? Math.round(100 * sn.hits / sn.shots) : 0;
   const snipeCard = sn.shots ? `<div class="snipe"><div class="px">SNIPER SCORE</div><div class="big2">${sn.score}</div>${newBest ? `<div class="nhs">NEW HIGH SCORE!</div>` : `<div class="note2">Best on this level: ${prevBest}</div>`}
-    <div class="stats">${[["Knocked out", sn.ko], ["Headshots", sn.head], ["Shot first", sn.first], ["Accuracy", acc + "%"], ["Best streak", sn.best]].map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join("")}</div></div>` : "";
+    <div class="stats">${[["Knocked out", sn.ko], ["Headshots", sn.head], ["Shot first", sn.first], ["Accuracy", acc + "%"], ["Best streak", sn.best]].map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join("")}</div>
+    <p class="roast">🎙 ${esc(PF.roast(Object.assign({}, sn, { acc })))}</p></div>` : "";
   const last = B.stage >= STAGES(L) - 1;
   if (res.win && !last) {
     /* a stage of a big level is done: save where we are, then the next stage's briefing */
@@ -3797,11 +3955,21 @@ document.querySelectorAll("#pads .pad").forEach(b => {
   const k = b.dataset.k, on = e => { e.preventDefault(); PF.hook.key(k, true); }, off = e => { e.preventDefault(); PF.hook.key(k, false); };
   b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointerleave", off); b.addEventListener("pointercancel", off);
 });
+$("#cv").addEventListener("pointerdown", () => PF.hook.tap());
 $("#adm-win").onclick = () => PF.hook.win();
 $("#adm-inv").onclick = () => { INV = !INV; $("#adm-inv").textContent = "Invincible: " + (INV ? "on" : "off"); };
 $("#adm-quit").onclick = () => { PF.stop(); renderMap(); show("map"); };
 if (PRACTICE) { document.body.classList.add("practice"); $("#hdr-practice").classList.remove("hidden"); }
 renderMap(); coachLevel(null); show("map");
+/* the title screen: shown when the game opens; SPACE (or Enter), a click or a tap starts */
+function splash() {
+  const el = $("#splash"); el.classList.remove("hidden"); el.focus();
+  const go = e => { if (e) e.preventDefault(); PF.titleGo(); };
+  const key = e => { if (e.ctrlKey || e.metaKey || e.altKey) return; if (e.code === "Space" || e.key === " " || e.key === "Enter") go(e); };
+  addEventListener("keydown", key); el.addEventListener("pointerdown", go);
+  PF.title({ canvas: $("#tcv"), sound: S.sound, onGo: () => { removeEventListener("keydown", key); el.removeEventListener("pointerdown", go); el.classList.add("hidden"); window.scrollTo(0, 0); } });
+}
+if (!window.__noSplash) splash();
 /* test hooks (tools/check_game4.js) */
 window.__rr = { chestAnswer: i => chestAnswer(i), closeChest: () => closeChest(), chest: () => CH && { answer: CH.q.answer, done: CH.done }, S: () => S, LEVELS, TRACKS, briefing, startBrief: (id, stage) => startBrief(LV[id], stage || 0), startLevel: id => startLevel(LV[id]), levelFor, B: () => B, answer, PF, kitFor, practice: PRACTICE,
   preview: q => { B = { L: LEVELS[0], stage: 0, qs: [Object.assign({}, q, { role: "focus" })], i: 0, right: 0, res: [] }; renderQ(); } };
