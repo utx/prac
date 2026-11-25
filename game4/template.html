@@ -40,6 +40,9 @@ main { min-width: 0; }
 .node .nm { font-size: 12.5px; font-weight: 700; line-height: 1.2; }
 .node .st { font-size: 13px; color: #e67700; letter-spacing: 1px; }
 .node.maths { border-left: 10px solid var(--m); } .node.thinking { border-left: 10px solid var(--t); } .node.reading { border-left: 10px solid var(--r); }
+#splash { position: fixed; inset: 0; z-index: 50; background: #0b0820; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+#splash.hidden { display: none; }
+#splash canvas { width: min(100vw, calc(100vh * 16 / 9)); height: auto; max-height: 100vh; image-rendering: pixelated; image-rendering: crisp-edges; }
 .node.boss { background: #ffe066; border-left: 10px solid #e03131; }
 .node.big { min-height: 150px; border-left: 10px solid #ffd43b; }
 .node .sk { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
@@ -138,6 +141,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px
 </style>
 </head>
 <body>
+<div id="splash" class="hidden" role="button" tabindex="0" aria-label="Ridge Runner: press any key or tap to start"><canvas id="tcv" width="480" height="270"></canvas></div>
 <header>
   <h1 class="px">RIDGE RUNNER</h1>
   <span class="chip" id="hdr-stars">★ 0</span><span class="chip" id="hdr-coins">● 0</span>
@@ -531,6 +535,15 @@ $("#adm-inv").onclick = () => { INV = !INV; $("#adm-inv").textContent = "Invinci
 $("#adm-quit").onclick = () => { PF.stop(); renderMap(); show("map"); };
 if (PRACTICE) { document.body.classList.add("practice"); $("#hdr-practice").classList.remove("hidden"); }
 renderMap(); coachLevel(null); show("map");
+/* the title screen: shown when the game opens; any key, click or tap starts */
+function splash() {
+  const el = $("#splash"); el.classList.remove("hidden"); el.focus();
+  const go = e => { if (e) e.preventDefault(); PF.titleGo(); };
+  const key = e => { if (e.ctrlKey || e.metaKey || e.altKey) return; go(e); };
+  addEventListener("keydown", key); el.addEventListener("pointerdown", go);
+  PF.title({ canvas: $("#tcv"), sound: S.sound, onGo: () => { removeEventListener("keydown", key); el.removeEventListener("pointerdown", go); el.classList.add("hidden"); window.scrollTo(0, 0); } });
+}
+if (!window.__noSplash) splash();
 /* test hooks (tools/check_game4.js) */
 window.__rr = { chestAnswer: i => chestAnswer(i), closeChest: () => closeChest(), chest: () => CH && { answer: CH.q.answer, done: CH.done }, S: () => S, LEVELS, TRACKS, briefing, startBrief: (id, stage) => startBrief(LV[id], stage || 0), startLevel: id => startLevel(LV[id]), levelFor, B: () => B, answer, PF, kitFor, practice: PRACTICE,
   preview: q => { B = { L: LEVELS[0], stage: 0, qs: [Object.assign({}, q, { role: "focus" })], i: 0, right: 0, res: [] }; renderQ(); } };

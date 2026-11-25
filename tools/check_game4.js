@@ -211,7 +211,17 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const browser = await chromium.launch();
   const url = "file://" + PAGE;
   const errs = [];
-  const open = async (vp, q = "") => { const p = await browser.newPage({ viewport: vp }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
+  const open = async (vp, q = "", splash = false) => { const p = await browser.newPage({ viewport: vp }); if (!splash) await p.addInitScript(() => { window.__noSplash = true; }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
+  /* the title screen: it animates, a key press flashes into the map */
+  { const ps = await open({ width: 1280, height: 800 }, "", true);
+    if (!(await ps.isVisible("#splash"))) bad("the game should open on its title screen");
+    await ps.waitForTimeout(2200); if (shots) await ps.screenshot({ path: path.join(shots, "rr-title.png") });
+    const t0 = await ps.evaluate(() => __rr.PF.titleState()); if (!t0 || t0.t < 60) bad("the title screen should be animating");
+    await ps.keyboard.press("Space"); await ps.waitForTimeout(1300);
+    if (await ps.isVisible("#splash")) bad("a key press should leave the title screen"); if (!(await ps.isVisible("#scr-map"))) bad("after the title screen comes the map");
+    const ps2 = await open({ width: 390, height: 800 }, "", true); await ps2.waitForTimeout(400); await ps2.click("#splash"); await ps2.waitForTimeout(1300);
+    if (await ps2.isVisible("#splash")) bad("a tap should leave the title screen");
+    await ps.close(); await ps2.close(); }
   const p = await open({ width: 1280, height: 800 });
   /* every level can be finished */
   /* every stage of every big level, and every boss run, as the game builds them */
