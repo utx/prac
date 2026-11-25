@@ -2757,7 +2757,7 @@ const PF = (() => {
   const keyMap = { ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right", ArrowUp: "up", KeyW: "up", Space: "jump", ArrowDown: "down", KeyS: "down", KeyE: "use", KeyJ: "fire", KeyX: "fire", KeyK: "duck", KeyC: "duck", Escape: "leave", KeyQ: "leave" };
   function onKey(e, down) {
     if (!S) return;
-    if (S.scope && (S.scope.nest.sentries.card || S.scope.intro)) { if (down && e.code === "Space") S.anyKey = true; if (e.code === "Space" || keyMap[e.code]) e.preventDefault(); return; }   /* SPACE closes the ridge report */
+    if (S.scope && (S.scope.nest.sentries.card || S.scope.intro)) { if (down && e.code === "Space") S.anyKey = true; if (e.code === "Space" || keyMap[e.code]) e.preventDefault(); if (!down && keyMap[e.code]) KEYS[keyMap[e.code]] = false; return; }   /* a key let go while a card is up still counts as let go */   /* SPACE closes the ridge report */
     const k = keyMap[e.code]; if (!k) return;
     e.preventDefault();
     if (down && !KEYS[k]) KEYS[k + "P"] = true;
@@ -2947,6 +2947,7 @@ const PF = (() => {
   function enterNest(n) {
     if (S.rounds <= 0 && n.sentries.gate && !n.boss) { msg("Out of sniper rounds: grab gold bullets, then come back for a higher score", 140, "#ffd43b"); return; }
     n.sentries.card = null;
+    for (const k in KEYS) KEYS[k] = false;
     S.scope = { nest: n, x: 240, y: 150, cd: 0, duck: false, flash: 0, fx: 0, fy: 0, supply: 0, intro: !n.boss && !n.briefed && !window.__noIntro ? { t: 0 } : null };
     n.briefed = true;
     S.msgs = [];                                                        // the platform's messages would clutter the scope
@@ -3000,7 +3001,7 @@ const PF = (() => {
   }
   function scopeTick() {
     const sc = S.scope, w = S.G.world;
-    if (sc.intro) { const go = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (go && sc.intro.t > 12) { sc.intro = null; beep(660, .08, "triangle"); } return; }   /* the gear card: nothing moves */
+    if (sc.intro) { const go = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (go && sc.intro.t > 12) { sc.intro = null; for (const k in KEYS) KEYS[k] = false; beep(660, .08, "triangle"); } return; }   /* the gear card: nothing moves */
     { const ss = sc.nest.sentries;                                             /* the ridge report: wait for SPACE, nothing else moves */
       if (ss.card && !sc.nest.boss) { const any = S.anyKey; S.anyKey = false; for (const k in KEYS) if (k.endsWith("P")) KEYS[k] = false; if (any && ss.card.t > 20) { closeCard(); for (const k in KEYS) KEYS[k] = false; } return; } }
     for (const b of S.incoming) {                                              /* bullets flying at you */
@@ -3624,7 +3625,7 @@ const PF = (() => {
   }
   /* test hooks: used only by tools/check_game4.js */
   const hook = {
-    state: () => S && { x: S.P.x, y: S.P.y, hearts: S.hearts, ammo: S.ammo, rounds: S.rounds, coins: S.coins, scope: !!S.scope, over: S.over, cols: S.G.cols, shield: S.shield, check: S.check },
+    state: () => S && { x: S.P.x, y: S.P.y, hearts: S.hearts, ammo: S.ammo, rounds: S.rounds, coins: S.coins, scope: !!S.scope, sy: S.scope ? S.scope.y : null, over: S.over, cols: S.G.cols, shield: S.shield, check: S.check },
     teleport: (col) => { if (!S) return; const c = Math.max(0, Math.min(S.G.cols - 1, col)); let r = 0; while (r < ROWS && !solidAt(S.G, c, r)) r++; S.P.x = c * TS + 3; S.P.y = r * TS - PH.h; S.P.vx = S.P.vy = 0; },
     nests: () => S ? S.ents.filter(e => e.t === "nest").map(e => ({ x: e.x, boss: !!e.boss, alive: e.sentries.list.filter(s => s.alive).length, ko: e.sentries.stat.ko, score: e.sentries.stat.score, min: e.sentries.min, gate: e.sentries.gate, card: !!e.sentries.card })) : [],
     snipe: () => S && snipeTotals(),
@@ -3642,7 +3643,7 @@ const PF = (() => {
     grab: () => { if (!S) return; const a = S.ents.find(e => e.t === "ammo" && e.alive); if (a) { S.P.x = a.x - 1; S.P.y = a.y - 2; S.P.vx = S.P.vy = 0; } },
     aimAt: (i, part = "body") => { if (!S || !S.scope) return false; const s = S.scope.nest.sentries.list.filter(q => q.alive)[i || 0]; if (!s) return false; s.state = "peek"; s.st = 0; s.hold = 9999; s.hideIn = 0; s.x = s.at + s.side * (s.boss ? 42 : 36); S.stop = 0; const b = sBox(s), drop = (s.range / 100 - 1) * 8, w = S.scope.nest.sentries.wind, a = S.kit.steady ? 2.5 : 5.5; const tx = s.x - w * 8, ty = (part === "head" ? (b.top + b.head) / 2 : (b.head + b.bot) / 2) - drop; S.scope.x = tx - a * Math.sin((S.t + 1) / 23); S.scope.y = ty - a * 0.8 * Math.sin((S.t + 1) / 31 + 1); S.scope.cd = 0; return true; },
     fire: () => { if (S && S.scope) { S.scope.cd = 0; KEYS.fireP = true; } else if (S) KEYS.fireP = true; },
-    key: (k, down) => { if (S && S.scope && (S.scope.nest.sentries.card || S.scope.intro)) { if (down && k === "jump") S.anyKey = true; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
+    key: (k, down) => { if (S && S.scope && (S.scope.nest.sentries.card || S.scope.intro)) { if (down && k === "jump") S.anyKey = true; if (!down) KEYS[k] = false; return; } KEYS[k] = down; if (down) KEYS[k + "P"] = true; },
     tap: () => { if (S && S.scope && (S.scope.nest.sentries.card || S.scope.intro)) S.anyKey = true; },
     /* the boss */
     toArena: () => { if (!S) return false; const a = S.ents.find(e => e.t === "arena"); if (!a) return false; S.P.x = a.x + 4 * TS; S.P.y = a.y - PH.h; S.P.vx = S.P.vy = 0; return true; },
