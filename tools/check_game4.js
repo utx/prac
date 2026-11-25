@@ -578,7 +578,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
       return out;
     });
     if (off.length) bad(`at ${vp.width}×${vp.height}${admin ? " with the coach sidebar" : ""} these need scrolling to reach the options or Next: ${off.slice(0, 6).join(", ")}${off.length > 6 ? ` … (${off.length})` : ""}`);
-    if (shots && vp.width === 1366 && admin) { await pg.evaluate(() => { __rr.preview(HAND.find(q => q.id === "ri4a")); __rr.answer(0); }); await pg.screenshot({ path: path.join(shots, "rr-monitor.png") }); }
+    if (shots && vp.width === 1366 && admin) { await pg.evaluate(() => { __rr.preview(HAND.find(q => q.id === "rw4a")); __rr.answer(0); }); await pg.screenshot({ path: path.join(shots, "rr-monitor.png") }); }
     await pg.close();
   }
   /* the keyboard answers and moves on */
@@ -599,7 +599,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     return out;
   });
   if (wide.length) bad(`too wide for a phone: ${wide.slice(0, 8).join(", ")}${wide.length > 8 ? " …" : ""}`);
-  if (shots) { await ph.evaluate(() => __rr.preview(HAND.find(q => q.id === "rs2a"))); await ph.screenshot({ path: path.join(shots, "rr-phone.png"), fullPage: true }); }
+  if (shots) { await ph.evaluate(() => __rr.preview(HAND.find(q => q.id === "rw2a"))); await ph.screenshot({ path: path.join(shots, "rr-phone.png"), fullPage: true }); }
   await browser.close();
   if (errs.length) bad("page errors: " + [...new Set(errs)].slice(0, 5).join(" | "));
   finish();
