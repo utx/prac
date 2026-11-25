@@ -161,7 +161,10 @@ const SOLVE = {
   "t-order-3": d => { const rules = d.clues.map(clueRule), sols = perms(d.ppl).filter(p => rules.every(f => f(p))), at = [...new Set(sols.map(p => p[d.ask]))]; return at.length === 1 ? { text: at[0] } : { error: "place not fixed" }; },
   "t-order-4": (d, q) => { const rules = d.clues.map(clueRule), sols = perms(d.ppl).filter(p => rules.every(f => f(p)));
     const good = q.options.filter(o => { const f = clueRule(text(o)); return d.askMust ? sols.every(f) : !sols.some(f); });
-    return good.length === 1 ? { text: text(good[0]) } : { error: `${good.length} options fit` }; },
+    if (good.length !== 1) return { error: `${good.length} options fit` };
+    /* step 4: no single clue may settle the answer on its own (a restated clue is far too easy) */
+    const f = clueRule(text(good[0])), one = rules.find(r => perms(d.ppl).filter(r).every(p => f(p) === !!d.askMust));
+    return one ? { error: `one clue alone settles "${text(good[0])}"` } : { text: text(good[0]) }; },
   "t-space-1": (d, q) => { const want = norm(rot(d.cells));   /* rot: (r, c) → (c, −r) is a clockwise quarter turn on screen */
     /* the shape and the dot: check the dot too */
     const dotOf = o => { const m = o.match(/<circle cx="([\d.]+)" cy="([\d.]+)"/); return m ? [Math.round((+m[2] - 14) / 20), Math.round((+m[1] - 14) / 20)] : null; };
@@ -211,7 +214,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const browser = await chromium.launch();
   const url = "file://" + PAGE;
   const errs = [];
-  const open = async (vp, q = "", splash = false) => { const p = await browser.newPage({ viewport: vp }); if (!splash) await p.addInitScript(() => { window.__noSplash = true; window.__noIntro = true; window.__noVeh = true; }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
+  const open = async (vp, q = "", splash = false) => { const p = await browser.newPage({ viewport: vp }); if (!splash) await p.addInitScript(() => { window.__noSplash = true; window.__noIntro = true; window.__noVeh = true; window.__noCritter = true; }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
   /* the title screen: it animates, a key press flashes into the map */
   { const ps = await open({ width: 1280, height: 800 }, "", true);
     if (!(await ps.isVisible("#splash"))) bad("the game should open on its title screen");
@@ -400,6 +403,20 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     await p.evaluate(() => { __rr.PF.hook.aimAt(0, "body"); __rr.PF.hook.fire(); __rr.PF.hook.quiet(); }); await p.waitForTimeout(1500);
     if (await p.evaluate(() => __rr.PF.hook.incoming())) bad("shooting an aiming sentry first should stop its shot"); }
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "body")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(80);
+  /* surprise visitors: a dog, a dinosaur or an old man on a bike now and then runs across the far hills; harmless */
+  { const pc = await open({ width: 1280, height: 800 });
+    await pc.evaluate(() => { __rr.startBrief("1-L1", 0); }); for (let i = 0; i < 4; i++) { await pc.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await pc.click("#btn-next"); }
+    await pc.click("#btn-play"); await pc.waitForTimeout(300);
+    for (const k of ["dog", "dino", "bike"]) {
+      const c0 = await pc.evaluate(k => __rr.PF.hook.critter(k), k);
+      if (!c0 || c0.k !== k) bad(`a ${k} should be able to run across the hills`);
+      await pc.waitForTimeout(600); const c1 = await pc.evaluate(() => __rr.PF.hook.critter());
+      if (!c1 || Math.sign(c1.x - c0.x) !== c0.dir) bad(`the ${k} should run across the screen (${JSON.stringify([c0, c1])})`);
+      if (shots && k === "dino") await pc.screenshot({ path: path.join(shots, "rr-critter.png") });
+      for (let i = 0; i < 80 && (await pc.evaluate(() => __rr.PF.hook.critter())); i++) await pc.waitForTimeout(150);
+      if (await pc.evaluate(() => __rr.PF.hook.critter())) bad(`the ${k} should leave the screen`);
+    }
+    await pc.evaluate(() => localStorage.clear()); await pc.close(); }
   /* the gear card before the shooting, and the vehicles (with both switched back on) */
   { const pv = await open({ width: 1280, height: 800 });
     await pv.evaluate(() => { window.__noIntro = false; window.__noVeh = false; __rr.startBrief("3-L1", 0); });

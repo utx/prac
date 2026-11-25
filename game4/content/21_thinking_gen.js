@@ -90,8 +90,13 @@ gen("t-order-4", "order", 4, R => {
   const st = [];
   for (const a of ppl) for (const b2 of ppl) if (a !== b2) { st.push(CLUES.nextTo(a, b2)); st.push(CLUES.leftOf(a, b2)); }
   for (const a of ppl) { st.push(CLUES.end(a)); for (let i = 0; i < 5; i++) st.push({ t: `${a} is in place ${i + 1}.`, ok: p => p.indexOf(a) === i }); }
+  /* test level: the answer must need the clues working together. A statement that one clue (or any two) already
+     settles is too easy (David, Nov 2026: "Kira is next to Yusuf" when a clue said "Yusuf is next to Kira") */
   const fresh = st.filter(s => !clues.some(c => c.t === s.t));
-  const must = fresh.filter(s => sols.every(s.ok)), some = fresh.filter(s => sols.some(s.ok) && !sols.every(s.ok));
+  const subsets = [];
+  clues.forEach((c, i) => { subsets.push([c]); clues.forEach((d, j) => { if (j > i) subsets.push([c, d]); }); });
+  const settledBy = (s, want) => subsets.some(sub => { const left = all.filter(p => sub.every(c => c.ok(p))); return left.every(p => s.ok(p) === want); });
+  const must = fresh.filter(s => sols.every(s.ok) && !settledBy(s, true)), some = fresh.filter(s => sols.some(s.ok) && !sols.every(s.ok));
   const askMust = R.chance(0.6);
   if (askMust) {
     if (!must.length || some.length < 3) return null;
@@ -100,7 +105,7 @@ gen("t-order-4", "order", 4, R => {
     return { form: "must", stem: `<p>Five friends, ${ppl.slice(0, 4).join(", ")} and ${ppl[4]}, sit in a row of five seats, numbered 1 to 5 from left to right.</p><ul class="clues">${clues.map(c => `<li>${c.t}</li>`).join("")}</ul><p>Which of these <b>must</b> be true?</p>`, ...o, data: { ppl, clues: clues.map(c => c.t), askMust },
       explain: ex("order", `<p>The clues allow ${sols.length} arrangements: ${sols.map(p => p.join(" – ")).join("; ")}. "Must be true" means true in ALL of them: <b>${right.t}</b></p>`, o) };
   }
-  const never = fresh.filter(s => !sols.some(s.ok) && !/place/.test(s.t));
+  const never = fresh.filter(s => !sols.some(s.ok) && !/place/.test(s.t) && !settledBy(s, false));
   if (!never.length || some.length < 3) return null;
   const right = R.pick(never), wr = R.shuffle(some).slice(0, 3).map(s => [s.t, "this is true in at least one arrangement that fits, so it CAN be true"]);
   const o = shuffleOpts(R, right.t, wr);
