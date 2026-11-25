@@ -277,7 +277,8 @@ const PF = (() => {
   }
   /* ---------- vehicles at the nests (our own pixel art): planes drop paratroopers, helicopters zoom in and fire,
      tanks roll up behind the rocks and shell you. Each one down counts as a knockout and scores big. ---------- */
-  const VEH = { plane: { hp: 2, pts: 200, name: "PLANE DOWN!" }, heli: { hp: 3, pts: 400, name: "CHOPPER DOWN!" }, tank: { hp: 4, pts: 300, name: "TANK DOWN!" } };
+  /* three hits (a tank's hatch counts double) and it blows up for mega points (David, Nov 2026) */
+  const VEH = { plane: { hp: 3, pts: 1000, name: "PLANE DESTROYED!" }, heli: { hp: 3, pts: 1500, name: "CHOPPER DESTROYED!" }, tank: { hp: 3, pts: 1500, name: "TANK DESTROYED!" } };
   const vehKinds = w => w === 1 ? ["plane", "heli"] : ["plane", "heli", "tank"];
   function spawnVeh(ss, kind) {
     const w = S.G.world, dir = Math.random() < .5 ? 1 : -1, k = kind || vehKinds(w)[Math.floor(Math.random() * vehKinds(w).length)], x = dir > 0 ? -50 : VW + 50;
@@ -293,7 +294,7 @@ const PF = (() => {
     const v = ss.veh;
     if (v) {
       v.st++; if (v.flash > 0) v.flash--;
-      if (v.dead) { v.vy = (v.vy || 0) + 0.15; v.y += v.vy; v.x += v.dir * 0.8; v.rot = (v.rot || 0) + 0.08 * v.dir; if (S.t % 4 === 0) burst(v.x, v.y, "#495057", 3); if (v.y > FAR + 10 || (v.k === "tank" && v.st > 60)) { burst(v.x, FAR - 4, "#ff922b", 20); S.shake = 8; ss.veh = null; } }
+      if (v.dead) { if (v.st > 6) ss.veh = null; }
       else if (v.k === "plane") {
         v.x += v.vx; v.drops = v.drops.filter(dx => { if ((v.dir > 0 && v.x >= dx) || (v.dir < 0 && v.x <= dx)) { ss.chutes.push({ x: v.x, y: v.y + 8, t: 0 }); beep(600, .05, "triangle"); return false; } return true; });
         if (v.x < -60 || v.x > VW + 60) ss.veh = null;
@@ -317,6 +318,15 @@ const PF = (() => {
     ss.chutes = ss.chutes.filter(c => !c.gone);
   }
   /* a shot at a vehicle or paratrooper (they are close: no bullet drop, but wind still counts) */
+  /* a big explosion: flash, fireball, shockwave, flying wreckage and smoke */
+  function boom(x, y, ground) {
+    const parts = [], blobs = [];
+    for (let i = 0; i < 18; i++) { const a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 4; parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (ground ? 3 : 1.5), r: Math.random() * 6, s: 2 + Math.floor(Math.random() * 4) }); }
+    for (let i = 0; i < 7; i++) blobs.push([(Math.random() - .5) * 34, (Math.random() - .5) * 22 - (ground ? 8 : 0), 10 + Math.random() * 14]);
+    S.hfx.push({ k: "boom", x, y, parts, blobs, t: 0 });
+    S.stop = 10; S.shake = 22;
+    beep(60, .7, "sawtooth", .09); beep(90, .5, "square", .06); setTimeout(() => beep(45, .6, "sawtooth", .06), 120);
+  }
   function vehHit(ss, x, y) {
     const st = ss.stat, v = ss.veh;
     for (const c of ss.chutes) if (x > c.x - 9 && x < c.x + 9 && y > c.y - 22 && y < c.y + 14) {
@@ -331,7 +341,9 @@ const PF = (() => {
     v.hp -= dmg; v.flash = 8; st.hits++; st.streak++; st.best = Math.max(st.best, st.streak); S.coins += 1;
     let pts = hatch ? 100 : 50;
     if (v.aim) { pts += 50; st.first++; v.aim = false; if (v.k === "heli") { v.state = "out"; } S.hfx.push({ k: "pop", x: v.x, y: v.y - 40, text: "SHOT FIRST! +50", c: "#8ce99a", t: -4 }); }
-    if (v.hp <= 0) { v.dead = true; v.st = 0; pts += VEH[v.k].pts; st.ko++; st.veh = (st.veh || 0) + 1; S.coins += 5; S.hfx.push({ k: "pop", x: v.x, y: v.y - 26, text: VEH[v.k].name, c: "#9be15d", t: -6 }); beep(110, .4, "sawtooth", .07); S.shake = 14; burst(v.x, v.y, "#ff922b", 24); }
+    if (v.hp <= 0) { v.dead = true; v.st = 0; const mega = VEH[v.k].pts; st.ko++; st.veh = (st.veh || 0) + 1; st.boom = (st.boom || 0) + 1; S.coins += 10; st.score += mega;
+      boom(v.x, v.y - (v.k === "tank" ? 12 : 0), v.k === "tank");
+      S.hfx.push({ k: "pop", x: VW / 2, y: 70, text: "MEGA KILL!", sub: `+${mega}`, c: "#ff922b", t: -2, big: true }, { k: "pop", x: v.x, y: v.y - 30, text: VEH[v.k].name, c: "#fff3bf", t: -14 }); }
     st.score += pts;
     S.hfx.push({ k: "mark", x, y, head: hatch, t: 0 }, { k: "pop", x: v.x, y: v.y - 14, text: hatch ? "HATCH HIT! x2" : "HIT!", sub: `+${pts}`, c: hatch ? "#ff4d4d" : "#fff", t: 0 });
     burst(x, y, "#ffd43b", 10); S.stop = 5; S.shake = Math.max(S.shake, 6); beep(784, .07, "triangle", .06);
@@ -512,12 +524,13 @@ const PF = (() => {
     if (!S || S.over || S.paused) return;
     S.t++;
     if (S.scope) {
-      S.hfx.forEach(f => { f.t++; if (f.k === "helmet") { f.x += f.vx; f.y += f.vy; f.vy += 0.25; } }); S.hfx = S.hfx.filter(f => f.t < (f.k === "pop" ? 70 : f.k === "helmet" ? 60 : f.k === "ouch" ? 50 : 26));
+      S.hfx.forEach(f => { f.t++; if (f.k === "helmet") { f.x += f.vx; f.y += f.vy; f.vy += 0.25; } }); S.hfx = S.hfx.filter(f => f.t < (f.k === "pop" ? 70 : f.k === "helmet" ? 60 : f.k === "ouch" ? 50 : f.k === "boom" ? 60 : 26));
       for (const q of S.scope.nest.sentries.list) { if (q.flash > 0) q.flash--; if (q.koT !== undefined) q.koT++; if (q.hideIn > 0 && --q.hideIn === 0 && q.alive) { q.state = "hide"; q.st = 0; q.hold = 30; q.x = q.at; } }
       if (S.shake > 0) S.shake--;
       if (S.stop > 0) { S.stop--; return; }                                               /* the freeze-frame on a hit */
       scopeTick(); S.parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .15; p.d--; }); S.parts = S.parts.filter(p => p.d > 0); S.msgs.forEach(m => m.d--); S.msgs = S.msgs.filter(m => m.d > 0); return; }
     const P = S.P, G = S.G;
+    critterTick();
     if (S.shake > 0) S.shake--;
     const dir = (KEYS.right ? 1 : 0) - (KEYS.left ? 1 : 0); if (dir) P.face = dir;
     const jp = pressed("jump") || pressed("up");
@@ -852,7 +865,7 @@ const PF = (() => {
     bad: ["That aim was so wobbly the scope got seasick.", "You hit more rocks than a landslide does.", "The sentries asked if you were shooting with your eyes shut.", "Some hits! Mostly misses. The misses are winning."],
     ok: ["Half hits, half misses. Perfectly... medium.", "Not bad! Not great either. A solid 'meh' from the sentries.", "Some of your shots hit. The others are still flying somewhere."],
     good: ["Okay, okay, you're good. Don't let it go to your head (your bullets did).", "Sharp shooting! The sentries want a rematch. And a hug.", "Nice! Your teacher would give that a sticker. A small one."],
-    veh: ["You knocked things out of the SKY. The pilots would like a word.", "Planes, choppers, tanks... is there anything you won't shoot?", "That tank had a very bad day. You're welcome, sentries."],
+    veh: ["KABOOM! The pilots would like their vehicle back. In one piece, please.", "You knocked things out of the SKY. The pilots would like a word.", "Planes, choppers, tanks... is there anything you won't shoot?", "That tank had a very bad day. You're welcome, sentries."],
     heads: ["So many headshots the sentries are ordering bigger helmets.", "Headshot after headshot. The helmet shop is sold out."],
     perfect: ["Every shot hit! Did you bribe the sentries?", "100% accuracy. Now try being this accurate with your spelling.", "Perfect aim. The sentries have filed a complaint. It was ignored."] };
   const pickOne = a => a[Math.floor(Math.random() * a.length)];
@@ -894,6 +907,61 @@ const PF = (() => {
   function dropAmmo(e) { if (e.i % 2) return; const x = e.x + 3; S.ents.push({ t: "ammo", x, y: groundBelow(x) - 12, alive: true, i: S.ents.length, ph: 0 }); S.totalAmmo++; msg("It dropped a bullet!", 50, "#ffd43b"); }
   const groundBelow = x => { const c = Math.floor(x / TS); for (let r = 0; r < ROWS; r++) if (solidAt(S.G, c, r)) return r * TS; return ROWS * TS; };
 
+  /* ---------- surprise visitors (David, Nov 2026: "random stuff running across the screen rarely, like dogs or dinosaurs or an old man on a bike") ----------
+     Every 20 to 40 seconds or so, something runs across the far hills behind the level. Just for fun: it can't hurt you and you can't hit it. Our own drawings. */
+  const CRITTERS = { dog: { v: 2.3, says: ["Was that a dog?!", "Good boy! Where's he going?", "A dog on the run!"] }, dino: { v: 1.3, says: ["Was that a DINOSAUR?!", "A dinosaur! Nobody will believe this.", "Stomp, stomp, stomp…"] },
+    bike: { v: 1.0, says: ["An old man on a bike? Out here?", "Ding ding! Coming through!", "Grandpa's out for a ride!"] } };
+  const hillY = x => { const wx = x + S.cam * 0.45; return 190 + Math.round(18 * Math.sin(wx / 45) + 9 * Math.sin(wx / (45 * 0.37))); };
+  function spawnCritter(kind) {
+    kind = kind || ["dog", "dino", "bike"][Math.floor(Math.random() * 3)];
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    S.critter = { k: kind, dir, x: dir > 0 ? -40 : VW + 40, t: 0 };
+    if (Math.random() < 0.6) msg(CRITTERS[kind].says[Math.floor(Math.random() * 3)], 90, "#fff3bf");
+    if (kind === "bike") beep(1568, .06, "triangle", .03), setTimeout(() => beep(1568, .08, "triangle", .03), 140);
+  }
+  function critterTick() {
+    if (S.critT === undefined) S.critT = 700 + Math.floor(Math.random() * 900);
+    const c = S.critter;
+    if (c) { c.t++; c.x += c.dir * CRITTERS[c.k].v; if (c.x < -60 || c.x > VW + 60) S.critter = null; return; }
+    if (window.__noCritter) return;
+    if (--S.critT <= 0) { spawnCritter(); S.critT = 1200 + Math.floor(Math.random() * 1200); }
+  }
+  function drawCritter(ctx, c) {
+    const R = (x, y, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(x, y, w, h); };
+    const base = hillY(c.x), step = Math.floor(c.t / 6) % 2;
+    ctx.save(); ctx.translate(Math.round(c.x), base); ctx.scale(c.dir * 1.5, 1.5);
+    if (c.k === "dog") {          /* a scruffy brown dog, ears flapping */
+      const hop = step ? -1 : 0;
+      R(-9, -9 + hop, 16, 6, "#1b1b2f"); R(-8, -8 + hop, 14, 4, "#a0682f");                        // body
+      R(5, -13 + hop, 7, 6, "#1b1b2f"); R(6, -12 + hop, 5, 4, "#a0682f"); R(11, -10 + hop, 2, 2, "#1b1b2f");   // head and nose
+      R(6, -14 + hop - step, 2, 3, "#5a3a1a"); R(8, -11 + hop, 1, 1, "#fff");                      // ear, eye
+      R(-11, -10 + hop - (step ? 2 : 0), 3, 2, "#a0682f");                                       // wagging tail
+      const L = step ? [[-7, 2], [4, -1]] : [[-6, -1], [3, 2]];
+      for (const [lx, d] of L) { R(lx, -4 + hop, 2, 4 + d, "#5a3a1a"); R(lx + 3, -4 + hop, 2, 4 - d, "#5a3a1a"); }
+    } else if (c.k === "dino") {  /* a long-necked green dinosaur, plodding */
+      const bob = step;
+      R(-18, -16 + bob, 26, 10, "#1b1b2f"); R(-17, -15 + bob, 24, 8, "#5fae4f"); R(-14, -15 + bob, 18, 3, "#7fcf6a");          // body
+      R(4, -30 + bob, 5, 16, "#1b1b2f"); R(5, -29 + bob, 3, 15, "#5fae4f");                                                 // neck
+      R(4, -34 + bob, 11, 6, "#1b1b2f"); R(5, -33 + bob, 9, 4, "#5fae4f"); R(11, -32 + bob, 1, 1, "#1b1b2f"); R(13, -30 + bob, 2, 1, "#1b1b2f");  // head, eye, smile
+      R(-26, -13 + bob, 9, 3, "#5fae4f"); R(-30, -11 + bob, 5, 2, "#5fae4f");                                              // tail
+      for (const [lx, up] of [[-15, step], [-9, 1 - step], [0, 1 - step], [5, step]]) R(lx, -7 + bob, 4, 7 - up * 2, "#3f8a37");
+      for (let k = 0; k < 4; k++) R(-12 + k * 5, -18 + bob, 3, 2, "#ffd43b");                                              // spots on the back
+    } else {                      /* an old man in a flat cap on a bicycle, pedalling slowly */
+      const wob = Math.round(Math.sin(c.t / 10));
+      const wheel = (x) => { ctx.strokeStyle = "#1b1b2f"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, -6, 6, 0, 7); ctx.stroke(); ctx.save(); ctx.translate(x, -6); ctx.rotate(c.t / 6); R(-1, -6, 1, 12, "#868e96"); R(-6, -1, 12, 1, "#868e96"); ctx.restore(); };
+      wheel(-9); wheel(9);
+      ctx.strokeStyle = "#c92a2a"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-9, -6); ctx.lineTo(-2, -15); ctx.lineTo(7, -15); ctx.lineTo(9, -6); ctx.moveTo(-2, -15); ctx.lineTo(1, -6); ctx.lineTo(9, -6); ctx.stroke();   // frame
+      R(-4, -17, 5, 2, "#1b1b2f"); R(6, -19, 2, 4, "#1b1b2f"); R(5, -20, 4, 1, "#1b1b2f");                                  // seat, handlebars
+      R(-3, -27 + wob, 6, 10, "#1b1b2f"); R(-2, -26 + wob, 4, 8, "#4c6ef5");                                                // body (blue cardigan)
+      R(1, -24 + wob, 6, 2, "#4c6ef5");                                                                                     // arm to the bars
+      R(-2, -33 + wob, 6, 6, "#1b1b2f"); R(-1, -32 + wob, 4, 4, "#f1c27d"); R(1, -29 + wob, 4, 2, "#f8f9fa");               // head and white beard
+      R(-3, -35 + wob, 8, 3, "#6b4f2a"); R(4, -33 + wob, 3, 1, "#6b4f2a");                                                  // flat cap
+      const pd = step ? [[-1, -12], [2, -8]] : [[2, -12], [-1, -8]];
+      R(-1, -18 + wob, 2, 4, "#495057"); R(pd[0][0], pd[0][1], 2, 4, "#495057"); R(pd[1][0], pd[1][1], 2, 3, "#495057");    // legs pedalling
+    }
+    ctx.restore();
+  }
+
   /* ---------- drawing ---------- */
   function draw() {
     if (!S) return; const { ctx, G } = S, th = G.theme;
@@ -904,6 +972,7 @@ const PF = (() => {
     if (G.world === 4 && S.t % 240 < 4) { ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0, 0, VW, VH); }
     const hills = (col, par, h, amp, f) => { ctx.fillStyle = col; for (let x = 0; x < VW; x += 4) { const wx = x + S.cam * par; const y = h + Math.round(amp * Math.sin(wx / f) + amp * 0.5 * Math.sin(wx / (f * 0.37))); ctx.fillRect(x, y, 4, VH - y); } };
     hills(th.far, 0.2, 150, 26, 70); hills(th.mid, 0.45, 190, 18, 45);
+    if (S.critter) drawCritter(ctx, S.critter);
     const c0 = Math.floor(S.cam / TS), c1 = c0 + Math.ceil(VW / TS) + 1, ox = -Math.round(S.cam);
     for (let c = c0; c <= c1 && c < G.cols; c++) for (let r = 0; r < ROWS; r++) {
       const t = G.map[r][c], x = c * TS + ox, y = r * TS;
@@ -1076,6 +1145,17 @@ const PF = (() => {
         const p = Math.min(1, f.t / 4), g = 4 + 8 * p, L = 7, a = f.t < 14 ? 1 : 1 - (f.t - 14) / 12;
         ctx.strokeStyle = `rgba(${f.head ? "255,59,59" : "255,255,255"},${a})`; ctx.lineWidth = f.head ? 3 : 2;
         for (const [dx, dy] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { ctx.beginPath(); ctx.moveTo(f.x + dx * g, f.y + dy * g); ctx.lineTo(f.x + dx * (g + L), f.y + dy * (g + L)); ctx.stroke(); }
+      } else if (f.k === "boom") {
+        const t = f.t;
+        if (t < 5) { ctx.fillStyle = `rgba(255,250,220,${0.75 - t * 0.14})`; ctx.fillRect(0, 0, VW, VH); }
+        const ra = Math.max(0, 1 - t / 22); ctx.strokeStyle = `rgba(255,236,170,${ra})`; ctx.lineWidth = 4 - 3 * (t / 22); ctx.beginPath(); ctx.arc(f.x, f.y, 10 + t * 5, 0, 7); ctx.stroke();
+        const grow = Math.min(1, t / 6), fade = t < 16 ? 1 : Math.max(0, 1 - (t - 16) / 40);
+        for (const [dx, dy, r] of f.blobs) { const rr = r * grow * (1 + t * 0.02), yy = f.y + dy - Math.max(0, t - 16) * 0.6;
+          if (t > 14) { ctx.fillStyle = `rgba(60,60,70,${0.6 * fade})`; ctx.beginPath(); ctx.arc(f.x + dx, yy, rr * 1.2, 0, 7); ctx.fill(); }
+          if (t < 26) { ctx.fillStyle = t < 8 ? "#fff3bf" : t < 14 ? "#ffd43b" : "#ff922b"; ctx.globalAlpha = Math.max(0, 1 - t / 26); ctx.beginPath(); ctx.arc(f.x + dx, f.y + dy, rr, 0, 7); ctx.fill();
+            ctx.fillStyle = "#e8590c"; ctx.beginPath(); ctx.arc(f.x + dx, f.y + dy, rr * 0.55, 0, 7); ctx.fill(); ctx.globalAlpha = 1; } }
+        for (const q of f.parts) { if (f.t !== q.lt) { q.lt = f.t; q.x += q.vx; q.y += q.vy; q.vy += 0.2; q.r += 0.3; }
+          ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(q.r); ctx.fillStyle = "#1b1b2f"; ctx.fillRect(-q.s / 2 - 1, -q.s / 2 - 1, q.s + 2, q.s + 2); ctx.fillStyle = t < 20 ? "#ffa94d" : "#495057"; ctx.fillRect(-q.s / 2, -q.s / 2, q.s, q.s); ctx.restore(); }
       } else if (f.k === "ring") {
         const r = 6 + f.t * 2.2, a = 1 - f.t / 26; ctx.strokeStyle = `rgba(255,212,59,${a})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(f.x, f.y, r, 0, 7); ctx.stroke();
       } else if (f.k === "helmet") {
@@ -1084,7 +1164,7 @@ const PF = (() => {
         const a = 1 - f.t / 26; ctx.fillStyle = `rgba(201,180,138,${a})`; for (let i = 0; i < 5; i++) ctx.fillRect(f.x - 6 + i * 3, f.y - f.t * 0.4 - (i % 2) * 3, 3, 3);
       } else if (f.k === "pop" && f.t >= 0) {
         const grow = f.t < 6 ? 1.8 - f.t * 0.13 : 1, a = f.t < 50 ? 1 : 1 - (f.t - 50) / 20, y = f.y - Math.min(f.t, 40) * 0.5;
-        ctx.globalAlpha = Math.max(0, a); txt(ctx, f.text, Math.max(70, Math.min(VW - 70, f.x)), Math.max(40, y), Math.round(15 * grow), f.c); if (f.sub) txt(ctx, f.sub, Math.max(70, Math.min(VW - 70, f.x)), Math.max(40, y) + 14, 9, "#ffd43b"); ctx.globalAlpha = 1;
+        ctx.globalAlpha = Math.max(0, a); txt(ctx, f.text, Math.max(70, Math.min(VW - 70, f.x)), Math.max(40, y), Math.round((f.big ? 26 : 15) * grow), f.c); if (f.sub) txt(ctx, f.sub, Math.max(70, Math.min(VW - 70, f.x)), Math.max(40, y) + 14, 9, "#ffd43b"); ctx.globalAlpha = 1;
       }
     }
   }
@@ -1099,6 +1179,7 @@ const PF = (() => {
     gates: () => S ? S.ents.filter(e => e.t === "gate").map(e => ({ col: e.col, nest: e.nest, open: !!S.G.gateOpen[e.col] })) : [],
     setRounds: n => { if (S) S.rounds = n; },
     fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
+    critter: k => { if (!S) return null; if (k) spawnCritter(k); return S.critter && { k: S.critter.k, x: S.critter.x, dir: S.critter.dir }; },
     toChest: () => { if (!S) return false; const c = S.ents.find(e => e.t === "chest" && !e.opened); if (!c) return false; S.P.x = c.x; S.P.y = c.y - 4; S.P.vx = S.P.vy = 0; return true; },
     chests: () => S ? S.ents.filter(e => e.t === "chest").map(e => e.opened || "closed") : [], paused: () => !!(S && S.paused),
     incoming: () => S ? S.incoming.length : 0,
