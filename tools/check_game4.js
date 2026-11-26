@@ -412,9 +412,11 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     let seen = 0; for (let k = 0; k < 40 && !seen; k++) { await p.waitForTimeout(80); seen = await p.evaluate(() => __rr.PF.hook.incoming()); }
     if (!seen) bad("an aiming sentry should fire a bullet you can see coming");
     const h0 = await p.evaluate(() => __rr.PF.hook.state().hearts + __rr.PF.hook.state().shield);
+    const hearts0 = await p.evaluate(() => __rr.PF.hook.state().hearts);
     for (let k = 0; k < 30 && (await p.evaluate(() => __rr.PF.hook.incoming())); k++) await p.waitForTimeout(60);
     const h1 = await p.evaluate(() => __rr.PF.hook.state().hearts + __rr.PF.hook.state().shield);
     if (h1 !== h0 - 1) bad(`a bullet that arrives while standing should cost a heart or the shield (${h0} → ${h1})`);
+    if ((await p.evaluate(() => __rr.PF.hook.state().hearts)) < hearts0 && !(await p.evaluate(() => __rr.PF.hook.splats()))) bad("losing a heart to a sniper should splat the screen");
     if (shots) await p.screenshot({ path: path.join(shots, "rr-ouch.png") });
     /* the other sentries are held still for this one, so only the sentry we shoot could fire */
     await p.evaluate(() => { __rr.PF.hook.quiet(); __rr.PF.hook.forceAim(); }); await p.waitForTimeout(100);

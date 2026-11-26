@@ -266,7 +266,7 @@ const PF = (() => {
       P: { x: first.x + 3, y: first.y - PH.h, vx: 0, vy: 0, ground: false, face: 1, inv: 0, boots: opts.kit.boots, cd: 0 },
       check: { x: first.x + 3, y: first.y - PH.h }, hearts: opts.kit.hearts, shield: opts.kit.shield ? 1 : 0, ammo: opts.kit.ammo, rounds: opts.kit.rounds,
       ents: G.ents.map((e, i) => Object.assign({ i, alive: true, vx: e.t === "walker" ? -(0.45 + 0.15 * opts.level.world) : 0, ph: i * 1.7 }, e)),
-      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0, incoming: [], snipe: { score: 0, ko: 0, head: 0, shots: 0, hits: 0, best: 0, first: 0 }, arena: null, boss: null, waves: [], orbs: [], strikes: [], pops: [] };
+      bolts: [], shells: [], scope: null, over: false, fire: [], invincible: !!opts.invincible, got: 0, streak: 0, flash: 0, hfx: [], stop: 0, shake: 0, incoming: [], splats: [], snipe: { score: 0, ko: 0, head: 0, shots: 0, hits: 0, best: 0, first: 0 }, arena: null, boss: null, waves: [], orbs: [], strikes: [], pops: [] };
     S.totalAmmo = S.ents.filter(e => e.t === "ammo").length;
     S.ents.filter(e => e.t === "nest").forEach(e => { e.sentries = makeSentries(e); });
     G.gateOpen = {};
@@ -307,7 +307,7 @@ const PF = (() => {
     const ranges = w === 1 ? [100] : [100, 200, 300];
     const list = [];
     for (let i = 0; i < n; i++) list.push({ at: rocks[i % rocks.length], side: i % 2 ? -1 : 1, x: rocks[i % rocks.length], tx: rocks[i % rocks.length], state: "hide", st: 40 + i * 50, hp: boss ? 6 : 1, alive: true, range: boss ? 300 : ranges[(i + nest.id) % ranges.length], boss, rocks, hold: 60 + i * 40 });
-    return { list, rocks, ranges, n, wind: w >= 3 ? [-2, -1, 1, 2][(nest.id + w) % 4] : 0, min: boss ? 1 : w === 1 ? 2 : 3,
+    return { list, rocks, ranges, n, wind: 0, min: boss ? 1 : w === 1 ? 2 : 3,
       stat: { ko: 0, head: 0, shots: 0, hits: 0, streak: 0, best: 0, first: 0, score: 0, veh: 0 }, respawn: [], gate: false, card: null, chutes: [], veh: null, vehOff: boss || !!window.__noVeh };
   }
   /* a fresh sentry drops in at a rock nobody is using */
@@ -428,7 +428,7 @@ const PF = (() => {
   const cardOut = (kind, data) => { if (S && S.opts.onCard) S.opts.onCard(kind, data); };
   function gearInfo(sc) {
     const ss = sc.nest.sentries, w = S.G.world, k = S.kit;
-    return { nest: sc.nest.id + 1, world: w, rounds: S.rounds, min: ss.min, steady: !!k.steady, hearts: S.hearts, shield: !!S.shield, boots: !!k.boots, wind: w >= 3 ? ss.wind : null, dots: w >= 2,
+    return { nest: sc.nest.id + 1, world: w, rounds: S.rounds, min: ss.min, steady: !!k.steady, hearts: S.hearts, shield: !!S.shield, boots: !!k.boots, wind: ss.wind ? ss.wind : null, dots: w >= 2,
       threats: vehKinds(w) };
   }
   function dimOnly(ctx, t, n) { ctx.fillStyle = `rgba(5,8,20,${0.6 * Math.min(1, t / n)})`; ctx.fillRect(0, 0, VW, VH); }
@@ -446,7 +446,7 @@ const PF = (() => {
       ["❤", `HEARTS: ${S.hearts}${S.shield ? " + SHIELD" : ""}`, true, "Each enemy shot that hits costs one. Hold K to duck when you see a red glint."],
       ["⤒", `BOOTS: ${k.boots ? "ON" : "OFF"}`, k.boots, k.boots ? "A second jump in mid-air on the way to the next nest." : "Get ¾ of the briefing right for double-jump boots."]];
     if (w >= 2) rows.push(["⋮", "DROP DOTS", true, "Far targets: aim 1 dot high for 200 m, 2 dots for 300 m."]);
-    if (w >= 3) rows.push(["≋", `WIND: ${ss.wind > 0 ? "→".repeat(ss.wind) : "←".repeat(-ss.wind)}`, true, "Aim against the wind, one green dot per arrow."]);
+    if (ss.wind) rows.push(["≋", `WIND: ${ss.wind > 0 ? "→".repeat(ss.wind) : "←".repeat(-ss.wind)}`, true, "Aim against the wind, one green dot per arrow."]);
     rows.forEach(([ic, h, on, d], i) => { const y = 50 + i * 26, show = it.t > 6 + i * 5; if (!show) return;
       txt(ctx, ic, 48, y + 4, 12, on ? "#ffd43b" : "#868e96", "left"); txt(ctx, h, 66, y, 10, on ? "#8ce99a" : "#adb5bd", "left"); txt(ctx, d, 66, y + 12, 8, "#dee2e6", "left"); });
     const threats = ["SENTRIES"].concat(vehKinds(w).map(v => ({ plane: "PLANES + PARATROOPERS", heli: "HELICOPTERS", tank: "TANKS" }[v])));
@@ -519,7 +519,7 @@ const PF = (() => {
       b.t++;
       if (b.t === b.dur) {
         if (sc.duck) { msg("WHOOSH! Ducked just in time", 60, "#9be15d"); beep(900, .05, "triangle"); S.hfx.push({ k: "whoosh", t: 0 }); }
-        else { const h0 = S.hearts; hurt("Sniped! When a bullet comes, hold K to duck"); S.hfx.push({ k: "ouch", t: 0, lost: S.hearts < h0 }); S.shake = 12; }
+        else { const h0 = S.hearts; hurt("Sniped! When a bullet comes, hold K to duck"); S.hfx.push({ k: "ouch", t: 0, lost: S.hearts < h0 }); S.shake = 12; if (S.hearts < h0) splat(); }
       }
     }
     S.incoming = S.incoming.filter(b => b.t < b.dur);
@@ -541,12 +541,12 @@ const PF = (() => {
     for (const s of sc.nest.sentries.list) {
       if (!s.alive) continue;
       s.st++;
-      const glint = (s.boss ? 70 : 95) - 10 * w;
+      const glint = (s.boss ? 55 : 70) - 8 * w;
       if (s.state === "aim") {
         if (s.st >= glint + 25) {                                              /* the shot: a bullet you can see coming */
-          const b = sBox(s); S.incoming.push({ x0: s.x - 16, y0: b.top + 9, t: 0, dur: Math.max(24, 46 - 5 * w - (s.boss ? 6 : 0)) });
+          const b = sBox(s); S.incoming.push({ x0: s.x - 16, y0: b.top + 9, t: 0, dur: Math.max(18, 34 - 4 * w - (s.boss ? 4 : 0)) });
           beep(220, .08, "sawtooth"); S.hfx.push({ k: "muzzle", x: s.x, y: b.top + 6, t: 0 });
-          s.state = "hide"; s.st = 0; s.hold = 60 + Math.random() * 60; s.x = s.at;
+          s.state = "hide"; s.st = 0; s.hold = 35 + Math.random() * 40; s.x = s.at;
         }
         continue;
       }
@@ -554,7 +554,7 @@ const PF = (() => {
       const out = () => { s.x = s.at + s.side * (s.boss ? 42 : 36); };
       if (s.st < s.hold) continue;
       const r = Math.random();
-      if (s.state === "hide") { s.side = Math.random() < 0.5 ? -1 : 1; out(); if (r < (s.boss ? 0.45 : 0.25) + 0.05 * w) { s.state = "aim"; s.st = 0; } else { s.state = "peek"; s.st = 0; s.hold = 70 + Math.random() * 60 - 8 * w; } }
+      if (s.state === "hide") { s.side = Math.random() < 0.5 ? -1 : 1; out(); if (r < (s.boss ? 0.6 : 0.45) + 0.08 * w) { s.state = "aim"; s.st = 0; } else { s.state = "peek"; s.st = 0; s.hold = 45 + Math.random() * 40 - 5 * w; } }
       else if (s.state === "peek") { if (r < 0.2 + 0.1 * w) { const o = s.rocks.filter(x => x !== s.at); s.at = o[Math.floor(Math.random() * o.length)]; s.tx = s.at + s.side * (s.boss ? 42 : 36); s.state = "run"; s.st = 0; } else { s.state = "hide"; s.st = 0; s.hold = 40 + Math.random() * 60; s.x = s.at; } }
     }
   }
@@ -1282,7 +1282,7 @@ const PF = (() => {
       if (s.flash > 0) { ctx.fillStyle = `rgba(255,255,255,${s.flash / 9})`; ctx.fillRect(b.l - 1, b.top - 1, b.r - b.l + 2, b.bot - b.top + 1); }
       if (s.boss) { ctx.fillStyle = "#ffd43b"; ctx.fillRect(b.l + 1, b.top - 4, 3, 4); ctx.fillRect(s.x - 1, b.top - 6, 3, 6); ctx.fillRect(b.r - 4, b.top - 4, 3, 4); }
       if (s.state === "aim") {
-        const gl = (s.boss ? 70 : 95) - 10 * S.G.world, left = Math.max(0, 1 - s.st / (gl + 25)), f = 3 + 2 * Math.abs(Math.sin(S.t / 4));
+        const gl = (s.boss ? 55 : 70) - 8 * S.G.world, left = Math.max(0, 1 - s.st / (gl + 25)), f = 3 + 2 * Math.abs(Math.sin(S.t / 4));
         ctx.fillStyle = "#343a40"; ctx.fillRect(s.x - 16, b.top + 7, 14, 3);
         ctx.fillStyle = "#ff2b2b"; ctx.fillRect(s.x - 16 - f * 2, b.top + 8, f * 4, 2); ctx.fillRect(s.x - 17, b.top + 8 - f * 2, 2, f * 4);
         ctx.strokeStyle = `rgba(255,59,59,${0.5 + 0.5 * (1 - left)})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(s.x - 16, b.top + 9, 6 + 26 * left, 0, 7); ctx.stroke();
@@ -1306,7 +1306,7 @@ const PF = (() => {
       ctx.strokeStyle = "#0d1330"; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(x, y, R, 0, 7); ctx.stroke();
       ctx.fillStyle = "#e9f7ff"; ctx.fillRect(x - R + 4, y, R - 10, 1); ctx.fillRect(x + 6, y, R - 10, 1); ctx.fillRect(x, y - R + 4, 1, R - 10); ctx.fillRect(x, y + 6, 1, R - 10);
       if (w >= 2) for (let d = 1; d <= 3; d++) { ctx.fillStyle = "#ffd43b"; ctx.fillRect(x - 1, y + d * 8 - 1, 3, 3); }     /* drop dots below the centre */
-      if (w >= 3) for (let d = 1; d <= 2; d++) { ctx.fillStyle = "#8ce99a"; ctx.fillRect(x - d * 8 - 1, y - 1, 3, 3); ctx.fillRect(x + d * 8 - 1, y - 1, 3, 3); }   /* wind dots */
+      /* (no wind dots: David asked to drop the wind) */
       ctx.fillStyle = "#ff3b3b"; ctx.fillRect(x - 1, y - 1, 2, 2);
       if (sc.flash > 0) { ctx.fillStyle = `rgba(255,243,160,${sc.flash / 7})`; ctx.beginPath(); ctx.arc(sc.fx, sc.fy, 9 - sc.flash, 0, 7); ctx.fill(); }
       /* the rangefinder reads the closest visible sentry */
@@ -1316,13 +1316,13 @@ const PF = (() => {
     }
     hitFx(ctx);
     ctx.restore();
+    drawSplats(ctx); drawHealth(ctx);
     if (sc.nest.sentries.card) { drawCard(ctx, sc.nest.sentries.card); return; }
     if (sc.intro) { drawIntro(ctx, sc); return; }
     const wind = sc.nest.sentries.wind;
     ctx.fillStyle = "rgba(10,12,30,.7)"; ctx.fillRect(0, 0, VW, 18);
     txt(ctx, `SNIPER ${S.rounds}`, 8, 13, 9, "#ffd43b", "left");
     const ouch = S.hfx.find(f => f.k === "ouch" && f.lost);
-    for (let i = 0; i < S.hearts; i++) { ctx.fillStyle = "#ff6b6b"; ctx.fillRect(90 + i * 10, 6, 7, 6); }
     if (ouch) { const t = ouch.t; ctx.fillStyle = `rgba(255,107,107,${1 - t / 50})`; ctx.fillRect(90 + S.hearts * 10 + Math.min(t, 20) * 0.3, 6 + t * 0.8, 7, 6); }
     if (S.shield) txt(ctx, "◆", 160, 13, 9, "#9fe7ff", "left");
     const sst = sc.nest.sentries.stat, need = Math.max(0, sc.nest.sentries.min - sst.ko);
@@ -1332,6 +1332,34 @@ const PF = (() => {
     if (glint && !sc.duck && !S.incoming.length) txt(ctx, "RED GLINT: SHOOT THEM FIRST, OR GET READY TO DUCK (K)", VW / 2, 36, 10, "#ff6b6b");
     txt(ctx, "J fire · K duck · E leave", VW / 2, VH - 8, 9, "#ced4da");
     messages();
+  }
+  /* cartoon blood splats across the scope when a sniper hits you: blobs and droplets that drip down and fade */
+  function splat() {
+    for (let i = 0; i < 3; i++) {
+      const x = 60 + Math.random() * (VW - 120), y = 40 + Math.random() * (VH - 120), r = 14 + Math.random() * 16, drops = [];
+      for (let k = 0; k < 7; k++) { const a = Math.random() * 7, d = r * (0.9 + Math.random() * 0.9); drops.push([Math.cos(a) * d, Math.sin(a) * d, 2 + Math.random() * 5]); }
+      S.splats.push({ x, y, r, drops, drip: [[-r * 0.4, 0], [r * 0.1, 0], [r * 0.5, 0]].map(([dx]) => ({ dx, len: 0, sp: 0.3 + Math.random() * 0.5 })), t: 0 });
+    }
+  }
+  function drawSplats(ctx) {
+    for (const p of S.splats) {
+      p.t++; const a = p.t < 90 ? 0.85 : Math.max(0, 0.85 - (p.t - 90) / 70); if (a <= 0) continue;
+      ctx.fillStyle = `rgba(150,0,10,${a})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+      ctx.fillStyle = `rgba(190,10,20,${a})`; ctx.beginPath(); ctx.arc(p.x - p.r * 0.2, p.y - p.r * 0.2, p.r * 0.6, 0, 7); ctx.fill();
+      for (const [dx, dy, rr] of p.drops) { ctx.fillStyle = `rgba(150,0,10,${a})`; ctx.beginPath(); ctx.arc(p.x + dx, p.y + dy, rr, 0, 7); ctx.fill(); }
+      for (const d of p.drip) { d.len = Math.min(60, d.len + d.sp); ctx.fillStyle = `rgba(150,0,10,${a})`; ctx.fillRect(p.x + d.dx - 2, p.y, 4, p.r * 0.6 + d.len); ctx.beginPath(); ctx.arc(p.x + d.dx, p.y + p.r * 0.6 + d.len, 3, 0, 7); ctx.fill(); }
+    }
+    S.splats = S.splats.filter(p => p.t < 160);
+  }
+  /* a clear health bar along the bottom of the scope: big hearts, the lost one shatters, low health pulses */
+  function drawHealth(ctx) {
+    const n = S.hearts, max = Math.max(n, S.kit.hearts || n), x0 = 12, y0 = VH - 34, ouch = S.hfx.find(f => f.k === "ouch" && f.lost);
+    ctx.fillStyle = "rgba(10,12,30,.8)"; ctx.fillRect(x0 - 6, y0 - 6, 28 + max * 20, 30);
+    txt(ctx, "HEALTH", x0, y0 + 13, 8, "#ff8787", "left");
+    const heart = (x, y, c) => { ctx.fillStyle = "#1b1b2f"; ctx.fillRect(x, y + 2, 16, 9); ctx.fillRect(x + 2, y, 5, 13); ctx.fillRect(x + 9, y, 5, 13); ctx.fillRect(x + 4, y + 12, 8, 3); ctx.fillStyle = c; ctx.fillRect(x + 1, y + 3, 14, 7); ctx.fillRect(x + 3, y + 1, 3, 11); ctx.fillRect(x + 10, y + 1, 3, 11); ctx.fillRect(x + 5, y + 10, 6, 3); };
+    for (let i = 0; i < max; i++) heart(x0 + 44 + i * 20, y0, i < n ? "#ff4d4d" : "#495057");
+    if (ouch && ouch.t < 40) { const t = ouch.t, x = x0 + 44 + n * 20; ctx.fillStyle = `rgba(255,77,77,${1 - t / 40})`; ctx.fillRect(x - t * 0.6, y0 + t * 0.9, 7, 7); ctx.fillRect(x + 9 + t * 0.6, y0 + t * 0.7, 7, 7); }
+    if (n === 1) { const p = 0.35 + 0.25 * Math.sin(S.t / 6); ctx.strokeStyle = `rgba(255,0,0,${p})`; ctx.lineWidth = 10; ctx.strokeRect(5, 5, VW - 10, VH - 10); txt(ctx, "LOW HEALTH!", VW - 70, y0 + 13, 10, S.t % 20 < 12 ? "#ff4d4d" : "#fff"); }
   }
   /* the hit effects: a hit marker (an X of four strokes round the impact), a burst ring on a headshot,
      a flying helmet, a puff for a miss, and big pop-up words that grow in, float up and fade */
@@ -1396,7 +1424,7 @@ const PF = (() => {
     fx: () => S ? S.hfx.map(f => f.k + (f.head ? "-head" : "")) : [],
     critter: (k, dir) => { if (!S) return null; if (k === "onHero") { if (S.critter) { S.critter.x = S.P.x + PH.w / 2; S.critter.y = S.P.y + PH.h; S.critter.vy = 0; } return null; } if (k) spawnCritter(k, dir); const c = S.critter; return S.critWarn ? { warn: S.critWarn.k } : c && { k: c.k, x: c.x, y: c.y, dir: c.dir, hit: c.hit }; },
     toChest: () => { if (!S) return false; const c = S.ents.find(e => e.t === "chest" && !e.opened); if (!c) return false; S.P.x = c.x; S.P.y = c.y - 4; S.P.vx = S.P.vy = 0; return true; },
-    chests: () => S ? S.ents.filter(e => e.t === "chest").map(e => e.opened || "closed") : [], paused: () => !!(S && S.paused),
+    chests: () => S ? S.ents.filter(e => e.t === "chest").map(e => e.opened || "closed") : [], paused: () => !!(S && S.paused), splats: () => S ? S.splats.length : 0,
     incoming: () => S ? S.incoming.length : 0,
     forceAim: () => { if (!S || !S.scope) return; const s = S.scope.nest.sentries.list.find(q => q.alive); if (s) { s.x = s.at + s.side * (s.boss ? 42 : 36); s.state = "aim"; s.st = 0; s.hold = 9999; } },
     kit: () => S && Object.assign({}, S.kit, { boots: !!S.P.boots, shield: S.shield, hearts: S.hearts, rounds: S.rounds, ammo: S.ammo }),
