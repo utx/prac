@@ -2,10 +2,11 @@
 /* Checks the platform game (prac4/index.html, built by tools/build_game4.py).
    1. Content: 15 skill tracks with 4 steps each, every step has questions; sample references only by number;
       hand-written questions have unique ids, 4 options, a trap named for every wrong option, a why-not paragraph,
-      the correct option never the single longest, and the four answers in each step on different letters.
+      the correct option never the single longest, and the answers in each step spread evenly over the letters
+      (at most twice each in a step of 8).
    2. Templates: 300 seeds each; every answer is worked out again HERE by a separate method from `data`
       (or from the picture itself for the spatial ones); options are all different; every wrong option names a trap.
-   3. In a real browser: all 64 levels can be finished (the hero's own physics, no double jump); a level is played
+   3. In a real browser: all 52 stages and boss runs can be finished (the hero's own physics, no double jump); a level is played
       from the map through the briefing, kit, platform, nest and scope (body shot, headshot, ducking a glint), clearing
       it unlocks the next and survives a reload; losing offers one retry then a new briefing; a boss is beaten;
       practice mode (admin) unlocks everything, shows the coach sidebar with sample references and saves nothing;
@@ -30,7 +31,7 @@ const { GENS, HAND, TRACKS } = C;
 const build = fs.readFileSync(path.join(ROOT, "tools", "build.py"), "utf8");
 const cats = sec => JSON.parse(build.match(new RegExp(`"${sec}": (\\[[^\\]]*\\])`, "s"))[1].replace(/\s+/g, " "));
 const CATS = { reading: cats("reading"), thinking: cats("thinking"), maths: cats("maths") };
-if (TRACKS.length !== 15) bad(`expected 15 tracks, found ${TRACKS.length}`);
+if (TRACKS.length !== 12) bad(`expected 12 tracks, found ${TRACKS.length}`);
 for (const t of TRACKS) {
   if (t.rungs.length !== 4) bad(`${t.id}: needs 4 steps`);
   if (!CATS[t.subject] || !CATS[t.subject].includes(t.cat)) bad(`${t.id}: unknown question type "${t.cat}"`);
@@ -59,9 +60,13 @@ for (const q of HAND) {
 for (const t of TRACKS) for (let r = 1; r <= 4; r++) {
   const qs = HAND.filter(q => q.track === t.id && q.rung === r); if (!qs.length) continue;
   const n = {}; qs.forEach(q => n[q.answer] = (n[q.answer] || 0) + 1);
-  if (Math.max(...Object.values(n)) > Math.ceil(qs.length / 4) + 0) bad(`${t.id} step ${r}: answer letters not spread ${JSON.stringify(n)}`);
+  /* spread evenly: no letter more than ceil(n / 4) times, so at most twice in a step of 8 */
+  if (Math.max(...Object.values(n)) > Math.ceil(qs.length / 4)) bad(`${t.id} step ${r}: answer letters not spread ${JSON.stringify(n)}`);
 }
 const page = fs.existsSync(PAGE) ? fs.readFileSync(PAGE, "utf8") : "";
+{ const menu = fs.readFileSync(path.join(ROOT, "index.html"), "utf8"), adm = fs.readFileSync(path.join(ROOT, "pracadmin", "index.html"), "utf8");
+  if (!/href="prac4\/index\.html"/.test(menu)) bad("the student menu should link to Ridge Runner");
+  for (const id of ["rr-reset-seen", "rr-reset-all", "game4-practice", "game4-play"]) if (!adm.includes(`id="${id}"`)) bad(`the admin page's Ridge Runner card needs #${id}`); }
 if (!page) bad("prac4/index.html is missing: run python3 tools/build_game4.py");
 if (/\bOC\b/.test(page)) bad('the page must never mention "OC"');
 if (/setInterval/.test(page)) bad("no clocks: the game runs on animation frames");
@@ -156,7 +161,10 @@ const SOLVE = {
   "t-order-3": d => { const rules = d.clues.map(clueRule), sols = perms(d.ppl).filter(p => rules.every(f => f(p))), at = [...new Set(sols.map(p => p[d.ask]))]; return at.length === 1 ? { text: at[0] } : { error: "place not fixed" }; },
   "t-order-4": (d, q) => { const rules = d.clues.map(clueRule), sols = perms(d.ppl).filter(p => rules.every(f => f(p)));
     const good = q.options.filter(o => { const f = clueRule(text(o)); return d.askMust ? sols.every(f) : !sols.some(f); });
-    return good.length === 1 ? { text: text(good[0]) } : { error: `${good.length} options fit` }; },
+    if (good.length !== 1) return { error: `${good.length} options fit` };
+    /* step 4: no single clue may settle the answer on its own (a restated clue is far too easy) */
+    const f = clueRule(text(good[0])), one = rules.find(r => perms(d.ppl).filter(r).every(p => f(p) === !!d.askMust));
+    return one ? { error: `one clue alone settles "${text(good[0])}"` } : { text: text(good[0]) }; },
   "t-space-1": (d, q) => { const want = norm(rot(d.cells));   /* rot: (r, c) → (c, −r) is a clockwise quarter turn on screen */
     /* the shape and the dot: check the dot too */
     const dotOf = o => { const m = o.match(/<circle cx="([\d.]+)" cy="([\d.]+)"/); return m ? [Math.round((+m[2] - 14) / 20), Math.round((+m[1] - 14) / 20)] : null; };
@@ -206,28 +214,70 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const browser = await chromium.launch();
   const url = "file://" + PAGE;
   const errs = [];
-  const open = async (vp, q = "") => { const p = await browser.newPage({ viewport: vp }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
+  const open = async (vp, q = "", splash = false) => { const p = await browser.newPage({ viewport: vp }); if (!splash) await p.addInitScript(() => { window.__noSplash = true; window.__noIntro = true; window.__noVeh = true; window.__noCritter = true; }); p.on("pageerror", e => errs.push(e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_FAILED|fonts\.g/.test(m.text())) errs.push(m.text()); }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url + q); return p; };
+  /* the title screen: it animates, a key press flashes into the map */
+  { const ps = await open({ width: 1280, height: 800 }, "", true);
+    if (!(await ps.isVisible("#splash"))) bad("the game should open on its title screen");
+    await ps.waitForTimeout(2200); if (shots) await ps.screenshot({ path: path.join(shots, "rr-title.png") });
+    const t0 = await ps.evaluate(() => __rr.PF.titleState()); if (!t0 || t0.t < 60) bad("the title screen should be animating");
+    await ps.keyboard.press("KeyJ"); await ps.waitForTimeout(400);
+    if (!(await ps.isVisible("#splash"))) bad("only SPACE (or a tap) should leave the title screen");
+    await ps.keyboard.press("Space"); await ps.waitForTimeout(1300);
+    if (await ps.isVisible("#splash")) bad("SPACE should leave the title screen"); if (!(await ps.isVisible("#scr-map"))) bad("after the title screen comes the map");
+    const ps2 = await open({ width: 390, height: 800 }, "", true); await ps2.waitForTimeout(400); await ps2.click("#splash"); await ps2.waitForTimeout(1300);
+    if (await ps2.isVisible("#splash")) bad("a tap should leave the title screen");
+    await ps.close(); await ps2.close(); }
   const p = await open({ width: 1280, height: 800 });
   /* every level can be finished */
-  const stuck = await p.evaluate(() => __rr.LEVELS.filter(L => !__rr.PF.reach({ world: L.world, boss: !!L.boss, seed: L.seed }).ok).map(L => L.id));
-  if (stuck.length) bad(`levels that can't be finished: ${stuck.join(", ")}`);
+  /* every stage of every big level, and every boss run, as the game builds them */
+  await p.evaluate(() => { window.__stages = __rr.LEVELS.flatMap(L => (L.boss ? [0] : [0, 1, 2]).map(st => Object.assign({ id: `${L.id}#${st + 1}` }, __rr.levelFor(L, st)))); });
+  const nStages = await p.evaluate(() => __stages.length); if (nStages !== 52) bad(`expected 48 stages and 4 boss runs (got ${nStages})`);
+  const stuck = await p.evaluate(() => __stages.filter(L => !__rr.PF.reach(L).ok).map(L => L.id));
+  if (stuck.length) bad(`stages that can't be finished: ${stuck.join(", ")}`);
+  /* cloze (David: "proper passages with several gaps"): a cloze stage's briefing is one passage, gaps 1 to 4 in order; the next briefing is a new passage */
+  { const cz = await p.evaluate(() => { const runs = []; for (let k = 0; k < 3; k++) { __rr.startBrief("1-L1", 2); runs.push(__rr.B().qs.map(q => [q.grp, q.rung])); } return { runs, passages: new Set(HAND.filter(q => q.track === "word").map(q => q.grp)).size, gaps: HAND.filter(q => q.track === "word").length }; });
+    if (cz.passages < 8 || cz.gaps !== cz.passages * 4) bad(`the cloze skill should be passages of 4 gaps (${cz.passages} passages, ${cz.gaps} gaps)`);
+    for (const r of cz.runs) if (new Set(r.map(x => x[0])).size !== 1 || !r[0][0] || r.map(x => x[1]).join() !== "1,2,3,4") bad(`a cloze briefing should be one passage, gaps 1 to 4 (${JSON.stringify(r)})`);
+    if (new Set(cz.runs.map(r => r[0][0])).size !== 3) bad("each new cloze briefing should bring a passage not seen yet");
+    await p.click("#btn-map"); }
+  /* every big level is its own place (David: "the levels all look too samey"): 4 different places in each world, each stage with its own hazard */
+  { const places = await p.evaluate(() => [1, 2, 3, 4].map(w => __rr.LEVELS.filter(L => L.world === w && !L.boss).map(L => L.name)));
+    for (const [i, ps] of places.entries()) if (new Set(ps).size !== 4) bad(`world ${i + 1} should have 4 different places (${ps.join(", ")})`);
+    const missing = await p.evaluate(() => __stages.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen(L), B = G.biome, has = t => G.map.some(row => row.includes(t)), ent = k => G.ents.some(e => e.t === k);
+      return !({ "Dusty Canyon": ent("boulder"), "Frozen Caves": has(7), "Vine Jungle": has(5), "Lava Foundry": ent("jet"), "Neon Rooftops": has(8) || has(9), "Gale Peaks": B.wind, "Lantern Mine": ent("lantern") && ent("icicle"), "Thunder Ridge": B.bolts }[B.name]); }).map(L => L.id));
+    if (missing.length) bad(`stages missing their place's own hazard: ${missing.join(", ")}`);
+    /* ice slides further than rock; a belt carries you */
+    const phys = await p.evaluate(() => { const mk = t => { const map = [...Array(17)].map((_, r) => Array(40).fill(r === 12 ? t : r > 12 ? 1 : 0)); return { map, cols: 40 }; };
+      const slide = t => { const G = mk(t), b = { x: 50, y: 12 * 16 - 14, vx: 2, vy: 0, ground: true, under: t }; for (let f = 0; f < 120; f++) __rr.PF.step(G, b, { dir: 0, jump: false, jumpPressed: false }); return b.x - 50; };
+      return { rock: slide(1), ice: slide(7), belt: slide(9) - slide(1) }; });
+    if (!(phys.ice > phys.rock * 3)) bad(`ice should be slippery (slid ${Math.round(phys.ice)} px, rock ${Math.round(phys.rock)} px)`);
+    if (!(phys.belt > 60)) bad(`a conveyor belt should carry you (${Math.round(phys.belt)} px)`); }
+  const seeds = await p.evaluate(() => new Set(__stages.map(L => L.seed)).size); if (seeds !== 52) bad("every stage should have its own map");
   /* every level has its sniper nests (2 in worlds 1–2, 3 in worlds 3–4), each with a laser gate after it */
-  const nestBad = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }), n = G.ents.filter(e => e.t === "nest").length, g = G.ents.filter(e => e.t === "gate").length; return n !== (L.world <= 2 ? 2 : 3) || g !== n; }).map(L => L.id));
-  if (nestBad.length) bad(`levels without the right number of nests and gates: ${nestBad.join(", ")}`);
+  const nestBad = await p.evaluate(() => __stages.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen(L), n = G.ents.filter(e => e.t === "nest").length, g = G.ents.filter(e => e.t === "gate").length; return n !== (L.world <= 2 ? 2 : 3) || g !== n; }).map(L => L.id));
+  if (nestBad.length) bad(`stages without the right number of nests and gates: ${nestBad.join(", ")}`);
+  /* the trickier pieces: every stage opens with a moving platform and a crumbling bridge; world 1 already has springs */
+  { const bad2 = await p.evaluate(() => __stages.filter(L => { const G = __rr.PF.gen(L), m = G.ents.find(e => e.t === "mover"); let cr = 0; for (let c = 0; c < 40; c++) for (let r = 0; r < 17; r++) if (G.map[r][c] === 6) cr++; return !m || m.x > 30 * 16 || cr < 4; }).map(L => L.id));
+    if (bad2.length) bad(`stages that don't open with a moving platform and a crumbling bridge: ${bad2.slice(0, 6).join(", ")}`);
+    const w1 = await p.evaluate(() => { let springs = 0, movers = 0; for (const L of __stages.filter(L => L.world === 1)) { const G = __rr.PF.gen(L); movers += G.ents.filter(e => e.t === "mover").length; for (let r = 0; r < 17; r++) for (let c = 0; c < G.cols; c++) if (G.map[r][c] === 5) springs++; } return { springs, movers }; });
+    if (w1.springs < 3 || w1.movers < 18) bad(`world 1 should already have springs and plenty of moving platforms (${JSON.stringify(w1)})`); }
+  /* every boss run ends in an arena with ledges to hide on */
+  const arenaBad = await p.evaluate(() => __stages.filter(L => L.boss).filter(L => { const G = __rr.PF.gen(L), a = G.ents.find(e => e.t === "arena"); if (!a) return true; let ledges = 0; for (let c = a.col; c < a.col + 30; c++) if (G.map[9][c] === 2) ledges++; return ledges < 8 || G.ents.some(e => e.t === "nest"); }).map(L => L.id));
+  if (arenaBad.length) bad(`boss runs without a proper arena: ${arenaBad.join(", ")}`);
   const nodes = await p.$$eval(".node", n => n.length), locked = await p.$$eval(".node.lock", n => n.length);
-  if (nodes !== 16 || locked !== 15) bad(`world 1 should show 16 levels with only the first open (shows ${nodes}, ${locked} locked)`);
+  if (nodes !== 5 || locked !== 4) bad(`world 1 should show 4 big levels and the boss, with only the first open (shows ${nodes}, ${locked} locked)`);
   /* play level 1 from the map */
-  await p.click('.node[data-l="1-frac"]'); await p.click("#btn-go");
+  await p.click('.node[data-l="1-L1"]'); await p.click("#btn-go");
   const n1 = await p.evaluate(() => __rr.B().qs.length); if (n1 !== 4) bad(`a briefing should have 4 questions (has ${n1})`);
   const climb = await p.evaluate(() => __rr.B().qs.map(q => q.track + ":" + q.rung).join(","));
   if (climb !== "frac:1,frac:2,frac:3,frac:4") bad(`a briefing should climb through one skill's steps 1 to 4 (got ${climb})`);
   /* no repeats while unseen questions are left, even when a briefing is left early */
   const pr = await open({ width: 1280, height: 800 });
-  const rep = await pr.evaluate(() => { const got = []; for (let k = 0; k < 4; k++) { __rr.startBrief("1-flaw"); got.push(...__rr.B().qs.map(q => q.id)); } return got.length - new Set(got).size; });
+  const rep = await pr.evaluate(() => { const got = []; for (let k = 0; k < 4; k++) { __rr.startBrief("1-L1", 1); got.push(...__rr.B().qs.map(q => q.id)); } return got.length - new Set(got).size; });
   await pr.evaluate(() => localStorage.clear()); await pr.close();
   if (rep) bad(`four briefings of the same skill (each left after the first question) repeated ${rep} question(s) while unseen ones were left`);
   /* every level of every world climbs easy to hard, on its own skill */
-  const climbs = await p.evaluate(() => { const out = []; for (const L of __rr.LEVELS) { const qs = __rr.briefing(L), steps = qs.map(q => q.rung); if (steps.some((r, i) => i && r < steps[i - 1]) || (!L.boss && (qs.length !== 4 || qs.some(q => q.track !== L.track)))) out.push(L.id); } return out; });
+  const climbs = await p.evaluate(() => { const out = []; for (const L of __rr.LEVELS) for (const st of L.boss ? [0] : [0, 1, 2]) { const qs = __rr.briefing(L, st), steps = qs.map(q => q.rung); if (steps.some((r, i) => i && r < steps[i - 1]) || (!L.boss && (qs.length !== 4 || qs.some(q => q.track !== L.tracks[st])))) out.push(`${L.id} stage ${st + 1}`); } return out; });
   if (climbs.length) bad(`briefings that don't climb easy to hard: ${climbs.join(", ")}`);
   for (let i = 0; i < 4; i++) { await p.evaluate(i => { const B = __rr.B(), q = B.qs[B.i]; __rr.answer(i < 2 ? q.answer : (q.answer + 1) % q.options.length); }, i); if (!(await p.isVisible("#explain"))) bad("the explanation should show after answering"); await p.click("#btn-next"); }
   const kit = await p.evaluate(() => __rr.B().kit), want = await p.evaluate(() => __rr.kitFor(2, 4, false));
@@ -236,6 +286,19 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.click("#btn-play"); await p.waitForTimeout(400);
   const st0 = await p.evaluate(() => __rr.PF.hook.state());
   if (!st0 || st0.hearts !== kit.hearts || st0.ammo !== kit.ammo || st0.rounds !== kit.rounds) bad("the level should start with the kit from the briefing");
+  /* a moving platform carries the hero; a crumbling block falls if you stand on it; a spring bounces higher than a jump */
+  { const pc = await p.evaluate(() => __rr.PF.hook.pieces()), m = pc.movers[0];
+    await p.evaluate(m => __rr.PF.hook.place(m.x + 16, m.y - 20), m); await p.waitForTimeout(300);
+    const a0 = await p.evaluate(() => __rr.PF.hook.state()); await p.waitForTimeout(500); const a1 = await p.evaluate(() => __rr.PF.hook.state());
+    if (Math.abs(a1.x - a0.x) < 10 || Math.abs(a1.y - (m.y - 14)) > 2) bad(`standing on a moving platform should carry the hero (${a0.x} → ${a1.x}, y ${a1.y})`);
+    const cb = pc.crumbles[1]; await p.evaluate(c => __rr.PF.hook.place(c[0] * 16 + 3, c[1] * 16 - 20), cb); await p.waitForTimeout(900);
+    const pc2 = await p.evaluate(() => __rr.PF.hook.pieces()); if (!pc2.crumbles.some(c => c[2])) bad("standing on a crumbling block should make it fall away");
+    if (shots) await p.screenshot({ path: path.join(shots, "rr-crumble.png") });
+    await p.evaluate(() => { __rr.PF.hook.teleport(3); }); await p.waitForTimeout(300);
+    const hts = await p.evaluate(() => { const map = [...Array(17)].map(() => Array(20).fill(0)); for (let c = 0; c < 20; c++) map[12][c] = 1; map[12][10] = 5;
+      const G = { map, cols: 20, open: true }, top = (x0, jump) => { const b = { x: x0, y: 12 * 16 - 14, vx: 0, vy: 0, ground: true }; let min = b.y; for (let f = 0; f < 90; f++) { __rr.PF.step(G, b, { dir: 0, jump, jumpPressed: jump && f === 0 }); min = Math.min(min, b.y); } return 12 * 16 - 14 - min; };
+      return { jump: top(48, true), spring: (() => { const b = { x: 10 * 16 + 3, y: 12 * 16 - 40, vx: 0, vy: 1, ground: false }; let min = 999, max = 0; for (let f = 0; f < 90; f++) { __rr.PF.step(G, b, { dir: 0, jump: false, jumpPressed: false }); min = Math.min(min, b.y); } return 12 * 16 - 14 - min; })() }; });
+    if (!(hts.spring > hts.jump + 40)) bad(`a spring pad should bounce far higher than a normal jump (jump ${Math.round(hts.jump)} px, spring ${Math.round(hts.spring)} px)`); }
   /* real keys move the hero */
   await p.keyboard.down("ArrowRight"); await p.waitForTimeout(500); await p.keyboard.up("ArrowRight");
   const st1 = await p.evaluate(() => __rr.PF.hook.state()); if (!(st1.x > st0.x + 20)) bad("the right arrow should move the hero");
@@ -252,17 +315,17 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   const after = await p.evaluate(() => __rr.PF.hook.nests()[0].alive); if (after !== before - 1) bad(`a shot on a sentry should knock it out (${before} → ${after})`);
   if (shots) await p.screenshot({ path: path.join(shots, "rr-scope.png") });
   /* gold bullets: every level has more than enough for its sentries, and grabbing one adds a sniper round */
-  const short = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }); const sentries = (L.world === 1 ? 2 : L.world === 4 ? 4 : 3) * G.ents.filter(e => e.t === "nest").length; return G.ents.filter(e => e.t === "ammo").length < sentries + 3; }).map(L => L.id));
-  if (short.length) bad(`levels without enough gold bullets for their sentries: ${short.join(", ")}`);
+  const short = await p.evaluate(() => __stages.filter(L => !L.boss).filter(L => { const G = __rr.PF.gen(L); const sentries = (L.world === 1 ? 2 : L.world === 4 ? 4 : 3) * G.ents.filter(e => e.t === "nest").length; return G.ents.filter(e => e.t === "ammo").length < sentries + 3; }).map(L => L.id));
+  if (short.length) bad(`stages without enough gold bullets for their sentries: ${short.join(", ")}`);
   { await p.evaluate(() => __rr.PF.hook.exitScope()); const r0 = await p.evaluate(() => __rr.PF.hook.state().rounds);
     await p.evaluate(() => __rr.PF.hook.grab()); await p.waitForTimeout(150);
     const r1 = await p.evaluate(() => __rr.PF.hook.state().rounds); if (r1 !== r0 + 1) bad(`grabbing a gold bullet should add a sniper round (${r0} → ${r1})`);
     await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100); }
   /* moving enemies of several kinds from world 1, and two treasure chests in every normal level */
-  const kinds = await p.evaluate(() => { const k = new Set(); for (const L of __rr.LEVELS.filter(L => L.world === 1 && !L.boss)) __rr.PF.gen({ world: 1, boss: false, seed: L.seed }).ents.forEach(e => k.add(e.t)); return [...k]; });
+  const kinds = await p.evaluate(() => { const k = new Set(); for (const L of __stages.filter(L => L.world === 1 && !L.boss)) __rr.PF.gen(L).ents.forEach(e => k.add(e.t)); return [...k]; });
   for (const t of ["walker", "hopper", "roller", "drone"]) if (!kinds.includes(t)) bad(`world 1 should have ${t} enemies`);
-  const noChest = await p.evaluate(() => __rr.LEVELS.filter(L => !L.boss && __rr.PF.gen({ world: L.world, boss: false, seed: L.seed }).ents.filter(e => e.t === "chest").length !== 2).map(L => L.id));
-  if (noChest.length) bad(`levels without two treasure chests: ${noChest.join(", ")}`);
+  const noChest = await p.evaluate(() => __stages.filter(L => !L.boss && __rr.PF.gen(L).ents.filter(e => e.t === "chest").length !== 2).map(L => L.id));
+  if (noChest.length) bad(`stages without two treasure chests: ${noChest.join(", ")}`);
   /* a chest: the game pauses, a right answer opens it and gives loot, the level carries on */
   { await p.evaluate(() => __rr.PF.hook.exitScope());
     const k0 = await p.evaluate(() => __rr.PF.hook.kit());
@@ -288,8 +351,8 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.keyboard.press("KeyE"); await p.waitForTimeout(150);
   if (!(await p.evaluate(() => __rr.PF.hook.nests()[0].card))) bad("E should show the ridge report");
   if (shots) await p.screenshot({ path: path.join(shots, "rr-report.png") });
-  await p.waitForTimeout(500); await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
-  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("E again should leave the scope");
+  await p.waitForTimeout(500); await p.keyboard.press("Space"); await p.waitForTimeout(100);
+  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("SPACE on the ridge report should leave the scope");
   await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.gates()[0].col - 3)); await p.keyboard.down("ArrowRight"); await p.waitForTimeout(900); await p.keyboard.up("ArrowRight");
   const gx = await p.evaluate(() => __rr.PF.hook.state().x), gcol = await p.evaluate(() => __rr.PF.hook.gates()[0].col);
   if (gx > gcol * 16) bad("a shut laser gate should block the way");
@@ -307,20 +370,37 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   if (!((await p.evaluate(() => __rr.PF.hook.nests()[0].score)) > sc0)) bad("shots after the gate opens should keep adding to the score");
   await p.evaluate(() => __rr.PF.hook.setRounds(0)); await p.waitForTimeout(700);
   if (!(await p.evaluate(() => __rr.PF.hook.nests()[0].card))) bad("running out of rounds after the gate opens should show the ridge report");
-  /* any key closes the report (J here), and an empty rifle can't reopen an open ridge */
-  await p.waitForTimeout(500); await p.keyboard.press("KeyJ"); await p.waitForTimeout(150);
-  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("any key (J) should close the ridge report");
+  /* the report has the commentator's roast; J doesn't close it, SPACE does; an empty rifle can't reopen an open ridge */
+  { const r = await p.evaluate(() => __rr.PF.roast({ shots: 5, hits: 0, acc: 0, ko: 0, head: 0 })); if (!/./.test(r)) bad("the commentator should have something to say"); }
+  await p.waitForTimeout(1500); if (shots) await p.screenshot({ path: path.join(shots, "rr-roast.png") });
+  await p.keyboard.press("KeyJ"); await p.waitForTimeout(150);
+  if (!(await p.evaluate(() => __rr.PF.hook.state().scope))) bad("J should not close the ridge report (only SPACE)");
+  await p.keyboard.press("Space"); await p.waitForTimeout(150);
+  if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("SPACE should close the ridge report");
   await p.keyboard.press("KeyE"); await p.waitForTimeout(150);
   if (await p.evaluate(() => __rr.PF.hook.state().scope)) bad("with no rounds left, an open ridge shouldn't show its report again");
   await p.waitForTimeout(800);
   /* reach the flag */
   await p.evaluate(() => __rr.PF.hook.exitScope());
   await p.evaluate(() => __rr.PF.hook.teleport(__rr.PF.hook.state().cols - 5)); await p.waitForTimeout(1600);
-  if (!(await p.isVisible("#scr-result"))) bad("reaching the flag should finish the level");
-  const rec = await p.evaluate(() => __rr.S().levels["1-frac"]); if (!rec || !rec.cleared || rec.stars !== 1) bad("clearing with 2/4 should save 1 star");
-  await p.reload(); const open2 = await p.$$eval(".node.lock", n => n.length); if (open2 !== 14) bad("after a reload level 2 should be open");
+  if (!(await p.isVisible("#scr-result"))) bad("reaching the flag should finish the stage");
+  if (!/STAGE 1 OF 3 CLEAR/.test(await p.textContent("#scr-result"))) bad("the first flag of a big level should say stage 1 of 3 is clear");
+  { const r1 = await p.evaluate(() => __rr.S().levels["1-L1"]); if (!r1 || r1.cleared || r1.at !== 1) bad("after stage 1 the level is not cleared yet, and the place (stage 2) is saved"); }
+  /* the place is kept: back on the map (and after a reload) the level carries on from stage 2 */
+  await p.reload(); await p.click('.node[data-l="1-L1"]');
+  if (!/Carry on: stage 2/.test(await p.textContent("#lvcard"))) bad("the level card should offer to carry on from stage 2");
+  await p.click("#btn-go");
+  if ((await p.evaluate(() => __rr.B().qs.map(q => q.track).join())) !== "flaw,flaw,flaw,flaw") bad("stage 2 of level 1 is the second skill (spot the mistake)");
+  for (const st of [2, 3]) {
+    for (let i = 0; i < 4; i++) { await p.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await p.click("#btn-next"); }
+    await p.click("#btn-play"); await p.waitForTimeout(300); await p.evaluate(() => __rr.PF.hook.win()); await p.waitForTimeout(1300);
+    if (st === 2) { if (!/STAGE 2 OF 3 CLEAR/.test(await p.textContent("#scr-result"))) bad("stage 2 should end with its own clear screen"); await p.click("#btn-nextst"); }
+  }
+  if (!/LEVEL CLEAR/.test(await p.textContent("#scr-result"))) bad("the third stage should clear the whole level");
+  const rec = await p.evaluate(() => __rr.S().levels["1-L1"]); if (!rec || !rec.cleared || rec.stars !== 2 || rec.at) bad(`10 of 12 right over the three stages should clear the level with 2 stars (${JSON.stringify(rec)})`);
+  await p.reload(); const open2 = await p.$$eval(".node.lock", n => n.length); if (open2 !== 3) bad("after a reload level 2 should be open");
   /* ducking a glint and the shells */
-  await p.evaluate(() => __rr.startBrief("2-flaw"));
+  await p.evaluate(() => __rr.startBrief("2-L1", 1));
   for (let i = 0; i < 4; i++) { await p.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await p.click("#btn-next"); }
   await p.click("#btn-play"); await p.waitForTimeout(300);
   await p.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(150); await p.keyboard.press("KeyE"); await p.waitForTimeout(100);
@@ -343,6 +423,72 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     await p.evaluate(() => { __rr.PF.hook.aimAt(0, "body"); __rr.PF.hook.fire(); __rr.PF.hook.quiet(); }); await p.waitForTimeout(1500);
     if (await p.evaluate(() => __rr.PF.hook.incoming())) bad("shooting an aiming sentry first should stop its shot"); }
   await p.evaluate(() => __rr.PF.hook.aimAt(0, "body")); await p.evaluate(() => __rr.PF.hook.fire()); await p.waitForTimeout(80);
+  /* surprise visitors: a warning, then a dog, a dinosaur or an old man on a bike charges along the level; touching one knocks you out */
+  { const pc = await open({ width: 1280, height: 800 });
+    const toLevel = async (wrong = 0) => { await pc.evaluate(() => { __rr.startBrief("1-L1", 0); }); for (let i = 0; i < 4; i++) { await pc.evaluate(w => { const B = __rr.B(), q = B.qs[B.i]; __rr.answer(B.i < w ? (q.answer + 1) % q.options.length : q.answer); }, wrong); await pc.click("#btn-next"); } await pc.click("#btn-play"); await pc.waitForTimeout(300); };
+    await toLevel();
+    for (const k of ["dog", "dino", "bike"]) {
+      const w = await pc.evaluate(k => __rr.PF.hook.critter(k, -1), k);
+      if (!w || w.warn !== k) bad(`a ${k} should be announced with a warning first`);
+      if (shots && k === "dino") await pc.screenshot({ path: path.join(shots, "rr-critter-warn.png") });
+      await pc.waitForTimeout(1500); const c0 = await pc.evaluate(() => __rr.PF.hook.critter());
+      if (!c0 || c0.k !== k) { bad(`after the warning a ${k} should charge in (${JSON.stringify(c0)})`); continue; }
+      await pc.waitForTimeout(500); const c1 = await pc.evaluate(() => __rr.PF.hook.critter());
+      if (!c1 || !(c1.x < c0.x)) bad(`the ${k} should run along the level (${JSON.stringify([c0, c1])})`);
+      if (c1 && !(c1.y > 0 && c1.y < 272)) bad(`the ${k} should be on the ground (y ${c1 && c1.y})`);
+      if (shots && k === "dino") await pc.screenshot({ path: path.join(shots, "rr-critter.png") });
+      await pc.evaluate(() => __rr.PF.stop()); await toLevel();
+    }
+    /* touching one knocks you out, even with hearts to spare (no shield: one briefing answer wrong) */
+    await pc.evaluate(() => __rr.PF.stop()); await toLevel(1);
+    await pc.evaluate(() => __rr.PF.hook.critter("dog", -1)); await pc.waitForTimeout(1300);
+    const hit = await pc.evaluate(() => { const c = __rr.PF.hook.critter(); if (c) __rr.PF.hook.critter("onHero"); return !!c; });
+    for (let i = 0; i < 20 && !(await pc.isVisible("#scr-result")); i++) await pc.waitForTimeout(150);
+    if (!hit || !/OUT OF HEARTS/.test(await pc.textContent("#scr-result"))) bad("touching a runaway visitor should knock you out");
+    await pc.evaluate(() => localStorage.clear()); await pc.close(); }
+  /* the gear card before the shooting, and the vehicles (with both switched back on) */
+  { const pv = await open({ width: 1280, height: 800 });
+    await pv.evaluate(() => { window.__noIntro = false; window.__noVeh = false; __rr.startBrief("3-L1", 0); });
+    for (let i = 0; i < 4; i++) { await pv.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await pv.click("#btn-next"); }
+    await pv.click("#btn-play"); await pv.waitForTimeout(300);
+    await pv.evaluate(() => { const n = __rr.PF.hook.nests()[0]; __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await pv.waitForTimeout(150); await pv.keyboard.down("ArrowDown"); await pv.waitForTimeout(500);
+    if (!(await pv.evaluate(() => __rr.PF.hook.intro()))) bad("entering a nest should first show the gear card");
+    if (shots) await pv.screenshot({ path: path.join(shots, "rr-gear.png") });
+    /* the bug David found: ▼ held to open the nest and let go while the gear card is up must not stay "held" */
+    await pv.keyboard.down("ArrowDown"); await pv.waitForTimeout(200); await pv.keyboard.up("ArrowDown"); await pv.waitForTimeout(100);
+    await pv.keyboard.press("KeyJ"); await pv.waitForTimeout(100); if (!(await pv.evaluate(() => __rr.PF.hook.intro()))) bad("only SPACE should close the gear card");
+    await pv.keyboard.press("Space"); await pv.waitForTimeout(150); if (await pv.evaluate(() => __rr.PF.hook.intro())) bad("SPACE should close the gear card and start the shooting");
+    { const y0 = await pv.evaluate(() => __rr.PF.hook.state().sy); await pv.waitForTimeout(600); const y1 = await pv.evaluate(() => __rr.PF.hook.state().sy);
+      if (Math.abs(y1 - y0) > 1) bad(`the crosshair should stay still when no key is held (it drifted ${y0} → ${y1})`);
+      await pv.keyboard.down("ArrowUp"); await pv.waitForTimeout(300); await pv.keyboard.up("ArrowUp"); const y2 = await pv.evaluate(() => __rr.PF.hook.state().sy);
+      if (!(y2 < y1 - 10)) bad(`↑ should move the crosshair up (${y1} → ${y2})`); }
+    await pv.evaluate(() => __rr.PF.hook.vehOff(true));
+    /* a plane drops a paratrooper: a sky shot knocks it out */
+    await pv.evaluate(() => __rr.PF.hook.spawnVeh("plane"));
+    let ch = null; for (let k = 0; k < 40 && !ch; k++) { await pv.waitForTimeout(100); ch = (await pv.evaluate(() => __rr.PF.hook.vehicles())).chutes[0]; }
+    if (!ch) bad("a plane should drop a paratrooper");
+    else { await pv.waitForTimeout(300); const c = (await pv.evaluate(() => __rr.PF.hook.vehicles())).chutes[0]; const ko0 = (await pv.evaluate(() => __rr.PF.hook.vehicles())).stat.ko;
+      await pv.evaluate(c => { __rr.PF.hook.aimPoint(c.x, c.y + 4); __rr.PF.hook.fire(); }, c); await pv.waitForTimeout(150);
+      const v1 = await pv.evaluate(() => __rr.PF.hook.vehicles()); if (v1.stat.ko !== ko0 + 1 || v1.chutes.length) bad(`a shot on a paratrooper should knock it out (${JSON.stringify(v1.stat)})`); }
+    if (shots) await pv.screenshot({ path: path.join(shots, "rr-plane.png") });
+    /* a helicopter takes 3 hits; a tank's hatch counts double */
+    for (const [k, hits] of [["heli", 3], ["tank", 2]]) {
+      await pv.waitForTimeout(3000); await pv.evaluate(k => __rr.PF.hook.spawnVeh(k), k);
+      for (let t = 0; t < 60; t++) { await pv.waitForTimeout(100); const v = (await pv.evaluate(() => __rr.PF.hook.vehicles())).veh; if (v && v.x > 60 && v.x < 420 && v.state !== "in") break; }
+      if (shots) await pv.screenshot({ path: path.join(shots, `rr-${k}.png`) });
+      const sc0 = (await pv.evaluate(() => __rr.PF.hook.vehicles())).stat.score; let boomSeen = false;
+      for (let h = 0; h < hits; h++) { await pv.evaluate(k => { const v = __rr.PF.hook.vehicles().veh; if (v) { __rr.PF.hook.aimPoint(v.x, k === "tank" ? v.y - 23 : v.y); __rr.PF.hook.fire(); } }, k); await pv.waitForTimeout(h === hits - 1 ? 150 : 700); }
+      boomSeen = (await pv.evaluate(() => __rr.PF.hook.fx())).includes("boom");
+      if (shots && k === "heli") await pv.screenshot({ path: path.join(shots, "rr-boom.png") });
+      await pv.waitForTimeout(550);
+      const vs = await pv.evaluate(() => __rr.PF.hook.vehicles()), v = vs.veh;
+      if (v && !v.dead) bad(`${k}: ${hits} ${k === "tank" ? "hatch hits" : "hits"} should bring it down (${JSON.stringify(v)})`);
+      /* David: three hits and it explodes for mega points */
+      if (!boomSeen) bad(`${k}: the last hit should blow it up (an explosion)`);
+      if (!(vs.stat.score - sc0 >= 1500)) bad(`${k}: blowing it up should score mega points (got ${vs.stat.score - sc0})`);
+    }
+    if (!((await pv.evaluate(() => __rr.PF.hook.vehicles())).stat.veh >= 3)) bad("vehicles and sky shots should be counted for the report");
+    await pv.evaluate(() => localStorage.clear()); await pv.close(); }
   /* losing: one retry with the same kit, then a new briefing */
   await p.evaluate(() => __rr.PF.hook.lose()); await p.waitForTimeout(900);
   if (!(await p.isVisible("#btn-retry"))) bad("losing should offer a retry with the same kit");
@@ -352,23 +498,67 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
   await p.evaluate(() => __rr.startBrief("1-boss"));
   if ((await p.evaluate(() => __rr.B().qs.length)) !== 6) bad("a boss briefing has 6 questions");
   const subs = await p.evaluate(() => __rr.B().qs.map(q => __rr.TRACKS.find(t => t.id === q.track).subject).sort().join(","));
-  if (subs !== "maths,maths,reading,reading,thinking,thinking") bad(`a boss briefing mixes 2 of each subject (${subs})`);
+  if (subs !== "maths,maths,maths,reading,thinking,thinking") bad(`a boss briefing mixes 3 maths, 2 thinking and 1 cloze (${subs})`);
   const bossSteps = await p.evaluate(() => __rr.B().qs.map(q => q.rung).join(","));
   if (bossSteps !== "1,2,3,3,4,4") bad(`a boss briefing should climb 1, 2, 3, 3, 4, 4 (got ${bossSteps})`);
   for (let i = 0; i < 6; i++) { await p.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await p.click("#btn-next"); }
   await p.click("#btn-play"); await p.waitForTimeout(300);
-  await p.evaluate(() => { const n = __rr.PF.hook.nests().find(x => x.boss); __rr.PF.hook.teleport(Math.floor(n.x / 16)); }); await p.waitForTimeout(250);
-  if (!(await p.evaluate(() => __rr.PF.hook.state().scope))) bad("reaching the boss nest should open the scope");
-  for (let k = 0; k < 10 && !(await p.isVisible("#scr-result")); k++) { await p.evaluate(() => { __rr.PF.hook.aimAt(0, "head"); __rr.PF.hook.fire(); }); await p.waitForTimeout(250); }
-  await p.waitForTimeout(1200);
-  if (!(await p.evaluate(() => (__rr.S().levels["1-boss"] || {}).cleared))) bad("three headshots should beat the world 1 boss");
+  /* the boss fight: the arena closes, the boss drops in, and it can be beaten the classic way */
+  if (await p.evaluate(() => __rr.PF.hook.nests().some(n => n.boss))) bad("the boss is a giant arena fight now, not a sniper duel");
+  await p.evaluate(() => __rr.PF.hook.toArena()); await p.waitForTimeout(2600);
+  const b0 = await p.evaluate(() => __rr.PF.hook.boss());
+  if (!b0 || b0.name !== "RUSTJAW" || b0.state === "intro" || b0.hp !== b0.max) bad(`entering the arena should bring in the world 1 boss at full health (${JSON.stringify(b0)})`);
+  if (shots) await p.screenshot({ path: path.join(shots, "rr-boss.png") });
+  /* a shot while the core is shut only clangs; after a stomp the core glows and a shot hurts it */
+  await p.evaluate(() => __rr.PF.hook.shootCore()); await p.waitForTimeout(200);
+  if ((await p.evaluate(() => __rr.PF.hook.boss().hp)) !== b0.max) bad("a blaster shot on the shut core should do nothing");
+  await p.evaluate(() => __rr.PF.hook.bossDo("stomp")); await p.waitForTimeout(1050);
+  { const b = await p.evaluate(() => __rr.PF.hook.boss()); if (!b.core || b.waves < 1) bad(`a stomp should send shockwaves and open the core (${JSON.stringify(b)})`); }
+  if (shots) await p.screenshot({ path: path.join(shots, "rr-boss-stomp.png") });
+  await p.evaluate(() => __rr.PF.hook.shootCore()); await p.waitForTimeout(200);
+  if ((await p.evaluate(() => __rr.PF.hook.boss().hp)) !== b0.max - 1) bad("a blaster shot on the glowing core should do 1 damage");
+  /* rolling into the wall dazes it: a stomp on its head does 3 */
+  await p.evaluate(() => __rr.PF.hook.bossDo("roll"));
+  for (let k = 0; k < 40 && (await p.evaluate(() => __rr.PF.hook.boss().state)) !== "stun"; k++) await p.waitForTimeout(100);
+  if ((await p.evaluate(() => __rr.PF.hook.boss().state)) !== "stun") bad("rolling into the wall should daze the boss");
+  if (shots) await p.screenshot({ path: path.join(shots, "rr-boss-dazed.png") });
+  const hpS = await p.evaluate(() => __rr.PF.hook.boss().hp);
+  await p.evaluate(() => __rr.PF.hook.stompBoss()); await p.waitForTimeout(400);
+  { const b = await p.evaluate(() => __rr.PF.hook.boss()); if (b.hp !== hpS - 3) bad(`a stomp on the dazed boss's head should do 3 damage (${hpS} → ${b.hp})`); if (b.phase !== 2) bad(`losing a third of its health should start phase 2 (phase ${b.phase}, hp ${b.hp}/${b.max})`); }
+  /* the phase change drops a power crate: a bonus question for loot */
+  await p.waitForTimeout(1000);
+  if (!(await p.evaluate(() => __rr.PF.hook.toChest()))) bad("a power crate should fall when the boss loses a third of its health");
+  await p.waitForTimeout(250);
+  if (!(await p.isVisible("#chest")) || !/POWER CRATE/.test(await p.textContent("#chest"))) bad("touching the power crate should ask its question");
+  if (await p.evaluate(() => !!__rr.chest())) { await p.evaluate(() => __rr.chestAnswer(__rr.chest().answer)); await p.waitForTimeout(100); await p.evaluate(() => __rr.closeChest()); await p.waitForTimeout(100); }
+  /* finish it */
+  await p.evaluate(() => { __rr.PF.hook.bossDo("idle"); __rr.PF.hook.bossHp(1); __rr.PF.hook.bossDo("vent"); }); await p.waitForTimeout(100);
+  await p.evaluate(() => __rr.PF.hook.shootCore()); await p.waitForTimeout(300);
+  if ((await p.evaluate(() => __rr.PF.hook.boss().state)) !== "dying") bad("the last hit should knock the boss out");
+  for (let k = 0; k < 40 && !(await p.isVisible("#scr-result")); k++) await p.waitForTimeout(150);
+  if (!(await p.evaluate(() => (__rr.S().levels["1-boss"] || {}).cleared))) bad("beating the boss should clear the world 1 boss level");
+  if (!/RUSTJAW IS DEFEATED/.test(await p.textContent("#scr-result"))) bad("the result should name the beaten boss");
+  /* every world has its own boss */
+  { const names = []; for (const w of [2, 3, 4]) { await p.evaluate(w => { __rr.startBrief(w + "-boss"); }, w); for (let i = 0; i < 6; i++) { await p.evaluate(() => { const B = __rr.B(); __rr.answer(B.qs[B.i].answer); }); await p.click("#btn-next"); }
+      await p.click("#btn-play"); await p.waitForTimeout(200); await p.evaluate(() => __rr.PF.hook.toArena()); await p.waitForTimeout(400); names.push(await p.evaluate(() => (__rr.PF.hook.boss() || {}).name));
+      if (shots && w === 4) { await p.waitForTimeout(2200); await p.screenshot({ path: path.join(shots, "rr-boss4.png") }); } await p.evaluate(() => __rr.PF.stop()); }
+    if (names.join() !== "FROSTGEAR,THORNBARK,THE STORM WARDEN") bad(`worlds 2–4 should each have their own boss (${names.join()})`); }
+  /* progress from the first layout (one level per skill) carries over */
+  { const pm = await open({ width: 1280, height: 800 });
+    await pm.evaluate(() => localStorage.setItem("prac4.v1", JSON.stringify({ v: 1, levels: { "1-frac": { cleared: true, stars: 3, best: 4 }, "1-flaw": { cleared: true, stars: 2, best: 3 }, "1-word": { cleared: true, stars: 3, best: 4 }, "1-data": { cleared: true, stars: 1, best: 2 }, "1-L2": { cleared: true, stars: 3 } }, seen: {}, seed: 5, coins: 9, sound: true, world: 1, log: [] })));
+    await pm.reload();
+    const r = await pm.evaluate(() => __rr.S().levels["1-L1"]), lk = await pm.$$eval(".node.lock", n => n.length);
+    if (!r || !r.cleared || r.stars !== 2 || lk !== 3) bad(`old progress should carry over: level 1 cleared (all its skills were) with the lowest stars, level 2 open (${JSON.stringify(r)}, ${lk} locked)`);
+    /* a big-level record from the five-level layout held other skills: it is dropped (level 2 now needs data, claim and time) */
+    if (await pm.evaluate(() => __rr.S().levels["1-L2"])) bad("a level record from the old five-level layout should be dropped");
+    await pm.evaluate(() => localStorage.clear()); await pm.close(); }
   /* practice mode: everything open, coach notes, nothing saved */
   const saved = await p.evaluate(() => localStorage.getItem("prac4.v1"));
   await p.evaluate(() => sessionStorage.setItem("prac.admin", "1"));
   await p.goto(url + "?admin=1");
   if ((await p.$$eval(".node.lock", n => n.length)) !== 0) bad("practice mode should open every level");
   if (!(await p.isVisible("#coach"))) bad("practice mode should show the coach sidebar");
-  await p.click('.tab[data-w="3"]'); await p.click('.node[data-l="3-frac"]');
+  await p.click('.tab[data-w="3"]'); await p.click('.node[data-l="3-L1"]');
   if (!/PT1 Maths Q4/.test(await p.textContent("#coach-body"))) bad("the coach notes should list the sample questions");
   await p.click("#btn-go");
   const coach = await p.textContent("#coach-body");
@@ -396,12 +586,12 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
       return out;
     });
     if (off.length) bad(`at ${vp.width}×${vp.height}${admin ? " with the coach sidebar" : ""} these need scrolling to reach the options or Next: ${off.slice(0, 6).join(", ")}${off.length > 6 ? ` … (${off.length})` : ""}`);
-    if (shots && vp.width === 1366 && admin) { await pg.evaluate(() => { __rr.preview(HAND.find(q => q.id === "ri4a")); __rr.answer(0); }); await pg.screenshot({ path: path.join(shots, "rr-monitor.png") }); }
+    if (shots && vp.width === 1366 && admin) { await pg.evaluate(() => { __rr.preview(HAND.find(q => q.id === "cz4-4")); __rr.answer(0); }); await pg.screenshot({ path: path.join(shots, "rr-monitor.png") }); }
     await pg.close();
   }
   /* the keyboard answers and moves on */
   { const pg = await open({ width: 1366, height: 768 });
-    await pg.evaluate(() => __rr.startBrief("1-frac")); const i0 = await pg.evaluate(() => __rr.B().i);
+    await pg.evaluate(() => __rr.startBrief("1-L1")); const i0 = await pg.evaluate(() => __rr.B().i);
     await pg.keyboard.press("b"); await pg.keyboard.press("Enter");
     if ((await pg.evaluate(() => __rr.B().i)) !== i0 + 1 || (await pg.evaluate(() => __rr.B().res[0])) === undefined) bad("keys A–E should answer and Enter should go to the next question");
     await pg.close(); }
@@ -417,7 +607,7 @@ console.log(`content: ${TRACKS.length} tracks, ${HAND.length} hand-written quest
     return out;
   });
   if (wide.length) bad(`too wide for a phone: ${wide.slice(0, 8).join(", ")}${wide.length > 8 ? " …" : ""}`);
-  if (shots) { await ph.evaluate(() => __rr.preview(HAND.find(q => q.id === "rs2a"))); await ph.screenshot({ path: path.join(shots, "rr-phone.png"), fullPage: true }); }
+  if (shots) { await ph.evaluate(() => __rr.preview(HAND.find(q => q.id === "cz2-2"))); await ph.screenshot({ path: path.join(shots, "rr-phone.png"), fullPage: true }); }
   await browser.close();
   if (errs.length) bad("page errors: " + [...new Set(errs)].slice(0, 5).join(" | "));
   finish();

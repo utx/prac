@@ -223,6 +223,13 @@ const MENU = TESTS.filter(t => t.status !== "review"), HELD = TESTS.filter(t => 
 const PIN_HASH = "88e4eb6c3c041225c1cec20d38f53a35bf13c9909242528f10224affc9a473b2"; // sha256("prac-admin:" + PIN)
 const SECTION_NAMES = { reading: "Reading", thinking: "Thinking Skills", maths: "Maths" };
 const app = document.getElementById("app");
+/* Ridge Runner's saved game on this device (the game keeps it in this browser) */
+function rrLoad() { try { const s = JSON.parse(localStorage.getItem("prac4.v1")); return s && typeof s === "object" ? s : null; } catch (e) { return null; } }
+function rrSummary() {
+  const s = rrLoad(); if (!s) return "On this device: not played yet.";
+  const lv = Object.entries(s.levels || {}).filter(([k, v]) => /-(L\d|boss)$/.test(k) && v.cleared).length, seen = Object.keys(s.seen || {}).length;
+  return `On this device: ${lv} level${lv === 1 ? "" : "s"} cleared (of 24), ${seen} question${seen === 1 ? "" : "s"} or question types seen.`;
+}
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 function load() {
@@ -431,8 +438,11 @@ function render() {
     <p class="sub">The game lives at <a href="../prac3/index.html">prac3/</a>. “Practice” opens it with every gun and 3 of each item owned, and buttons to jump to any storm circle or the boss. Nothing is saved, so the real game progress on this device is not touched. The daily Fortnite-time limit is set inside the game, under “For grown-ups”.</p>
     <a class="btn primary" id="game3-practice" href="../prac3/index.html?admin=1">Practice</a></div>
   <div class="card"><h2>Ridge Runner (the platform game)</h2>
-    <p class="sub">The game lives at <a href="../prac4/index.html">prac4/</a>. Each level is a short briefing of questions (more right answers = better kit), then a pixel platform level with sniper nests. “Practice” opens every level and shows a coach sidebar for each question: the sample-paper questions it builds toward, the underlying skill, how this step builds it, and the traps. Nothing is saved.</p>
-    <a class="btn primary" id="game4-practice" href="../prac4/index.html?admin=1">Practice</a></div>`;
+    <p class="sub">The game lives at <a href="../prac4/index.html">prac4/</a> and is on the student page too. Each world has four big levels of three stages (every stage starts with a short briefing of questions: more right answers = better kit) and then a giant boss. “Practice” opens every level and shows a coach sidebar for each question: the sample-paper questions it builds toward, the underlying skill, how this step builds it, and the traps. Nothing is saved.</p>
+    <p class="sub">${rrSummary()}</p>
+    <span class="actions"><a class="btn primary" id="game4-practice" href="../prac4/index.html?admin=1">Practice</a> <a class="btn" id="game4-play" href="../prac4/index.html">Play (the real game)</a>
+      <button class="btn" id="rr-reset-seen">Reset question memory</button> <button class="btn" id="rr-reset-all">Reset all progress</button></span>
+    <p class="sub" id="rr-msg">The resets work on this device's browser (the game saves its progress on the device it is played on), so use them on the computer or tablet he plays on. “Reset question memory” forgets which questions he has seen, so every question counts as new again; his levels, stars and high scores stay. “Reset all progress” starts the game from the beginning.</p></div>`;
   const testsTable = `<div class="card"><h2>All tests</h2><p class="sub">“Practice” opens a test without recording anything. You can also mark tests done or not done here.</p>
     <div class="tw"><table class="t"><tr><th>Test</th><th>Reading</th><th>Status</th><th>First score</th><th>R / T / M</th><th>Time</th>${reviewRows ? "<th>Your review</th>" : ""}<th></th></tr>
     ${[...MENU].reverse().map(t => {
@@ -485,6 +495,19 @@ function render() {
     ${heldCard}${tiles}${focus}<div class="grid2">${bySection}${byFormat}</div><div style="height:18px"></div>${scoreChart}${byType}${habits}${mistakes}${fbCard}${gameCard}${testsTable}${data}`;
 
   app.querySelectorAll("[data-approve]").forEach(b => b.onclick = () => approveTest(+b.dataset.approve, b));
+  /* Ridge Runner resets (this device's saved game) */
+  const rrMsg = t => { const m = document.getElementById("rr-msg"); if (m) m.innerHTML = `<b>${esc(t)}</b>`; };
+  document.getElementById("rr-reset-seen").onclick = () => {
+    if (!confirm("Forget which Ridge Runner questions have been seen on this device? Levels, stars and high scores stay.")) return;
+    const s = rrLoad(), n = s ? Object.keys(s.seen || {}).length : 0;
+    try { if (s) { s.seen = {}; localStorage.setItem("prac4.v1", JSON.stringify(s)); } localStorage.removeItem("prac4.practice.seen"); } catch (e) {}
+    rrMsg(n ? `Done: ${n} seen question${n === 1 ? "" : "s"} forgotten. Every question counts as new again.` : "Done: there was no question memory on this device (practice mode's memory was cleared too).");
+  };
+  document.getElementById("rr-reset-all").onclick = () => {
+    if (!confirm("Start Ridge Runner again from the very beginning on this device? Levels, stars, coins, high scores and the question memory will all be cleared.")) return;
+    try { localStorage.removeItem("prac4.v1"); localStorage.removeItem("prac4.practice.seen"); } catch (e) {}
+    rrMsg("Done: Ridge Runner starts from the beginning on this device.");
+  };
   app.querySelectorAll("[data-flag]").forEach(b => b.onclick = () => {
     const s = load(), v = b.dataset.flag;
     const wasDone = !!(s.flags[v] && s.flags[v].completed);
